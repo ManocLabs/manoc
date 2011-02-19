@@ -1,0 +1,223 @@
+[% META 
+   title='Ip Address View'
+   use_table=1
+-%]
+
+
+<div id="tabs">	
+  <ul>
+     <li><a href="#tabs-1">Mac Address Association</a></li>
+     <li><a href="#tabs-2">Subnet</a></li>
+     <li><a href="#tabs-3">AD Hotname</a></li>
+     <li><a href="#tabs-4">AD Logons</a></li>
+     <li><a href="#tabs-5">DHCP Lease</a></li>
+     <li><a href="#tabs-6">DHCP Reservation</a></li>
+     <li><a href="#tabs-7">Notes</a></li>
+ </ul>
+
+<div id="tabs-1">
+[% FOREACH r IN arp_results %]
+   [% IF loop.first %]
+      [% init_table('arp_res', undef, {sortby => 3, order => 'desc'}) %]
+
+    <table class="display" id="arp_res">
+      <thead>  
+         <tr>
+ 	 <th>Mac Address</th>
+ 	 <th>Vlan</th>
+ 	 <th>From</th>
+         <th>To</th>
+         </tr>
+      </thead>  
+      <tbody>
+  [% END %]
+         <tr>
+ 	 <td> <a href="[% c.uri_for('/mac',r.macaddr) %]">[% r.macaddr %]</a></td>
+ 	 <td> <a href="[% c.uri_for_action('vlan/view',[r.vlan]) %]">[% r.vlan %]</a></td>
+ 	 <td> [% r.firstseen %]</td>
+	 <td> [% r.lastseen  %]</td>
+         </tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+[% END %]
+
+
+</div>
+
+  <div id="tabs-2">	
+ 
+    [% FOREACH s IN subnet %]
+      [% IF loop.first %]
+      [% init_table('subnet') %]
+       <table class="display" id="subnet">
+         <thead>  
+         	<tr>
+ 	 	 <th>Subnet Name</th>
+ 	 	<th>From</th>
+ 	 	<th>To</th>
+           </tr>
+           </thead>  
+         <tbody>
+      [% END %]
+            <tr>
+ 	 <td><a href="[% c.uri_for_action('iprange/view',[s.subnet_name]) %]"> 
+              [% s.subnet_name %]</a></td>
+  	 <td> [% s.from_addr %]</td>
+ 	 <td> [% s.to_addr %] </td>
+	</tr>
+      [% IF loop.last %]
+      </tbody>
+    </table>
+     [% END %]
+    [% END %]
+
+   </div>
+
+   <div id="tabs-3">	
+   [% FOREACH h IN hostnames %]
+      [% IF loop.first %]
+       [% init_table('hostname',undef, {sortby=>2,order=>'desc'}) %]
+       <table class="display" id="hostname">
+         <thead>  
+         	<tr>
+ 	 	 <th>Name</th>
+ 	 	<th>From</th>
+ 	 	<th>To</th>
+           </tr>
+           </thead>  
+         <tbody>
+      [% END %]
+            <tr>
+ 	 <td>[% h.name %]</td>
+  	 <td> [% h.firstseen %]</td>
+ 	 <td> [% h.lastseen %]  </td>
+	</tr>
+      [% IF loop.last %]
+      </tbody>
+    </table>
+     [% END %]
+    [% END %]
+
+
+   </div>
+
+   <div id="tabs-4">	
+[% FOREACH h IN logons %]
+      [% IF loop.first %]
+       [% init_table('logons',undef, {sortby=>2,order=>'desc'}) %]
+       <table class="display" id="logons">
+         <thead>  
+         	<tr>
+ 	 	 <th>Name</th>
+ 	 	<th>From</th>
+ 	 	<th>To</th>
+           </tr>
+           </thead>  
+         <tbody>
+      [% END %]
+            <tr>
+ 	 <td>[% h.user %]</td>
+  	 <td> [% h.firstseen %]</td>
+ 	 <td> [% h.lastseen %]  </td>
+	</tr>
+      [% IF loop.last %]
+      </tbody>
+    </table>
+     [% END %]
+    [% END %]
+
+   </div>
+
+
+
+<div id="tabs-5">
+[% IF (leases.0) %]
+[% FOREACH r IN leases %]
+   [% IF loop.first %]
+   [% init_table('leases') %]
+    <table class="display" id="leases">
+      <thead>  
+         <tr>
+ 	 <th>Server</th>
+ 	 <th>Mac Address</th>
+ 	 <th>From</th>
+ 	 <th>To</th>
+ 	 <th>Status</th>
+ 	 <th>Hostname</th>
+         </tr>
+      </thead>  
+      <tbody>
+   [% END %]
+         <tr>
+ 	 <td>[% r.server -%]</td>
+ 	 <td>[% print_mac(r.macaddr) %]</td>
+	 <td>[% r.start %]</td>
+ 	 <td>[% r.end %] </td>
+ 	 <td>[% r.status %] </td>
+ 	 <td>[% r.hostname %] </td>
+	</tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+ [% END %]
+
+[% ELSE %]
+      [% PROCESS  'message.tt' msg='There are no DHCP leases for this MAC' %]
+[% END %] 
+
+</div>     <!-- end tabs-5 -->
+
+<div id="tabs-6">
+[% IF (reservations.0) %]
+[% FOREACH r IN reservations %]
+   [% IF loop.first %]
+    [% init_table('res') %]
+    <table class="display" id="res">
+      <thead>  
+         <tr>
+ 	 <th>Server</th>
+ 	 <th>Mac Address</th>
+ 	 <th>Name</th>
+ 	 <th>Hostname</th>
+         </tr>
+      </thead>  
+      <tbody>
+   [% END %]
+         <tr>
+ 	 <td>[% r.server %]</td>
+ 	 <td>[% print_mac(r.macaddr) %]</td>
+	 <td>[% r.name %]</td>
+ 	 <td>[% r.hostname %] </td>
+	</tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+ [% END %]
+
+[% ELSE %]
+      [% PROCESS  'message.tt' msg='There are no DHCP reservations for this MAC' %]
+[% END %] 
+
+</div> <!-- end tabs-6 -->
+
+
+<div id="tabs-7">	
+ <p> [% notes | html %] </p>
+  <div class="buttons">	
+    [% IF notes %]
+    <a href="[% c.uri_for_action('ip/edit_notes',[id]) %]">[% ui_icon('pencil') %]Edit</a>
+    <a href="[% c.uri_for_action('ip/delete_notes',[id]) %]">[%
+ ui_icon('closethick') %]Delete</a>
+    [% ELSE %]
+    <a href="[% c.uri_for_action('ip/edit_notes',[id]) %]">[% ui_icon('plusthick') %] Add a Note</a>
+    [% END %]
+    </div>      
+
+  </div>      
+
+  
+</div><!-- end tabs -->

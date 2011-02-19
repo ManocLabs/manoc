@@ -1,0 +1,60 @@
+[% link_css.push(               
+      c.uri_for('/static/css/theme/jquery-ui-1.8.4.custom.css'),
+      )
+-%]
+[% link_js.push(c.uri_for('/static/js/jquery-1.4.2.min.js'), 
+               c.uri_for('/static/js/jquery-ui-1.8.custom.min.js'),
+                ) 
+-%]
+
+[% IF template.use_popup -%]
+[%    link_js.push(c.uri_for('/static/js/jquery.popupWindow.js')) -%]
+[%  END -%]
+
+[% MACRO init_scripts BLOCK -%]
+<script type="text/javascript">
+$(function() { 
+	//jExpand
+         if($("#expandible").jExpand){
+     	  $("#expandible").jExpand();
+         }  
+	 //Tabs
+	 if($("#tabs").tabs){
+	     var $tabs = $("#tabs").tabs({selected:[% 
+	     IF c.req.param('def_tab') -%][% c.req.param('def_tab') - 1 -%][% 
+             ELSE -%] 0 [% END -%]});
+             //.find(".ui-tabs-nav").sortable({axis:'x'});
+	}
+	 //Popup
+	 if ( $(".popup").popupWindow  ) {
+	     $(".popup").popupWindow({ 
+		 height:600, 
+		 width:500, 
+		 top: 218, 
+		 left:700 
+		 });
+	 }
+	 if ( $(".readme").popupWindow  ) {
+	     $(".readme").popupWindow({ 
+		 height:1000, 
+		 width:800, 
+		 top: 218, 
+		 left:700 
+		 });
+	 }
+
+	 //Buttons
+	 $( "button, input:submit, a", ".buttons").button();
+	 $("#disabled", ".buttons" ).button("disable");
+
+});			    
+ </script>
+[% END -%]
+
+[% MACRO add_css_tableinfo BLOCK  -%]
+<script>$("#info td:even").css("font-weight", "bold");</script>
+[% END -%]
+
+[% MACRO add_css_create_btn BLOCK  -%]
+ <script>$(".create_btn").addClass('manoc-toolbar ui-widget-header ui-corner-all ui-helper-clearfix');</script>
+[% END -%]

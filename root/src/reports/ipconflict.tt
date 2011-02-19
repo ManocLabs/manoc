@@ -1,0 +1,65 @@
+[% META 
+   title='Ip conflicts'
+   use_table=1
+   section='Reports'
+-%]
+
+<div id="tabs">
+     		<ul>
+	      	  <li><a href="#tabs-1">Ip Conflicts</a></li>
+	      	  <li><a href="#tabs-2">Multihomed Hosts</a></li>
+		</ul>
+
+<div id="tabs-1">
+[% init_table('ipcnf')%]
+[% FOREACH ip IN conflicts %]
+   [% IF loop.first %]
+    
+    <table class="display" id="ipcnf">
+       <thead>  
+	 <tr>
+ 	 <th>Ip Address</th>
+ 	 <th>Count</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+  	 <td>[% print_ip(ip.ipaddr) %]</td>
+	 <td>[% ip.count %]</td>
+	 </tr>
+   [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]
+</div>
+
+<div id="tabs-2">
+
+[% FOREACH mac IN multihomed %]
+   [% IF loop.first %]
+    [% init_table('multi')%]
+
+    <table class="display" id="multi">
+       <thead>  
+	 <tr>
+ 	 <th>Mac Address</th>
+ 	 <th>Count</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+  	 <td>[% print_mac(mac.macaddr) %]</td>
+	 <td>[% mac.count %]</td>
+	 </tr>
+   [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]
+</div>
+</div>
+
+</div>

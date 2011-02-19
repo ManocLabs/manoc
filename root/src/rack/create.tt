@@ -1,0 +1,8 @@
+[% META title='New Rack' 
+   section='Asset' %]
+
+<div class="buttons">
+[% form.render %]
+</div>
+
+

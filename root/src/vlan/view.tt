@@ -1,0 +1,85 @@
+[% META 
+   title='Vlan View'
+   use_table = 1
+   section='NetDB'
+-%]
+
+	<div id="tabs">
+			<ul>
+				<li><a href="#tabs-1">Info</a></li>
+				<li><a href="#tabs-2">Devices</a></li>
+			</ul>
+
+<div id="tabs-1">
+
+
+<table>
+    <tr align=left>
+        <th width=160>Name:</th>
+        <td width=160>[% object.name %]</td>
+    </tr>
+    <tr align=left>
+        <th>Description:</th>
+        <td>[% object.description %]</td>
+    </tr>
+    <tr align=left>
+        <th>Vlan Range:</th>
+        <td><a href="[%c.uri_for('/vlanrange/list')%]"> [% object.vlan_range.name %]</a></td>
+    </tr>
+    [% FOREACH r IN ranges%]
+    <tr align=left>
+      [% IF loop.first %]
+        <th>Associated subnets:</th>
+      [% ELSE %]
+	<td></td>
+      [% END %]
+        <td><a href="[%c.uri_for_action('iprange/view',[r.name])%]">[% r.name %] </a></td>
+    </tr>
+    [% END %]
+</table>
+
+
+<p>
+ <div class="buttons">	
+    <a href="[%c.uri_for_action('vlan/edit',[object.id],{backref=> c.uri_for_action('vlan/view',[object.id])})%]">
+    [% ui_icon('pencil') %]Edit</a>
+    <a href="[%c.uri_for_action('vlan/delete',[object.id])%]">[% ui_icon('closethick') %]Delete</a>
+ </div>
+</p>
+</div>
+
+   <div id="tabs-2">
+   [% IF devices %]
+      [% FOREACH r IN devices %]
+      	 [% IF loop.first %]
+	 [% init_table('devices') %]
+     	 <table class="display" id="devices">
+       	  <thead>  
+	   <tr>
+ 	    <th>Device</th>
+ 	    <th>Name</th>
+	    <th>Number of Interfaces</th>
+	   </tr>	
+       	   </thead>  
+      	   <tbody>
+         [% END %]
+             <tr>
+ 	      <td><a href="[%c.uri_for_action('device/view',[r.device])%]"> [% r.device %] </a>  </td>
+  	      <td>[% r.name %]
+	      </td>
+	      <td>[% r.count %]</td>
+             </tr>
+	 [% IF loop.last %]
+       </tbody>
+     </table>
+        [% END %]
+     [% END %]
+   [% ELSE %]
+      [% PROCESS  'message.tt' msg='No device on  VLAN ' _ object.id %]
+   [% END %]
+
+
+
+</div>
+
+</div>

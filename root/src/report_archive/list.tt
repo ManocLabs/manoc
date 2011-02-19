@@ -1,0 +1,29 @@
+[% META 
+   title='Scheduled Reports'
+   use_table=1
+   section='Reports'
+-%]
+
+ [% init_table('report_list', [{width => '50%'},{width => '30%'}, {width =>'20%'}])%] 
+ <table class="display" id="report_list">
+       <thead>  
+	 <tr>
+ 	 <th>Type</th>
+         <th>Report Title</th>
+ 	 <th>Time of last execution</th>
+         </tr>
+       </thead>  
+  <tbody>
+[% FOREACH r IN reports %]
+         <tr>
+ 	 <td><a href=[% c.uri_for_action('/reportarchive/view_type', r.type) %]> [% r.type  %] </a></td>
+	 <td>[% r.name %] </td>
+ 	 <td>[% r.timestamp %]  
+ 	 <div style="float:right;">
+ 	 <a href="[% c.uri_for_action('/reportarchive/view', [r.id]) %]">[% ui_icon('extlink')%] </a>
+ 	 </div> 
+ 	 </td>
+         </tr>
+ [% END %]
+  </tbody>
+</table>

@@ -1,0 +1,25 @@
+[% META 
+   title='Users'
+   section='Config'
+-%]
+
+<form name="form1" method="POST">
+[% FOREACH r IN all_roles -%]
+   [% IF loop.first -%] 
+    <table>
+   [% END -%]
+   [% role = r.role -%]
+    <tr>
+       <td>[% role  FILTER ucfirst -%]</td>
+       <td><input type="checkbox" name="[% role -%]" value="[% r.id -%]" [% IF user_roles.$role -%] checked="true" [% END -%] > </td>
+    </tr>
+
+   [% IF loop.last -%]
+    </table>
+   [% END -%]
+[% END -%]
+   <div class="buttons">
+   <input type="submit" name="submit" value="Submit">
+   <input type="submit" name="discard" value="Discard">
+   </div>
+</form>

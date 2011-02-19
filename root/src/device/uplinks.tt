@@ -1,0 +1,29 @@
+[% META title='Set Uplinks'
+   section='Asset' %]
+
+<p>Uplinks for <a href="[% c.uri_for_action('/device/view', [object.id])%]">
+	       [% object.name %]</a>.</p>
+
+<form method="POST">
+<input type=hidden name="id" value="[% object.id %]" />
+<table>
+<tr>
+<th>Uplink</th><th>Interface</th><th>Description</th>
+</tr>
+
+[% FOREACH if IN iface_list %]
+<tr>
+<td>
+<input type="checkbox" value="[% if.interface %]" name="uplinks" 
+[%IF if.checked %]checked="checked"[% END %] />
+</td>
+<td>[% if.interface %]</td>
+<td>[% if.description %]</td>
+</tr>
+[% END %]
+</table>
+<div class="buttons">
+<input type="submit" name="submit" value="Submit">
+<input type="submit" name="discard" value="Discard">
+</div>
+</form>

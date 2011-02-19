@@ -1,0 +1,73 @@
+[% MACRO init_datatable BLOCK -%]
+[%  link_css.push(c.uri_for('/static/css/table.css'), ) -%]
+[%  link_js.push(c.uri_for('/static/js/jquery.dataTables.js'),
+               c.uri_for('/static/js/dataTables.typeDetectPlugin.js'),
+	       c.uri_for('/static/js/dataTables.typeSortPlugin.js'),	
+              ) 
+-%]
+[% END -%]
+
+[% MACRO init_exp_table BLOCK -%]
+[% link_js.push(c.uri_for('/static/js/jExpand.js')) -%]
+[%  link_css.push( 
+		 c.uri_for('/static/css/jExpand.css'),
+    		 )
+
+-%]
+[%  END -%]
+
+[%# Init Table -%]
+[%MACRO init_table(id,columns, options) BLOCK -%]
+<script type="text/javascript">
+	 
+$(function() { 
+	  if ( $("#[% id  %]").dataTable ) {
+	   
+ 	     /* inizializzazione della tabella */
+	     $("#[% id  %]").dataTable( {
+	       //to use JQuery UI style
+	       "bJQueryUI"       : true,
+	       //to decide which column to sort at the beginning
+	       [% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
+	       //pagination button (two_button, full_numbers)
+ 	       "sPaginationType" : "full_numbers",
+	       //to disable sorting
+	        "bSort": [% IF options.disable_sorting %]false[% ELSE %]true[%END%],
+		     //to disable pagination
+	       	"bPaginate": [% IF options.disable_pagination %]false[% ELSE %]true[%END%],
+		 [% IF options.cust_pag -%]
+       		 "sDom": '<"H"f<"toolbar">>t<"F"i>',
+      		 [% END -%]
+
+
+	       //in columns trovo l'array per l'inizializzazione delle colonne della tabella
+	       [% IF columns %]
+	       "aoColumns" : [
+			     [% FOREACH col IN columns %]
+			     	     [% IF col %]
+				      {
+				      //abilita/disabilita la ricerca in una data colonna
+            			      [% IF col.searchable %]   "bSearchable" : [% col.searchable %], [% END %]
+      				      //abilita/disabilita il sort di una colonna
+				      [% IF col.sortable %]     "bSortable"   : [% col.sortable %],   [% END %]
+				      //tipo di dato: integer, string, html, date e ipaddress (plugin)
+				      [% IF col.type %]         "sType"	      : "[% col.type %]",     [% END %]
+				      //determina la larghezza della colonna
+				      [% IF col.width %]        "sWidth"      : "[% col.width %]",    [% END %]
+				      //ordinamento ascendente o discendente
+				      [% IF col.sort_dir %]     "asSorting"   : "[% col.sort_dir %]", [% END %]
+				      },
+				     [% ELSE %]	
+				       null,
+         			     [% END %]
+			     [% END %]
+			     ]
+	        [% END %]
+           	});
+	 }
+});
+
+ </script>
+
+
+[%END-%]

@@ -1,0 +1,32 @@
+/* ####################  ExpandTable javascript  #######################################  */
+#expandible { 
+border-collapse:collapse;
+
+}
+#expandible h4 { 
+margin:0px; padding:0px;
+}
+#expandible ul { 
+margin:10px 0 10px 40px;
+ padding:0px;
+}
+#expandible th {
+padding:5px 10px; 
+text-align:left;
+}
+#expandible td { 
+padding:5px 10px; 
+}
+#expandible tr.master .arrow { 
+    cursor:pointer;
+}
+#expandible div.arrow { 
+background:transparent url(../images/arrows.png) no-repeat scroll 0px -16px; 
+width: 16px; 
+height:16px; 
+display:block;
+}
+#expandible div.up { 
+background-position:0px 0px;
+}
+/*  ################################################################################   */

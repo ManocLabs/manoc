@@ -1,0 +1,8 @@
+[% META title='Create/Edit a User'
+      section='Config'
+ -%]
+
+<div class="buttons">
+[% form.render %]
+</div>
+

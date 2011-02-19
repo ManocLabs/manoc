@@ -1,0 +1,92 @@
+[% META title='Create a Subnet/IpRange'
+   section='NetDB' %]
+
+<form name="form1" method="POST">
+
+<input type=hidden name="parent" value="[% parent %]" />
+
+<br>
+<table>
+[% IF parent %]
+<tr>
+  <td class="label">Parent Range:</td>
+  <td>[% parent %]([% p_from %] [% IF p_prefix %] /[%p_prefix%] [% ELSE %] - [%p_to%] [% END %])</td>
+</tr>
+[% END %]
+
+<tr>
+  <td class="label">Name:</td>
+  <td><input type="text" name="name" value="[% range %]" /></td>
+      <td>
+	[% IF error.name %]
+	  <span class="error" id="error">[% error.name %] </span>
+	[%END%]
+      </td>
+
+</tr>
+<tr>
+<td class="label">Type:</td>
+<td><input id="radio_subnet" type="radio" name="type" value="subnet"
+onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Subnet:
+  <input type="text" name="network" value="[% network %]" />
+  / <select name="prefix">
+     [% FOREACH pref IN prefixes %]
+    <option value="[% pref.id %]"
+      [% IF pref.selected %] selected="1" [% END %] >
+      [% pref.label %]
+    </option>
+[% END %]
+    </select>
+   <br/>
+  <input id="radio_range" type="radio" name="type" value="range"
+  onClick="javascript:enableFields()" [% IF type_range %] checked [% END %]  />Range from
+  <input type="text" name="from_addr" value="[% from_addr %]" />
+  to <input type="text" name="to_addr" value="[% to_addr %]" />
+</td>
+     <td>
+	[% IF error.type %]
+	  <span class="error" id="error">[% error.type %] </span>
+	[%END%]
+      </td>
+</tr>
+<tr>
+    <td class="label">Vlan: </td>
+    <td>
+        <select name="vlan">
+            <option value=none>none</option>
+            [% FOREACH vlan IN vlans  %]
+                <option value="[% vlan.id %]" [% IF vlan.selected %] selected
+		[% END %]>[% vlan.name %] ([% vlan.id %])</option>
+            [% END %]
+        </select>
+    </td>
+</tr>
+</table>
+<div class="buttons">
+<input type="submit" name="submit" value="Submit">
+<input type="submit" name="discard" value="Discard">
+</div>
+</form>
+
+
+<script language="javascript">
+
+function enableFields() {
+	if(document.form1.radio_range.checked) {
+		document.form1.from_addr.disabled = false;
+		document.form1.to_addr.disabled   = false;
+	} else {
+		document.form1.from_addr.disabled = true;
+		document.form1.to_addr.disabled   = true;
+	}	
+
+	if(document.form1.radio_subnet.checked) {
+		document.form1.network.disabled   = false;
+		document.form1.prefix.disabled    = false;
+	} else {
+		document.form1.network.disabled   = true;
+		document.form1.prefix.disabled    = true;
+	}
+}
+enableFields();
+</script>

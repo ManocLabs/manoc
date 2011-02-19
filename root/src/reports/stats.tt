@@ -1,0 +1,58 @@
+[% META 
+   title='Statistics'
+   use_table=1
+   section='Reports'
+-%]
+
+<div id="tabs">
+     		<ul>
+	      	  <li><a href="#tabs-1">Vlan Info</a></li>
+	      	  <li><a href="#tabs-2">DB Info</a></li>
+		</ul>
+
+<div id="tabs-1">
+ [% init_table('stats') %]
+[% FOREACH v IN vlan_table %]
+   [% IF loop.first %]
+    
+    <table class="display" id="stats">
+       <thead>  
+	 <tr>
+ 	 <th>VLAN</th>
+ 	 <th>Mac Address</th>
+ 	 <th>Ip Address</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+  	 <td>[% v.vlan %]</td>
+	 <td>[% v.macaddr %]</td>
+ 	 <td>[% v.ipaddr %]</td>
+	 </tr>
+   [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]
+</div>
+
+<div id="tabs-2">
+
+[% FOREACH d IN db_stats %]
+   [% IF loop.first %]
+    <table id="info">
+   [% END %]
+         <tr>
+  	  <td>[% d.name %]</td>
+  	  <td>[% d.val %]</td>
+ 	 </tr>
+  [% IF loop.last %]
+    </table>
+    [% add_css_tableinfo %]
+   [% END %]
+[% END %]
+
+</div>
+
+</div>

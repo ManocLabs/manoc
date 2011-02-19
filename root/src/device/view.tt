@@ -1,0 +1,376 @@
+[% META 
+   title='Device View'
+   use_table=1
+   section='Asset'
+-%]
+
+
+<div id="tabs">	 
+  <ul>
+    <li><a href="#tabs-1">General</a></li>
+    <li><a href="#tabs-2">CDP Links</a></li>
+    <li><a href="#tabs-3">Interfaces Status</a></li>
+    <li><a href="#tabs-4">Interfaces Activity</a></li>
+    <li><a href="#tabs-5">Unused Interfaces</a></li>
+    <li><a href="#tabs-6">SSID List</a></li> 
+    <li><a href="#tabs-7">Associated clients</a></li> 
+</ul>
+
+
+<div id="tabs-1">
+<table id="info">
+<tr>
+<td>Name:</td><td>[% object.name %]</td>
+
+
+</tr>
+<tr>
+  <td>Ip Address:</td><td>[% print_device(object) %]</td>
+</tr>
+<tr>
+<td>Last Visited:</td><td>[% last_visited %]</td>
+</tr>
+<tr>
+  <td>Model:</td>
+  <td>
+  [% object.vendor | html %]
+  [% object.model  | html %]
+  </td>
+</tr>
+<tr>
+  <td>OS:</td>
+  <td>
+  [% object.os %]
+  [% object.ver %]
+  </td>
+</tr>
+<tr>
+  <td>VTP domain:</td>
+  <td>
+  [% object.vtp_domain | html %]
+  </td>
+</tr>
+<tr>
+ <td>Building:</td>
+ <td><a href="[%c.uri_for_action('building/view', [object.rack.building.id])%]">[%
+ object.rack.building.name %] </a> ([% object.rack.building.description %])</td>
+</tr>
+<tr>
+  <td>Rack:</td>
+  <td><a href="[% c.uri_for_action('rack/view', [object.rack.id] ) %]">[% object.rack.name %] </a></td>
+</tr>
+<tr>
+ <td>Up from:</td><td>[% boottime %]</td>
+</tr>
+<tr>
+  <td>Backup status:</td><td>[% backup_enabled %]</td>
+</tr>
+<tr>
+  <td>Last backup:</td>
+  <td>
+  [% IF backup_date %]
+       [% backup_date %] 
+       <!-- c.uri_for_action('device/view_config', [object.id]) -->
+	<a href="[% c.uri_for_action('device/show_run', [object.id]) %]">
+	  View</a>
+  [% ELSE %]
+	Backup not found
+  [% END %]
+  </td>
+</tr>
+<tr>
+  <td>Fetch ARP table:</td><td>[% arp_enabled %]</td>
+</tr>
+
+[% IF vlan_arpinfo %]
+<tr>
+  <td>ARP table to vlan:</td><td><a href="[%c.uri_for_action('vlan/view',[object.id])%]">
+  [% object.vlan_arpinfo %]</a></td>
+</tr>
+[% END %]
+
+<tr>
+  <td>Fetch mac-address-table:</td><td>[% mat_enabled %]</td>
+</tr>
+<tr>
+  <td>Fetch Dot11 info:</td><td> [% dot11_enabled %]</td>
+</tr>
+<tr>
+  <td>Uplinks:</td><td>[% uplinks %]</td>
+</tr>
+<tr>
+  <td>Notes:</td><td>[% object.notes | html %]</td>
+</tr>
+</table>
+ [% add_css_tableinfo %]
+
+<div class="buttons">	
+  <a href="[% c.uri_for_action('/device/edit',[object.id]) %]">[%
+  ui_icon('pencil') %]Edit</a>
+  &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
+  [% ui_icon('closethick') %]    Delete</a>
+  &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
+[% ui_icon('gear') %] Set Uplink</a>
+  &nbsp;<a href="[% c.uri_for_action('/device/change_ip', [object.id]) %]">
+  [% ui_icon('transferthick-e-w') %] Change Ip</a>		 
+  <!-- TODO: Netwalker button -->
+  <!-- &nbsp;<a href="[%  %]"> </a> -->		 
+</div>
+
+
+</div> <!-- end of tabs-1 -->
+
+<div id="tabs-2">
+[% IF  cdp_links.0 %]
+
+[% FOREACH link IN cdp_links %]
+  [% IF loop.first %]
+    [% init_table('cdp_links',undef,{sortby => 4, order=>'desc'}) %]
+    <table class="display" id="cdp_links">
+      <thead>  
+	<tr>
+	  <th>Interface</th>
+          <th>To device</th>
+	  <th>Interface</th>
+	  <th>Name</th>
+          <th>Last seen</th>
+	</tr>
+      </thead>  
+      <tbody>  
+    [% END %]
+         <tr>
+           <td>
+	     <a href="[% c.uri_for_action('interface/view', 
+	     [object.id,link.from_iface]) %]">
+	     [% link.from_iface %]</a>
+	   </td>
+	[% IF object.name == link.to_name %]
+         <td>
+	    <a href="[% c.uri_for_action('device/view', [link.to_device]) %]">[% link.to_device %]</a>
+	 </td>
+         <td>
+	   <a href="[% c.uri_for_action('interface/view', 
+	     [object.id,link.to_iface]) %]">[% link.to_iface %]</a>
+	 </td>
+	 <td>[% link.to_name %]</td>
+	 [% ELSE %]
+           <td>[% link.to_device %]
+         <td>[% link.to_iface %]</td>
+	 <td>na</td>
+	 [% END %]
+	<td>[% link.date %]</td>
+    </tr>
+    [% IF loop.last %]
+      </tbody>
+    </table>
+    [% END %]
+    [% END %] <!-- end of loop -->
+   [% ELSE %]
+      [% PROCESS  'message.tt' msg='This Device has no neighbor' %]  
+   [% END %]
+ </div> <!-- tabs-2 div --> 
+
+<div id="tabs-3">
+  [% FOREACH if IN iface_info %]
+  [% status_color = 'green' %]
+   [% IF loop.first %]
+   [% init_table('iface_info',undef)  -%]
+  <table class="display"  id="iface_info">
+    <thead>  
+      <tr>
+        <th>Interface</th>
+	<th>Connected</th>
+	<th>Adm Status</th>
+	<th>Speed</th>
+	<th>Duplex</th>
+	<th>Vlan</th>
+	<th>Port Security</th>
+	<th>Description</th>
+      </tr>
+    </thead>  
+    <tbody>
+  [% END %]
+    <tr>
+         <td>
+	   <a href="[% c.uri_for_action('interface/view', [object.id, if.interface]) %]">
+[% if.interface %]</a>
+	 </td>
+	 
+	  [% IF if.up == 'down' %]
+      		[% status_color = 'red' %]
+      [% END %]
+         <td style="color:[% status_color %];">[% if.up %]</td>
+   
+   	 [% IF if.up_admin == 'down' %]
+  		[% status_color = 'red' %]
+  	  [% ELSE %]
+  		[% status_color = 'green' %]
+      [% END %]
+   	   
+     <td style="color:[% status_color %];">
+          [% IF if.enable_updown %]
+               [% if.up_admin %] 
+          [% ELSE %]
+            [% if.up_admin %]
+          [% END %]
+	 </td>
+	  <td>[% if.speed %]</td>
+	  <td>[% if.duplex %]/[% if.duplex_admin %]</td>
+	  <td>[% if.vlan %]</td>
+          [% IF if.cps_enable %]
+	 <td>[% if.cps_status %] ([% if.cps_count %])</td>
+	 [% ELSE %]
+  	  <td>Disabled</td>
+	 [% END %]
+	  <td>[% if.description | html %]</td>
+    </tr>
+    [% IF loop.last %]
+    </tbody>
+  </table>
+    [% END %]
+ [% END %]
+</div> <!-- tab-3  -->
+
+
+<div id="tabs-4">
+[% FOREACH if IN iface_info %]
+  [% IF loop.first %]
+    [% init_table('iface_act', [{width => '15%'},{width => '6%'},{width => '20%'},0])  -%]
+     <table class="display" id="iface_act">
+     <thead>
+       <tr>
+	 <th>Interface</th>
+	 <th>Admin Status</th>
+	 <th>Last MAT activity date</th>
+	 <th>Description</th>
+       </tr>
+     </thead>  
+     <tbody>
+  [% END %]
+  <tr>
+    <td>
+      <a href="[% c.uri_for_action('interface/view', [object.id,
+      if.interface]) %]">[% if.interface %]</a>
+    </td>
+    
+    [% IF if.up_admin == 'down' %]
+		[% status_color = 'red' %]
+    [% ELSE %]
+      	[% status_color = 'green' %]
+    [% END %]
+    
+    <td style="color:[% status_color %];">[% if.up_admin %]</td>
+    <td>[% if.last_mat %]</td>
+    <td>[% if.description | html %]</td>
+  </tr>
+  [% IF loop.last %]
+    </tbody>
+  </table>
+    [% END %]
+  [% END %]
+</div> <!-- tab-4   -->
+
+<div id="tabs-5">
+[% FOREACH if IN unused_ifaces %]
+  [% IF loop.first %]
+       [% init_table('un_iface') %]
+       <table class="display" id="un_iface">
+	      <thead>
+		<tr>
+	   <th>Interface</th>
+	   <th>Description</th>
+	 </tr>
+     </thead>  
+     <tbody>
+  [% END %]
+	 <tr>
+        <td>
+	  <a href="[% c.uri_for_action('interface/view', 
+	  [object.id, if.interface]) %]"> [% if.interface %]</a>
+	</td>
+<td>[% if.description %]</td>
+</tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+[% END %]
+
+</div> <!-- tab-5  -->
+
+
+<div id="tabs-6">
+[% IF  ssid_list.0 %]
+[% init_table('ssid_list') %]
+[% FOREACH s IN ssid_list %]
+  [% IF loop.first %]
+       <table class="display" id="ssid_list">
+	 <thead>
+	       <tr>
+	         <th>Interface</th>
+	         <th>SSID</th>
+                 <th>Broadcast</th>
+                 <th>Channel</th>
+	       </tr>
+         </thead>  
+         <tbody>
+  [% END %]
+	 <tr>
+           <td><a href="[% c.uri_for_action('interface/view', 
+	       [s.ipaddr, s.interface]) %]"> [% s.interface %]</a>
+           </td>
+           <td><a href="#"> [% s.ssid %]</a></td>
+           <td>[% s.broadcast %]</td>
+           <td>[% s.channel %]</td>
+        </tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+[% END %] 
+[% ELSE %]
+      [% PROCESS  'message.tt' msg='No SSIDs on this device' %]
+[% END %]
+</div> <!-- end tab-6 -->
+
+
+
+<div id="tabs-7">
+[% IF dot11_clients.0 %]
+[% init_table('dot11_clients') %]
+ [% FOREACH s IN dot11_clients %]
+  [% IF loop.first %]
+       <table class="display" id="dot11_clients">
+	 <thead>
+	       <tr>
+	         <th>SSID</th>
+	 	 <th>Mac Address</th>
+	 	 <th>IP Address</th>
+	 	 <th>Vlan</th>
+	 	 <th>State</th>
+	 	 <th>Quality</th>
+	       </tr>
+         </thead>  
+         <tbody>
+  [% END %]
+	 <tr>
+           <td><a href="#"> [% s.ssid %]</a></td>
+           <td><a href="[% c.uri_for('mac', s.macaddr ) %]"> [% s.macaddr %]</a></td>
+           <td><a href="[% c.uri_for_action('ip', [s.ipaddr] ) %]"> [% s.ipaddr %]</a></td>
+           <td><a href="[% c.uri_for_action('vlan', [s.vlan] ) %]"> [% s.vlan %]</a></td>
+           <td>[% s.state %]</td>
+           <td>[% s.quality %]</td>
+           <!-- <a href="<tmpl_var name=detail_link>">details</a> -->
+        </tr>
+         [% IF loop.last %]
+      </tbody>
+    </table>
+     [% END %]
+   [% END %]
+[% ELSE %]
+      [% PROCESS  'message.tt' msg='No wireless clients on this device ' %]
+[% END %] 
+</div> <!-- end tab-7 -->
+
+
+</div>

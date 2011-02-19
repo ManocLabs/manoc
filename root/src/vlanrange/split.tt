@@ -1,0 +1,62 @@
+[%META title='Split Vlan Range' %]
+<table>
+    <tr align="left">
+        <th width=80>Name:</th>
+        <td width=160>[% object.name %]</td>
+    </tr>
+    <tr align="left">
+        <th width=80>Start:</th>
+        <td width=160>[% object.start %]</td>
+    </tr>
+    <tr align="left">
+        <th width=80>End:</th>
+        <td width=160>[% object.end %]</td>
+    </tr>
+</table>
+
+<h4>Split Options</h4>
+
+<form name="form1" method="POST">
+    <input type=hidden name="id" value="[% object.id %]" >
+    <table>
+        <tr>
+            <td>Name vlan range 1: </td>
+            <td><input type="text" value="[% name1 %]"
+    name="name1"></input></td>
+            <td>
+	       [% IF error.name1 %]
+	    	<span class="error" id="error">[% error.name1 %] </span>
+	       [%END%]
+	    </td>
+        </tr>
+        <tr>
+            <td>Name vlan range 2: </td>
+            <td><input type="text" value="[% name2 %]"
+    name="name2"></input></td>
+            <td>
+	       [% IF error.name2 %]
+	    	<span class="error" id="error">[% error.name2 %] </span>
+	       [%END%]
+	    </td>
+        </tr>
+        <tr>
+            <td>Split point: </td>
+            <td><input type="text" size=4 maxlength=4 value="[% split_point
+    %]" name="split_point"></input></td>
+             <td>
+	       [% IF error.split %]
+	    	<span class="error" id="error">[% error.split %] </span>
+	       [%END%]
+	    </td>
+        </tr>
+        <tr>
+	  <td>
+	    <div class="buttons">
+            <input type="submit" name="submit" value="Submit">
+            <input type="submit" name="discard" value="Discard"> 
+	    </div>
+          </td>
+        </tr>
+    </table>
+</form>
+

@@ -1,0 +1,38 @@
+[% META section="Istruzioni per l'uso della ricerca" -%]
+
+<h3> Simple Search </h3>
+
+Inventory search:
+<ul>
+<li>Ricerca indirizzo IP singolo:    "172.16.100.23"</li>
+<li>Ricerca indirizzo IP parziale:   "172.16.100." oppure  .16.100.  </li>
+<li>Ricerca indirizzo MAC singolo:   "00:27:13:ca:76:a9"  </li>
+<li>Ricerca indirizzo MAC parziale:  "00:27:" oppure ":76:a9" oppure ":ca:76:"   </li>
+<li>Ricerca di device per nome:      "device medica" oppure "medica"</li>
+<li>Ricerca di device per ip:        "device 172.16.100.252" oppure "172.16.100.252" </li>
+<li>Ricerca di rack, building, hostname, vlan, vlanrange,: ricerca di tipo inventory. E' la ricerca di default,
+ non è necessario quindi anteporre alcun token</li>
+<li>Ricerca delle note sugli indirizzi IP, delle note sulle interfacce degli switch (configurate tramite interfaccia del Manoc)
+     e delle description delle interfacce (configurate via telnet sugli apparati): "note 'keyword'" </li>
+<li>Ricerca utenti loggati su macchine in dominio Window: "logon 'nome utente' "</li>
+<li>Ricerca di subnet: "subnet 'network' / 'prefix'"</li>
+<li>Ricerca di subnet /24: "subnet 'network"</li>
+<li>Ricerca specificando il dominio (tipo) della ricerca: " 'query_word' type 'scope' " </li>
+<li>Ricerca con parola "esatta" : includere la parola chiave della ricerca tra virgolette ( \" ) </li>
+
+
+
+
+
+<li>Ricerca limitata nel tempo per le ricerche di tipo IP, MAC e Logon: appendere alla normale query "limit 'limite di tempo' ".
+    I limiti di tempo si posso specificare secondo questa legenda: 
+    <ul>
+	<li>'m' per indicare un minuto</li>
+	<li>'d' per indicare un giorno</li>
+	<li>'M' per indicare un Mese</li>	
+	<li>'y' per indicare un anno</li> 
+    </ul>
+ </li>
+
+
+</ul>

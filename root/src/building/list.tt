@@ -1,0 +1,33 @@
+[% META 
+   title='Building'
+   use_table=1
+   section='Asset'
+-%]
+
+<div class="buttons create_btn">
+<a href="[% c.uri_for_action('/building/create') %]" >
+   [% ui_icon('circle-plus') %] Create Building</a>
+ [% add_css_create_btn %]
+</div>
+
+
+[% init_table('build_list') %]
+ <table class="display" id="build_list">
+   <thead>  
+     <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Racks</th>
+     </tr>
+   </thead>  
+   <tbody>
+[% FOREACH b IN building_table %]
+
+         <tr>
+ 	 <td><a href=[% c.uri_for_action('/building/view', [b.id]) %]>[% b.name %]</a></td>
+ 	 <td>[% b.desc %]</td>
+ 	 <td>[% b.n_racks %]</td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

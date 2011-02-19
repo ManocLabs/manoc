@@ -1,0 +1,39 @@
+[% META title='VTP Vlan' 
+   section='NetDB' %]
+<form name="form1" method="POST">
+  <input type="hidden" name="forced_range_id" value="[% forced_range_id %]" />
+  <table>
+    <tr>
+      <td class="label">Id: </td>
+      <td><input type="text" value="[% id %]" name="id"></input></td>
+      <td>
+	[% IF error.id %]
+   	<span class="error" id="error">[% error.id %] </span>
+	[%END%]
+      </td> 
+    </tr>
+    <tr>
+      <td class="label">Name: </td>
+      <td><input type="text" value="[% vlan_name %]" name="name"></input></td>
+      <td>
+	[% IF error.name %]
+	  <span class="error" id="error">[% error.name %] </span>
+	[%END%]
+      </td>
+    </tr>
+            <tr>
+              <td class="label">Description: </td>
+              <td><textarea cols="40" rows="6" name="description">[%
+                description | html %] </textarea></input></td>
+            </tr>
+    <tr>
+      <td  colspan=2>
+  	<div class="buttons">
+	  <input type="submit" name="submit" value="Submit">
+	  <input type="submit" name="discard" value="Discard">
+	</div>
+      </td>
+    </tr>
+  </table>
+</form>
+  

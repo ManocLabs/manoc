@@ -1,0 +1,53 @@
+# rename this file to manoc.yml and put a ':' after 'name' if
+# you want to use YAML like in old versions of Catalyst
+name Manoc
+
+<ArpSniffer>
+
+	# a list of vlan to ignore
+	vlan_filter 2
+	vlan_filter 4
+
+	# optional 
+	# device eth0
+
+ 	refresh_interval 600
+	
+	# native vlan
+    	vlan 1
+
+</ArpSniffer>
+
+
+<"Model::ManocDB">  
+	connect_info DBI:mysql:database=manoc;host=localhost
+	connect_info manoc
+	connect_info manoc
+</"Model::ManocDB"> 
+
+<Netwalker>
+	ifstatus_interval	3600
+	iface_filter		1
+	check_db		1
+	n_procs			5
+</Netwalker> 
+
+<Credentials>
+	snmp_community	public
+	telnet_user 	admin
+	telnet_passord	cisco
+	enable		cisco
+</Credentials>
+
+<Archiver>
+	age 86400
+</Archiver>
+
+<Backup>
+	interval 1d
+	directory /opt/manoc/backup
+</Backup>
+
+<Log>
+	directory /var/log/manoc
+</Log>

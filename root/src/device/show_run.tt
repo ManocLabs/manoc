@@ -1,0 +1,60 @@
+[% META title='View Configuration'
+   section='Asset' %]
+<a href="[% c.uri_for_action('/device/view', [object.id]) %]">Back to device info</a>
+   
+
+<div id="tabs">	 
+  <ul>
+    <li><a href="#tabs-1">Current</a></li>
+    <li><a href="#tabs-2">Previous</a></li>
+    <li><a href="#tabs-3">Diff</a></li>
+  </ul>
+  
+  
+  <div id="tabs-1">
+    <table>
+      <tr>
+        <th valign=top align=left width=220>Configuration backup date: </th>
+        <td>[% curr_config_date %]</td>
+      </tr>
+      <tr>
+        <th valign=top align=left>Configuration: </th>
+        <td><pre>[% curr_config %]</pre></td>
+      </tr>
+    </table>
+  </div>
+  
+  <div id="tabs-2">
+  [% IF has_prev_config %]
+  <table>
+    <tr>
+      <th valign=top align=left width=220>Configuration backup date: </th>
+      <td>[% prev_config_date %]</td>
+    </tr>
+    <tr>
+      <th valign=top align=left>Configuration: </th>
+      <td><pre>[% prev_config %]</pre></td>
+    </tr>
+  </table>        
+  [% END %]
+  </div>
+  
+  <div id="tabs-3">
+    [% IF has_prev_config %]
+    <table>
+      <tr>
+	<td><b>Previous configuration backup:</b></td>
+	<td>[% prev_config_date %] </td>
+      </tr>
+      <tr>
+	<td><b>Current configuration backup:</b></td>
+      <td>[% curr_config_date %]</td>
+      </tr>
+    </table>
+    <pre>  
+      [% diff %]
+    </pre>
+    [% END %]
+  </div>
+</div>
+

@@ -1,0 +1,72 @@
+[%META title='Split Address Range'
+       section='NetDB' %]
+<form name="form1" method="POST">
+<input type=hidden name="name" value="[% name %]" />
+<input type=hidden name="parent" value="[% parent %]" />
+<table>
+	<tr>
+		<th>Name:</th><td>[%range_name%] </td>
+	</tr>
+	<tr>
+		<th>Range:</th><td>[% from_addr %] - [% to_addr %]</td>
+	</tr>
+</table>
+
+<h2>Split Options</h2>
+
+<table>
+	<tr>
+		<td>Name Subnet 1: </td><td><input type="text" name="name1"
+	value="[% name1 %]"/></td>
+                <td>
+	       [% IF error.name1 %]
+	    	<span class="error" id="error">[% error.name1 %] </span>
+	       [%END%]
+	    </td>
+	</tr>
+	<tr>
+		<td>Name Subnet 2: </td><td><input type="text" name="name2"
+	value="[% name2 %]"/></td>
+             <td>
+	       [% IF error.name2 %]
+	    	<span class="error" id="error">[% error.name2 %] </span>
+	       [%END%]
+	    </td> 
+	</tr>
+	<tr>
+		<td>Split at: </td><td><input type="text"
+	name="split_point_addr" value="[% split_point_addr %]"/></td> 
+	     <td>
+	       [% IF error.split %]
+	    	<span class="error" id="error">[% error.split %] </span>
+	       [%END%]
+	    </td>
+	</tr>
+</table>
+<div class="buttons">
+<input type="submit" name="submit" value="Submit">
+<input type="submit" name="discard" value="Discard">
+</div>
+</form>
+
+<script language="javascript">
+
+function enableFields() {
+	if(document.form1.radio_range.checked) {
+		document.form1.from_addr.disabled = false;
+		document.form1.to_addr.disabled   = false;
+	} else {
+		document.form1.from_addr.disabled = true;
+		document.form1.to_addr.disabled   = true;
+	}	
+
+	if(document.form1.radio_subnet.checked) {
+		document.form1.network.disabled   = false;
+		document.form1.prefix.disabled    = false;
+	} else {
+		document.form1.network.disabled   = true;
+		document.form1.prefix.disabled    = true;
+	}
+}
+enableFields();
+</script>

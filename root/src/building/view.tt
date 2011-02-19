@@ -1,0 +1,63 @@
+[% META 
+   title='Building'
+   use_table=1
+   section='Asset'
+-%]
+<div id="tabs">	 
+  <ul>
+    <li><a href="#tabs-1">General</a></li>
+    <li><a href="#tabs-2">Racks</a></li>
+  </ul>
+  		
+
+  <div id="tabs-1">
+    <table id="info">
+      <tr>
+	<td>Name:</td><td>[% object.name %]</td>
+      </tr>
+      <tr>
+	<td>Description:</td><td>[% object.description | html %] </td>
+      <tr>
+	<td>Notes:</td><td>[% object.notes | html%]</td>
+      </tr>
+    </table>
+    [% add_css_tableinfo -%]
+    <p>
+      <div class="buttons">	
+	<a href=[%c.uri_for_action('building/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
+	&nbsp;<a href=[% c.uri_for_action('building/delete', [object.id]) %]>
+	[% ui_icon('closethick') %]  Delete</a>
+	&nbsp;<a href="[% c.uri_for('/rack/create', object.id,{backref
+  =>c.req.uri}) %]">
+	[% ui_icon('plusthick') %] Add Rack</a>
+      </div>
+    </p>
+  [% add_css_tableinfo %]
+  </div>
+  
+  <div id="tabs-2">	
+    [% FOREACH r IN object.racks %]
+    [% IF loop.first %]
+    [% init_table('rack_list') %]
+    <table class="display" id="rack_list">
+      <thead>  
+        <tr>
+ 	  <th>Floor</th>
+ 	  <th>Racks</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% END %]
+        <tr>
+ 	  <td>[% r.floor %]</td>
+ 	  <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]>[% r.name %]</a></td>
+        </tr>
+	[% IF loop.last %]
+      </tbody>
+    </table>
+    [% END %]
+    [% END %]
+  </div>
+</div>
+
+

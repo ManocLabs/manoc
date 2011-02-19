@@ -1,0 +1,40 @@
+[% META 
+   title='Device'
+   use_table=1
+   section='Asset'
+-%]
+
+<div>
+<div class="buttons create_btn">
+    <a href="[% c.uri_for_action('/device/create') %]" >
+             [% ui_icon('circle-plus') %] Create Device</a>
+ [% add_css_create_btn %]
+ </div>
+ [% init_table('devices') %]
+ <table class="display" id="devices">
+       <thead>
+	 <tr>
+   	   <th>IP Address</th>
+	   <th>Building</th>
+	   <th>Rack</th>
+	   <th>Name</th>
+	   <th>Floor</th>
+	   <th>Vendor</th>
+	   <th>Model</th>
+         </tr>
+       </thead>  
+       <tbody>
+[% FOREACH d IN device_table %]
+         <tr>
+ 	   <td>[% print_device(d) %]</td>
+	   <td><a href="[%c.uri_for_action('/building/view',[d.rack.building.id])%]">[% d.rack.building.name %]</a></td>
+	   <td><a href="[%c.uri_for_action('/rack/view',	[d.rack.id])%]"> [% d.rack.name %]</a></td>
+	   <td>[% d.name %]</td>
+	   <td>[% d.floor %]</td>
+	   <td>[% d.vendor %]</td>
+	   <td>[% d.model %]</td>
+         </tr>
+[% END %]
+        </tbody>
+    </table>
+</div>

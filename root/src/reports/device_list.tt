@@ -1,0 +1,34 @@
+[% META 
+   title='Managed devices list'
+   section='Reports'
+-%]
+
+<table>
+  <tr>
+     <th>Building</th>
+     <th>Rack</th>
+     <th>Floor</th>
+     <th>IP Address</th>
+     <th>Name</th>
+     <th>Vendor</th>
+     <th>Model</th>
+     <th>OS</th>
+  </tr>
+[% FOREACH t IN table %]
+       <tr>
+	  <td>[% t.building %]</td>
+	  <td>[% t.rack %]</td>
+	  <td>[% t.floor %]</td>
+	  <td>[% t.ipaddr %]</td>
+	  <td>[% t.name %]</td>
+	  <td>[% t.vendor %]</td>
+	  <td>[% t.model %]</td>
+	  <td>[% t.os %]</td>
+       </tr>
+[% END %]
+</table>
+
+
+
+
+

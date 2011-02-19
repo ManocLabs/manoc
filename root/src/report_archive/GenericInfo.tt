@@ -1,0 +1,37 @@
+[% META 
+   title='Generic Info'
+   use_table=1
+   section='Reports'
+-%]
+<div id="tabs">
+       <ul>
+       	   <li><a href="#tabs-1">Info</a></li>		
+       </ul>
+   <table id="info">
+         <tr>
+  	  <td> Total Racks </td>
+  	  <td> [% report_obj.racks %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> Total Devices </td>
+  	  <td> [% report_obj.devices %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> Total Interfaces </td>
+  	  <td> [% report_obj.ifaces %] </td>
+ 	 </tr>
+ 	  <tr>
+  	  <td> CDP Entries </td>
+  	  <td> [% report_obj.cdps %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> MAT entries </td>
+  	  <td> [% report_obj.mats %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> ARP entries </td>
+  	  <td> [% report_obj.arps %] </td>
+ 	 </tr>
+  </table>
+    [% add_css_tableinfo %]
+</div>

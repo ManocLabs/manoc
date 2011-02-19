@@ -1,0 +1,109 @@
+[% META 
+   title='Backup Report'
+   use_table=1
+   section='Reports'
+-%]
+
+<h3> Report executed on host: [% report_name %] ([% timestamp %])</h3>
+
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Summary</a></li>
+		<li><a href="#tabs-2">Updated</a></li>
+		<li><a href="#tabs-3">Up to dated</a></li>
+		<li><a href="#tabs-4">Not Updated</a></li>
+		<li><a href="#tabs-5">Created</a></li>
+		<li><a href="#tabs-6">Errors</a></li>
+	</ul>
+
+
+<div id="tabs-1">
+   
+   <table id="info">
+         <tr>
+  	  <td> Configurations up to date: </td>
+  	  <td> [% report_obj.up_to_date_count %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> Configurations updated: </td>
+  	  <td> [% report_obj.updated_count %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> Configurations not saved: </td>
+  	  <td> [% report_obj.not_updated_count  %] </td>
+ 	 </tr>
+ 	  <tr>
+  	  <td> New configurations created: </td>
+  	  <td> [% report_obj.created_count %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> Errors occurred:  </td>
+  	  <td> [% report_obj.error_count %] </td>
+ 	 </tr>
+  </table>
+    [% add_css_tableinfo %]
+</div> <!--end of tab1 -->
+
+<div id="tabs-2">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_updated.0 -%]
+                         
+<table class="report ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_updated %]
+ 	 <tr class="[% loop.parity %]">
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %]</a></td>
+ 	 </tr>
+ [% END %]
+ </table>
+ </div><!--end of tab2 -->
+
+<div id="tabs-3">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_up_to_date.0 -%]
+<table class="report  ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_up_to_date %]
+ 	 	 <tr class="[% loop.parity %]" >
+                 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %]</a></td>
+                 </tr>
+ [% END %]
+ </table>
+</div><!--end of tab3 -->
+
+<div id="tabs-4">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_not_updated.0 -%]
+<table class="report ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_not_updated %]
+	 <tr class="[% loop.parity %]">
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %] </a></td>
+ 	 </tr>
+ [% END %]
+</table>
+</div><!--end of tab4 -->
+
+<div id="tabs-5">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_created.0 -%]
+<table class="report ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_created %]
+ 	 <tr class="[% loop.parity %]">
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %] </a></td>
+ 	 </tr>
+ [% END %]
+</table>
+</div><!--end of tab5 -->
+
+<div id="tabs-6">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_error.0 -%]
+<table class="report ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_error %]
+         <tr class="[% loop.parity %]">
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element.id ]) %]> [%  element.id %] </a></td>
+         <td>[% element.message %]</td>
+ 	 </td>
+         </tr>
+ [% END %]
+</table>
+</div><!--end of tab6 -->
+</div>

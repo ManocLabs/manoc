@@ -1,0 +1,78 @@
+[% META 
+   title='Rack'
+   use_table=1
+   section='Asset'
+-%]
+
+	<div id="tabs">
+			<ul>
+				<li><a href="#tabs-1">Info</a></li>
+				<li><a href="#tabs-2">Devices</a></li>
+			</ul>
+
+		
+
+<div id="tabs-1">
+<table id="info">
+<tr>
+  <td>Name:</td><td>[%object.name%]</td>
+</tr>
+<tr>
+  <td>Building:</td>
+  <td><a href="[% c.uri_for_action('/building/view',[object.building.id]) %]">[% object.building.name %]</a> 
+               [% object.building.description | html %]
+  </td>
+<tr>
+  <td>Floor:</td><td>[%object.floor%]</td>
+</tr>
+</tr>
+<tr>
+  <td>Notes:</td><td>[% object.notes | html %]</td>
+</tr>
+</table>
+[% add_css_tableinfo -%]
+
+<p>
+  <div class="buttons">	
+    <a href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% ui_icon('pencil') %] Edit</a>
+    &nbsp;<a href="[%c.uri_for_action('rack/delete',[object.id]) %]">
+      [% ui_icon('closethick') %] Delete</a>
+    &nbsp;<a href="[% c.uri_for_action('device/create', object.id, {backref
+  =>c.req.uri}) %]">[% ui_icon('plusthick') %] Add Device</a>
+  </div>
+</p>
+</div>
+
+   <div id="tabs-2">	
+[% FOREACH d IN object.devices %]
+   [% IF loop.first %]
+   [% init_table('devices') %]
+    <table class="display" id="devices">
+      <thead>  
+         <tr>
+ 	 <th>Level</th>
+ 	 <th>Name</th>
+ 	 <th>Address</th>
+         </tr>
+      </thead>  
+      <tbody>
+  [% END %]
+         <tr>
+ 	 <td>[% d.level %]</td>
+ 	 <td>[% d.name %]</td>
+ 	 <td>[% print_device(d) %]</td>
+         </tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+[% END %]
+        </div>
+
+
+
+  
+
+</div>
+
+

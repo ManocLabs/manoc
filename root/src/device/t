@@ -1,0 +1,13 @@
+/*
+ // selecting state (change) will populate cities select box
+ $("#states").bind("change",
+   function() {
+    $("#cities").children().remove() ;          // clear select box
+    var options = '' ;
+    for (var i = 0; i < state[this.value].length; i++) { 
+     options += '<option value="' + state[this.value][i] + '">' + state[this.value][i] + '</option>'; 
+    }
+    $("#cities").html(options);   // populate select box with array
+   }            // bind function end
+ );             // bind end 
+*/

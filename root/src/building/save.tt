@@ -1,0 +1,8 @@
+[%  META title='Create/Edit Building'    
+    section='Asset'
+ %]
+
+
+<div class="buttons">
+[% form.render %]
+</div>

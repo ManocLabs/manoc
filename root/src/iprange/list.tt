@@ -1,0 +1,37 @@
+[% META 
+   title='Subnet'
+   use_table=1
+   section='NetDB'
+-%]
+[% FOREACH s IN subnet_list %]
+   [% IF loop.first %]
+    [% init_table('subnet') %]
+    <table class="display" id="subnet">
+       <thead>  
+	 <tr>
+ 	 <th>Subnet Name</th>
+ 	 <th>Parent Name</th>
+	 <th>Network</th>
+	 <th>Netmask</th>
+  	 <th>From</th>
+	 <th>To</th>
+	 <th>Associated VLAN</th>
+         </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+ 	 <td><a href="[% c.uri_for_action('iprange/view', [s.name]) %]">[% s.name %]</a></td>
+  	 <td><a href="[% c.uri_for_action('iprange/view', [s.parent.name])%]">
+             [% s.parent.name %]</a></td>
+	 <td>[% s.network %]</td>
+  	 <td>[% s.netmask %]</td>
+	 <td>[% s.from_addr %]</td>
+ 	 <td>[% s.to_addr %]</td>
+	 <td>[% s.vlan_id.id %]</td>
+         </tr>
+  [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]

@@ -1,0 +1,26 @@
+[% META 
+   title='Report list of one type'
+   use_table=1
+   section='Reports'
+-%]
+
+
+ [% init_table('repolist', [{width => '75%'}, {width =>'25%'}],{sortby => 1, order => 'desc'})%] 
+ <table class="display" id="repolist">
+       <thead>  
+	 <tr>
+ 	 <th>Name</th>
+ 	 <th>Time of execution</th>
+         </tr>
+       </thead>  
+  <tbody>
+[% FOREACH r IN reports %]
+         <tr>
+ 	 <td>
+ 	  <a href="[% c.uri_for_action('/reportarchive/view', [r.id]) %]"> [% r.name %]  </a></td>
+ 	 <td>[% r.timestamp %]
+ 	 </td>
+         </tr>
+ [% END %]
+  </tbody>
+</table>

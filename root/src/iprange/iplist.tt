@@ -1,0 +1,53 @@
+
+
+[% FOREACH ip IN addresses %]
+   [% IF loop.first %]
+   [% init_table('iplist', [{sortable=>'true', type=>'ip-html'},{sortable=>'false'},{sortable=>'false'},{sortable=>'false'}], 
+		{disable_pagination => 1, cust_pag=>1 }) %]
+
+  <div id="toolbar_buttons">
+    <div class="buttons" >  
+       <a  href="[% prev_page -%]" [% UNLESS prev_page -%]id="disabled"[%END-%] >[% ui_icon('circle-arrow-w') -%]</a>
+       <a  href="[% next_page -%]" [% UNLESS next_page -%]id="disabled"[%END-%] >[% ui_icon('circle-arrow-e') -%]</a>
+    </div>	
+  </div>
+
+    <table class="display" id="iplist">
+       <thead>  
+	 <tr>
+ 	 <th>Address</th>
+ 	 <th>Lastseen</th>
+	 <th>Notes</th>
+	 <th>Commands</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+ 	 <td><a href="[% c.uri_for_action('ip/view',[ip.ipaddr]) %]">[% ip.ipaddr %]</a></td>
+  	 <td>
+	 [% ip.lastseen %]
+	 </td>
+	 <td>[% ip.notes %]</td>
+       <td> 
+        <a href="[% c.uri_for_action('ip/edit_notes',[ip.ipaddr],{backref=>
+       c.uri_for_action('iprange/view',[object.name], {def_tab=>'3', page => cur_page }) }) %]">[% icon('edit') %]</a>
+	[% IF ip.notes %]       
+           <a href="[% c.uri_for_action('ip/delete_notes',[ip.ipaddr],{backref=>
+       c.uri_for_action('iprange/view',[object.name], {def_tab=>'3', page => cur_page }) } ) %]">[% icon('remove') %]</a>
+    	[%END%]    
+       </td>
+         </tr>
+  [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]
+
+<script>
+$(function() { 
+  var $tb = $('#toolbar_buttons');
+  $('div.toolbar').html($tb.html());
+  $tb.empty();
+});
+</script>

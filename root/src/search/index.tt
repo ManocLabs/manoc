@@ -1,0 +1,122 @@
+[% META section="Search"
+        use_popup=1 -%]
+
+<form method="get"  enctype="multipart/form-data">
+<input type="hidden" name="advanced" value="[% advanced_search %]">
+<table align="center" >
+
+<tr>
+<td  class="search_cen" align="center">
+<input type="text" name="q" value="[% q | html %]" size="50"/>
+</td>
+
+</tr>
+
+[% IF advanced_search %]
+<tr>
+<td class="search_cen"> Type: 
+[% manoc_radiobox(options=search_types,name='type', default=default_type) %]
+</tr>
+<tr>
+<td class="search_cen" >Limit:
+<input type="text" name="limit" value="[% limit %]"/>  
+(Default is [% default_limit OR 'no limits' %])
+</td>
+</tr>
+[% END %]
+                  
+<tr>
+<td class="buttons" align="center">
+<input value="Search" type="submit" />
+</td>
+</tr>
+
+</table>
+
+[% MACRO item_building(item) BLOCK -%]
+<label id="search-cat">Building</label> <a href="[% c.uri_for_action('building/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
+[% END -%]
+[% MACRO item_rack(item) BLOCK -%]
+<label id="search-cat">Rack:</label>  <a href="[% c.uri_for_action('rack/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
+[%  END -%]
+[% MACRO item_device(item) BLOCK -%]
+<label id="search-cat">Device:</label> [% item.name %] [% print_device(item) -%]
+[% END -%]
+[% MACRO item_ipaddr(item) BLOCK -%]
+<label id="search-cat">IP:</label> [% print_ip(item.addr) %] 
+[% END -%]
+[% MACRO item_macaddr(item) BLOCK -%]
+<label id="search-cat">MAC:</label>  [% print_mac(item.addr) %]
+[% END -%]
+[% MACRO item_iface(item) BLOCK -%]
+<label id="search-cat">Interface:</label>  [% print_short_iface(item.device.id, item.interface) %] on
+[% print_device(item.device) %]
+[% END -%]
+[% MACRO item_generic_group(item) BLOCK -%]
+[% item.match %]
+[% END -%]
+[% MACRO item_vlan(item) BLOCK -%]
+<label id="search-cat">Vlan:</label>  [% print_vlan(item.id, item.name) %]
+[% END -%]
+[% MACRO item_ipnote(item) BLOCK -%]
+<label id="search-cat">IpNote:</label>  [% print_note(item.ipaddr, item.notes) %] 
+[% END -%]
+[% MACRO item_hostname(item) BLOCK -%]
+<label id="search-cat">Hostname:</label>  [% print_host(item.ipaddr, item.name) %] 
+[% END -%]
+[% MACRO item_iprange(item) BLOCK -%]
+<label id="search-cat">Subnet:</label>  [% print_iprange(item.name, item.iprange) %] 
+[% END -%]
+[% MACRO item_ipcalc(item) BLOCK -%]
+<label id="search-cat">Ipcalc:</label>  [% print_ipcalc(item.iprange, item.prefix) %] 
+[% END -%]
+[% MACRO item_vlanrange(item) BLOCK -%]
+<label id="search-cat">VlanRange:</label>  [% print_vlanrange(item.name) %] 
+[% END -%]
+[% MACRO item_logon(item) BLOCK -%]
+<label id="search-cat">Logon:</label>  [% item.match %]
+[% END -%]
+
+[% MACRO item_generic(item) BLOCK %]
+  [% SWITCH item.item_type -%]
+     [%  CASE 'building'  %][% item_building(item)      -%]
+     [%  CASE 'rack'      %][% item_rack(item)          -%]
+     [%  CASE 'device'    %][% item_device(item)        -%]
+     [%  CASE 'ipaddr'    %][% item_ipaddr(item)        -%]
+     [%  CASE 'macaddr'   %][% item_macaddr(item)       -%]
+     [%  CASE 'iface'     %][% item_iface(item)         -%]
+     [%  CASE 'vlan'      %][% item_vlan(item)          -%]
+     [%  CASE 'hostname'  %][% item_hostname(item)      -%]
+     [%  CASE 'iprange'   %][% item_iprange(item)       -%]
+     [%  CASE 'ipcalc'    %][% item_ipcalc(item)        -%]
+     [%  CASE 'logon'     %][% item_logon(item)         -%]
+     [%  CASE 'vlanrange' %][% item_vlanrange(item)     -%]
+     [%  CASE 'group'     %][% item_generic_group(item) -%]
+     [% END -%]
+   [% IF item.text -%]<span class="result-text">[% item.text -%]</span>[% END -%]
+[% END -%]
+[% IF not(result.items.size) and q %]
+  [% PROCESS 'message.tt' msg="There are no results!" -%]
+[% END %]
+[% FOREACH item IN result.items -%]
+  [% '<ul class="results">' IF loop.first %]
+  <li>
+  [% IF item.item_type == 'group' && item.items.size == 1 %]
+    [% item_generic(item.items.0) %]
+  [% ELSE %]
+    [% item_generic(item) %] 
+      [% IF item.items %]
+	<ul>
+	[% FOREACH subitem IN item.items -%]		
+	<li>[% item_generic(subitem) %]</li>
+	[% END -%]
+        </ul>
+     [% END -%]
+  [% END %]
+  </li>
+  [% '</ul>' IF loop.last %]
+[% END %]
+
+[% IF not(result.items.size) %]
+<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme"> Istruzioni per l'uso</a></p>
+[% END%]

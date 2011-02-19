@@ -1,0 +1,6 @@
+[%  META title='Management URL Format' 
+    section='Config' %]
+
+<div class="buttons">
+[% form.render %]
+</div>

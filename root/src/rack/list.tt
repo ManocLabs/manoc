@@ -1,0 +1,33 @@
+[% META 
+   title='Rack'
+   use_table=1
+   section='Asset'
+-%]
+
+<div class="buttons create_btn">
+<a href="[% c.uri_for_action('/rack/create') %]" >
+   [% ui_icon('circle-plus') %] Create a Rack</a>
+[% add_css_create_btn %]
+</div>
+
+ [% init_table('rack_list')%] 
+ <table class="display" id="rack_list">
+       <thead>  
+	 <tr>
+ 	 <th>Rack</th>
+ 	 <th>Building</th>
+ 	 <th>Floor</th>
+	 <th>Notes</th>
+         </tr>
+       </thead>  
+  <tbody>
+[% FOREACH r IN rack_table %]
+         <tr>
+ 	 <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]> [% r.name %] </a></td>
+ 	 <td>[% r.building.id %]</td>
+ 	 <td>[% r.floor %]</td>
+ 	 <td>[% r.notes %]</td>
+         </tr>
+ [% END %]
+  </tbody>
+</table>

@@ -1,0 +1,6 @@
+[% META title='Edit Ip Notes'%]
+
+<div class="buttons">
+[% form.render %] 
+</div>
+

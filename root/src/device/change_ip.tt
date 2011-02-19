@@ -1,0 +1,27 @@
+[% META title='Change IP' 
+   section='Asset' %]
+
+
+<form method="POST">
+<input type="hidden" name="id" value="[% object.id %]" />
+<table id="info">
+<tr>
+  <td>Device name:</td>
+  <td>[% object.name %]</td>
+</tr>
+<tr>
+  <td>Old address:</td>
+  <td>[% object.id %]</td>
+</tr>
+<tr>
+  <td>New address:</td>
+  <td><input type="text" name="new_ip" value="[% new_ip %]" /></td>
+  <td>[% IF error.ip %]<span class="error" id="error">[% error.ip %] </span>[%END%]</td>
+</tr>
+</table>
+[% add_css_tableinfo %]
+<div class="buttons" style="padding:1em" >
+<input type="submit" name="submit" value="Submit" />
+<input type="submit" name="discard" value="Discard" />
+</div>
+</form>

@@ -1,0 +1,115 @@
+[% META 
+   title='Interface View'
+   use_table=1
+-%]
+
+<div id="tabs">	
+  <ul>
+     <li><a href="#tabs-1">Interface info</a></li>
+     <li><a href="#tabs-2">Mac Address History</a></li>
+ </ul>
+
+<div id="tabs-1">
+<table id="info">
+<tr>
+  <td>Interface:</td><td>[% obj.interface %] </td>
+</tr>
+<tr>
+  <td>Switch:</td><td>[% device.name | html %]
+   (<a href="[% c.uri_for_action('device/view', [device.id])%] ">[% device.id %]</a>)</td>
+</tr>
+<tr>
+  <td>Switch Model:</td><td>[% device.model | html %]</td>
+</tr>
+<tr>
+  <td>Switch Location:</td>
+  <td>Building [% device.rack.building.name %] ( [%
+  device.rack.building.description | html  %] ), Rack [% device.rack.name %]</td>
+<tr>
+  <td>Description:</td><td>[% obj.description | html  %] </td>
+</tr>
+<tr>
+  <td>Status (admin):</td>
+  <td>
+    [% obj.up %] ([% obj.up_admin %])	
+  </td>
+</tr>
+<tr>
+  <td>Duplex (admin):</td>
+  <td>
+	[% obj.duplex %]([% obj.duplex_admin %])
+  </td>
+</tr>
+<tr>
+  <td>Vlan:</td>
+  <td>
+      [% print_vlan(obj.vlan) %]
+  </td>
+</tr>
+<tr>
+  <td>STP Status</td>
+  <td> [% obj.stp_state %] </td>
+</tr>
+<tr>
+  <td>Portsecurity:</td>
+  <td>
+    [% IF obj.cps_enable %]
+	[% obj.cps_status %] -
+        [% obj.cps_count %] violations
+    [% ELSE %]
+    Disabled
+    [% END %]
+  </td>
+</tr>
+<tr> 
+  <td>Notes: </td>
+  <td>[% notes | html %]</td>
+</tr>
+</table>
+[% add_css_tableinfo %]
+<div class="buttons">	
+[% IF notes=='' %]
+   <a href="[% c.uri_for_action
+   ('interface/edit_notes', [obj.device,obj.interface])%]">
+   [% ui_icon('plusthick') %] Add a Note</a>
+[% ELSE %]
+<a href="[% c.uri_for_action
+   ('interface/edit_notes', [obj.device,obj.interface])%]">Edit Note</a>
+<a href="[% c.uri_for_action
+   ('interface/delete_notes', [obj.device,obj.interface])%]">Delete</a> 
+[% END %]
+</div>
+
+</div>  <!-- end tabs-1 -->
+
+<div id="tabs-2">
+
+[% FOREACH m IN mat_results %]
+   [% IF loop.first %]
+     [% init_table('mat',undef, {sortby=>3,order=>'desc'}) %]
+        <table class="display"  id="mat">
+      <thead>  
+         <tr>
+ 	 <th>Mac Address</th>
+ 	 <th>Vlan</th>
+ 	 <th>From</th>
+	 <th>To</th>
+         </tr>
+      </thead>  
+      <tbody>
+  [% END %]
+         <tr>
+ 	 <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
+ 	 <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
+ 	 <td> [% m.firstseen %]</td>
+	 <td> [% m.lastseen  %]</td>
+         </tr>
+  [% IF loop.last %]
+      </tbody>
+    </table>
+  [% END %]
+[% END %]
+
+</div> <!-- end tabs-2 -->
+
+<div> <!-- end tabs -->

@@ -1,0 +1,53 @@
+#! /bin/sh
+# Author: GM
+#
+# System startup script for manoc (RHEL)
+#
+# chkconfig: - 65 35
+# description: manoc arp sniffer
+
+### BEGIN INIT INFO
+# Provides: manoc
+# Required-Start: $network
+# Required-Stop:  
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    network manoc
+### END INIT INFO
+
+. /etc/init.d/functions
+
+MANOC_ROOT=/home/manoc/production
+MANOC_ARPD=$MANOC_ROOT/bin/arpsnifferd
+
+test -x $MANOC_ARPD || exit 5
+
+case "$1" in
+    start)
+	echo -n "Starting manoc arp sniffer "
+	daemon $MANOC_ARPD --daemon
+	RETVAL=$?
+	echo
+	;;
+    stop)
+	echo -n "Shutting down manoc arp sniffer "
+	killproc -TERM $MANOC_ARPD
+	RETVAL=$?
+	echo
+	;;
+    restart)
+	$0 stop
+	$0 start
+        ;;
+    status)
+	echo -n "Checking for manoc arp sniffer: "
+	status $MANOC_ARPD
+	echo
+	;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+
+exit $RETVAL

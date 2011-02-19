@@ -1,0 +1,13 @@
+
+<table>
+<tr>
+  <td>Are you sure to delete this Object?</td>
+<td>
+<form method="POST" >
+<div class="buttons">
+<input type="submit" name="submit" value="Submit"/>
+</div>
+</form>
+</td>
+</tr>
+</table>

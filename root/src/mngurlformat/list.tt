@@ -1,0 +1,38 @@
+[% META 
+   title='Management Urls'
+   use_table=1
+   section='Config'
+%]
+
+<div class="buttons create_btn">
+<a href="[% c.uri_for_action('/mngurlformat/create') %]" >
+   [% ui_icon('circle-plus') %] Add Format</a>
+[% add_css_create_btn %]
+</div>
+
+[% FOREACH o IN obj_list %]
+   [% IF loop.first %]  
+   [% init_table('objlist',[{width=>'40%'},{width=>'40%'},{width=>'10%'}]) %] 
+    <table class="display" id="objlist">
+       <thead>  
+	 <tr>
+ 	 <th>Name</th>
+ 	 <th>Description</th>
+  	 <th>Commands</th>
+         </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+         <tr>
+ 	 <td>[% o.name %]</td>
+ 	 <td>[% o.format %]</td>
+	  <td>
+	   <a href="[% c.uri_for_action('/mngurlformat/edit', [o.id],{backref=>c.req.uri})%] ">[% icon('edit') %]</a>
+           <a href="[% c.uri_for_action('/mngurlformat/delete',[o.id],{backref=>c.req.uri})%] ">[% icon('remove') %]</a>
+   	   </td>
+           </tr>
+  [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]

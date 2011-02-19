@@ -1,0 +1,88 @@
+[% META 
+   title='Archive Report'
+   use_table=1
+   section='Reports'
+-%]
+
+<h3>  [% report_name %] ([% timestamp %])</h3>
+
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Summary</a></li>
+		<li><a href="#tabs-2">Archived</a></li>
+		<li><a href="#tabs-3">Discarded</a></li>
+		<li><a href="#tabs-4">Errors</a></li>
+	</ul>
+
+
+<div id="tabs-1">
+   
+   <table id="info">
+         <tr>
+  	  <td> Totale records archived: </td>
+  	  <td> [% report_obj.tot_archived %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> Totale records discarded: </td>
+  	  <td> [% report_obj.tot_discarded %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> Number of errors occurred: </td>
+  	  <td> [% IF report_obj.all_error.0 %]
+               [% report_obj.error_count  %] 
+               [% ELSE %] 0
+               [% END %]
+          </td> 
+ 	 </tr>
+  </table>
+    [% add_css_tableinfo %]
+</div> <!--end of tab1 -->
+
+<div id="tabs-2">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_archived.0 -%]
+<p> Archived lastseen before [% report_obj.archive_date%] from:</p>
+                         
+<table class="report ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_archived %]
+ 	 <tr class="[% loop.parity %]">
+ 	 <td>[% element.source  %]</td>
+       	 <td>[% element.n_archived  %]</td>
+ 	 </tr>
+ [% END %]
+ </table>
+ </div><!--end of tab2 -->
+
+<div id="tabs-3">
+[% PROCESS message.tt msg="There are no results for this view" 
+                         UNLESS report_obj.all_discarded.0 -%]
+<p> Discarded lastseen before [% report_obj.discard_date%] from: </p>
+
+<table class="report  ui-priority-primary ui-corner-all">
+[% FOREACH element IN report_obj.all_discarded %]
+ 	 	 <tr class="[% loop.parity %]" >
+               	 <td>[% element.source  %]    </td>
+		 <td>[% element.n_discarded %]</td>
+                 </tr>
+ [% END %]
+ </table>
+</div><!--end of tab3 -->
+
+<div id="tabs-4">
+[% PROCESS message.tt msg="No errors occurred." 
+                         UNLESS report_obj.all_error.0 -%]
+
+<table class="report ui-priority-primary ui-corner-all">
+
+
+[% FOREACH element IN report_obj.all_error %]
+	 <tr class="[% loop.parity %]">
+ 	 <td>[% element.type %] </td>
+  	 <td>[% element.message %] </td>
+
+	 </tr>
+ [% END %]
+</table>
+</div><!--end of tab4 -->
+
+</div>
