@@ -10,13 +10,8 @@ use Data::Dumper;
 
 extends 'Manoc::DataDumper::Converter';
 
-sub upgrade {
-    my ( $self, $data, $table ) = @_;
-    $table eq 'win_logon' and return $self->upgrade_winlogon( $data->{'win_logon'} );
-    $table eq 'sessions' and return $self->upgrade_sessions( $data->{'sessions'} );
-    return 0;
-}
 
+# check for spurious data
 sub upgrade_winlogon {
     my ( $self, $data ) = @_;
     my $count = 0;
@@ -33,16 +28,13 @@ sub upgrade_winlogon {
     return $count;
 }
 
-# delete session data!
+# delete session datas
 sub upgrade_sessions {
     my ( $self, $data ) = @_;
-    my $count = 0;
 
-    return 0 unless ( defined($data) );
-
-    $count = scalar( @{$data} );
-    @{$data} = ();
-    return $count;
+    $data->{'sessions'} = undef;
+    
+    return 0;
 }
 
 no Moose;    # Clean up the namespace.

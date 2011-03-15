@@ -21,6 +21,8 @@ use Manoc::DataDumper::VersionType;
 
 use Manoc::DB;
 
+use Try::Tiny;
+
 has 'filename' => (
     is       => 'ro',
     isa      => 'Str',
@@ -71,10 +73,18 @@ sub _build_metadata {
 sub load {
     my ( $self, $filename ) = @_;
 
+    my $tar;
+
+    -f $filename or return undef;
+    try {
+       $tar = Archive::Tar->new($filename);
+    }
+    $tar or return undef;    
+    
     return $self->new(
         {
             filename => $filename,
-            tar      => Archive::Tar->new($filename),
+            tar      => $tar
         }
     );
 }

@@ -5,10 +5,8 @@ package Manoc::DataDumper;
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
 use Moose;
+use Manoc::DB;
 use Manoc::DataDumper::Converter;
 use Manoc::DataDumper::VersionType;
 use Data::Dumper;
@@ -60,12 +58,30 @@ sub get_source_names {
     return \@include_list;
 }
 
-################################################################################################################
-###################################### L O A D   A C T I O N ###################################################
-################################################################################################################
+#----------------------------------------------------------------------#
+#                      L O A D   A C T I O N                           #
+#----------------------------------------------------------------------#
+
 
 sub load_tables_loop {
     my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
+
+    my $converter;
+    
+    # try to load a converter if needed
+    my $version = $datadump->metadata->{'version'};
+    if ( $version < Manoc::DB::get_version ) {
+        my $c = 0;
+        my $converter_class =
+          Manoc::DataDumper::Converter->get_converter_class( $version );
+        
+        if (defined($converter_class) ) {
+            $converter = $converter_class->new({ log => $self->log });
+            $self->log->info("Using converter $converter_class.");
+        }        
+    }
+
+
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
@@ -82,17 +98,15 @@ sub load_tables_loop {
             $self->log->info("File is empty. Skipping...");
             next;
         }
-
-        #convert data if needed
-        if ( $datadump->metadata->{'version'} < Manoc::DB::get_version ) {
-            my $c = 0;
-            my $converter =
-                Manoc::DataDumper::Converter->get_converter( $datadump->metadata->{'version'} );
-            defined($converter) and $c = $converter->upgrade( $datadump->data, $table );
-            $self->log->info("Number of records converted: $c");
-        }
-
+        
         $self->log->info("Loaded $count records from $table.yaml");
+
+        $converter and $converter->upgrade_table( $datadump->data, $table );
+        if ( ! defined($datadump->data->{$table}) ) {
+            $self->log->info("No data to import in $table");
+            next;
+        }
+                    
         $self->load_table( $source, $datadump->data->{$table}, $overwrite, $force );
     }
 }
@@ -126,6 +140,11 @@ sub load {
 
     my $datadump = Manoc::DataDumper::Data->load( $self->filename );
 
+    if (! defined($datadump)) {
+        $self->log->fatal("cannot open ", $self->filename);
+        return undef;
+    }
+    
     my $file_set = { map { $_ => 1 } $datadump->tar->list_files };
     my $source_names = $self->get_source_names();
 
@@ -147,9 +166,7 @@ sub load {
     $self->log->info("Database restored!");
 }
 
-################################################################################################################
-###################################### S A V E   A C T I O N ###################################################
-################################################################################################################
+
 
 sub dump_table {
     my ( $storage, $dbh, $datadump, $table, $cols ) = @_;
@@ -174,6 +191,10 @@ sub dump_table {
 
     $datadump->save_table( $table, \@list );
 }
+
+#----------------------------------------------------------------------#
+#                      S A V E   A C T I O N                           #
+#----------------------------------------------------------------------#
 
 sub save {
     my ($self) = @_;

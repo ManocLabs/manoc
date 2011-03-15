@@ -5,24 +5,36 @@
 
 package Manoc::DataDumper::Converter;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
 use Moose;
-use Data::Dumper;
-use Manoc::DB;
-use Manoc::DataDumper::Converter::Converter_1000000;
+use Class::MOP;
 
-sub get_converter {
+has 'log' => (
+    is       => 'ro',
+    required => 1,
+);
+
+sub get_converter_class {
     my ( $self, $release ) = @_;
 
-    if ( $release eq '1.000000' ) {
-        return Manoc::DataDumper::Converter::Converter_1000000->new();
-    }
-    return undef;
+    my $class_name;
+    
+    $release eq '1.000000' and $class_name = 'Converter_1000000';
+
+    $class_name or return undef;
+    $class_name = "Manoc::DataDumper::Converter::$class_name";
+    Class::MOP::load_class($class_name) or return undef;
+    return $class_name;
 }
 
-sub upgrade { }
+sub upgrade_table {
+    my ( $self, $data, $table ) = @_;
+
+    my $method_name = "upgrade_$table";
+    return 0 unless $self->can($method_name);
+
+    $self->log->info("Running converter for table $table");
+    return $self->$method_name($data);
+}
 
 no Moose;    # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
