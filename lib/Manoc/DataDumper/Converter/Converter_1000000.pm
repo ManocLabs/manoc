@@ -13,6 +13,7 @@ extends 'Manoc::DataDumper::Converter';
 sub upgrade {
     my ( $self, $data, $table ) = @_;
     $table eq 'win_logon' and return $self->upgrade_winlogon( $data->{'win_logon'} );
+    $table eq 'sessions' and return $self->upgrade_sessions( $data->{'sessions'} );
     return 0;
 }
 
@@ -29,6 +30,18 @@ sub upgrade_winlogon {
             splice( @{$data}, $i, 1 );
         }
     }
+    return $count;
+}
+
+# delete session data!
+sub upgrade_sessions {
+    my ( $self, $data ) = @_;
+    my $count = 0;
+
+    return 0 unless ( defined($data) );
+
+    $count = scalar( @{$data} );
+    @{$data} = ();
     return $count;
 }
 
