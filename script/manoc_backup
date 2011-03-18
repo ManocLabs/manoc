@@ -90,7 +90,7 @@ sub do_device {
         #Get configuration via telnet
         ( $config, $message ) =
           Manoc::CiscoUtils->get_config( $device_id, $self->schema,
-            $self->config->{'Script::Backup'} );
+            $self->config->{'Backup'} );
         $config or return ( 0, $message );
 
         #Update configuration in DB
@@ -176,7 +176,7 @@ sub update_device_config {
 sub check_lastrun {
     my $self     = shift;
     my $interval = Manoc::Utils::str2seconds(
-        $self->config->{'Script::Backup'}->{'interval'} );
+        $self->config->{'Backup'}->{'interval'} );
 
     $interval or $self->log->logdie("Backup interval not configured");
 
