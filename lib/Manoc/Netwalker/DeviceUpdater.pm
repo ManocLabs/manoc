@@ -2,7 +2,12 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
+
 package Manoc::Netwalker::DeviceUpdater;
+
+# The DeviceUpdater is a bridge between a Netwalker::Source and the
+# data in the Manoc DB
+
 
 use Moose;
 with 'Manoc::Logger::Role';
@@ -27,11 +32,14 @@ has 'schema' => (
     required => 1
 );
 
+# used to to recognise neighbors and uplinks
 has 'device_set' => (
     is       => 'ro',
     isa      => 'HashRef',
     required => 1,
 );
+
+# netwalker global config
 has 'config' => (
     is       => 'ro',
     isa      => 'HashRef',

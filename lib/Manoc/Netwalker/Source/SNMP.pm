@@ -2,9 +2,13 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
+
+# A frontend for SNMP::Info
+
 package Manoc::Netwalker::Source::SNMP;
 use Moose;
 
+with 'Manoc::Netwalker::Source';
 with 'Manoc::Logger::Role';
 
 use Carp;
