@@ -44,23 +44,6 @@ has 'snmp_info' => (
     builder => '_build_snmp_info',
 );
 
-has 'neighbors' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_neighbors',
-);
-
-has 'mat' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_mat',
-);
-
-has 'ifstatus_table' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_ifstatus_table',
-);
 
 #-----------------------------------------------------------------------#
 sub _build_snmp_info {

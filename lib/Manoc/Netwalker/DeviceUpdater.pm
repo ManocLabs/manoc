@@ -179,7 +179,7 @@ sub update_device_entry {
     }
     elsif ( $name ne $entry->name ) {
         my $msg = "Name mismatch " . $entry->name . " $name";
-        $self->log->warning($msg);
+        $self->log->warn($msg);
         $self->report->add_warning($msg);
     }
 
@@ -188,7 +188,7 @@ sub update_device_entry {
     }
     elsif ( $model ne $entry->model ) {
         my $msg = "Model mismatch " . $entry->model . " $model";
-        $self->log->warning($msg);
+        $self->log->warn($msg);
         $self->report->add_warning($msg);
     }
 

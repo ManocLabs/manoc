@@ -7,12 +7,30 @@ use Moose::Role;
 
 requires 'connect';
 
-requires 'neighbors';
 requires 'device_info';
-requires 'boottime'
+requires 'boottime';
 
-requires 'ifstatus_table';
-requires 'mat';
+
+has 'neighbors' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_neighbors',
+);
+requires '_build_neighbors';
+
+has 'mat' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_mat',
+);
+requires  '_build_mat';
+
+has 'ifstatus_table' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_ifstatus_table',
+);
+requires '_build_ifstatus_table';
 
 requires 'vtp_domain';
 requires 'vtp_database';
