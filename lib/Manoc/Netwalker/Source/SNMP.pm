@@ -132,7 +132,7 @@ sub _build_neighbors {
     my $info           = $self->snmp_info;
     my $interfaces     = $info->interfaces();
     my $c_if           = $info->c_if();
-    my $c_ip           = $info > c_ip();
+    my $c_ip           = $info->c_ip();
     my $c_port         = $info->c_port();
     my $c_capabilities = $info->c_capabilities();
 
@@ -183,7 +183,7 @@ sub _build_mat {
         $mat->{default}->{$mac} = $port;
     }
 
-    if ( $info->cisco_comm_indexing() && !$self->is_subreq ) {
+    if ( $info->cisco_comm_indexing() && !$self->is_subrequest ) {
         $self->log->debug("Device supports Cisco community string indexing.");
 
         my $v_name = $info->v_name() || {};
@@ -213,16 +213,16 @@ sub _build_mat {
 
             $self->log->debug(" VLAN: $vlan - $vlan_name");
             my $vlan_comm = $self->community . '@' . $vlan;
-            my $subreq    = SNMP(
-                host      => $self->host,
-                community => $vlan_comm,
-                version   => $self->version,
-                is_subreq => 1
+            my $subreq    = Manoc::Netwalker::Source::SNMP->new(
+                host          => $self->host,
+                community     => $vlan_comm,
+                version       => $self->version,
+                is_subrequest => 1
             );
             next unless defined($subreq);
 
             # merge mat
-            $subreq->mat and $mat->{$vlan} = $subreq->mat;
+            $subreq->mat and $mat->{$vlan} = $subreq->mat->{default};
         }
     }    # end of cisco vlan comm indexing
 
@@ -297,7 +297,7 @@ sub device_info {
 sub _build_ifstatus_table {
     my $self = shift;
 
-    my $info = self->snmp_info;
+    my $info = $self->snmp_info;
 
     # get interface info
     my $interfaces     = $info->interfaces();

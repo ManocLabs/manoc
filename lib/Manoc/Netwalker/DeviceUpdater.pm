@@ -159,6 +159,11 @@ sub update_all_info {
 
     $self->log->info( "updating all device info for ", $self->entry->id );
     $self->update_device_entry;
+    $self->update_cdp_neighbors;
+    $self->update_if_table;
+    $self->update_mat;
+    $self->update_vtp_database;
+    #update_arp_table;
 }
 
 #----------------------------------------------------------------------#
@@ -221,7 +226,7 @@ sub update_cdp_neighbors {
                     from_interface => $p,
                     to_device      => $s->{addr},
                     to_interface   => $s->{port},
-                    last_seen      => $self->Timestamp
+                    last_seen      => $self->timestamp
                 }
             );
             $link->update;
@@ -267,7 +272,7 @@ sub update_mat {
     my $entry  = $self->entry;
     my $schema = $self->schema;
 
-    my $uplinks = $self->uplinks;
+    my $uplinks = $self->uplink_ports;
     $self->log->debug( "device uplinks: ", join( ",", keys %$uplinks ) );
 
     my $timestamp = $self->timestamp;
@@ -276,6 +281,7 @@ sub update_mat {
     my $ignore_portchannel = $self->config->{ignore_portchannel};
 
     my $mat = $source->mat();
+
     while ( my ( $vlan, $entries ) = each(%$mat) ) {
         $self->log->debug("updating mat vlan $vlan");
 
