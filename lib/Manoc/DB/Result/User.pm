@@ -11,7 +11,7 @@ __PACKAGE__->load_components(qw(PK::Auto EncodedColumn Core));
 __PACKAGE__->table('users');
 __PACKAGE__->add_columns(
     id => {
-        data_type         => 'integer',
+        data_type         => 'int',
         is_nullable       => 0,
         is_auto_increment => 1,
     },
@@ -39,10 +39,10 @@ __PACKAGE__->add_columns(
         is_nullable => 1
     },
     active => {
-        data_type   => 'integer',
-        size        => 1,
-        is_nullable => 0,
-        default     => 1,
+        data_type     => 'int',
+        size          => 1,
+        is_nullable   => 0,
+        default_value => 1,
     }
 );
 __PACKAGE__->set_primary_key(qw(id));

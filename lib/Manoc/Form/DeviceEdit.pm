@@ -37,6 +37,7 @@ has_field 'model' => (
         },
     ]
 );
+
 #Location
 has_field 'rack' => (
     type         => 'Select',
@@ -60,13 +61,18 @@ has_field 'get_arp' => (
 );
 
 has_field 'vlan_arpinfo' => (
-    type  => 'Text',
+    type  => 'Select',
     label => 'ARP info on VLAN',
 );
 
 has_field 'get_mat' => (
     type  => 'Checkbox',
     label => 'Get MAT'
+);
+
+has_field 'mat_native_vlan' => (
+    type  => 'Select',
+    label => 'Native VLAN for MAT info',
 );
 
 has_field 'get_dot11' => (
@@ -131,6 +137,25 @@ sub options_mng_url_format {
     my $rs = $self->schema->resultset('MngUrlFormat')->search( {}, { order_by => 'name' } );
 
     return map +{ value => $_->id, label => $_->name }, $rs->all();
+}
+
+sub options_mat_native_vlan {
+    my $self = shift;
+    return $self->_do_options_vlan()
+}
+
+sub options_vlan_arpinfo {
+    my $self = shift;
+    return $self->_do_options_vlan()
+}
+
+sub _do_options_vlan {
+    my $self = shift;
+
+    return unless $self->schema;
+    my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
+
+    return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 }
 
 1;

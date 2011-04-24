@@ -15,6 +15,7 @@ with 'HTML::FormHandler::Render::Table';
 has_field 'rack' => (
     type         => 'Select',
     label        => 'Rack name',
+    required => 1,
     empty_select => '---Choose a Rack---',
 );
 
@@ -55,6 +56,8 @@ has_field 'model' => (
     ]
 );
 
+has_field 'level' => ( type => 'Text',  required => 1, );
+
 has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
 has_field 'discard' => ( type => 'Submit', value => 'Discard' );
 
@@ -75,7 +78,7 @@ sub options_rack {
         my $label = "Rack " . $rack->name . " (" . $rack->building->name . ")";
         push @selections, { value => $rack->id, label => $label };
     }
-    return @selections;
+    return { label =>"---Choose a Rack---", value => ""}, @selections;
 }
 
 1;

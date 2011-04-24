@@ -30,10 +30,10 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'archived' => {
-        data_type   => 'int',
-        is_nullable => 0,
-        size        => 1,
-        default     => '0',
+        data_type     => 'int',
+        is_nullable   => 0,
+        size          => 1,
+        default_value => '0',
     },
 );
 

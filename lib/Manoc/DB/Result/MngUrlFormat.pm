@@ -11,7 +11,7 @@ __PACKAGE__->table('mng_url_fmt');
 
 __PACKAGE__->add_columns(
     id => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 0,
     },
     name => {

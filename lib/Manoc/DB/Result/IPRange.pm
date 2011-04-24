@@ -48,7 +48,7 @@ __PACKAGE__->add_columns(
         size        => 64
     },
     'vlan_id' => {
-        data_type      => 'integer',
+        data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
     }
