@@ -221,11 +221,11 @@ sub process_new_vlan : Private {
 
     #Check new vlan id
     $id =~ /^\d+$/ or $error->{id} = "Invalid vlan id";
-    $c->model('ManocDB::Vlan')->find( 'id' => $id ) and
+    $c->model('ManocDB::Vlan')->find({ 'id' => $id }) and
         $error->{id} = "Duplicated vlan id";
 
     #Check parameters
-    my $dup = $c->stash->{'resultset'}->find( 'name' => $name );
+    my $dup = $c->stash->{'resultset'}->find({ 'name' => $name });
     $dup and $error->{name} = "Duplicated vlan name";
     $name =~ /^\w[\w-]*$/ or $error->{name} = "Invalid vlan name";
 
