@@ -23,69 +23,69 @@ __PACKAGE__->add_columns(
         size        => 64
     },
     'description' => {
-        data_type   => 'varchar',
-        size        => 128,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 128,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'up' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'up_admin' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'duplex' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'duplex_admin' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'speed' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'stp_state' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'cps_enable' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'cps_status' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'cps_count' => {
-        data_type   => 'varchar',
-        size        => 16,
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'varchar',
+        size          => 16,
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'vlan' => {
-        data_type   => 'integer',
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'int',
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
 );
 
