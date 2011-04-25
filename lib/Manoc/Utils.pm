@@ -177,6 +177,11 @@ sub netmask2prefix {
     return $INET_NETMASK{$netmask};
 }
 
+sub padded_ipaddr {
+    my $addr = shift;
+    join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
+}
+
 BEGIN {
     my $netmask_i;
 
