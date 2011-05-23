@@ -28,14 +28,14 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'broadcast' => {
-        data_type   => 'integer',
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'int',
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
     'channel' => {
-        data_type   => 'integer',
-        is_nullable => 1,
-        default     => 'NULL'
+        data_type     => 'int',
+        is_nullable   => 1,
+        default_value => 'NULL'
     },
 );
 

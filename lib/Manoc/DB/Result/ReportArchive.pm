@@ -11,7 +11,7 @@ __PACKAGE__->table('report_archive');
 
 __PACKAGE__->add_columns(
     id => {
-        data_type         => 'integer',
+        data_type         => 'int',
         is_nullable       => 0,
         is_auto_increment => 1,
     },
@@ -21,7 +21,7 @@ __PACKAGE__->add_columns(
         size        => 64,
     },
     timestamp => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 0,
     },
     type => {

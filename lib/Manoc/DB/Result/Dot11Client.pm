@@ -40,7 +40,7 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
     },
     'vlan' => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 1,
     },
     'parent' => {
@@ -64,19 +64,19 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
     },
     'power' => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 1,
     },
     'quality' => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 1,
     },
     'mic' => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 1,
     },
     'wep' => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 1,
     },
     'authen' => {

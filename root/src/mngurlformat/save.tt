@@ -4,3 +4,4 @@
 <div class="buttons">
 [% form.render %]
 </div>
+<p>Use <tt>%h</tt> as a placeholder for device address</p>

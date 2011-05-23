@@ -11,7 +11,7 @@ __PACKAGE__->table('vlan');
 
 __PACKAGE__->add_columns(
     id => {
-        data_type   => 'integer',
+        data_type   => 'int',
         is_nullable => 0
     },
     name => {
@@ -25,7 +25,7 @@ __PACKAGE__->add_columns(
         is_nullable => 1
     },
     vlan_range => {
-        data_type      => 'integer',
+        data_type      => 'int',
         is_nullable    => 0,
         is_foreign_key => 1
     }
