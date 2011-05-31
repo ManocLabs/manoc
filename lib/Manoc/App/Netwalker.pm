@@ -8,6 +8,8 @@ package Manoc::App::Netwalker;
 use Moose;
 extends 'Manoc::App';
 
+with qw(MooseX::Workers);
+
 use Manoc::Netwalker::DeviceUpdater;
 
 has 'device' => (
@@ -21,6 +23,42 @@ has 'debug' => (
     isa     => 'Bool',
     default => 0,
 );
+
+my $Reports = {};
+
+sub visit_device {
+    my ($device_id, $device_set, $config) = @_;
+
+    # my $device_entry = $self->schema->resultset('Device')->find( $device_id );
+    # $device_entry or $self->log->logdie( $self->device, " not in device list" );
+
+    # my $updater = Manoc::Netwalker::DeviceUpdater->new(
+    #     entry      => $device_entry,
+    #     config     => $config,
+    #     device_set => $device_set,
+    #     schema     => $self->schema,
+    #     timestamp  => time
+    # );
+    # $updater->update_all_info();
+
+    #print $updater->report->freeze;
+    print @{POE::Filter::Reference->new->put([ {id => $device_id,
+                                                report => "ohyeah", } 
+                                              ])};
+}
+
+sub worker_stdout  {  
+ my ( $self, $result ) = @_;
+
+ $Reports->{$result->id} = $result->report; 
+}
+
+sub worker_manager_stop  { 
+
+    use Data::Dumper;
+    print Dumper($Reports);
+}
+
 
 sub run {
     my $self = shift;
@@ -41,18 +79,18 @@ sub run {
         ignore_portchannel => $self->config->{Netwalker}->{ignore_portchannel} || 1,
     );
 
-    my $device_entry = $self->schema->resultset('Device')->find( $self->device );
-    $device_entry or $self->log->logdie( $self->device, " not in device list" );
+    my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
+    #set the number of parallel procs
+    $self->max_workers($n_procs);
+    
 
-    my $updater = Manoc::Netwalker::DeviceUpdater->new(
-        entry      => $device_entry,
-        config     => \%config,
-        device_set => \%device_set,
-        schema     => $self->schema,
-        timestamp  => time
-    );
-    $updater->update_all_info();
-    print $updater->report->freeze;
+    # spawn workers
+    foreach(@device_ids){
+        $self->enqueue( visit_device($_, \%device_set, \%config)  );
+        
+    }
+
+   POE::Kernel->run();
 }
 
 no Moose;    # Clean up the namespace.
