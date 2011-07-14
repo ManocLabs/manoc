@@ -35,7 +35,7 @@ sub archive {
     my ($self, $time) = @_;
     my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!") ;
     my $schema       = $self->schema;
-    my $archive_age  = Manoc::Utils::str2seconds($conf->{'age'}); 
+    my $archive_age  = Manoc::Utils::str2seconds($conf->{'archive_age'}); 
     my $tot_archived = 0;
 
    if (! $archive_age) {
@@ -69,7 +69,7 @@ sub archive {
 sub discard {
     my ($self, $time) = @_;
     my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
-    my $discard_age  = Manoc::Utils::str2seconds($conf->{'age'}); 
+    my $discard_age  = Manoc::Utils::str2seconds($conf->{'discard_age'}); 
     my $tot_discarded = 0;
 
     if ( ! $discard_age ) {
@@ -118,10 +118,10 @@ sub run {
 
     $self->schema->resultset('ReportArchive')->create(
         {
-            timestamp => time,
-	    name      => 'archive report',
-	    type      => 'ArchiveReport',
-            s_class   => $self->report,
+            'timestamp' => time,
+	    'name'      => 'archive report',
+	    'type'      => 'ArchiveReport',
+            's_class'   => $self->report,
         }
     );
 

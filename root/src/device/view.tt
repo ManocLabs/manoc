@@ -18,6 +18,13 @@
 
 
 <div id="tabs-1">
+
+<div id="dialog-confirm" title="This may take some time">
+	<p><h3>Please wait!</h3></p>
+	<p>and remember, from great power...</p>
+</div>
+
+
 <table id="info">
 <tr>
 <td>Name:</td><td>[% object.name %]</td>
@@ -41,7 +48,7 @@
   <td>OS:</td>
   <td>
   [% object.os %]
-  [% object.ver %]
+  [% object.os_ver %]
   </td>
 </tr>
 <tr>
@@ -113,9 +120,10 @@
 [% ui_icon('gear') %] Set Uplink</a>
   &nbsp;<a href="[% c.uri_for_action('/device/change_ip', [object.id]) %]">
   [% ui_icon('transferthick-e-w') %] Change Ip</a>		 
-  <!-- TODO: Netwalker button -->
-  <!-- &nbsp;<a href="[%  %]"> </a> -->		 
+  &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id]) %]" id="confirm-button"> 
+        [% ui_icon('arrowrefresh-1-w') %] Refresh Info</a>
 </div>
+
 
 
 </div> <!-- end of tabs-1 -->
@@ -144,13 +152,13 @@
 	     [object.id,link.from_iface]) %]">
 	     [% link.from_iface %]</a>
 	   </td>
-	[% IF object.name == link.to_name %]
+	[% IF  link.to_name %]
          <td>
 	    <a href="[% c.uri_for_action('device/view', [link.to_device]) %]">[% link.to_device %]</a>
 	 </td>
          <td>
 	   <a href="[% c.uri_for_action('interface/view', 
-	     [object.id,link.to_iface]) %]">[% link.to_iface %]</a>
+	     [link.to_device,link.to_iface]) %]">[% link.to_iface %]</a>
 	 </td>
 	 <td>[% link.to_name %]</td>
 	 [% ELSE %]

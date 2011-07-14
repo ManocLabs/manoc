@@ -13,6 +13,7 @@ with 'Manoc::Logger::Role';
 
 use Carp;
 use SNMP::Info;
+use Try::Tiny;
 
 has 'host' => (
     is       => 'ro',
@@ -44,10 +45,10 @@ has 'snmp_info' => (
     builder => '_build_snmp_info',
 );
 
-
 #-----------------------------------------------------------------------#
 sub _build_snmp_info {
     my $self = shift;
+    my $info;
 
     my %snmp_info_args = (
         # Auto Discover more specific Device Class
@@ -61,12 +62,18 @@ sub _build_snmp_info {
         Version   => $self->version,
     );
 
-    my $info = new SNMP::Info(%snmp_info_args);
+    try{
+        $info = new SNMP::Info(%snmp_info_args);
+    } catch{
+        my $msg = "Could not connect to ".$self->host." .$_";
+        $self->log->error( $msg );
+        return undef;
+    };
+
     unless ($info) {
         $self->log->error( "Could not connect to ", $self->host );
-        return;
+        return undef;
     }
-
     # guessing special devices...
     my $class = _guess_snmp_info_class($info);
     return $info unless defined $class;
@@ -280,7 +287,7 @@ sub boottime {
 
 sub device_info {
     my $self = shift;
-    my $info = $self->snmp_info;
+    my $info = $self->snmp_info or return undef;
 
     return {
         name   => $info->name,
@@ -352,7 +359,7 @@ INTERFACE:
 sub _build_arp_table {
     my $self = shift;
 
-    my $info = self->snmp_info;
+    my $info = $self->snmp_info;
     my %arp_table;
 
     my $at_paddr   = $info->at_paddr();

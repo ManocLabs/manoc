@@ -59,9 +59,9 @@ sub _search_id {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
     return $schema->resultset('Device')->search(
-        'id' => { -like => $pattern },
-        { order_by => 'name' }
-    );
+        {'id' => { -like => $pattern }},
+        { order_by => ['name'] },
+	);
 }
 
 sub _search_name {

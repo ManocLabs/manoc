@@ -283,7 +283,14 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
 
     my $schema = $c->stash->{resultset};
 
-    my @subnet_list = $schema->all();
+    my @subnet_list = $schema->search({},
+				      {
+				       order_by => ['me.from_addr','me.to_addr'],
+				       #prefetch => ['vlan_id','children','parent'],
+				       }
+				     );
+    
+
 
     $c->stash( subnet_list => \@subnet_list );
     $c->stash( template    => 'iprange/list.tt' );

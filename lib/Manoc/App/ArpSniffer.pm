@@ -221,12 +221,15 @@ sub handle_arp_packets {
     if ( scalar(@entries) > 1 ) {
         $self->log->error("More than one non archived entry for $ip_addr,$mac_addr");
     }
-    elsif ( @entries == 1 ) {
+    elsif ( scalar(@entries) == 1 ) {
         my $entry = $entries[0];
+        $self->log->debug("Updating ip $ip_addr...");
         $entry->lastseen($timestamp);
         $entry->update();
     }
     else {
+        $self->log->debug("Trying to create entry fo r ip $ip_addr with mac $mac_addr");
+               
         $self->schema->resultset('Arp')->create(
             {
                 ipaddr    => $ip_addr,

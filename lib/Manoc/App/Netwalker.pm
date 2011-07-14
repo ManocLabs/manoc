@@ -9,91 +9,134 @@ use Moose;
 extends 'Manoc::App';
 
 with qw(MooseX::Workers);
+use POE qw(Filter::Reference Filter::Line);
 
+use Data::Dumper;
 use Manoc::Netwalker::DeviceUpdater;
+use Manoc::Report::NetwalkerReport;
 
 has 'device' => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => '',
-);
+                 is      => 'ro',
+                 isa     => 'Str',
+                 default => '',
+                );
 
-has 'debug' => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
-);
+has 'report' => (
+                 traits   => ['NoGetopt'],
+                 is       => 'rw',
+                 isa      => 'Manoc::Report::NetwalkerReport',
+                 required => 0,
+                 default  => sub { Manoc::Report::NetwalkerReport->new },
+                );
 
-my $Reports = {};
 
 sub visit_device {
-    my ($device_id, $device_set, $config) = @_;
+    my ($self, $device_id, $config) = @_;
 
-    # my $device_entry = $self->schema->resultset('Device')->find( $device_id );
-    # $device_entry or $self->log->logdie( $self->device, " not in device list" );
+    my $device_entry = $self->schema->resultset('Device')->find( $device_id );
+    unless($device_entry){
+        $self->log->error("$device_id not in device list");
+        return;
+    }
+    my $updater = Manoc::Netwalker::DeviceUpdater->new(
+                                                       entry      => $device_entry,
+                                                       config     => $config,
+                                                       schema     => $self->schema,
+                                                       timestamp  => time
+                                                      );
+    $updater->update_all_info();
 
-    # my $updater = Manoc::Netwalker::DeviceUpdater->new(
-    #     entry      => $device_entry,
-    #     config     => $config,
-    #     device_set => $device_set,
-    #     schema     => $self->schema,
-    #     timestamp  => time
-    # );
-    # $updater->update_all_info();
-
-    #print $updater->report->freeze;
-    print @{POE::Filter::Reference->new->put([ {id => $device_id,
-                                                report => "ohyeah", } 
-                                              ])};
+    print @{POE::Filter::Reference->new->put([{ report => $updater->report->freeze  }])};
 }
 
+sub worker_stderr  {
+    my ( $self, $stderr_msg ) = @_;  
+
+    print $stderr_msg,"\n"
+}
+ 
 sub worker_stdout  {  
- my ( $self, $result ) = @_;
+    my ( $self, $result ) = @_;
 
- $Reports->{$result->id} = $result->report; 
+    #accumulate Manoc::Report::NetwalkerReport
+    my $worker_report = Manoc::Netwalker::DeviceReport->thaw($result->{report});
+    my $id_worker = $worker_report->host;
+
+    $self->log->debug("Device $id_worker is up to date");
+
+    my $errors = $worker_report->error;
+    scalar(@$errors) and $self->report->add_error({id       => $id_worker,
+                                                   messages =>  $errors });
+    my $warning = $worker_report->warning;
+    scalar(@$warning) and $self->report->add_warning({id      => $id_worker,
+                                                      messages=> $warning});
+
+    $self->report->update_stats({
+                                 mat_entries => $worker_report->mat_entries,
+                                 arp_entries => $worker_report->arp_entries,
+                                 cdp_entris  => $worker_report->cdp_entries,
+                                 new_devices => $worker_report->new_devices,
+                                 visited     => $worker_report->visited,
+                                });
 }
+
+sub stdout_filter  { POE::Filter::Reference->new }
+sub stderr_filter  { POE::Filter::Line->new }
 
 sub worker_manager_stop  { 
-
-    use Data::Dumper;
-    print Dumper($Reports);
+    my $self  = shift;
+    $self->schema->resultset('ReportArchive')->create(
+                                                      {
+                                                       'timestamp' => time,
+                                                       'name'      => 'Netwalker',
+                                                       'type'      => 'NetwalkerReport',
+                                                       's_class'   => $self->report,
+                                                      }
+                                                     );
+    $self->log->debug(Dumper($self->report));
 }
 
 
 sub run {
     my $self = shift;
+    my @device_ids;
 
     $self->log->info("Starting netwalker");
 
-    # test code
-    $self->device or die "Missing device";
-
-    my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
-    my %device_set = map { $_ => 1 } @device_ids;
 
     my %config = (
-        snmp_community     => $self->config->{Credentials}->{snmp_community}   || 'public',
-        snmp_version       => '2c',
-        default_vlan       => $self->config->{Netwalker}->{default_vlan}       || 1,
-        iface_filter       => $self->config->{Netwalker}->{iface_filter}       || 1,
-        ignore_portchannel => $self->config->{Netwalker}->{ignore_portchannel} || 1,
-    );
+                  snmp_community      => $self->config->{Credentials}->{snmp_community}   || 'public',
+                  snmp_version        => '2c',
+                  default_vlan        => $self->config->{Netwalker}->{default_vlan}       || 1,
+                  iface_filter        => $self->config->{Netwalker}->{iface_filter}       || 1,
+                  ignore_portchannel  => $self->config->{Netwalker}->{ignore_portchannel} || 1,
+                  ifstatus_interval   => $self->config->{Netwalker}->{ifstatus_interval}  || 0,
+                  vtpstatus_interval  => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
+                 );
 
     my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
-    #set the number of parallel procs
-    $self->max_workers($n_procs);
-    
 
-    # spawn workers
-    foreach(@device_ids){
-        $self->enqueue( visit_device($_, \%device_set, \%config)  );
-        
+    $self->max_workers($n_procs);
+    #Only for debug purpose
+    my $counter = 0;
+
+    #prepare the device list to visit
+    if ($self->device) {
+        push @device_ids, $self->device;
+    } else {
+        @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
     }
 
-   POE::Kernel->run();
+    foreach my $ids (@device_ids) {
+        $self->enqueue( sub {  $self->visit_device($ids, \%config)  } );
+        $counter++;
+        #last if ($counter == 20);
+    }
+    POE::Kernel->run();
 }
 
-no Moose;    # Clean up the namespace.
+
+no Moose;                       # Clean up the namespace.
 __PACKAGE__->meta->make_immutable;
 
 # Local Variables:

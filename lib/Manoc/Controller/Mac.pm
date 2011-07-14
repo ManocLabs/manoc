@@ -82,8 +82,8 @@ sub _get_arp : Private {
     my ( $self, $c ) = @_;
 
     my @r = $c->stash->{'resultset'}->{'arp'}->search(
-        macaddr => $c->stash->{'id'},
-        { order_by => 'lastseen DESC, firstseen DESC' }
+        {macaddr => $c->stash->{'id'}},
+        { order_by => ['lastseen DESC, firstseen DESC'] }
     );
     my @arp_results = map +{
         ipaddr    => $_->ipaddr,
@@ -104,7 +104,7 @@ sub _get_mat : Private {
     my ( $self, $c ) = @_;
 
     my @r = $c->stash->{'resultset'}->{'mat'}->search(
-        macaddr => $c->stash->{id},
+        {macaddr => $c->stash->{id}},
         {
             join => [ { 'device_entry' => 'mng_url_format' }, 'device_entry', ],
             prefetch => [ 'device_entry', { 'device_entry' => 'mng_url_format' }, ]
@@ -120,9 +120,10 @@ sub _get_mat : Private {
         lastseen    => print_timestamp( $_->lastseen )
     }, @r;
 
-    @r =
-        $c->stash->{'resultset'}->{'mat_archive'}
-        ->search( { macaddr => $c->stash->{'id'} }, prefetch => [ 'device_id', ] );
+    @r = $c->stash->{'resultset'}->{'mat_archive'}->search( 
+							   { macaddr  => $c->stash->{'id'} }, 
+							   { prefetch => [ 'device', ]}, 
+							  );
     my @mat_archive_entries = map +{
         arch_device_ip   => $_->device->ipaddr,
         arch_device_name => $_->device->name,
@@ -151,8 +152,8 @@ sub _get_dot11 : Private {
     my ( $self, $c ) = @_;
 
     my @r = $c->stash->{'resultset'}->{'dot11'}->search(
-        macaddr => $c->stash->{id},
-        { order_by => 'lastseen DESC, firstseen DESC' }
+        {macaddr => $c->stash->{id}},
+        { order_by => ['lastseen DESC, firstseen DESC'] }
     );
     my @dot11_results = map +{
         device    => $_->device,

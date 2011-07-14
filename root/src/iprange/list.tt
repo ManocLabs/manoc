@@ -3,6 +3,14 @@
    use_table=1
    section='NetDB'
 -%]
+[% UNLESS subnet_list.0 %]
+      [% PROCESS  'message.tt' msg='There is no subnet range defined!' %]
+      <div class="buttons create_btn">
+      <a href="[% c.uri_for_action('/iprange/create') %]" >
+             [% ui_icon('circle-plus') %] Create a Range</a>
+      [% add_css_create_btn %]
+       </div>
+[% END %]
 [% FOREACH s IN subnet_list %]
    [% IF loop.first %]
     [% init_table('subnet') %]

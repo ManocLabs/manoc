@@ -43,7 +43,7 @@
 <tr>
   <td>Vlan:</td>
   <td>
-      [% print_vlan(obj.vlan) %]
+      [% obj.vlan %]
   </td>
 </tr>
 <tr>

@@ -13,7 +13,8 @@ __PACKAGE__->add_columns(
     id => {
         data_type   => 'int',
         is_nullable => 0,
-    },
+        is_auto_increment => 1, 
+  },
     name => {
         data_type => 'varchar',
         size      => '32',
