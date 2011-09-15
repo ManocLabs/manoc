@@ -116,8 +116,9 @@ sub _guess_snmp_info_class {
     $desc =~ /Cisco.*?IOS.*?CIGESM/ and
         $class = "SNMP::Info::Layer3::C3550";
 
-    $desc =~ /Cisco Controller/ and
-        $class = "SNMP::Info::Layer2::CiscoWCS";
+    #broken
+    #$desc =~ /Cisco Controller/ and
+    #    $class = "SNMP::Info::Layer2::CiscoWCS";
 
     return unless $class;
 
@@ -145,6 +146,7 @@ sub _build_neighbors {
 
     foreach my $neigh ( keys %$c_if ) {
         my $port = $interfaces->{ $c_if->{$neigh} };
+        defined($port) or next;
 
         my $neigh_ip   = $c_ip->{$neigh}   || "no-ip";
         my $neigh_port = $c_port->{$neigh} || "";
@@ -167,7 +169,7 @@ sub _build_neighbors {
 
 sub _build_mat {
     my $self = shift;
-    my $info = $self->snmp_info;
+    my $info = $self->snmp_info || croak "SNMP source not initialized!";
 
     my $interfaces = $info->interfaces();
     my $fw_mac     = $info->fw_mac();
@@ -227,7 +229,6 @@ sub _build_mat {
                 is_subrequest => 1
             );
             next unless defined($subreq);
-
             # merge mat
             $subreq->mat and $mat->{$vlan} = $subreq->mat->{default};
         }

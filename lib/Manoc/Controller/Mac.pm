@@ -71,6 +71,7 @@ sub base : Chained('/') PathPart('mac') Args(1) {
     unless ($n_res) {
         $c->stash( message => 'Sorry, Mac Address not found!' );
     }
+    $c->stash(macaddr => $id);
 
 }
 

@@ -208,6 +208,9 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     $c->stash( template => 'device/view.tt' );
     $c->stash(%tmpl_param);
 
+
+    use URL::Encode;
+
     $c->stash(
         iface_info    => \@iface_info,
         cdp_links     => \@cdp_links,
@@ -239,78 +242,80 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my $device_id = $c->stash->{object}->id;
 
 
-    my %config = (
-        snmp_community => $c->config->{Credentials}->{snmp_community}
-          || 'public',
-        snmp_version       => '2c',
-        default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
-        iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
-        ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
-          || 1,
-        ifstatus_interval => $c->config->{Netwalker}->{ifstatus_interval} || 0,
-        vtpstatus_interval => $c->config->{Netwalker}->{vtpstatus_interval}
-          || 0,
-    );
+     my %config = (
+         snmp_community => $c->config->{Credentials}->{snmp_community}
+           || 'public',
+         snmp_version       => '2c',
+         default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
+         iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
+         ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
+           || 1,
+         update_ifstatus_interval => $c->config->{Netwalker}->{ifstatus_interval} || 0,
+         vtpstatus_interval => $c->config->{Netwalker}->{vtpstatus_interval}
+		   || 0,
+     );
 
-    my $updater = Manoc::Netwalker::DeviceUpdater->new(
-        entry      => $c->stash->{object},
-        config     => \%config,
-        schema     => $c->model('ManocDB'),
-        timestamp  => time
-    );
+     $ENV{DEBUG} = 0;
+     my $updater = Manoc::Netwalker::DeviceUpdater->new(
+         entry        => $c->stash->{object},
+         config       => \%config,
+         schema       => $c->model('ManocDB'),
+         force_update => 1,
+         timestamp    => time
+     );
     
-    my $ret_status = $updater->update_all_info();
-    unless(defined($ret_status)){
-      my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
-      $c->flash( error_msg => $err_msg );
-      $c->response->redirect(
-			     $c->uri_for_action( '/device/view', [$device_id] ) );
-      $c->detach();
-    }
+     my $ret_status = $updater->update_all_info();
+     unless(defined($ret_status)){
+       my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
+       $c->flash( error_msg => $err_msg );
+       $c->response->redirect(
+ 			     $c->uri_for_action( '/device/view', [$device_id] ) );
+       $c->detach();
+     }
     
-    my $worker_report = $updater->report;
-    my $report        = Manoc::Report::NetwalkerReport->new;
+      my $worker_report = $updater->report;
+      my $report        = Manoc::Report::NetwalkerReport->new;
 
-    #create the report
-    my $errors = $worker_report->error;
-    scalar(@$errors) and $report->add_error(
-        {
-            id       => $device_id,
-            messages => $errors
-        }
-    );
-    my $warning = $worker_report->warning;
-    scalar(@$warning) and $report->add_warning(
-        {
-            id       => $device_id,
-            messages => $warning
-        }
-    );
+      #create the report
+      my $errors = $worker_report->error;
+      scalar(@$errors) and $report->add_error(
+          {
+              id       => $device_id,
+              messages => $errors
+          }
+      );
+      my $warning = $worker_report->warning;
+      scalar(@$warning) and $report->add_warning(
+          {
+              id       => $device_id,
+              messages => $warning
+          }
+      );
 
-    $report->mat_entries( $worker_report->mat_entries );
-    $report->arp_entries( $worker_report->arp_entries );
-    $report->cdp_entries( $worker_report->cdp_entries );
-    $report->new_devices( $worker_report->new_devices );
-    $report->visited( $worker_report->visited );
+      $report->mat_entries( $worker_report->mat_entries );
+      $report->arp_entries( $worker_report->arp_entries );
+      $report->cdp_entries( $worker_report->cdp_entries );
+      $report->new_devices( $worker_report->new_devices );
+      $report->visited( $worker_report->visited );
 
-    my $new_report = $c->model('ManocDB::ReportArchive')->create(
-        {
-            'timestamp' => time,
-            'name'      => 'Netwalker',
-            'type'      => 'NetwalkerReport',
-            's_class'   => $report,
-        }
-    );
+      my $new_report = $c->model('ManocDB::ReportArchive')->create(
+          {
+              'timestamp' => time,
+              'name'      => 'Netwalker',
+              'type'      => 'NetwalkerReport',
+              's_class'   => $report,
+          }
+      );
 
-    my $report_url =
-      $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
+      my $report_url =
+        $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
 
-    my $msg = "Success! Device infomations are now up to date!"
-      . " See the <a href=\"$report_url\">report</a> for details.";
+      my $msg = "Success! Device infomations are now up to date!"
+        . " See the <a href=\"$report_url\">report</a> for details.";
 
-    $c->flash( message => $msg );
+    $c->flash( message => $msg);
     $c->response->redirect(
-        $c->uri_for_action( '/device/view', [$device_id] ) );
+			   $c->uri_for_action( '/device/view', [$device_id] ) );
     $c->detach();
 
 }

@@ -15,20 +15,25 @@ sub search_note {
     my $schema  = $self->engine->schema;
 
     $it = $schema->resultset('IfStatus')->search(
-        description => { '-like' => $pattern },
-        { order_by => 'description' }
-    );
+						 {description => { '-like' => $pattern }},
+						 { order_by => 'description',
+						   prefetch   => 'device_info',
+						 },
+						);
     while ( $e = $it->next ) {
-        my $item = Manoc::Search::Item::Iface->new(
-            {
-                device    => $e->device_info,
-                interface => $e->interface,
-                text      => $e->description,
-            }
-        );
-        $result->add_item($item);
-    }
+      #print $e->device_info->id;
 
+      use Data::Dumper;
+         my $item = Manoc::Search::Item::Iface->new(
+             {
+                 device    => $e->device_info,
+                 interface => $e->interface,
+                 text      => $e->description,
+	         match     => $e->device_info->name,
+             }
+         );
+         $result->add_item($item);
+}
 }
 
 no Moose;

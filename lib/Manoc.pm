@@ -13,7 +13,6 @@ use Catalyst::Runtime 5.80;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
     Authentication
@@ -34,6 +33,8 @@ with 'Manoc::Logger::CatalystRole';
 our $VERSION = '1.98';
 $VERSION = eval $VERSION;
 
+use Data::Dumper;
+
 # Configure the application.
 #
 # Note that settings in manoc.conf (or other external
@@ -46,6 +47,7 @@ $VERSION = eval $VERSION;
 __PACKAGE__->config(
     name         => 'Manoc',
     default_view => 'TT',
+    use_request_uri_for_path => 1,
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
@@ -73,7 +75,7 @@ __PACKAGE__->config(
             agents => {
                 credential => {
                     class              => 'HTTP',
-                    type               => 'basic',      # or 'digest' or 'basic'
+                    type               => 'basic',      # 'digest' or 'basic'
                     password_field     => 'password',
                     username_field     => 'login',
                     password_type      => 'hashed',

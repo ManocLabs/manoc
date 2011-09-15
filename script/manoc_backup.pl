@@ -49,7 +49,6 @@ sub visit_all {
     #Get devices from DB
     my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
     my %visited = map { $_ => 0 } @device_ids;
-
     #Visit all devices
     foreach my $host (@device_ids) {
         ( $res, $message ) = $self->do_device( $host, \%visited );
@@ -90,7 +89,7 @@ sub do_device {
         #Get configuration via telnet
         ( $config, $message ) =
           Manoc::CiscoUtils->get_config( $device_id, $self->schema,
-            $self->config->{'Backup'} );
+            $self->config->{'Credentials'} );
         $config or return ( 0, $message );
 
         #Update configuration in DB
@@ -216,10 +215,13 @@ sub run {
     $self->log->info( "New configurations created: " . $self->report->created_count );
     $self->log->info( "Errors occurred:            " . $self->report->error_count );
 
+    use Data::Dumper;
+    $self->log->debug(Dumper($self->report));
+
     $self->schema->resultset('ReportArchive')->create(
         {
             timestamp => $timestamp,
-	    name      => hostname,
+	    name      => 'BackupReport',
 	    type      => 'BackupReport',
             s_class   => $self->report,
         }

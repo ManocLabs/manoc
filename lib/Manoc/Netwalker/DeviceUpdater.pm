@@ -32,6 +32,12 @@ has 'schema' => (
     required => 1
 );
 
+has 'force_update' => (
+    is       => 'ro',
+    required => 0,
+);
+
+
 # used to to recognise neighbors and uplinks
 has 'device_set' => (
     is       => 'ro',
@@ -72,19 +78,16 @@ has 'native_vlan' => (
     builder => '_build_native_vlan',
 );
 
-
-has 'update_ifstatus_interval' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_update_ifstatus_interval',
-);
-
 has 'update_vtp_interval' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_update_vtp_interval',
 );
-
+has 'ifstatus_interval' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_ifstatus_interval',
+);
 
 
 #----------------------------------------------------------------------#
@@ -180,27 +183,6 @@ sub _build_uplinks {
 
 #----------------------------------------------------------------------#
 
-sub _build_update_ifstatus_interval {
- my $self = shift;
- my $if_update_interval = $self->config->{ifstatus_interval};
- my $update_status = 0;
-     if ($if_update_interval) {
- 	my $if_last_update_entry =
- 	    $self->schema->resultset('System')->find("netwalker.if_update");
- 	if (!$if_last_update_entry) {
- 	    $if_last_update_entry =  $self->schema->resultset('System')->create({
- 		name  => "netwalker.if_update",
- 		value => "0"});				
- 	}
- 	my $if_last_update = $if_last_update_entry->value();
- 	my $elapsed_time   = $self->timestamp - $if_last_update;	
- 	$update_status = $elapsed_time > $if_update_interval;
-     }
-
- return $update_status;
-}
-
-
 sub _build_update_vtp_interval {
     my $self                = shift;
     my $vtp_update_interval = $self->config->{vtpstatus_interval};
@@ -225,11 +207,21 @@ sub _build_update_vtp_interval {
 
 }
 
+#----------------------------------------------------------------------#
 
+sub _build_ifstatus_interval {
+ my $self               = shift;
+ my $if_update_interval = $self->config->{ifstatus_interval};
+ my $update_status      = 0;
+ my $last_visit         = $self->entry->last_visited || 0;
+ my $timestamp          = time();
 
-
-
-
+ if ($if_update_interval) {
+     my $elapsed_time   = $timestamp - $last_visit;	
+     $update_status = $elapsed_time > $if_update_interval;
+ }
+ return $self->force_update ? 1 : $update_status;
+}
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -246,16 +238,22 @@ sub update_all_info {
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
-    $self->update_ifstatus_interval and $self->update_if_table;
-    $self->update_mat;
+    $self->ifstatus_interval and $self->update_if_table;
+    $self->entry->get_mat() and $self->update_mat;
     $self->update_vtp_interval and $self->update_vtp_database;
     $self->entry->get_arp() and $self->update_arp_table;
     #update_dot11;
 
+
+    #update last visited
+    $self->entry->last_visited($self->timestamp);
+    $self->entry->update();
     return 1;
 }
 
 #----------------------------------------------------------------------#
+
+
 
 sub update_device_entry {
     my $self = shift;
@@ -294,7 +292,7 @@ sub update_device_entry {
     $entry->boottime( $source->boottime );
 
     $entry->offline(0);
-    $entry->last_visited( $self->timestamp );
+#    $entry->last_visited( $self->timestamp );
     $entry->update;
 }
 
@@ -360,11 +358,9 @@ sub update_if_table {
 
     # delete old infos
     $entry->ifstatus()->delete;
-
     # update
     foreach my $port ( keys %$ifstatus_table ) {
         $iface_filter && lc($port) =~ /^(vlan|null|unrouted vlan)/o and next;
-
         my $ifstatus = $ifstatus_table->{$port};
         $entry->add_to_ifstatus(
             {
@@ -373,12 +369,6 @@ sub update_if_table {
             }
         );
     }
-
-    my $if_last_update_entry =
-      $self->schema->resultset('System')->find("netwalker.if_update");
-    $if_last_update_entry->value($self->timestamp);
-    $if_last_update_entry->update();
-
 
 }
 
@@ -411,7 +401,6 @@ sub update_mat {
         }
         while ( my ( $m, $p ) = each %$entries ) {
             next if $uplinks->{$p};
-
             next if $ignore_portchannel && lc($p) =~ /^port-channel/;
 
             my @mat_entries = $self->schema->resultset('Mat')->search(

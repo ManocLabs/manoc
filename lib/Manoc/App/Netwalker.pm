@@ -29,6 +29,14 @@ has 'report' => (
                  default  => sub { Manoc::Report::NetwalkerReport->new },
                 );
 
+has 'force' => (
+                 is      => 'ro',
+                 isa     => 'Int',
+                 default => 0,
+                );
+
+
+
 
 sub visit_device {
     my ($self, $device_id, $config) = @_;
@@ -39,10 +47,11 @@ sub visit_device {
         return;
     }
     my $updater = Manoc::Netwalker::DeviceUpdater->new(
-                                                       entry      => $device_entry,
-                                                       config     => $config,
-                                                       schema     => $self->schema,
-                                                       timestamp  => time
+                                                       entry        => $device_entry,
+                                                       config       => $config,
+                                                       schema       => $self->schema,
+                                                       timestamp    => time,
+                                                       force_update => $self->force,
                                                       );
     $updater->update_all_info();
 
@@ -103,16 +112,15 @@ sub run {
 
     $self->log->info("Starting netwalker");
 
-
     my %config = (
-                  snmp_community      => $self->config->{Credentials}->{snmp_community}   || 'public',
-                  snmp_version        => '2c',
-                  default_vlan        => $self->config->{Netwalker}->{default_vlan}       || 1,
-                  iface_filter        => $self->config->{Netwalker}->{iface_filter}       || 1,
-                  ignore_portchannel  => $self->config->{Netwalker}->{ignore_portchannel} || 1,
-                  ifstatus_interval   => $self->config->{Netwalker}->{ifstatus_interval}  || 0,
-                  vtpstatus_interval  => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
-                 );
+                  snmp_community       => $self->config->{Credentials}->{snmp_community}   || 'public',
+                  snmp_version         => '2c',
+                  default_vlan         => $self->config->{Netwalker}->{default_vlan}       || 1,
+                  iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
+                  ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
+                  vtpstatus_interval   => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
+                  ifstatus_interval    => $self->config->{Netwalker}->{update_ifstatus_interval} || 0,
+                 ); 
 
     my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
 

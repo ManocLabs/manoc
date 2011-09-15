@@ -1,0 +1,18 @@
+[%META section="Ricerca di tipo 'notes' " %]
+
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>Note 
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'note presa 14' }) %]">note presa 14</a>
+<td>Ricerca delle note sugli indirizzi IP ,delle note sulle interfacce degli switch (configurate tramite interfaccia del Manoc),
+e delle description delle porte degli switch (configurate via telnet sugli apparati)
+</tr>
+</table>
+
+

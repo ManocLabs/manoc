@@ -93,8 +93,10 @@ sub index : Path : Args(0) {
 
 sub instruction : Path('readme') Args(0) {
     my ( $self, $c ) = @_;
-
+    my $page = $c->request->param('page');
     $c->stash( template => 'search/readme.tt' );
+
+    $c->stash(template => "search/readme/$page.tt") if(defined $page);
 }
 
 =head1 AUTHOR
