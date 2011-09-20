@@ -109,8 +109,7 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     my $range = $c->stash->{'object'};
 
     if ($range) {
-        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) )
-            if ($range);
+        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) );
         $c->detach();
     }
     my $host   = $c->stash->{'host'};
@@ -146,8 +145,8 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     );
     $c->stash( prev_page => $prev_page, next_page => $next_page );
 
-    $self->ip_list( $c, $from_i, $to_i, $page );
     $c->stash(%tmpl_param);
+    $self->ip_list( $c, $from_i, $to_i, $page );
 }
 
 =head2 ip_list
@@ -230,12 +229,17 @@ sub ip_list : Private {
             distinct => 1,
         }
     );
-
+    my $backref = $c->uri_for_action('/iprange/view_iprange', [$c->stash->{network},$c->stash->{prefix}],{def_tab=>'2', page => $page } );
+    if(defined($c->stash->{object})){
+     $backref = 
+       $c->uri_for_action('iprange/view',[$c->stash->{object}->name], {def_tab=>'3', page => $page })
+    }
     $c->stash(
         ip_used            => $rs->count,
         disable_pagination => 1,
         disable_sorting    => 1,
-        cur_page           => $page
+        cur_page           => $page,
+	backref            => $backref,
     );
 }
 

@@ -54,7 +54,7 @@ has 'arp_table' => (
 
 after start => sub {
     my $self = shift;
-
+    return unless $self->is_daemon;
     $self->start_pcap_loop();
 };
 
