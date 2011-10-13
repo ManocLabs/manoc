@@ -91,8 +91,9 @@ __PACKAGE__->config(
         },
     },
 
+    #remove stale sessions from db
     'Plugin::Session' => {
-        expires           => 3600,
+        expires           => 28800,
         dbi_dbh           => 'ManocDB',
         dbi_table         => 'sessions',
         dbi_id_field      => 'id',
@@ -136,7 +137,7 @@ after setup_finalize => sub {
 
     #Additional acl for admin privileges
     my @add_acl =
-        qw{ device/change_ip device/uplinks vlanrange/split vlanrange/merge iprange/split
+        qw{ device/change_ip device/uplinks device/refresh vlanrange/split vlanrange/merge iprange/split
         iprange/merge user/switch_status user/set_roles vlan/merge_name
         interface/edit_notes interface/delete_notes ip/edit_notes ip/delete_notes
     };
@@ -153,7 +154,7 @@ after setup_finalize => sub {
 __PACKAGE__->setup();
 
 __PACKAGE__->schedule(
-    at    => '@hourly',
+    at    => '@daily',
     event => '/cron/remove_sessions'
 );
 

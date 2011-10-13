@@ -14,6 +14,8 @@ use Manoc::Utils qw(str2seconds print_timestamp);
 use Manoc::CiscoUtils;
 use Manoc::Report::BackupReport;
 
+use Data::Dumper;
+
 use Sys::Hostname qw(hostname);
  
 extends 'Manoc::App';
@@ -63,9 +65,9 @@ sub visit_all {
 }
 
 sub visit_device {
-    my ( $self, $host ) = @_;
+    my ( $self, $host, $visited_ref ) = @_;
     my ( $res, $message );
-    ( $res, $message ) = $self->do_device( $host, { $host => 0 } );
+    ( $res, $message ) = $self->do_device( $host,$visited_ref );
 
     if ( !$res ) {
         $self->log->error("configuration for $host not saved: $message");
@@ -107,8 +109,8 @@ sub do_device {
         #Backup disabled
         my $message = "device $device_id has backup disabled";
         $self->log->info($message);
-        $self->report->add_error( {id => $device, message => $message } );
-
+        $self->report->add_error( {id => $device_id, message => $message } );
+        $visited_ref->{$device_id} = 1;
         return ( 1, "Backup disabled" );
 
     }
@@ -200,10 +202,11 @@ sub run {
     my ($self) = @_;
     my $timestamp = time();
 
+    
     $self->check_lastrun or $self->log->logdie("Too soon to backup again!");
 
     #Start backup
-    $self->device ? $self->visit_device( $self->device ) : $self->visit_all();
+    $self->device ? $self->visit_device( $self->device, {$self->device => 0} ) : $self->visit_all();
 
     #Print final report
     $self->log->info("Backup Done");
@@ -215,13 +218,12 @@ sub run {
     $self->log->info( "New configurations created: " . $self->report->created_count );
     $self->log->info( "Errors occurred:            " . $self->report->error_count );
 
-    use Data::Dumper;
     $self->log->debug(Dumper($self->report));
 
     $self->schema->resultset('ReportArchive')->create(
         {
             timestamp => $timestamp,
-	    name      => 'BackupReport',
+	    name      => 'backup report',
 	    type      => 'BackupReport',
             s_class   => $self->report,
         }

@@ -13,6 +13,8 @@ use Manoc::Logger;
 use Manoc::Utils qw(str2seconds print_timestamp);
 use Manoc::Report::ArchiveReport;
 
+use Data::Dumper;
+
 extends 'Manoc::App';
 
 has 'sources' => (
@@ -160,7 +162,7 @@ sub run {
             's_class'   => $self->report,
         }
     );
-
+  $self->log->debug(Dumper($self->report));
 }
 
 no Moose;
