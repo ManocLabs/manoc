@@ -57,9 +57,9 @@ jQuery.fn.dataTableExt.aTypes.unshift(
 	{
 
 	var iParse = Date.parse(sData);
-	if ( iParse !== null && !isNaN(iParse) )
+        if ( iParse !=  null && !isNaN(iParse) && iParse > 0 )
 	{
-	    return 'date-euro';
+           return 'date-euro';
 	}
 	return null;
 	}

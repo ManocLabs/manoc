@@ -8,7 +8,7 @@
   <ul>
      <li><a href="#tabs-1">Mac Address Association</a></li>
      <li><a href="#tabs-2">Subnet</a></li>
-     <li><a href="#tabs-3">AD Hotname</a></li>
+     <li><a href="#tabs-3">AD Hostname</a></li>
      <li><a href="#tabs-4">AD Logons</a></li>
      <li><a href="#tabs-5">DHCP Lease</a></li>
      <li><a href="#tabs-6">DHCP Reservation</a></li>

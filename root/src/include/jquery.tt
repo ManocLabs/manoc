@@ -48,19 +48,20 @@ $(function() {
 	 $("#disabled", ".buttons" ).button("disable");
 
 	//Dialog Modal Confirmation
+        if ( $("#dialog-confirm")  ) {
 	 $( "#dialog-confirm" ).dialog({
 	                autoOpen:  false,
 			resizable: false,
 	            closeOnEscape: false,
 			    modal: true,
 			   height: 240,
-			    width: 350,	
+			    width: 350
 		});
-
-	$( "#confirm-button" ).button().click(function() {
+   
+	  $( "#confirm-button" ).button().click(function() {
 				$( "#dialog-confirm" ).dialog( "open" );
 			});
-
+        }
 });			    
  </script>
 [% END -%]

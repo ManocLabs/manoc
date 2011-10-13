@@ -409,6 +409,7 @@ sub update_mat {
                     device    => $device_id,
                     interface => $p,
                     archived  => 0,
+                    vlan      => $vlan,
                 }
             );
             if ( scalar(@mat_entries) > 1 ) {
