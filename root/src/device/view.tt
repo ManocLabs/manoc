@@ -181,7 +181,7 @@
   [% FOREACH if IN iface_info %]
   [% status_color = 'green' %]
    [% IF loop.first %]
-   [% init_table('iface_info',undef)  -%]
+   [% init_table('iface_info',[25,5,5,10,10,5,10,30])  -%]
   <table class="display"  id="iface_info">
     <thead>  
       <tr>
@@ -242,7 +242,7 @@
 <div id="tabs-4">
 [% FOREACH if IN iface_info %]
   [% IF loop.first %]
-    [% init_table('iface_act', [{width => '15%'},{width => '6%'},{width => '20%'},0])  -%]
+    [% init_table('iface_act', [20,5,15,60])  -%]
      <table class="display" id="iface_act">
      <thead>
        <tr>
@@ -280,7 +280,7 @@
 <div id="tabs-5">
 [% FOREACH if IN unused_ifaces %]
   [% IF loop.first %]
-       [% init_table('un_iface') %]
+       [% init_table('un_iface',[40,60]) %]
        <table class="display" id="un_iface">
 	      <thead>
 		<tr>

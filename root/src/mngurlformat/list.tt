@@ -12,7 +12,7 @@
 
 [% FOREACH o IN obj_list %]
    [% IF loop.first %]  
-   [% init_table('objlist',[{width=>'40%'},{width=>'40%'},{width=>'20%'}]) %] 
+   [% init_table('objlist',[40,40,20]) %] 
     <table class="display" id="objlist">
        <thead>  
 	 <tr>

@@ -38,31 +38,19 @@ $(function() {
 		 [% IF options.cust_pag -%]
        		 "sDom": '<"H"f<"toolbar">>t<"F"i>',
       		 [% END -%]
-
-
 	       //in columns trovo l'array per l'inizializzazione delle colonne della tabella
 	       [% IF columns %]
-	       "aoColumns" : [
+	       "bAutoWidth": false,
+               "aoColumns" : [
+			     {"sWidth"      : "[% columns.shift %]%"} 
 			     [% FOREACH col IN columns %]
-			     	     [% IF col %]
-				      {
-				      //abilita/disabilita la ricerca in una data colonna
-            			      [% IF col.searchable %]   "bSearchable" : [% col.searchable %], [% END %]
-      				      //abilita/disabilita il sort di una colonna
-				      [% IF col.sortable %]     "bSortable"   : [% col.sortable %],   [% END %]
-				      //tipo di dato: integer, string, html, date e ipaddress (plugin)
-				      [% IF col.type %]         "sType"	      : "[% col.type %]",     [% END %]
-				      //determina la larghezza della colonna
-				      [% IF col.width %]        "sWidth"      : "[% col.width %]",    [% END %]
-				      //ordinamento ascendente o discendente
-				      [% IF col.sort_dir %]     "asSorting"   : "[% col.sort_dir %]", [% END %]
-				      },
-				     [% ELSE %]	
-				       null,
-         			     [% END %]
+			     ,{ "sWidth"    : "[% col %]%"}  
 			     [% END %]
 			     ]
+		[% ELSE %]
+	        "test": false
 	        [% END %]
+
            	});
 	 }
 });

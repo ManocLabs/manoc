@@ -54,7 +54,7 @@
 
 [% FOREACH v IN vlan_vtp %]
    [% IF loop.first %]
-   [% init_table('dbmissing') %]
+   [% init_table('dbmissing',undef,{disable_sorting=>1}) %]
     <table class="display" id="dbmissing">
       <thead>  
 	<tr>
