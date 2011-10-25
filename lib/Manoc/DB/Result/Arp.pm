@@ -8,7 +8,9 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core/);
+use Manoc::Utils;
+
+__PACKAGE__->load_components(qw/FilterColumn Core/);
 __PACKAGE__->table('arp');
 
 __PACKAGE__->add_columns(
@@ -49,6 +51,12 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
+
+__PACKAGE__->filter_column(
+			   ipaddr => {
+				    filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+				   }
+			  );
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

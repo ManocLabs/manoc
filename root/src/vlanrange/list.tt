@@ -1,5 +1,5 @@
 [% META 
-        title='VlanRange' 
+        title='VLAN' 
 	use_exp_table = 1
 	section= 'NetDB'
 -%]
@@ -20,7 +20,8 @@
  <a href="#" id="expandall" style="font-size:0.1em"  >[% ui_icon('circlesmall-plus')%] </a>
  <a href="#" id="collapseall" style="font-size:0.1em"  >[% ui_icon('circlesmall-minus')%] </a>
 </div></th>
-        <th>Vlan Range</th>
+        <th>Range</th>
+	<th></th><!-- reserved for vlan name in sublist -->
         <th>Start</th>
         <th>End</th>
         <th>Description</th>
@@ -33,6 +34,7 @@
     <tr class="master">
     	<td><div class="arrow"></div></td>
         <td>[%range.name%]</td>
+	<td></td>
         <td>[%range.start%]</td>
         <td>[%range.end%]</td>
         <td>[%range.description%]</td>
@@ -47,14 +49,12 @@
   </tr>   
     [% FOREACH vlan  IN range.vlans %]
     <tr>
+    <td></td><!-- arrows -->
+    <td></td><!-- range name -->
+    <td><a href="[% c.uri_for_action('vlan/view', [vlan.id]) %]">[% vlan.name %]</a></td>
+    <td>[% vlan.id %]</td>
     <td></td>
-    <td>
-       &nbsp;<a href="[% c.uri_for_action('vlan/view', [vlan.id])
-	  %]">[% vlan.id %]</a>	
-    </td>
-    <td></td>
-    <td></td>
-    <td>[% vlan.name %]</td>
+    <td>[% vlan.description %]</td>
     <td>
     <a href="[% c.uri_for_action('vlan/edit',[vlan.id],{backref=>c.req.uri})%]">[% icon('edit') %]</a>
     <a href="[% c.uri_for_action('vlan/delete',[vlan.id],{backref=>c.req.uri})%]">[% icon('remove')

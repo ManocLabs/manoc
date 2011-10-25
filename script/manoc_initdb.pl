@@ -33,6 +33,7 @@ sub run {
     # full init
     $self->do_reset_admin;
     $self->init_vlan;
+    $self->init_iprange;
 
 }
 
@@ -66,7 +67,8 @@ sub init_vlan {
             $self->log->info('We have a VLAN range: skipping init.');
             return;
     }
-    my $vlan_range = $schema->resultset('VlanRange')->update_or_create({
+    $self->log->info('Creating a sample vlan range with VLAN 1.');
+    my $vlan_range = $rs->update_or_create({
         name => 'sample',
         description => 'sample range',
         start => 1,
@@ -75,6 +77,25 @@ sub init_vlan {
     $vlan_range->add_to_vlans({ name => 'native', id => 1 });
 }
 
+sub init_iprange {
+    my ($self) = @_;
+
+    my $schema = $self->schema;
+    my $rs = $schema->resultset('IPRange');
+    if ($rs->count() > 0) {
+            $self->log->info('We have a IP range: skipping init.');
+            return;
+    }
+    $self->log->info('Creating a sample IP range for 0.0.0.0/0.');
+    $rs->update_or_create({
+        name => 'IPV4',
+        description => 'all ipv4 addresses',
+        from_addr => '0.0.0.0',
+        to_addr   => '255.255.255.255',
+        network   => '0.0.0.0',
+        netmask   => '0.0.0.0',
+       });
+}
 no Moose;
 
 package main;

@@ -59,7 +59,7 @@
 		],
 	 NetDB = [
   	       {
-		     name = 'VlanRange', 
+		     name = 'VLAN', 
 		     path = c.uri_for('/vlanrange/list'),
 	       },
 	       {
