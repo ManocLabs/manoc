@@ -24,6 +24,7 @@
   	 <th>From</th>
 	 <th>To</th>
 	 <th>Associated VLAN</th>
+         <th>Description</th>
          </tr>
        </thead>  
        <tbody>
@@ -37,6 +38,7 @@
 	 <td>[% s.from_addr %]</td>
  	 <td>[% s.to_addr %]</td>
 	 <td>[% s.vlan_id.id %]</td>
+	 <td>[% s.description %]</td>
          </tr>
   [% IF loop.last %]
         </tbody>
