@@ -116,6 +116,10 @@ sub _guess_snmp_info_class {
     $desc =~ /Cisco.*?IOS.*?CIGESM/ and
         $class = "SNMP::Info::Layer3::C3550";
 
+    $desc =~ /Cisco.*?IOS.*?C2960/ and
+      $class = "SNMP::Info::Layer3::C6500";
+
+
     #broken
     #$desc =~ /Cisco Controller/ and
     #    $class = "SNMP::Info::Layer2::CiscoWCS";
