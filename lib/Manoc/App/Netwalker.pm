@@ -29,17 +29,43 @@ has 'report' => (
                  default  => sub { Manoc::Report::NetwalkerReport->new },
                 );
 
-has 'force' => (
+has 'force_update' => (
                  is      => 'ro',
-                 isa     => 'Int',
+                 isa     => 'Bool',
                  default => 0,
+                 required=> 0,
                 );
 
 
+sub get_update_status {
+    my ( $self, $if_update_interval ) = @_;
+    my $timestamp = time;
+    #if the update was forced or interval == 0 refresh info
+    return 1 if($self->force_update or !$if_update_interval );
 
+    my $if_last_update_entry =
+      $self->schema->resultset('System')->find("netwalker.if_update");
+    if (!$if_last_update_entry) {
+        $if_last_update_entry =  $self->schema->resultset('System')->create({
+                                                                             name  => "netwalker.if_update",
+                                                                             value => "0"});
+    }
+    my $if_last_update = $if_last_update_entry->value();
+    my $elapsed_time   = $timestamp - $if_last_update;
+
+    return $elapsed_time > $if_update_interval ? 1 : 0;
+}
+
+sub set_update_status {
+    my  $self  = shift;
+    my $if_last_update_entry =
+      $self->schema->resultset('System')->find("netwalker.if_update");
+    $if_last_update_entry->value(time);
+    $if_last_update_entry->update();
+}
 
 sub visit_device {
-    my ($self, $device_id, $config) = @_;
+    my ($self, $device_id, $config, $update) = @_;
 
     my $device_entry = $self->schema->resultset('Device')->find( $device_id );
     unless($device_entry){
@@ -47,11 +73,11 @@ sub visit_device {
         return;
     }
     my $updater = Manoc::Netwalker::DeviceUpdater->new(
-                                                       entry        => $device_entry,
-                                                       config       => $config,
-                                                       schema       => $self->schema,
-                                                       timestamp    => time,
-                                                       force_update => $self->force,
+                                                       entry           => $device_entry,
+                                                       config          => $config,
+                                                       schema          => $self->schema,
+                                                       timestamp       => time,
+                                                       update_ifstatus => $update,
                                                       );
     $updater->update_all_info();
 
@@ -102,6 +128,10 @@ sub worker_manager_stop  {
                                                        's_class'   => $self->report,
                                                       }
                                                      );
+    #update netwalker.if_status variable
+    $self->set_update_status();
+
+
     $self->log->debug(Dumper($self->report));
 }
 
@@ -119,14 +149,15 @@ sub run {
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
                   vtpstatus_interval   => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
-                  ifstatus_interval    => $self->config->{Netwalker}->{ifstatus_interval} || 0,
                  ); 
+
+    #deep update?
+    my $update_all = $self->get_update_status($self->config->{Netwalker}->{ifstatus_interval} || 0);
+
 
     my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
 
     $self->max_workers($n_procs);
-    #Only for debug purpose
-    my $counter = 0;
 
     #prepare the device list to visit
     if ($self->device) {
@@ -136,9 +167,7 @@ sub run {
     }
 
     foreach my $ids (@device_ids) {
-        $self->enqueue( sub {  $self->visit_device($ids, \%config)  } );
-        $counter++;
-        #last if ($counter == 20);
+        $self->enqueue( sub {  $self->visit_device($ids, \%config, $update_all)  } );
     }
     POE::Kernel->run();
 }

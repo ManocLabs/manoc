@@ -32,11 +32,11 @@ has 'schema' => (
     required => 1
 );
 
-has 'force_update' => (
+has 'update_ifstatus' => (
     is       => 'ro',
     required => 0,
+    default  => 0,
 );
-
 
 # used to to recognise neighbors and uplinks
 has 'device_set' => (
@@ -83,11 +83,7 @@ has 'update_vtp_interval' => (
     lazy    => 1,
     builder => '_build_update_vtp_interval',
 );
-has 'ifstatus_interval' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_ifstatus_interval',
-);
+
 
 
 #----------------------------------------------------------------------#
@@ -207,21 +203,6 @@ sub _build_update_vtp_interval {
 
 }
 
-#----------------------------------------------------------------------#
-
-sub _build_ifstatus_interval {
- my $self               = shift;
- my $if_update_interval = $self->config->{ifstatus_interval};
- my $update_status      = 0;
- my $last_visit         = $self->entry->last_visited || 0;
- my $timestamp          = time();
-
- if ($if_update_interval) {
-     my $elapsed_time   = $timestamp - $last_visit;	
-     $update_status = $elapsed_time > $if_update_interval;
- }
- return $self->force_update ? 1 : $update_status;
-}
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -238,7 +219,7 @@ sub update_all_info {
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
-    $self->ifstatus_interval and $self->update_if_table;
+    $self->update_ifstatus and $self->update_if_table;
     $self->entry->get_mat() and $self->update_mat;
     $self->update_vtp_interval and $self->update_vtp_database;
     $self->entry->get_arp() and $self->update_arp_table;
@@ -367,7 +348,6 @@ sub update_if_table {
             }
         );
     }
-
 }
 
 #----------------------------------------------------------------------#

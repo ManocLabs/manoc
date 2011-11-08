@@ -250,7 +250,6 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
          ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
            || 1,
-         update_ifstatus_interval => $c->config->{Netwalker}->{ifstatus_interval} || 0,
          vtpstatus_interval => $c->config->{Netwalker}->{vtpstatus_interval}
 		   || 0,
      );
@@ -260,7 +259,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          entry        => $c->stash->{object},
          config       => \%config,
          schema       => $c->model('ManocDB'),
-         force_update => 1,
+         update_ifstatus  => 1,
          timestamp    => time
      );
     
