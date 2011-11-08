@@ -119,7 +119,7 @@ sub run {
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
                   vtpstatus_interval   => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
-                  ifstatus_interval    => $self->config->{Netwalker}->{update_ifstatus_interval} || 0,
+                  ifstatus_interval    => $self->config->{Netwalker}->{ifstatus_interval} || 0,
                  ); 
 
     my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;

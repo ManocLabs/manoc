@@ -244,7 +244,6 @@ sub update_all_info {
     $self->entry->get_arp() and $self->update_arp_table;
     #update_dot11;
 
-
     #update last visited
     $self->entry->last_visited($self->timestamp);
     $self->entry->update();
@@ -292,7 +291,6 @@ sub update_device_entry {
     $entry->boottime( $source->boottime );
 
     $entry->offline(0);
-#    $entry->last_visited( $self->timestamp );
     $entry->update;
 }
 
