@@ -69,6 +69,7 @@ foreach my $col (qw(from_addr to_addr network netmask)) {
     __PACKAGE__->filter_column(
 			       $col => {
 					filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+					filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
 				       }
 			      );
 }

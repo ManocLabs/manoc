@@ -183,6 +183,11 @@ sub padded_ipaddr {
     join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
 }
 
+sub unpadded_ipaddr {
+    my $addr = shift;
+    join('.', map { sprintf('%d', $_) } split( /\./, $addr ))
+}
+
 BEGIN {
     my $netmask_i;
 

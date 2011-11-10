@@ -309,10 +309,12 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
         vlan       => $_->vlan_id ? $_->vlan_id->name : "-",
         n_children => $_->children->count(),
         n_neigh    => get_neighbour(
-            $c->model('ManocDB::IPRange'), $name,
-            ip2int( $_->from_addr ),       ip2int( $_->to_addr )
-            )->count(),
-        },
+				    $c->model('ManocDB::IPRange'), 
+				    $name,
+				    $_->from_addr,    
+				    $_->to_addr
+				   )->count(),
+			},
         $range->search_related( 'children', undef, { order_by => 'from_addr' } );
 
     my $rs = $c->model('ManocDB::Arp')->search(
@@ -937,6 +939,8 @@ sub check_iprange_form : Private {
     }
     scalar( keys(%$error) ) and return 0;
 
+    # WARNING: now to_addr and from_addr MUST be zero padded!
+
     # check parent parameter and overlappings
     my $parent;
     if ($range) {
@@ -1044,9 +1048,9 @@ sub check_iprange_form : Private {
     }
     
     $c->stash->{'from_addr'} = $from_addr;
-    $c->stash->{'to_addr'} = $to_addr;
-    $c->stash->{'network'} = $network;
-    $c->stash->{'netmask'} = $netmask;
+    $c->stash->{'to_addr'}   = $to_addr;
+    $c->stash->{'network'}   = $network;
+    $c->stash->{'netmask'}   = $netmask;
 
     return 1;
 }
@@ -1062,8 +1066,8 @@ sub get_neighbour {
         {
             parent => $parent,
             -or    => [
-                { 'to_addr'   => $lower_addr },
-                { 'from_addr' => $upper_addr }
+                { 'to_addr'   => padded_ipaddr($lower_addr) },
+                { 'from_addr' => padded_ipaddr($upper_addr) }
             ]
         }
     );
