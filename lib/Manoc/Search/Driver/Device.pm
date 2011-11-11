@@ -74,5 +74,26 @@ sub _search_name {
 					       );
 }
 
+sub search_note {
+  my ( $self, $query, $result ) = @_;
+  my $pattern = $query->sql_pattern;
+  my $schema  = $self->engine->schema;
+  
+  my $rs = $schema->resultset('Device')->search({notes => { -like => $pattern }},
+						{ order_by => ['name'] },
+					       );
+  
+  while ( my $e = $rs->next ) {
+    my $item = Manoc::Search::Item::Device->new(
+						{
+						 device => $e,
+						 match  => $e->id,
+						 notes  => $e->notes,
+						}
+					       );
+    $result->add_item($item);
+  }
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;

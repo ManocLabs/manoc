@@ -163,7 +163,7 @@ sub ip_list : Private {
 
     # paging arithmetics
     my $page_start_addr = $from_i;
-    my $page_end_addr   = $to_i;
+    my $page_end_addr   = $to_i+1;
     my $page_size       = $page_end_addr - $page_start_addr;
     my $num_pages       = ceil( $page_size / $max_page_items );
     if ( $page > 1 ) {

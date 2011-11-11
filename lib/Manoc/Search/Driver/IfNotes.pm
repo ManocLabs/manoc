@@ -15,7 +15,7 @@ sub search_note {
     my $schema  = $self->engine->schema;
 
     $it = $schema->resultset('IfNotes')->search(
-        notes => { '-like' => $pattern },
+        {notes => { '-like' => $pattern }},
         { order_by => 'notes' }
     );
     while ( $e = $it->next ) {
