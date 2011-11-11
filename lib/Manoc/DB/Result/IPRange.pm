@@ -63,13 +63,13 @@ __PACKAGE__->has_many(
     children => 'Manoc::DB::Result::IPRange',
     { 'foreign.parent' => 'self.name' }
 );
-__PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
+# __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 
-foreach my $col (qw(from_addr to_addr network netmask)) {
-    __PACKAGE__->filter_column(
-			       $col => {
-					filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-				       });
-}
+# foreach my $col (qw(from_addr to_addr network netmask)) {
+#     __PACKAGE__->filter_column(
+# 			       $col => {
+# 					filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+# 				       });
+# }
 
 1;

@@ -653,8 +653,8 @@ sub create : Chained('base') : PathPart('create') : Args() {
     }
     $tmpl_param{range}       = $c->req->param('name');
     $tmpl_param{parent}      = $parent;
-    $tmpl_param{type_subnet} = $c->req->param('type') eq 'subnet';
-    $tmpl_param{type_range}  = $c->req->param('type') eq 'range';
+    $tmpl_param{type_subnet} = $c->req->param('type') eq 'subnet' if(defined($c->req->param('type')));
+    $tmpl_param{type_range}  = $c->req->param('type') eq 'range'  if(defined($c->req->param('type')));
     $tmpl_param{vlans}       = \@vlans;
 
     $tmpl_param{template} = 'iprange/create.tt';
@@ -667,6 +667,7 @@ sub process_create : Private {
     my $name    = $c->req->param('name');
     my $type    = $c->req->param('type');
     my $vlan_id = $c->req->param('vlan');
+    my $desc    = $c->req->param('description');
     my $error;
 
     $name or $error->{name} = "Please insert range name";
@@ -780,13 +781,14 @@ sub process_create : Private {
 
     $c->stash->{'resultset'}->create(
         {
-            name      => $name,
-            parent    => $parent_name,
-            from_addr => int2ip($from_addr_i),
-            to_addr   => int2ip($to_addr_i),
-            network   => $network_i ? int2ip($network_i) : undef,
-            netmask   => $netmask_i ? int2ip($netmask_i) : undef,
-            vlan_id   => $vlan_id,
+            name         => $name,
+            parent       => $parent_name,
+            from_addr    => int2ip($from_addr_i),
+            to_addr      => int2ip($to_addr_i),
+            network      => $network_i ? int2ip($network_i) : undef,
+            netmask      => $netmask_i ? int2ip($netmask_i) : undef,
+            vlan_id      => $vlan_id,
+	    description  => $desc
         }
         ) or
         return ( 0, "Impossible create subnet" );
