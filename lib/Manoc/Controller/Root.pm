@@ -45,27 +45,26 @@ sub index : Path : Args(0) {
 =cut
 
 sub auto : Private {
-    my ( $self, $c ) = @_;
+  my ( $self, $c ) = @_;
 
-    if ( $c->controller eq $c->controller('Auth') ||
-        $c->controller eq $c->controller('Wapi') )
-    {
-        return 1;
-    }
-
-    # If a user doesn't exist, force login
-    if ( !$c->user_in_realm('normal') ) {
-        $c->flash( backref => $c->request->uri );
-        $c->response->redirect( $c->uri_for('/auth/login') );
-        return 0;
-    }
-
-    if ( $c->req->param('popup') ) {
-        $c->stash( current_view => 'Popup' );
-        delete $c->req->params->{'popup'};
-    }
-
+  if ( $c->controller eq $c->controller('Auth') ||
+       $c->controller eq $c->controller('Wapi') ) {
     return 1;
+  }
+  $c->log->debug($c->request->uri);
+  # If a user doesn't exist, force login
+  if ( !$c->user_in_realm('normal') ) {
+    $c->flash( backref => $c->request->uri );
+    $c->response->redirect( $c->uri_for('/auth/login') );
+    return 0;
+  }
+
+  if ( $c->req->param('popup') ) {
+    $c->stash( current_view => 'Popup' );
+    delete $c->req->params->{'popup'};
+  }
+
+  return 1;
 }
 
 =head2 default
@@ -76,7 +75,9 @@ Standard 404 error page
 
 sub default : Path {
     my ( $self, $c ) = @_;
-    $c->response->body('Page not found');
+    my $url = $c->request->uri;
+    $c->response->body("Page not found $url");
+    
     $c->response->status(404);
 }
 

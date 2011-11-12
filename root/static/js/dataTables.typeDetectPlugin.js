@@ -52,16 +52,29 @@ jQuery.fn.dataTableExt.aTypes.push(
 	}
 );
 
-jQuery.fn.dataTableExt.aTypes.unshift(
+jQuery.fn.dataTableExt.aTypes.push(
 	function ( sData )
 	{
-
-	var iParse = Date.parse(sData);
-	if ( iParse !== null && !isNaN(iParse) )
-	{
-	    return 'date-euro';
-	}
-	return null;
+		if (/^<a\s+href=\"\S*\">\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}<\/a>$/.test(sData)) {
+			return 'ip-html';
+		}
+		return null;
 	}
 );
 
+jQuery.fn.dataTableExt.aTypes.unshift(
+        function ( sData )
+        {
+
+        var iParse = Date.parse(sData);
+        if ( iParse !=  null && !isNaN(iParse))
+        {
+           return 'date-euro';
+        }
+        /*if (sData !== null && sData.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d$/))
+        {
+            return 'date-euro';
+        }*/
+        return null;
+        }
+);

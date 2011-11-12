@@ -2,8 +2,10 @@
    title='Mac Address View'
    use_table=1
 -%]
-
-<p>Device vendor: [% vendor %] </p>
+<table>
+<tr><td>Mac Address  : [% macaddr%]
+<tr><td>Device vendor: [% vendor %]
+</table>
 
 <div id="tabs">	
   <ul>

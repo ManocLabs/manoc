@@ -12,6 +12,9 @@ use Manoc::Utils qw/netmask_prefix2range int2ip ip2int padded_ipaddr
 use POSIX qw/ceil/;
 BEGIN { extends 'Catalyst::Controller'; }
 
+# TODO: explain error->{field} vs error->{message}
+
+
 =head1 NAME
 
 Manoc::Controller::IpRange - Catalyst Controller
@@ -109,8 +112,7 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     my $range = $c->stash->{'object'};
 
     if ($range) {
-        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) )
-            if ($range);
+        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) );
         $c->detach();
     }
     my $host   = $c->stash->{'host'};
@@ -146,8 +148,9 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     );
     $c->stash( prev_page => $prev_page, next_page => $next_page );
 
-    $self->ip_list( $c, $from, $to, $page );
     $c->stash(%tmpl_param);
+
+    $self->ip_list( $c, $from_i, $to_i, $page );
 }
 
 =head2 ip_list
@@ -163,24 +166,24 @@ sub ip_list : Private {
     $max_page_items > $MAX_PAGE_ITEMS and $max_page_items = $MAX_PAGE_ITEMS;
 
     # paging arithmetics
-    my $page_start_addr = ip2int($from);
-    my $page_end_addr   = int2ip($to);
-    my $page_size       = $page_end_addr - $page_start_addr;
-    my $num_pages       = ceil( $page_size / $max_page_items );
+    my $page_start_addr_i = ip2int($from);
+    my $page_end_addr_i   = ip2int($to);
+    my $page_size         = $page_end_addr_i - $page_start_addr_i;
+    my $num_pages         = ceil( $page_size / $max_page_items );
     if ( $page > 1 ) {
-        $page_start_addr += $max_page_items * ( $page - 1 );
-        $page_size = $page_end_addr - $page_start_addr;
+        $page_start_addr_i += $max_page_items * ( $page - 1 );
+        $page_size = $page_end_addr_i - $page_start_addr_i;
     }
     if ( $page_size > $max_page_items ) {
-        $page_end_addr = $page_start_addr + $max_page_items;
-        $page_size     = $max_page_items;
+        $page_end_addr_i = $page_start_addr_i + $max_page_items;
+        $page_size       = $max_page_items;
     }
     ( $page <= 1 )          and $c->stash( prev_page => undef );
     ( $page >= $num_pages ) and $c->stash( next_page => undef );
 
     # convert numeric address to normalized strings
-    $page_start_addr = padded_ipaddr(int2ip($page_start_addr));
-    $page_end_addr = padded_ipaddr(int2ip($page_end_addr));
+    my $page_start_addr = padded_ipaddr(int2ip($page_start_addr_i));
+    my $page_end_addr   = padded_ipaddr(int2ip($page_end_addr_i));
 
     my @rs;
     @rs = $c->model('ManocDB::Arp')->search(
@@ -211,7 +214,7 @@ sub ip_list : Private {
 
     my @addr_table;
     foreach my $i ( 0 .. $page_size - 1 ) {
-        my $ipaddr = int2ip( $page_start_addr + $i );
+        my $ipaddr = int2ip( $page_start_addr_i + $i );
         push @addr_table,
             {
             ipaddr   => $ipaddr,
@@ -234,12 +237,20 @@ sub ip_list : Private {
             distinct => 1,
         }
     );
-
+    my $backref = $c->uri_for_action('/iprange/view_iprange', 
+				     [$c->stash->{network},$c->stash->{prefix}], 
+				     {def_tab=>'2', page => $page }
+				    );
+    if(defined($c->stash->{object})){
+     $backref = 
+       $c->uri_for_action('iprange/view',[$c->stash->{object}->name], {def_tab=>'3', page => $page })
+    }
     $c->stash(
         ip_used            => $rs->count,
         disable_pagination => 1,
         disable_sorting    => 1,
-        cur_page           => $page
+        cur_page           => $page,
+	backref            => $backref,
     );
 }
 
@@ -287,7 +298,14 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
 
     my $schema = $c->stash->{resultset};
 
-    my @subnet_list = $schema->all();
+    my @subnet_list = $schema->search({},
+				      {
+				       order_by => ['me.from_addr','me.to_addr'],
+				       #prefetch => ['vlan_id','children','parent'],
+				       }
+				     );
+    
+
 
     $c->stash( subnet_list => \@subnet_list );
     $c->stash( template    => 'iprange/list.tt' );
@@ -403,8 +421,9 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     $netmask = $range->netmask;
     $vlan_id = $range->vlan_id ? $range->vlan_id->id : '';
 
-    if ( !$type && defined($network) && defined($netmask) ) {
+    if ( !$type && $network && $netmask) {
         $type   = 'subnet';
+	$c->log->info("netmask = '$netmask");
         $prefix = Manoc::Utils::netmask2prefix($netmask);
     }
 
@@ -476,7 +495,6 @@ sub create : Chained('base') : PathPart('create') : Args() {
     my $vlan_id = $c->req->param('vlan') || '';
     $c->stash( default_backref => $c->uri_for_action('/iprange/list') );
 
-    my ( $message, $error );
     if ( lc $c->req->method eq 'post' ) {
         if ( $c->req->param('discard') ) {
             $c->detach('/follow_backref');
@@ -491,6 +509,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
         }
     }
 
+    my $type   = $c->req->param('type');
     my $prefix = $c->req->param('prefix');
     my %tmpl_param;
 
@@ -508,16 +527,14 @@ sub create : Chained('base') : PathPart('create') : Args() {
     my @vlans = map { id => $_->id, name => $_->name, selected => $_->id eq $vlan_id },
         @vlans_rs;
 
-    $tmpl_param{error_msg} = $message;
-    $tmpl_param{error}     = $error;
 
     foreach (qw( network prefix from_addr to_addr )) {
         $tmpl_param{$_} = $c->req->param($_);
     }
     $tmpl_param{range}       = $c->req->param('name');
     $tmpl_param{parent}      = $parent;
-    $tmpl_param{type_subnet} = $c->req->param('type') eq 'subnet';
-    $tmpl_param{type_range}  = $c->req->param('type') eq 'range';
+    $tmpl_param{type_subnet} = defined($type) && $type eq 'subnet';
+    $tmpl_param{type_range}  = defined($type) && $type eq 'range';
     $tmpl_param{vlans}       = \@vlans;
 
     $tmpl_param{template} = 'iprange/create.tt';
@@ -529,16 +546,17 @@ sub process_create : Private {
     my ( $self, $c ) = @_;
     my $name    = $c->req->param('name');
     my $vlan_id = $c->req->param('vlan');
-    my $error;
 
-    $name or $error->{name} = "Please insert range name";
     $vlan_id eq "none" and undef $vlan_id;
 
     # check name parameter
-    if ( ! $c->forward('check_name', [ $name ]) ) {
-	$c->stash->{error}->{name} = $c->stash->{message}; 
-	return 0; 
+    if ( $name ) {
+	$c->forward('check_name', [ $name ]) or 
+	  $c->stash->{error}->{name} = $c->stash->{message}; 
+    } else {
+	$c->stash->{error}->{name} = "Missing field";
     }
+    scalar( keys(%{$c->stash->{error}}) ) and return 0;
 
     # check form
     $c->forward('check_iprange_form') || return 0; 
@@ -620,24 +638,6 @@ sub process_split : Private {
 
     my $range = $c->stash->{'object'};
 
-    $name1            or $error->{name1} = "Please insert name subnet 1";
-    $name2            or $error->{name2} = "Please insert name subnet 2";
-    $split_point_addr or $error->{split} = "Please insert split point address";
-
-    #Check parameters
-    my ( $res, $mess );
-    ( $res, $mess ) = check_name( $name1, $c->stash->{'resultset'} );
-    $res or $error->{name1} = $mess;
-    ( $res, $mess ) = check_name( $name2, $c->stash->{'resultset'} );
-    $res or $error->{name2} = $mess;
-
-    if ( $name1 and $name1 eq $name2 ) {
-        $error->{name1} = "Name Subnet 1 and Name Subnet 2 cannot be the same";
-        $error->{name2} = "Name Subnet 1 and Name Subnet 2 cannot be the same";
-    }
-
-    check_addr($split_point_addr) or
-        $error->{split} = "Split point address not a valid IPv4 address: $split_point_addr";
 
     #Retrieve subnet info
     my $from_addr = ip2int( $range->from_addr );
@@ -645,17 +645,48 @@ sub process_split : Private {
     my $parent    = $range->parent;
     my $vlan_id   = $range->vlan_id;
 
+    #Check parameters
+
+    if ($name1) {
+	$c->forward('check_name', [ $name1 ]) or
+	  $error->{name1} = $c->stash->{message};
+    } else {
+	$error->{name1} = "Missing field";
+    }
+    
+    if ($name2) {
+	$c->forward('check_name', [ $name2 ]) or
+	  $error->{name2} = $c->stash->{message};
+    } else {
+	$error->{name2} = "Missing field";
+    }
+
+  
+    if ( $name1 and $name1 eq $name2 ) {
+        $error->{name2} = "Name Subnet 1 and Name Subnet 2 cannot be the same";
+    }
+
     #Check split point address
-    $split_point_addr = ip2int($split_point_addr);
-    if ( ( $from_addr > $split_point_addr ) ||
-        ( $to_addr <= $split_point_addr ) )
-    {
-        $error->{split} = "Split point address not inside the range";
+    if ($split_point_addr) {
+	if ( check_addr($split_point_addr) ) {
+
+	    $split_point_addr = ip2int($split_point_addr);
+	    
+	    if ( ( $from_addr > $split_point_addr ) ||
+		 ( $to_addr <= $split_point_addr ) )
+	      {
+		  $error->{split} = "Split point address not inside the range";
+	      }
+	} else {
+	    $error->{split} = "Not a valid IPv4 address";
+	}	
+    } else {
+	$error->{split} = "Missing field";
     }
 
     if ( $range->children->count() ) {
 
-        # useless:is already checked in rangelist.tmpl
+        # should also be checked in rangelist.tmpl
         $error->{split} = "$name cannot be splitted because it is divided in subranges";
     }
     scalar( keys(%$error) ) and return ( 0, undef, $error );
@@ -728,8 +759,8 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
     }
 
     my $range     = $c->stash->{'object'};
-    my $from_addr = ip2int( $range->from_addr );
-    my $to_addr   = ip2int( $range->to_addr );
+    my $from_addr = $range->from_addr;
+    my $to_addr   = $range->to_addr;
 
     $parent = $range->parent;
     if ($parent) { $parent = $parent->name; }
@@ -744,8 +775,8 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
     $tmpl_param{error}      = $error;
     $tmpl_param{error_msg}  = $message;
     $tmpl_param{range_name} = $range->name;
-    $tmpl_param{from_addr}  = int2ip($from_addr);
-    $tmpl_param{to_addr}    = int2ip($to_addr);
+    $tmpl_param{from_addr}  = $from_addr;
+    $tmpl_param{to_addr}    = $to_addr;
     $tmpl_param{parent}     = $parent;
     $tmpl_param{neighbours} = \@neighbours;
     $tmpl_param{new_name}   = $new_name;
@@ -765,12 +796,13 @@ sub process_merge : Private {
     my $error    = {};
 
     #Check parameters
-    $neigh or return ( 0, "Please select the neighbour range" );
-    $new_name or $error->{name} = "Please insert merged subnet name";
+    unless ( $neigh ) {
+	$c->stash->{message} = "Please select the neighbour range";
+	return 0;
+    }
 
-    my ( $res, $mess );
-    ( $res, $mess ) = check_name( $new_name, $c->stash->{'resultset'} );
-    $res or $error->{name} = "Bad merged subnet name: $mess";
+    $c->forward('check_name', [ $new_name ]) or
+      $error->{name} = $c->stash->{error};
 
     scalar( keys(%$error) ) and return ( 0, undef, $error );
 
@@ -854,7 +886,10 @@ sub check_name : Private {
     my ( $self, $c, $name) = @_;
     my $schema = $c->stash->{resultset};
 
-    $name eq '' and return 0;
+    if ( $name eq '' ) {
+	$c->stash->{message} = "Empty name";
+	return 0;
+    }
     if ( $name !~ /^\w[\w-]*$/ ) {
 	$c->stash->{message} = "Invalid name";
 	return 0;
@@ -895,7 +930,7 @@ sub check_iprange_form : Private {
     if ( $type eq 'subnet' ) {
         $network = padded_ipaddr($network);
         $network or $error->{type} = "Please insert range network";
-        check_addr($network) or $error->{type} = "Invalid network address";
+        check_addr($network) or $error->{network} = "Invalid network address";
 
         my $prefix  = $c->req->param('prefix');
         $prefix or $error->{prefix} = "Please insert network prefix";
@@ -916,25 +951,21 @@ sub check_iprange_form : Private {
 	$netmask   = padded_ipaddr(int2ip($netmask_i));
     }
     elsif ( $type eq 'range' ) {
-        defined($from_addr) or
-            $error->{from_addr} = "Missing address";
         check_addr($from_addr) or
             $error->{from_addr} = "Not a valid IPv4 address";
-
-        defined($to_addr) or
-            $error->{to_addr} = "Missing address";
         check_addr($to_addr) or
-            $error->{to_addr} = "Not a valid IPv4 address";
+            $error->{to_addr}   = "Not a valid IPv4 address";
 
         $to_addr   = padded_ipaddr($to_addr);
         $from_addr = padded_ipaddr($from_addr);
-        $to_addr ge $from_addr or $error->{to_addr} = "Invalid range";
-
+        if($to_addr le $from_addr) {
+	    $c->stash->{error}->{to_addr} ||= "Bad range";
+	}
         $network = $netmask = undef;
     }
     else {
 	# internal error?
-	$c->stash->{'message'} = "Interal error: Unexpected form parameter (type)";
+	$c->stash->{'message'} = "No type selected";
 	return 0;
     }
     scalar( keys(%$error) ) and return 0;
@@ -1036,7 +1067,7 @@ sub check_iprange_form : Private {
 			'parent'  => { '=' => $name }
 		       },
 		       {
-			'from_addr)' => { '>' => $to_addr },
+			'from_addr' => { '>' => $to_addr },
 			'parent'     => { '=' => $name }
 		       },
 		      ];
@@ -1059,8 +1090,8 @@ sub check_iprange_form : Private {
 sub get_neighbour {
     my ( $schema, $parent, $from_addr, $to_addr ) = @_;
     
-    my $lower_addr = int2ip(ip2int($from_addr)) - 1;
-    my $upper_addr = int2ip(ip2int($to_addr)) + 1;
+    my $lower_addr = int2ip(ip2int($from_addr) - 1);
+    my $upper_addr = int2ip(ip2int($to_addr) + 1);
 
     $schema->search(
         {

@@ -1,0 +1,23 @@
+[%META section="Ricerca di una subnet" %]
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>Ricerca di una subnet presente all'interno del DB di Manoc
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'subnet 172.16.100.0/24' }) %]"> subnet 172.16.100.0/24</a>
+<td>N.B. se il range specificato è presente nel DB interno, la pagina restituita comprenderà
+le informazioni immesse relative alla subnet, altrimenti viene comunque restituita una
+pagina in stile 'ipcalc'
+</tr>
+<tr>
+<td>Ricerca di una subnet /24
+
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'subnet 172.16.100.0' }) %]"> subnet 172.16.100.0</a>
+<td>il sistema assume che la subnet sia /24
+</tr>
+</table>
+

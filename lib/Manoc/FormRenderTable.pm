@@ -13,13 +13,13 @@ with 'HTML::FormHandler::Render::Simple' => { -excludes =>
 
 sub render_start {
     my $self = shift;
-
-    return $self->html_form_tag . "<table>\n";
+    my $output = $self->html_form_tag . "<table class=\"ui-widget-content ui-corner-all\">\n";
+    return $output;
 }
 
 sub render_end {
     my $self   = shift;
-    my $output = "</table>\n";
+    my $output .= "</table>\n";
     $output .= "</form>\n";
     return $output;
 }

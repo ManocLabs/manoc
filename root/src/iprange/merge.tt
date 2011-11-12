@@ -42,7 +42,7 @@
 	    </td>
 		</tr>
 	</table>
-	<div class="buttons"
+	<div class="buttons">
 	<input type="submit" name="submit" value="Submit">
         <input type="submit" name="discard" value="Discard"> 
 	</div>

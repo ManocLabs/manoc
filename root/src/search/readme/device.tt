@@ -1,0 +1,39 @@
+[%META section="Ricerca di un apparato (device)" %]
+
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>ricerca apparato per nome
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'chirurgia' }) %]">chirurgia</a> 
+<td>se non si specifica l'ambito di ricerca il sistema cercherà il nome specificato nella query
+    all'interno delle tabelle  rack, building, hostname, vlan o vlanrange. Infatti nel caso dell'esempio 
+    verranno restituiti molteplici risultati tutti di natura differente, ovvero appartenenti a diversi ambiti.   
+</tr>
+<tr>
+<td>ricerca apparato per indirizzo IP
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '172.16.100.251' }) %]">172.16.100.251</a>
+<td>è una normale ricerca di un IP. Come già detto questo tipo di ricerca controlla anche se l'IP
+    è un indirizzo di management di uno switch (o  di un qualunque altro apparato di rete) e quindi se non si specifica
+    nulla nei risultati troveremo anche il link diretto alla pagina di visione dell'apparato.
+</tr>
+<tr>
+<td>Ricerca di un apparato per IP con la specifica dell'ambito di ricerca
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'device 172.18.11.' }) %]">device 172.18.11.</a> 
+<td>in questo modo si limita l'ambito della ricerca ai soli apparati. Questo è molto comodo nei casi in cui ad esempio 
+    si vuole sapere quanti e quali apparati sono contenuti all'interno di una determinata subnet. Nell'esempio
+    accanto infatti verranno restituiti tutti gli apparati che hanno i primi tre ottetti uguali a quelli della query
+    (di fatto quindi tutti gli apparati contenuti nella subnet 172.18.11.0/24).      
+</tr>
+<tr>
+<td>Ricerca di un apparato per nome con la specifica dell'ambito di ricerca
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'device neurologia' }) %]">device neurologia</a>  
+<td>Analogo al precedente con la differenza che la query verrà ricercata all'interno dei nomi degli apparati.
+</tr>
+</table>
+
+

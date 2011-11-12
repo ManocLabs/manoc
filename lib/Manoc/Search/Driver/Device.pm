@@ -25,7 +25,7 @@ sub search_device {
             }
         );
         $result->add_item($item);
-    }
+      }
 
     $rs = $self->_search_name($query);
     while ( my $e = $rs->next ) {
@@ -59,9 +59,9 @@ sub _search_id {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
     return $schema->resultset('Device')->search(
-        'id' => { -like => $pattern },
-        { order_by => 'name' }
-    );
+        {'id' => { -like => $pattern }},
+        { order_by => ['name'] },
+	);
 }
 
 sub _search_name {
@@ -69,9 +69,9 @@ sub _search_name {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
     return $schema->resultset('Device')->search(
-        'name' => { -like => $pattern },
-        { order_by => 'name' }
-    );
+						{name => { -like => $pattern }},
+						{ order_by => 'name' },
+					       );
 }
 
 no Moose;

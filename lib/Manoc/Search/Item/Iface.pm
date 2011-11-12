@@ -5,7 +5,7 @@
 package Manoc::Search::Item::Iface;
 use Moose;
 
-extends 'Manoc::Search::Item::Device';
+extends 'Manoc::Search::Item';
 
 has '+item_type' => ( default => 'iface' );
 

@@ -21,9 +21,10 @@ sub search_note {
     while ( $e = $it->next ) {
         my $item = Manoc::Search::Item::Iface->new(
             {
-                device    => $e->device,
-                interface => $e->interface,
-                text      => $e->notes,
+	     device    => $e->device,
+	     interface => $e->interface,
+	     text      => $e->notes,
+	     match     => $e->device->name || $e->device->id,
             }
         );
         $result->add_item($item);

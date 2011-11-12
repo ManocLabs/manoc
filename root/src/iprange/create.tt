@@ -67,7 +67,7 @@
   <td>to</td>
   <td><input type="text" name="to_addr" value="[% to_addr %]" /></td>
   <td>
-     [% IF error.to_addr %]<span class="error" id="error">[% error.from_addr %] </span>[%END%]
+     [% IF error.to_addr %]<span class="error" id="error">[% error.to_addr %] </span>[%END%]
   </td>
 </tr>
 </table>

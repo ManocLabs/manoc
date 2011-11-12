@@ -2,8 +2,7 @@
 
 [% FOREACH ip IN addresses %]
    [% IF loop.first %]
-   [% init_table('iplist', [{sortable=>'true', type=>'ip-html'},{sortable=>'false'},{sortable=>'false'},{sortable=>'false'}], 
-		{disable_pagination => 1, cust_pag=>1 }) %]
+   [% init_table('iplist',undef,{disable_pagination => 1, cust_pag=>1 }) %]
 
   <div id="toolbar_buttons">
     <div class="buttons" >  
@@ -30,11 +29,9 @@
 	 </td>
 	 <td>[% ip.notes %]</td>
        <td> 
-        <a href="[% c.uri_for_action('ip/edit_notes',[ip.ipaddr],{backref=>
-       c.uri_for_action('iprange/view',[object.name], {def_tab=>'3', page => cur_page }) }) %]">[% icon('edit') %]</a>
+        <a href="[% c.uri_for_action('ip/edit_notes',[ip.ipaddr],{backref=> backref}) %]">[% icon('edit') %]</a>
 	[% IF ip.notes %]       
-           <a href="[% c.uri_for_action('ip/delete_notes',[ip.ipaddr],{backref=>
-       c.uri_for_action('iprange/view',[object.name], {def_tab=>'3', page => cur_page }) } ) %]">[% icon('remove') %]</a>
+           <a href="[% c.uri_for_action('ip/delete_notes',[ip.ipaddr],{backref=> backref } ) %]">[% icon('remove') %]</a>
     	[%END%]    
        </td>
          </tr>
