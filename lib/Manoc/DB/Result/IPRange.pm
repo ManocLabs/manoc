@@ -8,9 +8,7 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-use Manoc::Utils;
-
-__PACKAGE__->load_components(qw/FilterColumn Core/);
+__PACKAGE__->load_components(qw/ Core/);
 __PACKAGE__->table('ip_range');
 
 __PACKAGE__->add_columns(
@@ -63,13 +61,6 @@ __PACKAGE__->has_many(
     children => 'Manoc::DB::Result::IPRange',
     { 'foreign.parent' => 'self.name' }
 );
-# __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 
-# foreach my $col (qw(from_addr to_addr network netmask)) {
-#     __PACKAGE__->filter_column(
-# 			       $col => {
-# 					filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-# 				       });
-# }
-
+__PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 1;
