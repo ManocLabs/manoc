@@ -12,6 +12,7 @@ package Manoc::Netwalker::DeviceUpdater;
 use Moose;
 with 'Manoc::Logger::Role';
 
+use Manoc::Utils qw(padded_ipaddr);
 use Manoc::Netwalker::DeviceReport;
 use Manoc::Netwalker::Source::SNMP;
 
@@ -291,9 +292,9 @@ sub update_cdp_neighbors {
         foreach my $s (@$n) {
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $entry->id,
+                    from_device    => padded_ipaddr($entry->id),
                     from_interface => $p,
-                    to_device      => $s->{addr},
+                    to_device      => padded_ipaddr($s->{addr}),
                     to_interface   => $s->{port},
                 }
             );
@@ -384,7 +385,7 @@ sub update_mat {
             my @mat_entries = $self->schema->resultset('Mat')->search(
                 {
                     macaddr   => $m,
-                    device    => $device_id,
+                    device    => padded_ipaddr($device_id),
                     interface => $p,
                     archived  => 0,
                     vlan      => $vlan,
@@ -488,7 +489,7 @@ sub update_arp_table {
         $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
 	my @entries = $self->schema->resultset('Arp')->search({
-	    ipaddr	=> $ip_addr,
+	    ipaddr	=> padded_ipaddr($ip_addr),
 	    macaddr	=> $mac_addr,
 	    vlan	=> $vlan,
 	    archived => 0

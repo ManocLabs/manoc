@@ -12,6 +12,7 @@ use Carp;
 
 use Manoc::Utils qw(str2seconds);
 use Manoc::Search::QueryType;
+use Manoc::Utils qw(padded_ipaddr);
 
 has 'search_string' => (
     is       => 'rw',

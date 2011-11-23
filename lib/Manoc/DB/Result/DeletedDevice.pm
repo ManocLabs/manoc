@@ -5,7 +5,10 @@
 package Manoc::DB::Result::DeletedDevice;
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+use Manoc::Utils;
+
+
+__PACKAGE__->load_components(qw/PK::Auto FilterColumn Core/);
 
 __PACKAGE__->table('deleted_devices');
 __PACKAGE__->add_columns(
@@ -45,5 +48,12 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many( mat_assocs => 'Manoc::DB::Result::MatArchive', 'device_id' );
+
+__PACKAGE__->filter_column(
+			   ipaddr => {
+			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
+				     },
+			  );
 
 1;

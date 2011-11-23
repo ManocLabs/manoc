@@ -5,7 +5,7 @@
 package Manoc::Controller::Ip;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int check_addr);
+use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int check_addr padded_ipaddr);
 use Manoc::Form::Ip_notes;
 use Data::Dumper;
 
@@ -72,8 +72,10 @@ sub _get_ipinfo : Private {
     my ( $self, $c ) = @_;
     my $id = $c->stash->{'id'};
 
+
+    #to do the query we have to zero-pad ip address
     my @r = $c->model('ManocDB::Arp')->search(
-        ipaddr => $id,
+        ipaddr => padded_ipaddr($id),
         { order_by => 'lastseen DESC, firstseen DESC' }
     );
     my @arp_results = map +{
@@ -84,18 +86,18 @@ sub _get_ipinfo : Private {
     }, @r;
     $c->stash( arp_results => \@arp_results );
 
-    my $note = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } );
+    my $note = $c->model('ManocDB::IpNotes')->find( { ipaddr => padded_ipaddr($id) } );
     defined($note) ? $c->stash( 'notes' => $note->notes ) :
         $c->stash( 'notes' => '' ),
 
         @r = $c->model('ManocDB::IPRange')->search(
         [
             {
-                'inet_aton(from_addr)' => { '<=' => ip2int($id) },
-                'inet_aton(to_addr)'   => { '>=' => ip2int($id) },
+                'from_addr' => { '<=' => padded_ipaddr($id) },
+                'to_addr'   => { '>=' => padded_ipaddr($id) },
             }
         ],
-        { order_by => 'inet_aton(from_addr) DESC, inet_aton(to_addr)' }
+        { order_by => 'from_addr DESC, to_addr' }
         );
     my @subnet = map +{
         subnet_name => $_->name,
@@ -115,7 +117,7 @@ sub _get_hostinfo : Private {
     my $id = $c->stash->{'id'};
 
     my @r = $c->model('ManocDB::WinHostname')->search(
-        ipaddr => $id,
+        ipaddr => padded_ipaddr($id),
         { order_by => 'name' }
     );
     my @hostnames = map +{
@@ -127,7 +129,7 @@ sub _get_hostinfo : Private {
 
     @r =
         $c->model('ManocDB::WinLogon')
-        ->search( { ipaddr => $id }, { order_by => 'lastseen DESC, firstseen DESC' } );
+        ->search( { ipaddr => padded_ipaddr($id) }, { order_by => 'lastseen DESC, firstseen DESC' } );
     my @logons = map +{
         user      => $_->user,
         firstseen => print_timestamp( $_->firstseen ),
@@ -144,7 +146,9 @@ sub _get_dhcpinfo : Private {
     my ( $self, $c ) = @_;
     my @r;
 
-    @r = $c->model('ManocDB::DHCPReservation')->search( { ipaddr => $c->stash->{id} } );
+    my $ipaddr_pad = padded_ipaddr($c->stash->{id});
+
+    @r = $c->model('ManocDB::DHCPReservation')->search( { ipaddr => $ipaddr_pad } );
     my @reservations = map +{
         macaddr  => $_->macaddr,
         name     => $_->name,
@@ -152,7 +156,7 @@ sub _get_dhcpinfo : Private {
         server   => $_->server,
     }, @r;
 
-    @r = $c->model('ManocDB::DHCPLease')->search( { ipaddr => $c->stash->{id} } );
+    @r = $c->model('ManocDB::DHCPLease')->search( { ipaddr => $ipaddr_pad } );
 
     my @leases = map +{
         macaddr  => $_->macaddr,
@@ -175,7 +179,7 @@ sub _get_dhcpinfo : Private {
 sub edit_notes : Chained('base') PathPart('edit_notes') Args(0) {
     my ( $self, $c ) = @_;
     my $id = $c->stash->{'id'};
-    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } ) ||
+    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => padded_ipaddr($id) } ) ||
         $c->model('ManocDB::IpNotes')->new_result( {} );
     $item->ipaddr($id);
     $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id] ) );
@@ -201,7 +205,7 @@ sub edit_notes : Chained('base') PathPart('edit_notes') Args(0) {
 sub delete_notes : Chained('base') PathPart('delete_notes') Args(0) {
     my ( $self, $c ) = @_;
     my $id = $c->stash->{'id'};
-    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } );
+    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => padded_ipaddr($id) } );
 
     $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id] ) );
 

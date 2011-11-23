@@ -6,7 +6,9 @@ package Manoc::DB::Result::CDPNeigh;
 
 use base qw(DBIx::Class);
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+use Manoc::Utils;
+
+__PACKAGE__->load_components(qw/PK::Auto FilterColumn Core/);
 
 __PACKAGE__->table('cdp_neigh');
 __PACKAGE__->add_columns(
@@ -46,6 +48,17 @@ __PACKAGE__->belongs_to(
     from_device_info => 'Manoc::DB::Result::Device',
     { 'foreign.id' => 'self.from_device' }
 );
+
+__PACKAGE__->filter_column(
+			   from_device => {
+			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
+				     },
+			   to_device => {
+			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
+				     },
+			  );
 
 # TODO is_foreign_key_constraint doesn't work!!
 #__PACKAGE__->might_have(to_device_info => 'Manoc::DB::Result::Device',

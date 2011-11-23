@@ -5,7 +5,10 @@
 package Manoc::DB::Result::Device;
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+use Manoc::Utils;
+
+
+__PACKAGE__->load_components(qw/PK::Auto FilterColumn Core/);
 
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
@@ -184,6 +187,18 @@ __PACKAGE__->belongs_to(
     'mng_url_format',
     { join_type => 'left' }
 );
+
+__PACKAGE__->filter_column(
+			   id => {
+			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
+				     },
+			  );
+
+
+
+
+
 
 sub get_mng_url {
     my $self = shift;

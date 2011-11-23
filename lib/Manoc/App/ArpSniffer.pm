@@ -13,6 +13,7 @@ with qw(MooseX::Daemonize);
 use Net::Pcap;
 use NetPacket::Ethernet qw(:types);
 use NetPacket::ARP;
+use Manoc::Utils qw(padded_ipaddr);
 
 my $DEFAULT_VLAN     = 1;
 my $REFRESH_INTERVAL = 600;
@@ -211,7 +212,7 @@ sub handle_arp_packets {
 
     my @entries = $self->schema->resultset('Arp')->search(
         {
-            ipaddr   => $ip_addr,
+            ipaddr   => padded_ipaddr($ip_addr),
             macaddr  => $mac_addr,
             vlan     => $vlan,
             archived => 0,

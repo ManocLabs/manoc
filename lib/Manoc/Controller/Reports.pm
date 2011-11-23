@@ -5,6 +5,7 @@
 package Manoc::Controller::Reports;
 use Moose;
 use namespace::autoclean;
+use Manoc::Utils qw(padded_ipaddr);
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME
@@ -178,7 +179,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
         my $iface       = $r->get_column('interface');
         my $count       = $r->get_column('count');
         my $description = $r->get_column('description') || "";
-        my $device      = $c->model('ManocDB::Device')->find($id);
+        my $device      = $c->model('ManocDB::Device')->find(padded_ipaddr($id));
 
         #TODO: if the device was deleted?
         push @multihost_ifaces,
@@ -218,7 +219,7 @@ sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
 
     if ($device_id) {
         my ( $rs, $r );
-        $rs = $schema->resultset('IfStatus')->search_unused($device_id);
+        $rs = $schema->resultset('IfStatus')->search_unused(padded_ipaddr($device_id));
 
         while ( $r = $rs->next() ) {
             push @unused_ifaces,
