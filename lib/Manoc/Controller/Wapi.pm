@@ -16,7 +16,6 @@ use YAML::Syck;
 use Encode;
 use POSIX qw(strftime);
 use Data::Dumper;
-use Manoc::Utils qw(padded_ipaddr);
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
@@ -63,7 +62,7 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
 
         my @entries = $rs->search(
             {
-                ipaddr   => padded_ipaddr($ipaddr),
+                ipaddr   => $ipaddr,
                 name     => $name,
                 archived => 0
             }
@@ -100,7 +99,7 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
         my @entries = $rs->search(
             {
                 user     => $user,
-                ipaddr   => padded_ipaddr($ipaddr),
+                ipaddr   => $ipaddr,
                 archived => 0
             }
         );

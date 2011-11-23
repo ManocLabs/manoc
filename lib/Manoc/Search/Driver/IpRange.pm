@@ -6,7 +6,7 @@ package Manoc::Search::Driver::IpRange;
 use Moose;
 use Manoc::Search::Item::IpRange;
 use Manoc::Search::Item::IpCalc;
-use Manoc::Utils qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr padded_ipaddr);
+use Manoc::Utils qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr);
 
 extends 'Manoc::Search::Driver';
 
@@ -24,16 +24,11 @@ sub search_subnet {
 
     my ( $from_addr, $to_addr ) = Manoc::Utils::netmask_prefix2range( $subnet, $prefix );
 
-
-    my $from_addr_pad = padded_ipaddr(int2ip($from_addr));
-    my $to_addr_pad   = padded_ipaddr(int2ip($to_addr));
-
-
     my @ranges = $schema->resultset('IPRange')->search(
         {
             -and => [
-                'from_addr' => $from_addr_pad,
-                'to_addr'   => $to_addr_pad
+                'inet_aton(from_addr)' => $from_addr,
+                'inet_aton(to_addr)'   => $to_addr
             ]
         }
     );
@@ -41,8 +36,8 @@ sub search_subnet {
         @ranges = $schema->resultset('IPRange')->search(
             {
                 -and => [
-                    'from_addr' => $from_addr_pad,
-                    'to_addr'   => { '<=' => $to_addr_pad }
+                    'inet_aton(from_addr)' => $from_addr,
+                    'inet_aton(to_addr)'   => { '<=' => $to_addr }
                 ]
             }
         );

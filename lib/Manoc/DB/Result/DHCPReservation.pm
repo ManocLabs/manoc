@@ -5,13 +5,10 @@
 package Manoc::DB::Result::DHCPReservation;
 
 use base 'DBIx::Class';
-
-use Manoc::Utils;
-
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/FilterColumn Core /);
+__PACKAGE__->load_components(qw/ Core /);
 __PACKAGE__->table('dhcp_reservation');
 
 __PACKAGE__->add_columns(
@@ -48,12 +45,5 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key( 'server', 'ipaddr', 'macaddr' );
-
-__PACKAGE__->filter_column(
-			   ipaddr => {
-			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
-				     },
-			  );
 
 1;

@@ -6,9 +6,7 @@ package Manoc::DB::Result::DeviceConfig;
 
 use base qw(DBIx::Class);
 
-use Manoc::Utils;
-
-__PACKAGE__->load_components(qw/PK::Auto FilterColumn Core/);
+__PACKAGE__->load_components(qw/PK::Auto Core/);
 
 __PACKAGE__->table('device_config');
 __PACKAGE__->add_columns(
@@ -49,13 +47,6 @@ __PACKAGE__->belongs_to(
     device_info => 'Manoc::DB::Result::Device',
     { 'foreign.id' => 'self.device' }
 );
-
-__PACKAGE__->filter_column(
-			   device => {
-			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
-				     },
-			  );
 
 =head1 NAME
 

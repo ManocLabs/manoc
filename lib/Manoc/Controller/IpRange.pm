@@ -150,7 +150,7 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
 
     $c->stash(%tmpl_param);
 
-    $self->ip_list( $c, $from, $to, $page );
+    $self->ip_list( $c, $from_i, $to_i, $page );
 }
 
 =head2 ip_list
@@ -227,8 +227,8 @@ sub ip_list : Private {
     my $rs = $c->model('ManocDB::Arp')->search(
         {
             'ipaddr' => {
-                '>=' => padded_ipaddr($from),
-                '<=' => padded_ipaddr($to),
+                '>=' => $from,
+                '<=' => $to,
             }
         },
         {
@@ -338,8 +338,8 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my $rs = $c->model('ManocDB::Arp')->search(
         {
             'ipaddr' => {
-                '>=' => padded_ipaddr($range->from_addr),
-                '<=' => padded_ipaddr($range->to_addr),
+                '>=' => $range->from_addr,
+                '<=' => $range->to_addr,
             }
         },
         {
@@ -466,7 +466,7 @@ sub process_edit : Private {
     $vlan_id eq "none" and undef $vlan_id;
 
     # check name parameter
-    if ( lc($name) ne lc($new_name) && !$c->forward('check_name', [ $new_name ]) ) {
+    if ( lc($name) ne lc($new_name) && !$c->forward('check_name', [ $name ]) ) {
 	$c->stash->{error}->{name} = $c->stash->{message}; 
 	$c->stash->{message} = undef; 
 	return 0;

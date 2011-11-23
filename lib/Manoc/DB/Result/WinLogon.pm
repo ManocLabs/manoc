@@ -4,13 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::WinLogon;
 use base 'DBIx::Class';
-
-use Manoc::Utils;
-
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/FilterColumn Core/);
+__PACKAGE__->load_components(qw/ Core/);
 __PACKAGE__->table('win_logon');
 
 __PACKAGE__->add_columns(
@@ -20,7 +17,7 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'ipaddr' => {
-        data_type   => 'varchar',
+        data_type   => 'char',
         is_nullable => 0,
         size        => 15,
     },
@@ -41,14 +38,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key(qw(user ipaddr firstseen));
-
-
- __PACKAGE__->filter_column(
- 			   ipaddr => {
- 			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
- 			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
- 				     },
- 			  );
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

@@ -49,15 +49,13 @@ __PACKAGE__->add_columns(
     },
 );
 
-
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 
 __PACKAGE__->filter_column(
 			   ipaddr => {
-			       filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-			       filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
-				     },
+				    filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
+				   }
 			  );
 
 sub sqlt_deploy_hook {

@@ -5,7 +5,7 @@
 package Manoc::Controller::Device;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(clean_string print_timestamp check_addr padded_ipaddr );
+use Manoc::Utils qw(clean_string print_timestamp check_addr );
 use Text::Diff;
 use Manoc::Form::DeviceNew;
 use Manoc::Form::DeviceEdit;
@@ -56,7 +56,7 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
     my ( $self, $c, $id ) = @_;
 
     return if ( $id eq '' );
-    $c->stash( object => $c->stash->{resultset}->find(padded_ipaddr($id)));
+    $c->stash( object => $c->stash->{resultset}->find($id) );
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
@@ -97,7 +97,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
     # CPD
     my @neighs = $c->model('ManocDB::CDPNeigh')->search(
-                 { from_device => padded_ipaddr($id) },
+                 { from_device => $id },
                  {
                      '+columns' => [ { 'name' => 'dev.name' } ],
                      order_by   => 'last_seen DESC, from_interface',
@@ -137,7 +137,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my ($e, $it);
 
     
-    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity(padded_ipadd($id));
+    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
 
 
     my %if_last_mat;
@@ -177,7 +177,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     }
 
     #Unused interfaces
-    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused(padded_ipaddr($id));
+    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused($id);
 
     #------------------------------------------------------------
     # wireless info
@@ -355,7 +355,7 @@ sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
     );
 
     #Retrieve device configuration from DB
-    $dev_config = $c->model('ManocDB::DeviceConfig')->find( {device => padded_ipaddr($device_id)} );
+    $dev_config = $c->model('ManocDB::DeviceConfig')->find( {device => $device_id} );
     if ( !$dev_config ) {
         $c->stash( error_msg => "Device backup not found!" );
         $c->detach('/error/index');
@@ -511,7 +511,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
                 );
 
                 $it = $c->model('ManocDB::Mat')->search(
-                    { device => padded_ipaddr($id), },
+                    { device => $id, },
                     {
                         select => [
                             'macaddr', 'vlan',
@@ -619,7 +619,7 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
 sub process_change_ip : Private {
     my ( $self, $c, $id, $new_id ) = @_;
     my $device = $c->stash->{'object'};
-    my $new_ip = $c->stash->{'resultset'}->find(padded_ipaddr($new_id));
+    my $new_ip = $c->stash->{'resultset'}->find($new_id);
 
     if ($new_ip) {
         return ( 0, "The ip is already in use. Try again with another one!" );

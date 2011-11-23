@@ -8,24 +8,11 @@ extends 'Manoc::Search::Driver';
 
 use Manoc::Search::Item::MacAddr;
 use Manoc::Search::Item::IpAddr;
-use Manoc::Utils qw(padded_ipaddr);
-
-sub build_ip_pattern{
- my ($self, $ip, $match) = @_;
-
- my $pattern = padded_ipaddr($ip);
-
- $match eq 'begin'   and $pattern = "$pattern%";
- $match eq 'end'     and $pattern = "%$pattern";
- $match eq 'partial' and $pattern = "%$pattern%";
-    
- return $pattern;
-}
 
 sub search_ipaddr {
     my ( $self, $query, $result ) = @_;
 
-    my $pattern = $self->build_ip_pattern($query->search_string, $query->match);
+    my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
     my $search = { ipaddr => { like => $pattern } };
