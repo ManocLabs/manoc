@@ -10,14 +10,17 @@ use warnings;
 
 use Manoc::Utils;
 
-__PACKAGE__->load_components(qw/FilterColumn Core/);
+use NetAddr::IP;
+
+__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('arp');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
+
     },
     'macaddr' => {
         data_type   => 'varchar',
@@ -52,11 +55,13 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 
-__PACKAGE__->filter_column(
-			   ipaddr => {
-				    filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-				   }
-			  );
+
+__PACKAGE__->inflate_column(
+        ipaddr => {
+            inflate => sub { return Manoc::Ipaddr->new({address => shift}) },
+            deflate => sub { return scalar shift->padded_address },
+		  }
+		      );
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
