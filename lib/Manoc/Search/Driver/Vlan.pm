@@ -23,6 +23,16 @@ sub search_inventory {
         $result->add_item($item);
     }
 
+
+    $it = $schema->resultset('Vlan')->search(
+        {id => { '-like' => $pattern }},
+        { order_by => 'id' }
+    );
+    while ( $e = $it->next ) {
+        my $item = Manoc::Search::Item::Vlan->new( { vlan => $e } );
+        $result->add_item($item);
+    }
+
 }
 
 no Moose;
