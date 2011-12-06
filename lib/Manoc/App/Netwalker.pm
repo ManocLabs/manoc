@@ -128,10 +128,6 @@ sub worker_manager_stop  {
                                                        's_class'   => $self->report,
                                                       }
                                                      );
-    #update netwalker.if_status variable
-    $self->set_update_status();
-
-
     $self->log->debug(Dumper($self->report));
 }
 
@@ -153,7 +149,8 @@ sub run {
 
     #deep update?
     my $update_all = $self->get_update_status($self->config->{Netwalker}->{ifstatus_interval} || 0);
-
+    #update netwalker.if_status variable
+    $update_all and $self->set_update_status();
 
     my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
 
