@@ -335,11 +335,18 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             distinct => 1,
         }
     );
+
+    my $min_host = $range->from_addr;
+    my $max_host = $range->to_addr;
+    
+    $range->netmask and $min_host = int2ip( ip2int( $range->from_addr ) + 1 ) and 
+      $max_host = int2ip( ip2int( $range->to_addr ) - 1 );
+
     my %param;
     $param{prefix}     = $range->netmask ? netmask2prefix( $range->netmask ) : '';
     $param{wildcard}   = prefix2wildcard( $param{prefix} );
-    $param{min_host}   = int2ip( ip2int( $range->from_addr ) + 1 );
-    $param{max_host}   = int2ip( ip2int( $range->to_addr ) - 1 );
+    $param{min_host}   = $min_host;
+    $param{max_host}   = $max_host;
     $param{numhost}    = ip2int( $param{max_host} ) - ip2int( $param{min_host} ) - 1;
     $param{ipaddr_num} = $rs->count();
 

@@ -221,7 +221,7 @@ sub update_all_info {
     $self->update_cdp_neighbors;
     $self->update_ifstatus and $self->update_if_table;
     $self->entry->get_mat() and $self->update_mat;
-    $self->update_vtp_interval and $self->update_vtp_database;
+    $self->update_vtp_database;
     $self->entry->get_arp() and $self->update_arp_table;
     #update_dot11;
 
@@ -447,7 +447,7 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from", $entry->id );
+    $self->log->info( "getting vtp info from ", $entry->id );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
         $self->report->add_error("cannot retrieve vtp info");
