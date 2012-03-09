@@ -58,8 +58,8 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 
 __PACKAGE__->inflate_column(
         ipaddr => {
-            inflate => sub { return Manoc::Ipaddr->new({address => shift}) },
-            deflate => sub { return scalar shift->padded_address },
+            inflate => sub { return Manoc::Ipv4->new({addr => shift}) },
+            deflate => sub { return scalar shift->padded },
 		  }
 		      );
 

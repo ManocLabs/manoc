@@ -66,12 +66,12 @@ __PACKAGE__->has_many(
 __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 
 foreach my $col (qw(from_addr to_addr network netmask)) {
-    __PACKAGE__->filter_column(
-			       $col => {
-					filter_to_storage   => sub { Manoc::Utils::padded_ipaddr($_[1]) },
-					filter_from_storage => sub { Manoc::Utils::unpadded_ipaddr($_[1]) },
-				       }
-			      );
+    __PACKAGE__->inflate_column(
+			$col => {
+			      inflate => sub { return Manoc::Ipv4->new({addr => shift})},
+			      deflate => sub { return scalar shift->padded },
+				}
+			       );
 }
 
 1;
