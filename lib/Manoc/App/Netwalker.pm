@@ -21,6 +21,13 @@ has 'device' => (
                  default => '',
                 );
 
+has 'force_update' => (
+                 is      => 'ro',
+                 isa     => 'Bool',
+                 default => 0,
+                 required=> 0,
+                );
+
 has 'report' => (
                  traits   => ['NoGetopt'],
                  is       => 'rw',
@@ -29,26 +36,35 @@ has 'report' => (
                  default  => sub { Manoc::Report::NetwalkerReport->new },
                 );
 
-has 'force_update' => (
-                 is      => 'ro',
-                 isa     => 'Bool',
-                 default => 0,
-                 required=> 0,
+has 'full_update' => (
+                 traits   => ['NoGetopt'],
+                 is       => 'ro',
+                 isa      => 'Bool',
+                 lazy_build  => 1,
+                );
+
+has 'n_procs' => (
+                 traits   => ['NoGetopt'],
+                 is       => 'ro',
+                 isa      => 'Int',
+                 lazy_build  => 1,
                 );
 
 
-sub get_update_status {
-    my ( $self, $if_update_interval ) = @_;
+sub _build_full_update {
+    my $self  = shift;
     my $timestamp = time;
+    my $if_update_interval = $self->config->{Netwalker}->{ifstatus_interval} || 0;
     #if the update was forced or interval == 0 refresh info
     return 1 if($self->force_update or !$if_update_interval );
 
     my $if_last_update_entry =
       $self->schema->resultset('System')->find("netwalker.if_update");
     if (!$if_last_update_entry) {
-        $if_last_update_entry =  $self->schema->resultset('System')->create({
-                                                                             name  => "netwalker.if_update",
-                                                                             value => "0"});
+        $if_last_update_entry =  
+          $self->schema->resultset('System')->create({ 
+                                                      name  => "netwalker.if_update",
+                                                      value => "0"});
     }
     my $if_last_update = $if_last_update_entry->value();
     my $elapsed_time   = $timestamp - $if_last_update;
@@ -56,12 +72,9 @@ sub get_update_status {
     return $elapsed_time > $if_update_interval ? 1 : 0;
 }
 
-sub set_update_status {
-    my  $self  = shift;
-    my $if_last_update_entry =
-      $self->schema->resultset('System')->find("netwalker.if_update");
-    $if_last_update_entry->value(time);
-    $if_last_update_entry->update();
+sub _build_n_procs{
+    my $self = shift;
+    return $self->config->{Netwalker}->{n_procs} || 1;
 }
 
 sub visit_device {
@@ -77,10 +90,16 @@ sub visit_device {
                                                        config          => $config,
                                                        schema          => $self->schema,
                                                        timestamp       => time,
-                                                       update_ifstatus => $update,
                                                       );
-    $updater->update_all_info();
-
+    #deep update?
+    if($self->full_update){
+        $updater->update_all_info();
+        #update vtp info if is also a vtp server 
+        $config->{vtp_servers}->{$device_id} and $updater->update_vtp_database();
+    }
+    else {
+        $updater->fast_update();
+    }
     print @{POE::Filter::Reference->new->put([{ report => $updater->report->freeze  }])};
 }
 
@@ -118,8 +137,20 @@ sub worker_stdout  {
 sub stdout_filter  { POE::Filter::Reference->new }
 sub stderr_filter  { POE::Filter::Line->new }
 
+sub set_update_status {
+    my  $self  = shift;
+    my $if_last_update_entry =
+      $self->schema->resultset('System')->find("netwalker.if_update");
+    $if_last_update_entry->value(time);
+    $if_last_update_entry->update();
+} 
+
 sub worker_manager_stop  { 
     my $self  = shift;
+
+    #update netwalker.if_status variable
+    $self->full_update and $self->set_update_status();
+
     $self->schema->resultset('ReportArchive')->create(
                                                       {
                                                        'timestamp' => time,
@@ -130,7 +161,6 @@ sub worker_manager_stop  {
                                                      );
     $self->log->debug(Dumper($self->report));
 }
-
 
 sub run {
     my $self = shift;
@@ -144,27 +174,31 @@ sub run {
                   default_vlan         => $self->config->{Netwalker}->{default_vlan}       || 1,
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
-                  vtpstatus_interval   => $self->config->{Netwalker}->{vtpstatus_interval} || 0,
+                  vtp_server           => $self->config->{Netwalker}->{vtp_server} || '',
                  ); 
 
-    #deep update?
-    my $update_all = $self->get_update_status($self->config->{Netwalker}->{ifstatus_interval} || 0);
-    #update netwalker.if_status variable
-    $update_all and $self->set_update_status();
+   #parse vtp servers
+   my $vtp_server_conf = $self->config->{Netwalker}->{vtp_server};
+    if ($vtp_server_conf) {
+	my @address_list = split /\s+/, $vtp_server_conf;
+	$config{vtp_servers} = { map { $_ => 1 } @address_list };
+    } else {
+	$self->log->info("no VTP servers defined");
+    }
 
-    my $n_procs =  $self->config->{Netwalker}->{n_procs} || 1;
-
-    $self->max_workers($n_procs);
-
+    $self->max_workers($self->n_procs);
+    
     #prepare the device list to visit
     if ($self->device) {
         push @device_ids, $self->device;
     } else {
+        #prepare full_update variable (to avoid concurrency problems)
+        $self->full_update();
         @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
     }
 
     foreach my $ids (@device_ids) {
-        $self->enqueue( sub {  $self->visit_device($ids, \%config, $update_all)  } );
+        $self->enqueue( sub {  $self->visit_device($ids, \%config)  } );
     }
     POE::Kernel->run();
 }
