@@ -2,32 +2,13 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Netwalker::DeviceReport;
-
-#----------------------------------------------------------------------#
-# WARNING: this is not a Manoc::Report!!!                              #
-#           it's only used internally by netwalker                     #
-#----------------------------------------------------------------------#
-
+package Manoc::Report::NetwalkerReport;
 use Moose;
 use MooseX::Storage;
 
 our $VERSION = '0.01';
 
-with Storage( 'format' => 'YAML' );
-
-has 'warning' => (
-    traits  => ['Array'],
-    is      => 'rw',
-    isa     => 'ArrayRef',
-    default => sub { [] },
-    handles => {
-        add_warning   => 'push',
-        map_warning   => 'map',
-        warning_count => 'count',
-        all_warning   => 'elements',
-    },
-);
+extends 'Manoc::Report';
 
 has 'error' => (
     traits  => ['Array'],
@@ -42,17 +23,25 @@ has 'error' => (
     },
 );
 
-has 'host' => (
-    is       => 'rw',
-    isa      => 'Str',
-    required => 1,
+has 'warning' => (
+    traits  => ['Array'],
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        add_warning   => 'push',
+        map_warning   => 'map',
+        warning_count => 'count',
+        all_warning   => 'elements',
+    },
 );
 
 has 'visited' => (
-    is      => 'rw',
-    isa     => 'Bool',
+    is  => 'rw',
+    isa => 'Int',
     default => 0,
 );
+
 has 'new_devices' => (
     is  => 'rw',
     isa => 'Int',
@@ -75,6 +64,17 @@ has 'arp_entries' => (
     isa => 'Int',
     default => 0,
 );
+
+
+sub update_stats {
+ my ($self,$report_stats) = @_;
+
+ foreach my $counter (keys %{$report_stats}){
+   if($self->can($counter)){
+     $self->$counter($self->$counter + $report_stats->{$counter});
+   }
+ }
+}
 
 
 1;

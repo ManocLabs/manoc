@@ -109,8 +109,7 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     my $range = $c->stash->{'object'};
 
     if ($range) {
-        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) )
-            if ($range);
+        $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) );
         $c->detach();
     }
     my $host   = $c->stash->{'host'};
@@ -146,8 +145,8 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
     );
     $c->stash( prev_page => $prev_page, next_page => $next_page );
 
-    $self->ip_list( $c, $from_i, $to_i, $page );
     $c->stash(%tmpl_param);
+    $self->ip_list( $c, $from_i, $to_i, $page );
 }
 
 =head2 ip_list
@@ -164,7 +163,7 @@ sub ip_list : Private {
 
     # paging arithmetics
     my $page_start_addr = $from_i;
-    my $page_end_addr   = $to_i;
+    my $page_end_addr   = $to_i+1;
     my $page_size       = $page_end_addr - $page_start_addr;
     my $num_pages       = ceil( $page_size / $max_page_items );
     if ( $page > 1 ) {
@@ -230,12 +229,17 @@ sub ip_list : Private {
             distinct => 1,
         }
     );
-
+    my $backref = $c->uri_for_action('/iprange/view_iprange', [$c->stash->{network},$c->stash->{prefix}],{def_tab=>'2', page => $page } );
+    if(defined($c->stash->{object})){
+     $backref = 
+       $c->uri_for_action('iprange/view',[$c->stash->{object}->name], {def_tab=>'3', page => $page })
+    }
     $c->stash(
         ip_used            => $rs->count,
         disable_pagination => 1,
         disable_sorting    => 1,
-        cur_page           => $page
+        cur_page           => $page,
+	backref            => $backref,
     );
 }
 
@@ -283,7 +287,14 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
 
     my $schema = $c->stash->{resultset};
 
-    my @subnet_list = $schema->all();
+    my @subnet_list = $schema->search({},
+				      {
+				       order_by => ['me.from_addr','me.to_addr'],
+				       #prefetch => ['vlan_id','children','parent'],
+				       }
+				     );
+    
+
 
     $c->stash( subnet_list => \@subnet_list );
     $c->stash( template    => 'iprange/list.tt' );
@@ -324,11 +335,18 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             distinct => 1,
         }
     );
+
+    my $min_host = $range->from_addr;
+    my $max_host = $range->to_addr;
+    
+    $range->netmask and $min_host = int2ip( ip2int( $range->from_addr ) + 1 ) and 
+      $max_host = int2ip( ip2int( $range->to_addr ) - 1 );
+
     my %param;
     $param{prefix}     = $range->netmask ? netmask2prefix( $range->netmask ) : '';
     $param{wildcard}   = prefix2wildcard( $param{prefix} );
-    $param{min_host}   = int2ip( ip2int( $range->from_addr ) + 1 );
-    $param{max_host}   = int2ip( ip2int( $range->to_addr ) - 1 );
+    $param{min_host}   = $min_host;
+    $param{max_host}   = $max_host;
     $param{numhost}    = ip2int( $param{max_host} ) - ip2int( $param{min_host} ) - 1;
     $param{ipaddr_num} = $rs->count();
 
@@ -642,8 +660,8 @@ sub create : Chained('base') : PathPart('create') : Args() {
     }
     $tmpl_param{range}       = $c->req->param('name');
     $tmpl_param{parent}      = $parent;
-    $tmpl_param{type_subnet} = $c->req->param('type') eq 'subnet';
-    $tmpl_param{type_range}  = $c->req->param('type') eq 'range';
+    $tmpl_param{type_subnet} = $c->req->param('type') eq 'subnet' if(defined($c->req->param('type')));
+    $tmpl_param{type_range}  = $c->req->param('type') eq 'range'  if(defined($c->req->param('type')));
     $tmpl_param{vlans}       = \@vlans;
 
     $tmpl_param{template} = 'iprange/create.tt';
@@ -656,6 +674,7 @@ sub process_create : Private {
     my $name    = $c->req->param('name');
     my $type    = $c->req->param('type');
     my $vlan_id = $c->req->param('vlan');
+    my $desc    = $c->req->param('description');
     my $error;
 
     $name or $error->{name} = "Please insert range name";
@@ -769,13 +788,14 @@ sub process_create : Private {
 
     $c->stash->{'resultset'}->create(
         {
-            name      => $name,
-            parent    => $parent_name,
-            from_addr => int2ip($from_addr_i),
-            to_addr   => int2ip($to_addr_i),
-            network   => $network_i ? int2ip($network_i) : undef,
-            netmask   => $netmask_i ? int2ip($netmask_i) : undef,
-            vlan_id   => $vlan_id,
+            name         => $name,
+            parent       => $parent_name,
+            from_addr    => int2ip($from_addr_i),
+            to_addr      => int2ip($to_addr_i),
+            network      => $network_i ? int2ip($network_i) : undef,
+            netmask      => $netmask_i ? int2ip($netmask_i) : undef,
+            vlan_id      => $vlan_id,
+	    description  => $desc
         }
         ) or
         return ( 0, "Impossible create subnet" );

@@ -211,7 +211,8 @@ sub _guess_query {
         return;
     }
 
-    if ( $text =~ /^([0-9\.]+)$/o ) {
+    if ( $text =~ /^([0-9\.]+\.)$/o or $text =~ /^(\.[0-9\.]+)$/o or
+         $text =~ /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/o ) {
         $self->query_type('ipaddr');
         return;
     }

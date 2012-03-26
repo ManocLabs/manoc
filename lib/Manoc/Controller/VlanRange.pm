@@ -362,7 +362,7 @@ sub process_merge_vlanrange : Private {
 sub check_name : Private {
     my ( $c, $id, $name ) = @_;
 
-    my $dup = $c->stash->{'resultset'}->find( 'name' => $name );
+    my $dup = $c->stash->{'resultset'}->find( {name => $name} );
     if ($dup) { $dup->id == $id or return ( 0, "Duplicated vlan range name" ); }
     $name =~ /^\w[\w-]*$/ or return ( 0, "Invalid vlan range name" );
 }

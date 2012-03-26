@@ -73,7 +73,7 @@ sub _get_ipinfo : Private {
     my $id = $c->stash->{'id'};
 
     my @r = $c->model('ManocDB::Arp')->search(
-        ipaddr => $id,
+        { ipaddr   => $id},
         { order_by => 'lastseen DESC, firstseen DESC' }
     );
     my @arp_results = map +{
@@ -115,8 +115,8 @@ sub _get_hostinfo : Private {
     my $id = $c->stash->{'id'};
 
     my @r = $c->model('ManocDB::WinHostname')->search(
-        ipaddr => $id,
-        { order_by => 'name' }
+        { ipaddr   => $id},
+        { order_by => 'name' },
     );
     my @hostnames = map +{
         name      => $_->name,

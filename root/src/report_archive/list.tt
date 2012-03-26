@@ -4,7 +4,7 @@
    section='Reports'
 -%]
 
- [% init_table('report_list', [{width => '50%'},{width => '30%'}, {width =>'20%'}])%] 
+ [% init_table('report_list', [50,30,20])%] 
  <table class="display" id="report_list">
        <thead>  
 	 <tr>

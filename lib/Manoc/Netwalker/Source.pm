@@ -35,6 +35,14 @@ requires '_build_ifstatus_table';
 requires 'vtp_domain';
 requires 'vtp_database';
 
+has 'arp_table' => (   
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_arp_table',
+);
+requires '_build_arp_table';
+
+
 1;
 
 # Local Variables:

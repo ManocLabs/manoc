@@ -1,3 +1,4 @@
+
 # Copyright 2011 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
@@ -46,7 +47,7 @@ has 'archived' => (
     },
 );
 
-has 'discarted' => (
+has 'discarded' => (
     traits  => ['Array'],
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -65,6 +66,11 @@ has 'discard_date' => (
 );
 
 has 'archive_date' => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+has 'reports_date' => (
     is  => 'rw',
     isa => 'Str',
 );

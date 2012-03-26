@@ -23,7 +23,7 @@ sub search_macaddr {
         as       => [ 'device', 'macaddr', 'interface', 'timestamp' ],
         group_by => [qw(device macaddr interface)],
         join     => { 'device_entry' => 'mng_url_format' },
-        prefetch => { 'device_entry' => 'mng_url_format' },
+#        prefetch => { 'device_entry' => 'mng_url_format' },
     };
 
     $query->limit and

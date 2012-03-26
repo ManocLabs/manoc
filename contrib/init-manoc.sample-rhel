@@ -17,32 +17,54 @@
 
 . /etc/init.d/functions
 
-MANOC_ROOT=/home/manoc/production
-MANOC_ARPD=$MANOC_ROOT/bin/arpsnifferd
+MANOC_ROOT=
+MANOC_ARPD=$MANOC_ROOT/
 
-test -x $MANOC_ARPD || exit 5
+LOCALLIB=
+if test -n "$LOCALLIB"; then
+    eval `perl -Mlocal::lib=$LOCALLIB`
+fi
+
 
 case "$1" in
     start)
-	echo -n "Starting manoc arp sniffer "
-	daemon $MANOC_ARPD --daemon
-	RETVAL=$?
-	echo
+        if test -x $MANOC_ARPD; then
+		echo -n "Starting manoc arp sniffer "
+		daemon $MANOC_ARPD start 
+		RETVAL=$?
+        else
+		echo -n "Nothing to start. Arpsniffer script not found!"
+		echo_failure
+		echo 
+		RETVAL=5
+        fi
 	;;
     stop)
-	echo -n "Shutting down manoc arp sniffer "
-	killproc -TERM $MANOC_ARPD
-	RETVAL=$?
-	echo
+	if test -x $MANOC_ARPD; then
+		echo -n "Shutting down manoc arp sniffer "
+		$MANOC_ARPD stop
+		RETVAL=$?
+	else
+		echo -n  "Nothing to stop. Arpsniffer script not found!"
+		echo_failure
+		echo 
+		RETVAL=0
+	fi
 	;;
     restart)
 	$0 stop
 	$0 start
         ;;
     status)
-	echo -n "Checking for manoc arp sniffer: "
-	status $MANOC_ARPD
-	echo
+        if test -x $MANOC_ARPD; then
+		echo -n "Checking for manoc arp sniffer: "
+		status $MANOC_ARPD
+	else
+                echo -n "Arpsniffer script not found!"
+                echo_failure
+                echo 
+	        RETVAL=3
+        fi
 	;;
     *)
         echo "Usage: $0 {start|stop|status|restart}"

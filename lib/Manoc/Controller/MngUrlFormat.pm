@@ -83,6 +83,31 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
 }
 
+=head2 set_default
+
+=cut
+
+sub set_default : Chained('object') : PathPart('set_default') : Args(0) {
+    my ( $self, $c ) = @_;
+    my ($it, $e);
+
+    if ( lc $c->req->method eq 'post' ) {
+      my $it = $c->model('ManocDB::Device')->search();
+      while($e = $it->next){
+	$e->mng_url_format($c->stash->{object}->id);
+	$e->update;
+      }
+      $c->stash(message => "Default Management URL setted to ".$c->stash->{object}->name);
+      $c->forward('list');
+    }
+    else {
+      $c->stash( template => 'generic_confirm.tt' );
+    }
+
+}
+
+
+
 =head2 create
 
 =cut

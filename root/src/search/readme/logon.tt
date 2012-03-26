@@ -1,0 +1,19 @@
+[%META section="Ricerca di tipo 'logon' " %]
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>login di un utente
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'logon enrico liguori' }) %]">logon enrico liguori</a>
+<td>Ricerca utente loggato su macchine in dominio Windows 
+</tr>
+<td>logins di utente nell'ultimo mese
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => 'logon enrico liguori limit 1M' }) %]">logon enrico liguori limit 1M</a>
+<td>Ricerca utente loggato su macchine in dominio Windows 
+</tr>
+</table>
+

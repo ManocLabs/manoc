@@ -9,6 +9,8 @@ use Manoc::Utils qw(clean_string print_timestamp check_addr );
 use Text::Diff;
 use Manoc::Form::DeviceNew;
 use Manoc::Form::DeviceEdit;
+use Manoc::Netwalker::DeviceUpdater;
+use Manoc::Report::NetwalkerReport;
 use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -95,29 +97,34 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
     # CPD
     my @neighs = $c->model('ManocDB::CDPNeigh')->search(
-        { from_device => $id },
-        {
-            include_columns => ['dev.name'],
-            order_by        => 'last_seen DESC, from_interface',
-            from            => [
-                { 'me' => 'cdp_neigh' },
-                [
-                    {
-                        'dev'      => 'devices',
-                        -join_type => 'LEFT',
-                    },
-                    { 'me.to_device' => 'dev.id' }
-                ]
-            ]
-        }
-    );
+                 { from_device => $id },
+                 {
+                     '+columns' => [ { 'name' => 'dev.name' } ],
+                     order_by   => 'last_seen DESC, from_interface',
+                     from  => [
+                               { 'me' => 'cdp_neigh' },  
+                               [
+                                { 
+                                    'dev'       => 'devices',
+                                    -join_type  => 'LEFT',
+                                },
+                                { 
+                                    'me.to_device' => 'dev.id'}
+                                ]
+                               ]});
+
+    
+
+
+
     my @cdp_links = map {
         from_iface    => $_->from_interface,
             to_device => $_->to_device,
             to_iface  => $_->to_interface,
             date      => print_timestamp( $_->last_seen ),
-            to_name   => $_->get_column('name')
+            to_name   => $_->get_column('name'),
     }, @neighs;
+
 
     #------------------------------------------------------------
     # Interfaces info
@@ -127,13 +134,19 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my %if_notes = map { $_->interface => 1 } $device->ifnotes;
 
     # prefetch interfaces last activity
-    my @iface_last_mat_rs = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
+    my ($e, $it);
+
+    
+    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
+
 
     my %if_last_mat;
-    foreach (@iface_last_mat_rs) {
-        $if_last_mat{ $_->interface } =
-            $_->get_column('lastseen') ? print_timestamp( $_->get_column('lastseen') ) :
-                                         'never';
+
+    while ( $e = $it->next ) {
+      
+      $if_last_mat{$e->interface} =
+	$e->get_column('lastseen') ? 
+	  print_timestamp( $e->get_column('lastseen') ) : 'never';
     }
 
     # fetch ifstatus and build result array
@@ -152,11 +165,11 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             duplex       => $r->duplex || '',
             duplex_admin => $r->duplex_admin || '',
             cps_enable   => $r->cps_enable && $r->cps_enable eq 'true',
-            cps_status  => $r->cps_status  || '',
-            cps_count   => $r->cps_count   || '',
-            description => $r->description || '',
-            vlan        => $r->vlan        || '',
-            last_mat    => $if_last_mat{ $r->interface },
+            cps_status   => $r->cps_status  || '',
+            cps_count    => $r->cps_count   || '',
+            description  => $r->description || '',
+            vlan         => $r->vlan        || '',
+            last_mat     => $if_last_mat{ $r->interface },
             has_notes => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
             updown_status_link => '',    #updown_status_link?device=$id&iface=".$r->interface,
             enable_updown => check_enable_updown( $r->interface, @cdp_links ),
@@ -195,6 +208,9 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     $c->stash( template => 'device/view.tt' );
     $c->stash(%tmpl_param);
 
+
+    use URL::Encode;
+
     $c->stash(
         iface_info    => \@iface_info,
         cdp_links     => \@cdp_links,
@@ -213,6 +229,91 @@ sub check_enable_updown {
     }
 
     return 1;
+}
+
+
+
+=head2 refresh
+
+=cut
+
+sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $device_id = $c->stash->{object}->id;
+
+
+     my %config = (
+         snmp_community => $c->config->{Credentials}->{snmp_community}
+           || 'public',
+         snmp_version       => '2c',
+         default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
+         iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
+         ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
+           || 1,
+     );
+
+     $ENV{DEBUG} = 0;
+     my $updater = Manoc::Netwalker::DeviceUpdater->new(
+         entry        => $c->stash->{object},
+         config       => \%config,
+         schema       => $c->model('ManocDB'),
+         timestamp    => time
+     );
+    
+     my $ret_status = $updater->update_all_info();
+     unless(defined($ret_status)){
+       my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
+       $c->flash( error_msg => $err_msg );
+       $c->response->redirect(
+ 			     $c->uri_for_action( '/device/view', [$device_id] ) );
+       $c->detach();
+     }
+    
+      my $worker_report = $updater->report;
+      my $report        = Manoc::Report::NetwalkerReport->new;
+
+      #create the report
+      my $errors = $worker_report->error;
+      scalar(@$errors) and $report->add_error(
+          {
+              id       => $device_id,
+              messages => $errors
+          }
+      );
+      my $warning = $worker_report->warning;
+      scalar(@$warning) and $report->add_warning(
+          {
+              id       => $device_id,
+              messages => $warning
+          }
+      );
+
+      $report->mat_entries( $worker_report->mat_entries );
+      $report->arp_entries( $worker_report->arp_entries );
+      $report->cdp_entries( $worker_report->cdp_entries );
+      $report->new_devices( $worker_report->new_devices );
+      $report->visited( $worker_report->visited );
+
+      my $new_report = $c->model('ManocDB::ReportArchive')->create(
+          {
+              'timestamp' => time,
+              'name'      => 'Netwalker',
+              'type'      => 'NetwalkerReport',
+              's_class'   => $report,
+          }
+      );
+
+      my $report_url =
+        $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
+
+      my $msg = "Success! Device infomations are now up to date!"
+        . " See the <a href=\"$report_url\">report</a> for details.";
+
+    $c->flash( message => $msg);
+    $c->response->redirect(
+			   $c->uri_for_action( '/device/view', [$device_id] ) );
+    $c->detach();
+
 }
 
 =head2 list
@@ -254,7 +355,7 @@ sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
     );
 
     #Retrieve device configuration from DB
-    $dev_config = $c->model('ManocDB::DeviceConfig')->find( device => $device_id );
+    $dev_config = $c->model('ManocDB::DeviceConfig')->find( {device => $device_id} );
     if ( !$dev_config ) {
         $c->stash( error_msg => "Device backup not found!" );
         $c->detach('/error/index');

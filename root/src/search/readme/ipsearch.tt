@@ -1,0 +1,32 @@
+[%META section="Ricerca di un indirizzo IP" %]
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>Indirizzo IP singolo
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '172.18.11.1' }) %]">172.18.11.1</a>
+<td>indirizzi MAC che nel tempo sono stati associati a quel determinato indirizzo IP. Nel caso in cui l'IP fosse
+    l'indirizzo di uno dei device che il sistema monitora, verrà restituito anche un oggetto di tipo device attraverso
+    il quale aprire direttamente la pagina che descrive il device (e non l'IP)
+</tr>
+<tr>
+<td>Indirizzo IP parziale
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '172.18.11.'}) %]">172.18.11.</a>
+<td>tutti gli indirizzi IP che contengono i tre ottetti specificati nella query. 
+</tr>
+<tr>
+<td>Indirizzo IP con limite di tempo
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '172.18.11.1 limit 1M'}) %]">172.18.11.1 limit 1M</a>   
+<td>cerca le associazioni IP-MAC avvistate nell'arco di tempo specificato (1 mese in questo caso).
+</tr>
+<tr>
+<td>Indirizzo IP parziale con limite di tempo
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '172.18.11. limit 1M'}) %]">172.18.11. limit 1M</a>
+<td>
+</tr>
+</table>
+

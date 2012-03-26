@@ -26,8 +26,8 @@ sub get_pwds {
 
     #Read parameters from config file (if needed)
     if ( !$telnet_pwd || !$enable_pwd ) {
-        $telnet_pwd = $conf->{'telnet'} or return ( undef, undef );
-        $enable_pwd = $conf->{'enable'} or return ( undef, undef );
+        $telnet_pwd = $conf->{'telnet_password'} or return ( undef, undef );
+        $enable_pwd = $conf->{'telnet_enable'} or return ( undef, undef );
     }
 
     return ( $telnet_pwd, $enable_pwd );

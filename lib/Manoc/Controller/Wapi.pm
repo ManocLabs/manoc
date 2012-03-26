@@ -11,10 +11,11 @@ BEGIN { extends 'Catalyst::Controller'; }
 use strict;
 use warnings;
 
-use YAML::Any ();
+use YAML::Syck;
 
 use Encode;
 use POSIX qw(strftime);
+use Data::Dumper;
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
@@ -140,37 +141,39 @@ sub dhcp_leases : Chained('base') : PathPart('dhcp_leases') : Args(0) {
     my $server = $req->param('server');
     $server ||= $req->hostname();
 
-    my $data = $req->body() || '';
+    my $data = $req->body || undef;
+    $c->detach unless(defined $data);
+    
+    my @records = LoadFile($data);
 
-    my $records = YAML::Any::Load($data);
+    $c->detach() unless(scalar(@records));
 
     $rs->search( { server => $server } )->delete();
 
     my $n_created = 0;
-    foreach my $r (@$records) {
-        my $macaddr = $r->{macaddr} or next;
-        my $ipaddr  = $r->{ipaddr}  or next;
-        my $start   = $r->{start}   or next;
-        my $end     = $r->{end}     or next;
+    foreach my $r (@records) {
+         my $macaddr = $r->{macaddr} or next;
+         my $ipaddr  = $r->{ipaddr}  or next;
+         my $start   = $r->{start}   or next;
+         my $end     = $r->{end}     or next;
 
-        my $hostname = $r->{hostname};
-        my $status   = $r->{status};
+         my $hostname = $r->{hostname};
+         my $status   = $r->{status};
 
-        $rs->update_or_create(
-            {
-                server   => $server,
-                macaddr  => $macaddr,
-                ipaddr   => $ipaddr,
-                hostname => $hostname,
-                start    => $start,
-                end      => $end,
-                status   => $status,
-            }
-        );
-        $n_created++;
-    }
-
-    $c->response->body( "$server: $n_created/" . scalar(@$records) );
+         $rs->update_or_create(
+             {
+                 server   => $server,
+                 macaddr  => $macaddr,
+                 ipaddr   => $ipaddr,
+                 hostname => $hostname,
+                 start    => $start,
+                 end      => $end,
+                 status   => $status,
+             }
+         );
+         $n_created++;
+     }
+    $c->response->body( "$server: $n_created/" . scalar(@records) );
     $c->detach();
 }
 
@@ -184,12 +187,13 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
     $server ||= $req->hostname();
 
     my $data = $req->body() || '';
-    my $records = YAML::Any::Load($data);
+    my @records = LoadFile($data);
+    $c->detach() unless(scalar(@records));
 
     $rs->search( { server => $server } )->delete();
 
     my $n_created = 0;
-    foreach my $r (@$records) {
+    foreach my $r (@records) {
         my $macaddr  = $r->{macaddr}  or next;
         my $ipaddr   = $r->{ipaddr}   or next;
         my $hostname = $r->{hostname} or next;
@@ -207,7 +211,7 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
         $n_created++;
     }
 
-    $c->response->body( "$server: $n_created/" . scalar(@$records) );
+    $c->response->body( "$server: $n_created/" . scalar(@records) );
     $c->detach();
 }
 

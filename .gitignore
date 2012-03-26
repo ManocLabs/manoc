@@ -8,3 +8,7 @@ Makefile.old
 .build
 *~
 *.bak
+log/
+manoc.conf
+manoc_log.conf
+scheduler.state

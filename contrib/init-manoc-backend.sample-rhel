@@ -1,0 +1,117 @@
+#!/bin/sh
+#
+# chkconfig:   345 86 14 
+# description:  Manoc2 FCGI server 
+# pidfile:     /var/run/manoc2/pid
+
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get config.
+test -f /etc/sysconfig/network && . /etc/sysconfig/network
+
+# Check that we are root ... so non-root users stop here
+[ `id -u` = 0 ] || exit 1
+
+# Check that networking is up.
+[ "${NETWORKING}" = "yes" ] || exit 0
+
+APP_HOME=
+RUN_DIR=
+
+PID_FILE=$RUN_DIR/pid
+SOCKET_FILE=$RUN_DIR/socket
+SUBSYS_FILE=/var/lock/subsys/manoc2
+
+#Location of FastCGI Backend
+SCRIPT=$APP_HOME/
+SCRIPT_ARGS="-l $RUN_DIR/socket -p $RUN_DIR/pid -d -n 4"
+
+LOCALLIB=/drbd/manoc/perl5
+if test -n "$LOCALLIB"; then
+    eval `perl -Mlocal::lib=$LOCALLIB`
+fi
+
+# Check that the script is executable
+# [ -x $SCRIPT ] || exit 5
+PROG="perl-fcgi-pm"
+
+start(){
+    if test -x $SCRIPT; then
+    	pidofproc $PROG >/dev/null 2>&1
+    	RETVAL=$?
+    	if test $RETVAL -eq 0; then 
+		echo -n $"Script is already running."
+		echo_failure
+		echo
+        	return $RETVAL
+        fi
+    	echo -n $"Starting manoc2-http: "
+    	daemon --user root $SCRIPT "$SCRIPT_ARGS >/dev/null 2>&1"
+    	RETVAL=$?
+    	echo
+    	touch $SUBSYS_FILE
+    	return $RETVAL
+    else 
+	 echo -n "Nothing to start. Script not found!"
+         echo_failure
+         echo 
+         RETVAL=5
+    fi
+
+
+}
+
+stop(){
+    if test -x $SCRIPT; then
+	    echo -n $"Stopping manoc2-http: "
+	    killproc -p $PID_FILE manoc
+	    RETVAL=$?
+    	    echo
+  	    rm -f $SUBSYS_FILE
+            return $RETVAL
+    else
+	 echo -n "Nothing to start. Script not found!"
+         echo_failure
+         echo 
+         RETVAL=0
+    fi
+}
+
+restart(){
+    stop
+    start
+}
+
+condrestart(){
+    [ -e $SUBSYS_FILE ] && restart
+    return 0
+}
+
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status -p $PID_FILE manoc2-http
+        ;;
+    restart)
+        restart
+        ;;
+    condrestart)
+        condrestart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+        RETVAL=1
+esac
+
+exit $RETVAL
+

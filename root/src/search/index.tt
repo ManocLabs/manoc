@@ -40,7 +40,7 @@
 <label id="search-cat">Rack:</label>  <a href="[% c.uri_for_action('rack/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
 [%  END -%]
 [% MACRO item_device(item) BLOCK -%]
-<label id="search-cat">Device:</label> [% item.name %] [% print_device(item) -%]
+<label id="search-cat">Device:</label> [% item.name %] [% print_device_long(item) -%]
 [% END -%]
 [% MACRO item_ipaddr(item) BLOCK -%]
 <label id="search-cat">IP:</label> [% print_ip(item.addr) %] 

@@ -1,0 +1,28 @@
+[%META section="Ricerca di un indirizzo MAC" %]
+
+<table style="border-width: 1px;border-style: solid">
+<tr>
+<th><b>Ricerca
+<th><b>Query d'esempio
+<td><b>Risultati
+</th>
+<tr>
+<td>Indirizzo MAC singolo
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '00:27:13:ca:76:a9' }) %]">00:27:13:ca:76:a9</a> 
+<td>indirizzi IP che nel tempo sono stati associati a quel determinato indirizzo MAC
+</tr>
+<tr>
+<td>Indirizzo MAC parziale
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '00:27:' }) %]">00:27:</a> oppure
+    <a href="[% c.uri_for('/search', {advanced => 0, q => ':76:a9' }) %]">:76:a9</a> 
+<td>tutti gli indirizzi MAC che contengono i byte specificati nella query
+</tr>
+<tr>
+<td>Indirizzo MAC (parziale e non) con limite di tempo
+<td><a href="[% c.uri_for('/search', {advanced => 0, q => '00:27:13:ca:76:a9 limit 1m' }) %]">00:27:13:ca:76:a9 limit 1m</a> 
+     oppure    <a href="[% c.uri_for('/search', {advanced => 0, q => ':76:a9 limit 1m' }) %]">:76:a9 limit 1m</a> 
+<td>cerca le associazioni IP-MAC avvistate nell'arco di tempo specificato (1 minuto in questo caso).
+</tr>
+</table>
+
+

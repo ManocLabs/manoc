@@ -5,7 +5,7 @@
 -%]
 
 
- [% init_table('repolist', [{width => '75%'}, {width =>'25%'}],{sortby => 1, order => 'desc'})%] 
+ [% init_table('repolist', [75,25],{sortby => 1, order => 'desc'})%] 
  <table class="display" id="repolist">
        <thead>  
 	 <tr>

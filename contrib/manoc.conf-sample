@@ -25,27 +25,31 @@ name Manoc
 	connect_info manoc
 </"Model::ManocDB"> 
 
+
 <Netwalker>
 	ifstatus_interval	3600
 	iface_filter		1
 	check_db		1
-	n_procs			5
+	n_procs		        8	
+	vtpstatus_interval	3600
 </Netwalker> 
 
 <Credentials>
-	snmp_community	public
-	telnet_user 	admin
-	telnet_passord	cisco
-	enable		cisco
+	snmp_community 	 public
+	telnet_user      admin
+	telnet_password  password	
+	telnet_enable	 enablepassword
 </Credentials>
 
 <Archiver>
-	age 86400
+	archive_age 86400
+	discard_age 0
+	# 3 months
+	reports_age 7776000
 </Archiver>
-
 <Backup>
-	interval 1d
-	directory /opt/manoc/backup
+	interval 1m
+	directory /opt/manoc/manoc2/backup
 </Backup>
 
 <Log>
