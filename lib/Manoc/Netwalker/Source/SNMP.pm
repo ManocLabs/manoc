@@ -117,7 +117,7 @@ sub _guess_snmp_info_class {
         $class = "SNMP::Info::Layer3::C3550";
 
     $desc =~ /Cisco.*?IOS.*?C2960/ and
-      $class = "SNMP::Info::Layer2::C2960";
+      $class = "SNMP::Info::Layer3::C3550";
 
 
     #broken
