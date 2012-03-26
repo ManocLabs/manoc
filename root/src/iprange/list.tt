@@ -3,9 +3,18 @@
    use_table=1
    section='NetDB'
 -%]
+[% UNLESS subnet_list.0 %]
+      [% PROCESS  'message.tt' msg='There is no subnet range defined!' %]
+[% END %]
+    
+<div class="buttons create_btn">
+  <a href="[% c.uri_for_action('/iprange/create') %]" >
+           [% ui_icon('circle-plus') %] Create a Range</a>
+  [% add_css_create_btn %]
+</div>
 [% FOREACH s IN subnet_list %]
    [% IF loop.first %]
-    [% init_table('subnet') %]
+    [% init_table('subnet',undef,{sortby => 1, order=>'asc'}) %]
     <table class="display" id="subnet">
        <thead>  
 	 <tr>
@@ -16,6 +25,7 @@
   	 <th>From</th>
 	 <th>To</th>
 	 <th>Associated VLAN</th>
+         <th>Description</th>
          </tr>
        </thead>  
        <tbody>
@@ -29,6 +39,7 @@
 	 <td>[% s.from_addr %]</td>
  	 <td>[% s.to_addr %]</td>
 	 <td>[% s.vlan_id.id %]</td>
+	 <td>[% s.description %]</td>
          </tr>
   [% IF loop.last %]
         </tbody>

@@ -138,19 +138,47 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
 
 sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
     my ( $self, $c ) = @_;
-    my $schema = $c->model('ManocDB');
+    my $schema = $c->model('ManocDB::Mat');
     my ( $rs, $r );
 
     my @multihost_ifaces;
 
-    $rs = $schema->resultset('Mat')->search_multihost;
+#    $rs = $schema->resultset('Mat')->search_multihost;
+
+    $rs = $schema->search(
+        { 'archived' => 0 },
+        {
+            select => [
+                'me.device', 'me.interface',
+                { count => { distinct => 'macaddr' } }, 'ifstatus.description',
+            ],
+
+            as       => [ 'device', 'interface', 'count', 'description', ],
+            group_by => [ 'device', 'interface' ],
+            having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
+            order_by => [ 'me.device', 'me.interface' ],
+            alias    => 'me',
+            from     => [
+                { me => 'mat' },
+                [
+                    { 'ifstatus' => 'if_status' },
+                    {
+                        'ifstatus.device'    => 'me.device',
+                        'ifstatus.interface' => 'me.interface',
+                    }
+                ]
+            ]
+        }
+    );
+
+
 
     while ( $r = $rs->next() ) {
         my $id          = $r->get_column('device');
         my $iface       = $r->get_column('interface');
         my $count       = $r->get_column('count');
         my $description = $r->get_column('description') || "";
-        my $device      = $schema->resultset('Device')->find($id);
+        my $device      = $c->model('ManocDB::Device')->find($id);
 
         #TODO: if the device was deleted?
         push @multihost_ifaces,

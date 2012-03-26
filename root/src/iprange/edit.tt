@@ -56,8 +56,7 @@
         </tr>
         <tr>
             <td class="label">Description: </td>
-            <td><textarea cols="40" rows="6" name="description">[%
-	    object.description | html %]
+            <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
 	    </textarea></input></td>
         </tr>
 </table>

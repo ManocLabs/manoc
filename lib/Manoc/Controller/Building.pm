@@ -71,7 +71,8 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
         desc    => $_->description,
         n_racks => $_->racks->count()
         },
-        $build_schema->all();
+        $build_schema->search({}, 
+			      {prefetch => 'racks'});
 
     $c->stash( building_table => \@building_table );
     $c->stash( template       => 'building/list.tt' );

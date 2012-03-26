@@ -13,7 +13,6 @@ use Catalyst::Runtime 5.80;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
     Authentication
@@ -34,6 +33,8 @@ with 'Manoc::Logger::CatalystRole';
 our $VERSION = '1.98';
 $VERSION = eval $VERSION;
 
+use Data::Dumper;
+
 # Configure the application.
 #
 # Note that settings in manoc.conf (or other external
@@ -46,6 +47,7 @@ $VERSION = eval $VERSION;
 __PACKAGE__->config(
     name         => 'Manoc',
     default_view => 'TT',
+    use_request_uri_for_path => 1,
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
@@ -73,7 +75,7 @@ __PACKAGE__->config(
             agents => {
                 credential => {
                     class              => 'HTTP',
-                    type               => 'basic',      # or 'digest' or 'basic'
+                    type               => 'basic',      # 'digest' or 'basic'
                     password_field     => 'password',
                     username_field     => 'login',
                     password_type      => 'hashed',
@@ -89,8 +91,9 @@ __PACKAGE__->config(
         },
     },
 
+    #remove stale sessions from db
     'Plugin::Session' => {
-        expires           => 3600,
+        expires           => 28800,
         dbi_dbh           => 'ManocDB',
         dbi_table         => 'sessions',
         dbi_id_field      => 'id',
@@ -134,7 +137,7 @@ after setup_finalize => sub {
 
     #Additional acl for admin privileges
     my @add_acl =
-        qw{ device/change_ip device/uplinks vlanrange/split vlanrange/merge iprange/split
+        qw{ device/change_ip device/uplinks device/refresh vlanrange/split vlanrange/merge iprange/split
         iprange/merge user/switch_status user/set_roles vlan/merge_name
         interface/edit_notes interface/delete_notes ip/edit_notes ip/delete_notes
     };
@@ -151,7 +154,7 @@ after setup_finalize => sub {
 __PACKAGE__->setup();
 
 __PACKAGE__->schedule(
-    at    => '@hourly',
+    at    => '@daily',
     event => '/cron/remove_sessions'
 );
 

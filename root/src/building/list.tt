@@ -11,13 +11,13 @@
 </div>
 
 
-[% init_table('build_list') %]
+[% init_table('build_list',[30,60,10]) %]
  <table class="display" id="build_list">
    <thead>  
      <tr>
         <th>Name</th>
         <th>Description</th>
-        <th>Racks</th>
+        <th>Nr. of racks</th>
      </tr>
    </thead>  
    <tbody>

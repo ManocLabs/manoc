@@ -12,7 +12,7 @@
 
 [% FOREACH o IN obj_list %]
    [% IF loop.first %]  
-   [% init_table('objlist',[{width=>'40%'},{width=>'40%'},{width=>'10%'}]) %] 
+   [% init_table('objlist',[40,40,20]) %] 
     <table class="display" id="objlist">
        <thead>  
 	 <tr>
@@ -29,6 +29,9 @@
 	  <td>
 	   <a href="[% c.uri_for_action('/mngurlformat/edit', [o.id],{backref=>c.req.uri})%] ">[% icon('edit') %]</a>
            <a href="[% c.uri_for_action('/mngurlformat/delete',[o.id],{backref=>c.req.uri})%] ">[% icon('remove') %]</a>
+	   <div class="buttons small_btn">
+	   <a href="[% c.uri_for_action('/mngurlformat/set_default', [o.id]) %]">Set Default</a>
+	   </div>
    	   </td>
            </tr>
   [% IF loop.last %]

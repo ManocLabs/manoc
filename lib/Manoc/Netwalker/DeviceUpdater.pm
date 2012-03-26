@@ -36,7 +36,8 @@ has 'schema' => (
 has 'device_set' => (
     is       => 'ro',
     isa      => 'HashRef',
-    required => 1,
+    builder => '_build_device_set',
+
 );
 
 # netwalker global config
@@ -62,7 +63,7 @@ has 'report' => (
 has 'uplink_ports' => (
     is      => 'ro',
     lazy    => 1,
-    builder => '_build_source',
+    builder => '_build_uplinks',
 );
 
 has 'native_vlan' => (
@@ -75,6 +76,15 @@ has 'native_vlan' => (
 #                                                                      #
 #              A t t r i b u t e s   B u i l d e r                     #
 #                                                                      #
+#----------------------------------------------------------------------#
+
+
+
+sub _build_report {
+    my $self = shift;
+    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id );
+}
+
 #----------------------------------------------------------------------#
 
 sub _build_source {
@@ -91,19 +101,16 @@ sub _build_source {
         host      => $host,
         community => $comm,
         version   => $version,
-        ) or
-        return undef;
-    $source->connect or return undef;
+        ) or return undef;
 
+    unless($source->connect){
+        my $msg = "Could not connect to ".$entry->id;
+        $self->log->error($msg);
+        $self->report->add_error($msg);
+        return undef;
+    }
     $self->report->visited(1);
     return $source;
-}
-
-#----------------------------------------------------------------------#
-
-sub _build_report {
-    my $self = shift;
-    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id );
 }
 
 #----------------------------------------------------------------------#
@@ -111,12 +118,21 @@ sub _build_report {
 sub _build_native_vlan {
     my $self = shift;
 
-    my $vlan = $self->config->{default_vlan};
+    my $vlan = $self->entry->mat_native_vlan->id || $self->config->{default_vlan};
     return defined($vlan) ? $vlan : 1;
 }
 
 #----------------------------------------------------------------------#
 
+sub _build_device_set {
+    my $self = shift;
+
+    my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
+    my %device_set = map { $_ => 1 } @device_ids;
+    return \%device_set;
+}
+
+#----------------------------------------------------------------------#
 sub _build_uplinks {
     my $self = shift;
 
@@ -128,6 +144,7 @@ sub _build_uplinks {
 
     # get uplink from CDP
     my $neighbors = $source->neighbors;
+
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
 
@@ -142,9 +159,10 @@ sub _build_uplinks {
     foreach ( $entry->uplinks->all ) {
         $uplinks{ $_->interface } = 1;
     }
-
+    
     return \%uplinks;
 }
+
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -157,16 +175,42 @@ sub update_all_info {
 
     $self->source or return undef;
 
-    $self->log->info( "updating all device info for ", $self->entry->id );
+    $self->log->info( "Performing full update for device ", $self->entry->id );
+
     $self->update_device_entry;
     $self->update_cdp_neighbors;
     $self->update_if_table;
-    $self->update_mat;
-    $self->update_vtp_database;
-    #update_arp_table;
+    $self->entry->get_mat() and $self->update_mat;
+    $self->entry->get_arp() and $self->update_arp_table;
+    #update_dot11;
+
+    #update last visited
+    $self->entry->last_visited($self->timestamp);
+    $self->entry->update();
+    return 1;
+}
+
+sub fast_update {
+    my $self = shift;
+
+    $self->source or return undef;
+
+    $self->log->info( "Performing fast update for device ", $self->entry->id );
+
+    $self->update_cdp_neighbors;
+    $self->entry->get_mat() and $self->update_mat;
+    $self->entry->get_arp() and $self->update_arp_table;
+    #update_dot11;
+
+    #update last visited
+    $self->entry->last_visited($self->timestamp);
+    $self->entry->update();
+    return 1;
 }
 
 #----------------------------------------------------------------------#
+
+
 
 sub update_device_entry {
     my $self = shift;
@@ -174,12 +218,12 @@ sub update_device_entry {
     my $source = $self->source;
     my $entry  = $self->entry;
 
-    my $device_info = $source->device_info;
+   my $device_info = $source->device_info;
 
     my $name  = $device_info->{name};
     my $model = $device_info->{model};
 
-    if ( $entry->name eq "" ) {
+    if ( !defined($entry->name) or $entry->name eq "" ) {
         $entry->name($name);
     }
     elsif ( $name ne $entry->name ) {
@@ -188,7 +232,7 @@ sub update_device_entry {
         $self->report->add_warning($msg);
     }
 
-    if ( $entry->model eq "" ) {
+    if ( !defined($entry->model) or $entry->model eq "" ) {
         $entry->model($model);
     }
     elsif ( $model ne $entry->model ) {
@@ -205,7 +249,7 @@ sub update_device_entry {
     $entry->boottime( $source->boottime );
 
     $entry->offline(0);
-    $entry->last_visited( $self->timestamp );
+    $entry->update;
 }
 
 #----------------------------------------------------------------------#
@@ -216,11 +260,23 @@ sub update_cdp_neighbors {
     my $source = $self->source;
     my $entry  = $self->entry;
     my $schema = $self->schema;
-
     my $neighbors = $source->neighbors;
+    my $new_dev     = 0;
+    my $cdp_entries = 0;
+    
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
-            my $link = $self->schema->resultset('CDPNeigh')->update_or_create(
+            my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
+                {
+                    from_device    => $entry->id,
+                    from_interface => $p,
+                    to_device      => $s->{addr},
+                    to_interface   => $s->{port},
+                }
+            );
+
+            unless ( scalar(@cdp_entries) ) {
+                $self->schema->resultset('CDPNeigh')->create(
                 {
                     from_device    => $entry->id,
                     from_interface => $p,
@@ -228,10 +284,20 @@ sub update_cdp_neighbors {
                     to_interface   => $s->{port},
                     last_seen      => $self->timestamp
                 }
-            );
+                ); 
+                $new_dev++;
+                $cdp_entries++; 
+                $self->report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id);
+                next;
+            }
+            my $link = $cdp_entries[0];
+            $link->last_seen($self->timestamp);
             $link->update;
+            $cdp_entries++; 
         }
     }
+    $self->report->cdp_entries($cdp_entries);
+    $self->report->new_devices($new_dev);
 
 }
 
@@ -248,11 +314,9 @@ sub update_if_table {
 
     # delete old infos
     $entry->ifstatus()->delete;
-
     # update
     foreach my $port ( keys %$ifstatus_table ) {
         $iface_filter && lc($port) =~ /^(vlan|null|unrouted vlan)/o and next;
-
         my $ifstatus = $ifstatus_table->{$port};
         $entry->add_to_ifstatus(
             {
@@ -271,10 +335,10 @@ sub update_mat {
     my $source = $self->source;
     my $entry  = $self->entry;
     my $schema = $self->schema;
-
+    
     my $uplinks = $self->uplink_ports;
     $self->log->debug( "device uplinks: ", join( ",", keys %$uplinks ) );
-
+ 
     my $timestamp = $self->timestamp;
     my $device_id = $entry->id;
 
@@ -282,14 +346,16 @@ sub update_mat {
 
     my $mat = $source->mat();
 
+    my $mat_count = 0;
+
     while ( my ( $vlan, $entries ) = each(%$mat) ) {
         $self->log->debug("updating mat vlan $vlan");
 
-        ( $vlan eq 'default' ) and $vlan = $self->native_vlan;
-
+        if( $vlan eq 'default' ) {
+            $vlan = $self->native_vlan;
+        }
         while ( my ( $m, $p ) = each %$entries ) {
             next if $uplinks->{$p};
-
             next if $ignore_portchannel && lc($p) =~ /^port-channel/;
 
             my @mat_entries = $self->schema->resultset('Mat')->search(
@@ -298,13 +364,16 @@ sub update_mat {
                     device    => $device_id,
                     interface => $p,
                     archived  => 0,
+                    vlan      => $vlan,
                 }
             );
             if ( scalar(@mat_entries) > 1 ) {
-                $self->log->error( "More than one non archived entry for ",
-                    $entry->name, ",$m,$p" );
+                my $msg = "More than one non archived entry for ".$entry->name.",$m,$p";
+                $self->log->error($msg );
+                $self->report->add_error($msg );
                 next;
             }
+            $mat_count++;
             my $create_new_entry = 0;
             if (@mat_entries) {
                 my $entry = $mat_entries[0];
@@ -342,7 +411,7 @@ sub update_mat {
 
     }    # end of mat loop
 
-    # TODO
+    $self->report->mat_entries($mat_count);
 }
 
 #----------------------------------------------------------------------#
@@ -355,9 +424,10 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from", $entry->id );
+    $self->log->info( "getting vtp info from ", $entry->id );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
+        $self->report->add_error("cannot retrieve vtp info");
         return;
     }
 
@@ -371,16 +441,57 @@ sub update_vtp_database {
             }
         );
     }
+    my $vtp_last_update_entry =
+      $self->schema->resultset('System')->find("netwalker.vtp_update");
+    $vtp_last_update_entry->value($self->timestamp);
+    $vtp_last_update_entry->update();
+
 }
 
 sub update_arp_table {
     my $self = shift;
 
-    my $source = $self->source;
-    my $entry  = $self->entry;
+    my $source   = $self->source;
+    my $entry    = $self->entry;
+    my $timestamp= $self->timestamp;
+    my $vlan     = $entry->vlan_arpinfo() || $self->config->{default_vlan};
+    my $arp_table= $source->arp_table;
+    my $arp_count= 0;
 
-    my $vlan = $entry->vlan_arpinfo() || $self->config->{default_vlan};
+    $self->log->debug("Fetching arp table from ",$self->entry->id);
+    
+    my ($ip_addr, $mac_addr);
+    while (($ip_addr, $mac_addr) = each(%$arp_table)) {
+        $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
+	my @entries = $self->schema->resultset('Arp')->search({
+	    ipaddr	=> $ip_addr,
+	    macaddr	=> $mac_addr,
+	    vlan	=> $vlan,
+	    archived => 0
+	    });
+    
+        if(scalar(@entries) > 1) {
+            $self->log->error("More than one non archived entry for $ip_addr,$mac_addr");
+            $self->report->add_error("More than one non archived entry for $ip_addr,$mac_addr");
+        }
+        $arp_count++;
+	if (@entries) {
+	    my $entry = $entries[0];	
+	    $entry->lastseen($timestamp);
+	    $entry->update();
+	} else {
+	    $self->schema->resultset('Arp')->create({
+		ipaddr    => $ip_addr,
+		macaddr   => $mac_addr,
+		firstseen => $timestamp,
+		lastseen  => $timestamp,
+		vlan      => $vlan,
+		archived  => 0
+	    });
+	}
+     }
+    $self->report->arp_entries($arp_count);
 }
 
 #----------------------------------------------------------------------#

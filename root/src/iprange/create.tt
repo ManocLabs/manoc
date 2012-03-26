@@ -61,6 +61,11 @@ onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Sub
         </select>
     </td>
 </tr>
+<tr>
+   <td class="label">Description: </td>
+   <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
+   </textarea></input></td>
+</tr>
 </table>
 <div class="buttons">
 <input type="submit" name="submit" value="Submit">

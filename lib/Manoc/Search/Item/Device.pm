@@ -27,6 +27,13 @@ has 'mng_url' => (
     reader => 'get_mng_url',
 );
 
+has 'notes' => (
+    is     => 'ro',
+    isa    => 'Str',
+    required => 0,
+
+);
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -35,11 +42,13 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{device};
         if ($b) {
-            $args->{id}   = $b->id;
-            $args->{name} = $b->name;
+            $args->{id}      = $b->id;
+            $args->{name}    = $b->name;
+	    $args->{notes}   = $b->notes if($b->notes);
             $args->{match} ||= $b->name;
             $b->get_mng_url and
                 $args->{mng_url} = $b->get_mng_url;
+
         }
         return $class->$orig($args);
     }

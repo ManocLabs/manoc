@@ -123,7 +123,6 @@ jQuery.fn.dataTableExt.oSort['ip-html-desc']  = function(a,b) {
     }
     return ((x < y) ? 1 : ((x > y) ? -1 : 0));
 };
-
 function trim(str) {
 	str = str.replace(/^\s+/, '');
 	for (var i = str.length - 1; i >= 0; i--) {

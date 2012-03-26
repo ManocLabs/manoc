@@ -1,0 +1,97 @@
+[% META 
+   title='Netwalker Report'
+   use_table=1
+   section='Reports'
+-%]
+
+<h3>  [% report_name %] ([% timestamp %])</h3>
+
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Summary</a></li>
+		<li><a href="#tabs-2">Error Details</a></li>
+		<li><a href="#tabs-3">Warning Details</a></li>
+	</ul>
+
+
+<div id="tabs-1">
+   
+   <table id="info">
+          <tr>
+  	  <td> Total devices visited: </td>
+  	  <td> [% report_obj.visited %] </td>
+ 	 </tr>
+	 <tr>
+  	  <td> Total MAT Entries: </td>
+  	  <td> [% report_obj.mat_entries %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> Total ARP Entries: </td>
+  	  <td> [% report_obj.arp_entries %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> Total CDP Entries: </td>
+  	  <td> [% report_obj.cdp_entries %] </td>
+ 	 </tr>
+          <tr>
+  	  <td> New devices discovered: </td>
+  	  <td> [% report_obj.new_devices %] </td>
+ 	 </tr>
+ 	 <tr>
+  	  <td> Number of errors occurred: </td>
+  	  <td> [% IF report_obj.all_error.0 %]
+               [% report_obj.error_count  %] 
+               [% ELSE %] 0
+               [% END %]
+          </td>
+          </tr>
+ 	  <tr>
+	  <td> Number of warnings: </td>
+  	  <td> [% IF report_obj.all_warning.0 %]
+               [% report_obj.warning_count  %] 
+               [% ELSE %] 0
+               [% END %]
+          </td> 
+ 	 </tr>
+  </table>
+    [% add_css_tableinfo %]
+</div> <!--end of tab1 -->
+
+
+
+<div id="tabs-2">
+[% PROCESS message.tt msg="No errors occurred." 
+                         UNLESS report_obj.error_count -%]
+<table class="report ui-priority-primary ui-corner-all">
+  [% FOREACH error IN report_obj.error %]
+     [% parity = loop.parity %]
+     [% FOREACH msg IN error.messages %]
+       <tr class="[% parity %]">
+ 	 <td>[% error.id %] </td>
+  	 <td>[% msg %] </td>
+       </tr>
+  [% END %]
+  [% END %]
+
+</table>
+</div><!--end of tab2 -->
+
+
+<div id="tabs-3">
+[% PROCESS message.tt msg="No warning occurred." 
+                         UNLESS report_obj.warning_count -%]
+
+<table class="report ui-priority-primary ui-corner-all">
+  [% FOREACH element IN report_obj.warning %]
+    [% parity=loop.parity %]
+    [% FOREACH entry IN element.messages %]
+       <tr class="[% parity %]">
+ 	 <td>[% element.id %] </td>
+  	 <td>[% entry %] </td>
+       </tr>
+    [% END %]
+  [% END %]
+</table>
+</div><!--end of tab3 -->
+
+</div>

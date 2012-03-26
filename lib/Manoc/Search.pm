@@ -29,7 +29,6 @@ sub search {
     if ( $params->{type} && !defined( $q->query_type ) ) {
         $q->query_type( $params->{type} );
     }
-
     $q->parse;
 
     return $engine->search($q);

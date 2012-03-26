@@ -13,6 +13,8 @@ use Manoc::Logger;
 use Manoc::Utils qw(str2seconds print_timestamp);
 use Manoc::Report::ArchiveReport;
 
+use Data::Dumper;
+
 extends 'Manoc::App';
 
 has 'sources' => (
@@ -35,7 +37,7 @@ sub archive {
     my ($self, $time) = @_;
     my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!") ;
     my $schema       = $self->schema;
-    my $archive_age  = Manoc::Utils::str2seconds($conf->{'age'}); 
+    my $archive_age  = Manoc::Utils::str2seconds($conf->{'archive_age'}); 
     my $tot_archived = 0;
 
    if (! $archive_age) {
@@ -69,7 +71,7 @@ sub archive {
 sub discard {
     my ($self, $time) = @_;
     my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
-    my $discard_age  = Manoc::Utils::str2seconds($conf->{'age'}); 
+    my $discard_age  = Manoc::Utils::str2seconds($conf->{'discard_age'}); 
     my $tot_discarded = 0;
 
     if ( ! $discard_age ) {
@@ -108,6 +110,41 @@ sub discard {
     $self->report->tot_discarded($tot_discarded);
 }
 
+
+
+sub discard_reports {
+    my ($self, $time) = @_;
+    my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
+    my $discard_age  = Manoc::Utils::str2seconds($conf->{'reports_age'}); 
+    my $tot_discarded = 0;
+
+    if ( ! $discard_age ) {
+	$self->log->info("Archiver: reports_age = 0: skipping.");
+        $self->report->add_error({ type   =>'report',
+                                   message => 'reports_age = 0: skipping'});
+	return;
+    }
+
+    my $discard_date = $time - $discard_age;
+
+    $self->log->info("Archiver: deleting reports before " .
+		  Manoc::Utils::print_timestamp($discard_date));
+    $self->report->reports_date(Manoc::Utils::print_timestamp($discard_date));
+
+    my $it = $self->schema->resultset('ReportArchive')->search({
+                                                                'timestamp' => { '<', $discard_date },	    
+                                                               });
+    $self->report->add_discarded({source      => 'ReportArchive',
+                                      n_discarded => $it->count});
+    $tot_discarded += $it->count;
+    $it->delete();
+    
+
+    $self->report->tot_discarded($tot_discarded);
+
+}
+
+
 sub run {
     my ($self) = @_;
     my $time = time;
@@ -115,16 +152,17 @@ sub run {
     $self->archive($time);
     $self->discard($time);
 
+    $self->discard_reports($time);
 
     $self->schema->resultset('ReportArchive')->create(
         {
-            timestamp => time,
-	    name      => 'archive report',
-	    type      => 'ArchiveReport',
-            s_class   => $self->report,
+            'timestamp' => time,
+	    'name'      => 'archive report',
+	    'type'      => 'ArchiveReport',
+            's_class'   => $self->report,
         }
     );
-
+  $self->log->debug(Dumper($self->report));
 }
 
 no Moose;
