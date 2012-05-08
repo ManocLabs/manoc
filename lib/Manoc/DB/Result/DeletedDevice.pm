@@ -5,7 +5,7 @@
 package Manoc::DB::Result::DeletedDevice;
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
 __PACKAGE__->table('deleted_devices');
 __PACKAGE__->add_columns(
@@ -45,5 +45,14 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many( mat_assocs => 'Manoc::DB::Result::MatArchive', 'device_id' );
+
+__PACKAGE__->inflate_column(
+    ipaddr => {
+        inflate =>
+          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+        deflate => sub { return scalar shift->padded },
+    }
+);
+
 
 1;

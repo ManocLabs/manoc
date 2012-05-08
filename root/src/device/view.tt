@@ -256,8 +256,7 @@
   [% END %]
   <tr>
     <td>
-      <a href="[% c.uri_for_action('interface/view', [object.id,
-      if.interface]) %]">[% if.interface %]</a>
+      [% print_short_iface(object.id,if.interface) %]
     </td>
     
     [% IF if.up_admin == 'down' %]

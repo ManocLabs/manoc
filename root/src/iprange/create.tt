@@ -6,7 +6,7 @@
 <input type=hidden name="parent" value="[% parent %]" />
 
 <br>
-<table>
+<table class="buttons ui-widget-content ui-corner-all">
 [% IF parent %]
 <tr>
   <td class="label">Parent Range:</td>
@@ -85,11 +85,11 @@
         </select>
     </td>
 </tr>
+   <tr>
+        <td colspan=2><input type="submit" name="submit" value="Submit">
+<input type="submit" name="discard" value="Discard"></td>
+        </tr>
 </table>
-<div class="buttons">
-<input type="submit" name="submit" value="Submit">
-<input type="submit" name="discard" value="Discard">
-</div>
 </form>
 
 

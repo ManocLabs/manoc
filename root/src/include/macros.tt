@@ -23,7 +23,14 @@ _ '.gif') %]" alt="[%command%]" title="[%command%]"/>
 [%# Device -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_device(device) BLOCK-%]
-<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.id%]</a>
+[% IF device and device.id.isa("Manoc::IpAddress") -%]
+  <a href="[% c.uri_for_action('device/view',[device.id.address])
+  %]">[%device.id.address%]</a>
+[% ELSE-%]
+  <a href="[% c.uri_for_action('device/view',[device.id])
+  %]">[%device.id%]</a>
+[% END-%]
+
   [% IF device.get_mng_url -%]
 <a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
 c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
@@ -35,7 +42,11 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 [%# IP address -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ip(ip) BLOCK%]
-<a href=[% c.uri_for_action('/ip/view', [ip]) %]> [% ip %] </a>
+   [% IF ip and ip.isa("Manoc::IpAddress") -%]
+      <a href=[% c.uri_for_action('/ip/view', [ip.address]) %]> [% ip.address %]</a>
+   [% ELSE-%]
+      <a href=[% c.uri_for_action('/ip/view', [ip]) %]> [% ip %]</a>
+   [% END-%]
 [% END-%]
 
 
@@ -51,14 +62,23 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 [%#                           Interface                               -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_short_iface(device,iface) BLOCK%]
-   <a href="[% c.uri_for_action('interface/view', 
-	     [device , iface]) %]">
+   [% IF device and device.isa("Manoc::IpAddress") -%]
+       <a href="[% c.uri_for_action('interface/view', 
+        [device.address , iface]) %]"> [% iface %]</a>
+   [% ELSE-%]
+   <a href="[% c.uri_for_action('interface/view',[device, iface]) %]">
 	     [% iface %]</a>
+   [% END-%]
 [% END-%]
+
 [% MACRO print_iface(device,iface) BLOCK-%]
-   <a href="[% c.uri_for_action('interface/view', 
-	     [device , iface]) %]">
+   [% IF device and device.id.isa("Manoc::IpAddress") -%]
+      <a href="[% c.uri_for_action('interface/view', 
+	[device.id.address , iface]) %]">[% device.id.address %]/[% iface %]</a>
+    [% ELSE-%]
+       <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
 	     [% device %]/[% iface %]</a>
+    [% END-%]
 [% END-%]
 
 

@@ -8,9 +8,6 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-use Manoc::Utils;
-
-use NetAddr::IP;
 
 __PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('arp');
@@ -57,11 +54,12 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 
 
 __PACKAGE__->inflate_column(
-        ipaddr => {
-            inflate => sub { return Manoc::Ipv4->new({addr => shift}) },
-            deflate => sub { return scalar shift->padded },
-		  }
-		      );
+    ipaddr => {
+        inflate =>
+          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+        deflate => sub { return scalar shift->padded },
+    }
+);
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

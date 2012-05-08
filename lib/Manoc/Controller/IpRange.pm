@@ -6,6 +6,7 @@ package Manoc::Controller::IpRange;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
+use Manoc::IpAddress;
 use Manoc::Utils qw/netmask_prefix2range int2ip ip2int padded_ipaddr
     print_timestamp prefix2wildcard netmask2prefix
     check_addr /;
@@ -90,8 +91,8 @@ sub range : Chained('base') : PathPart('range') : CaptureArgs(2) {
     my $range = $c->stash->{'resultset'}->search(
         {
             -and => [
-                from_addr => $from,
-                to_addr   => $to,
+                from_addr => Manoc::IpAddress->new( $from ),
+                to_addr   => Manoc::IpAddress->new( $to ),
             ]
         }
     )->single;
@@ -99,7 +100,7 @@ sub range : Chained('base') : PathPart('range') : CaptureArgs(2) {
         $c->stash( object => $range );
     }
     else {
-        $c->stash( host => $host, prefix => $prefix );
+        $c->stash( host => Manoc::IpAddress->new( $host ), prefix => $prefix );
     }
 }
 
@@ -115,7 +116,8 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
         $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) );
         $c->detach();
     }
-    my $host   = $c->stash->{'host'};
+    #N.B. in stash->{host} there is a Manoc::IpAddress object
+    my $host   = $c->stash->{'host'}->address;
     my $prefix = $c->stash->{'prefix'};
     my ( $from_i, $to_i, $network_i, $netmask ) = netmask_prefix2range( $host, $prefix );
     $netmask = int2ip($netmask);
@@ -150,10 +152,12 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
 
     $c->stash(%tmpl_param);
 
-    $self->ip_list( $c, $from_i, $to_i, $page );
+    $self->ip_list( $c, $from, $to, $page );
 }
 
 =head2 ip_list
+
+from xxx version $form and $to must be Manoc::IpAddress objects
 
 =cut
 
@@ -182,8 +186,9 @@ sub ip_list : Private {
     ( $page >= $num_pages ) and $c->stash( next_page => undef );
 
     # convert numeric address to normalized strings
-    my $page_start_addr = padded_ipaddr(int2ip($page_start_addr_i));
-    my $page_end_addr   = padded_ipaddr(int2ip($page_end_addr_i));
+    my $page_start_addr = Manoc::IpAddress->new(  int2ip($page_start_addr_i) );
+    my $page_end_addr   = Manoc::IpAddress->new(  int2ip($page_end_addr_i) );
+
 
     my @rs;
     @rs = $c->model('ManocDB::Arp')->search(
@@ -200,7 +205,7 @@ sub ip_list : Private {
         }
     );
     my %arp_info =
-        map { $_->ipaddr => print_timestamp( $_->get_column('max_lastseen') ) } @rs;
+        map { $_->ipaddr->address => print_timestamp( $_->get_column('max_lastseen') ) } @rs;
 
     @rs = $c->model('ManocDB::IpNotes')->search(
         {
@@ -210,7 +215,7 @@ sub ip_list : Private {
             }
         }
     );
-    my %ip_note = map { $_->ipaddr => $_->notes } @rs;
+    my %ip_note = map { $_->ipaddr->address => $_->notes } @rs;
 
     my @addr_table;
     foreach my $i ( 0 .. $page_size - 1 ) {
@@ -227,8 +232,8 @@ sub ip_list : Private {
     my $rs = $c->model('ManocDB::Arp')->search(
         {
             'ipaddr' => {
-                '>=' => $from,
-                '<=' => $to,
+                '>=' => Manoc::IpAddress->new($from) ,
+                '<=' => Manoc::IpAddress->new($to),
             }
         },
         {
@@ -237,14 +242,25 @@ sub ip_list : Private {
             distinct => 1,
         }
     );
-    my $backref = $c->uri_for_action('/iprange/view_iprange', 
-				     [$c->stash->{network},$c->stash->{prefix}], 
-				     {def_tab=>'2', page => $page }
-				    );
-    if(defined($c->stash->{object})){
-     $backref = 
-       $c->uri_for_action('iprange/view',[$c->stash->{object}->name], {def_tab=>'3', page => $page })
+    
+    #backref setting
+    my $backref;
+    if ( defined( $c->stash->{object} ) ) {
+        $backref = $c->uri_for_action(
+            'iprange/view',
+            [ $c->stash->{object}->name ],
+            { def_tab => '3', page => $page }
+        );
     }
+    else {
+        $backref = $c->uri_for_action(
+            '/iprange/view_iprange',
+            [ $c->stash->{network}->address, $c->stash->{prefix} ],
+            { def_tab => '2', page => $page }
+        );
+    }
+
+    
     $c->stash(
         ip_used            => $rs->count,
         disable_pagination => 1,
@@ -305,8 +321,6 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
 				       }
 				     );
     
-
-
     $c->stash( subnet_list => \@subnet_list );
     $c->stash( template    => 'iprange/list.tt' );
 }
@@ -321,8 +335,8 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my $name     = $range->name;
     my @children = map +{
         name       => $_->name,
-        from_addr  => $_->from_addr,
-        to_addr    => $_->to_addr,
+        from_addr  => $_->from_addr->address,
+        to_addr    => $_->to_addr->address,
         vlan_id    => $_->vlan_id ? $_->vlan_id->id : undef,
         vlan       => $_->vlan_id ? $_->vlan_id->name : "-",
         n_children => $_->children->count(),
@@ -349,10 +363,10 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
         }
     );
     my %param;
-    $param{prefix}     = $range->netmask ? netmask2prefix( $range->netmask ) : '';
+    $param{prefix}     = $range->netmask ? netmask2prefix( $range->netmask->address ) : '';
     $param{wildcard}   = prefix2wildcard( $param{prefix} );
-    $param{min_host}   = int2ip( ip2int( $range->from_addr ) + 1 );
-    $param{max_host}   = int2ip( ip2int( $range->to_addr ) - 1 );
+    $param{min_host}   = int2ip( ip2int( $range->from_addr->address ) + 1 );
+    $param{max_host}   = int2ip( ip2int( $range->to_addr->address ) - 1 );
     $param{numhost}    = ip2int( $param{max_host} ) - ip2int( $param{min_host} ) - 1;
     $param{ipaddr_num} = $rs->count();
 
@@ -374,7 +388,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     );
     $c->stash( prev_page => $prev_page, next_page => $next_page );
 
-    $self->ip_list( $c, $range->from_addr, $range->to_addr, $page );
+    $self->ip_list( $c, $range->from_addr->address, $range->to_addr->address, $page );
     $c->stash( template => 'iprange/view.tt' );
 }
 
@@ -424,9 +438,9 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     if ( !$type && $network && $netmask) {
         $type   = 'subnet';
 	$c->log->info("netmask = '$netmask");
-        $prefix = Manoc::Utils::netmask2prefix($netmask);
+        $prefix = Manoc::Utils::netmask2prefix($netmask->address);
     }
-
+    
     if ( !defined($prefix) ) {
         $type = 'range';
         $network = $netmask = undef;
@@ -447,6 +461,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     $tmpl_param{network}     = $network;
     $tmpl_param{prefixes} =
         [ map { id => $_, label => $_, selected => $prefix && $prefix == $_, }, ( 0 .. 32 ) ];
+
     $tmpl_param{template} = 'iprange/edit.tt';
     $c->stash(%tmpl_param);
 }
@@ -466,7 +481,7 @@ sub process_edit : Private {
     $vlan_id eq "none" and undef $vlan_id;
 
     # check name parameter
-    if ( lc($name) ne lc($new_name) && !$c->forward('check_name', [ $name ]) ) {
+    if ( lc($name) ne lc($new_name) && !$c->forward('check_name', [ $new_name ]) ) {
 	$c->stash->{error}->{name} = $c->stash->{message}; 
 	$c->stash->{message} = undef; 
 	return 0;
@@ -474,14 +489,15 @@ sub process_edit : Private {
 
     $c->forward('check_iprange_form') or return 0;
 
+
     #Update range
-    $range->set_column( 'name',        $new_name );
-    $range->set_column( 'from_addr',   $c->{stash}->{from_addr});
-    $range->set_column( 'to_addr',     $c->{stash}->{to_addr});
-    $range->set_column( 'network',     $c->{stash}->{network});
-    $range->set_column( 'netmask',     $c->{stash}->{netmask});
-    $range->set_column( 'vlan_id',     $vlan_id );
-    $range->set_column( 'description', $desc );
+     $range->set_column( 'name',        $new_name );
+     $range->set_column( 'from_addr',   $c->{stash}->{from_addr});
+     $range->set_column( 'to_addr',     $c->{stash}->{to_addr});
+     $range->set_column( 'network',     $c->{stash}->{network});
+     $range->set_column( 'netmask',     $c->{stash}->{netmask});
+     $range->set_column( 'vlan_id',     $vlan_id );
+     $range->set_column( 'description', $desc );
     $range->update or return 0;
 
     return 1;
@@ -518,10 +534,15 @@ sub create : Chained('base') : PathPart('create') : Args() {
 
     if ($parent) {
         my $par_obj = $c->stash->{'resultset'}->find($parent);
-        $tmpl_param{p_from} = $par_obj->network ? $par_obj->network : $par_obj->from_addr;
-        $tmpl_param{p_prefix} = $par_obj->netmask ? netmask2prefix( $par_obj->netmask ) : undef;
-        $tmpl_param{p_to} = $par_obj->to_addr;
+        $tmpl_param{p_from} =
+            $par_obj->network
+          ? $par_obj->network->address
+          : $par_obj->from_addr->address;
+        $tmpl_param{p_prefix} =
+          $par_obj->netmask ? netmask2prefix( $par_obj->netmask ) : undef;
+        $tmpl_param{p_to} = $par_obj->to_addr->address;
     }
+
 
     my @vlans_rs = $c->model('ManocDB::Vlan')->search();
     my @vlans = map { id => $_->id, name => $_->name, selected => $_->id eq $vlan_id },
@@ -607,8 +628,8 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
     }
 
     my $range     = $c->stash->{'object'};
-    my $from_addr = ip2int( $range->from_addr );
-    my $to_addr   = ip2int( $range->to_addr );
+    my $from_addr_str = $range->from_addr->address ;
+    my $to_addr_str   = $range->to_addr->address;
     $parent = $range->parent;
     $parent and $parent = $parent->name;
 
@@ -616,8 +637,8 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
     $tmpl_param{error_msg}        = $message;
     $tmpl_param{range_name}       = $range->name;
     $tmpl_param{parent}           = $parent;
-    $tmpl_param{from_addr}        = int2ip($from_addr);
-    $tmpl_param{to_addr}          = int2ip($to_addr);
+    $tmpl_param{from_addr}        = $from_addr_str;
+    $tmpl_param{to_addr}          = $to_addr_str;
     $tmpl_param{name1}            = $name1;
     $tmpl_param{name2}            = $name2;
     $tmpl_param{split_point_addr} = $split_point_addr;
@@ -640,8 +661,8 @@ sub process_split : Private {
 
 
     #Retrieve subnet info
-    my $from_addr = ip2int( $range->from_addr );
-    my $to_addr   = ip2int( $range->to_addr );
+    my $from_addr = $range->from_addr;
+    my $to_addr   = $range->to_addr;
     my $parent    = $range->parent;
     my $vlan_id   = $range->vlan_id;
 
@@ -670,10 +691,10 @@ sub process_split : Private {
     if ($split_point_addr) {
 	if ( check_addr($split_point_addr) ) {
 
-	    $split_point_addr = ip2int($split_point_addr);
+	    $split_point_addr = Manoc::IpAddress->new($split_point_addr);
 	    
-	    if ( ( $from_addr > $split_point_addr ) ||
-		 ( $to_addr <= $split_point_addr ) )
+	    if ( ( $from_addr gt $split_point_addr ) ||
+		 ( $to_addr le $split_point_addr ) )
 	      {
 		  $error->{split} = "Split point address not inside the range";
 	      }
@@ -700,8 +721,8 @@ sub process_split : Private {
                 {
                     name      => $name1,
                     parent    => $parent,
-                    from_addr => int2ip($from_addr),
-                    to_addr   => int2ip($split_point_addr),
+                    from_addr => $from_addr,
+                    to_addr   => $split_point_addr,
                     netmask   => undef,
                     network   => undef,
                     vlan_id   => $vlan_id,
@@ -709,12 +730,14 @@ sub process_split : Private {
                 ) or
                 return ( 0, "Impossible split range" );
 
+	    my $split_next_addr = ip2int($split_point_addr->address) + 1;
+
             $rs->create(
                 {
                     name      => $name2,
                     parent    => $parent,
-                    from_addr => int2ip($split_point_addr + 1),
-                    to_addr   => int2ip($to_addr),
+                    from_addr => Manoc::IpAddress->new( int2ip($split_next_addr) ),
+                    to_addr   => $to_addr,
                     netmask   => undef,
                     network   => undef,
                     vlan_id   => $vlan_id
@@ -767,16 +790,16 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
 
     my @neighbours = map {
         name        => $_->name,
-            from    => $_->from_addr,
-            to      => $_->to_addr,
+            from    => $_->from_addr->address,
+            to      => $_->to_addr->address,
             checked => ( $neigh eq ( $_->name ) ),
     }, get_neighbour( $c->stash->{'resultset'}, $parent, $from_addr, $to_addr );
 
     $tmpl_param{error}      = $error;
     $tmpl_param{error_msg}  = $message;
     $tmpl_param{range_name} = $range->name;
-    $tmpl_param{from_addr}  = $from_addr;
-    $tmpl_param{to_addr}    = $to_addr;
+    $tmpl_param{from_addr}  = $from_addr->address;
+    $tmpl_param{to_addr}    = $to_addr->address;
     $tmpl_param{parent}     = $parent;
     $tmpl_param{neighbours} = \@neighbours;
     $tmpl_param{new_name}   = $new_name;
@@ -808,29 +831,29 @@ sub process_merge : Private {
 
     #Retrieve subnet info
     my $rs        = $c->stash->{'resultset'}->find($name);
-    my $from_addr = ip2int( $rs->from_addr );
-    my $to_addr   = ip2int( $rs->to_addr );
+    my $from_addr = $rs->from_addr ;
+    my $to_addr   = $rs->to_addr ;
     my $parent    = $rs->parent;
     my $vlan_id   = $rs->vlan_id;
 
     #Retrieve neigh subnet info
 
     $rs = $c->stash->{'resultset'}->find($neigh);
-    my $neigh_from_addr = ip2int( $rs->from_addr );
-    my $neigh_to_addr   = ip2int( $rs->to_addr );
+    my $neigh_from_addr =  $rs->from_addr;
+    my $neigh_to_addr   =  $rs->to_addr;
 
     if ($parent) {
 
         #Retrieve parent subnet info
         my $rs               = $c->stash->{'resultset'}->find( $parent->name );
-        my $parent_from_addr = ip2int( $rs->from_addr );
-        my $parent_to_addr   = ip2int( $rs->to_addr );
+        my $parent_from_addr = $rs->from_addr;
+        my $parent_to_addr   = $rs->to_addr;
 
         #Check if the merged subnet and the parent subnet has the same range
         if (
-            ( ( $from_addr == $parent_from_addr ) && ( $neigh_to_addr == $parent_to_addr ) ) ||
-            ( ( $neigh_from_addr == $parent_from_addr ) &&
-                ( $to_addr == $parent_to_addr ) )
+            ( ( $from_addr eq $parent_from_addr ) && ( $neigh_to_addr eq $parent_to_addr ) ) ||
+            ( ( $neigh_from_addr eq $parent_from_addr ) &&
+                ( $to_addr eq $parent_to_addr ) )
             )
         {
             return ( 0, "Merged and parent subnets has the same range!" );
@@ -855,12 +878,12 @@ sub process_merge : Private {
                     name      => $new_name,
                     parent    => $parent,
                     from_addr => (
-                        $from_addr < $neigh_from_addr ? int2ip($from_addr) :
-                            int2ip($neigh_from_addr)
+                        $from_addr lt $neigh_from_addr ? $from_addr :
+                            $neigh_from_addr
                     ),
                     to_addr => (
-                        $to_addr > $neigh_to_addr ? int2ip($to_addr) :
-                            int2ip($neigh_to_addr)
+                        $to_addr gt $neigh_to_addr ? $to_addr :
+                            $neigh_to_addr
                     ),
                     netmask => undef,
                     network => undef,
@@ -912,9 +935,9 @@ sub check_iprange_form : Private {
     my $name      = $c->req->param('name');
     my $type      = $c->req->param('type');
     my $vlan_id   = $c->req->param('vlan');
-    my $from_addr = $c->req->param('from_addr');
-    my $to_addr   = $c->req->param('to_addr');
-    my $network   = $c->req->param('network');
+    my $from_addr_str = $c->req->param('from_addr'); #unpadded string
+    my $to_addr_str   = $c->req->param('to_addr');   #unpadded string
+    my $network_str   = $c->req->param('network');   #unpadded string
     my $netmask;
 
     my $range = $c->stash->{'object'};
@@ -926,11 +949,17 @@ sub check_iprange_form : Private {
     } else {
 	$error = $c->stash->{error} = {};
     }
+    #prepare padded object in order to compare them later
+    my $network;
+    my $from_addr;
+    my $to_addr;
 
     if ( $type eq 'subnet' ) {
-        $network = padded_ipaddr($network);
-        $network or $error->{type} = "Please insert range network";
-        check_addr($network) or $error->{network} = "Invalid network address";
+        
+        $network_str or $error->{type} = "Please insert range network";
+        check_addr($network_str) or $error->{type} = "Invalid network address";
+
+	$network   = Manoc::IpAddress->new($network_str);
 
         my $prefix  = $c->req->param('prefix');
         $prefix or $error->{prefix} = "Please insert network prefix";
@@ -941,27 +970,30 @@ sub check_iprange_form : Private {
         scalar( keys(%$error) ) and return 0;
 
         my ( $from_addr_i, $to_addr_i, $network_i, $netmask_i ) =
-            Manoc::Utils::netmask_prefix2range( $network, $prefix );
+            Manoc::Utils::netmask_prefix2range( $network_str, $prefix );
 
         if ( $network_i != $from_addr_i ) {
-            $error->{network} = "Bad network. Do you mean " . int2ip($from_addr_i) . "?";
-        }
-	$from_addr = padded_ipaddr(int2ip($from_addr_i));
-	$to_addr   = padded_ipaddr(int2ip($to_addr_i));
-	$netmask   = padded_ipaddr(int2ip($netmask_i));
-    }
-    elsif ( $type eq 'range' ) {
-        check_addr($from_addr) or
-            $error->{from_addr} = "Not a valid IPv4 address";
-        check_addr($to_addr) or
-            $error->{to_addr}   = "Not a valid IPv4 address";
+            $error->{type} = "Bad network. Do you mean " . int2ip($from_addr_i) . "?";
+	  }
 
-        $to_addr   = padded_ipaddr($to_addr);
-        $from_addr = padded_ipaddr($from_addr);
-        if($to_addr le $from_addr) {
-	    $c->stash->{error}->{to_addr} ||= "Bad range";
-	}
-        $network = $netmask = undef;
+	$to_addr   = Manoc::IpAddress->new(int2ip($to_addr_i));
+	$from_addr = Manoc::IpAddress->new(int2ip($from_addr_i));
+	
+      }
+    elsif ( $type eq 'range' ) {
+            $error->{type} = "Not a valid IPv4 address" and 
+	      return 0 unless(check_addr($from_addr_str)); 
+            $error->{type}   = "Not a valid IPv4 address" and 
+	      return 0 unless(check_addr($to_addr_str));
+	    
+	    $to_addr   = Manoc::IpAddress->new($to_addr_str);
+	    $from_addr = Manoc::IpAddress->new($from_addr_str);
+
+	    if($to_addr le $from_addr) {                
+	      $error->{type} = "Bad range!";
+	      return 0; 
+	    }
+	    $network = $netmask = undef;
     }
     else {
 	# internal error?
@@ -970,6 +1002,7 @@ sub check_iprange_form : Private {
     }
     scalar( keys(%$error) ) and return 0;
 
+   
     # WARNING: now to_addr and from_addr MUST be zero padded!
 
     # check parent parameter and overlappings
@@ -991,18 +1024,18 @@ sub check_iprange_form : Private {
     }
     if ($parent) {
         # range should be inside its parent
-	if ( $from_addr lt $parent->from_addr || $to_addr gt $parent->to_addr )
+	if ( ($from_addr lt $parent->from_addr) || ($to_addr gt $parent->to_addr) )
 	  {
-	      $c->stash->{message} = 
-		"Invalid range: overlaps with its parent (" . $parent->from_addr . " - " .
-		  $parent->to_addr . ")";
+	      $c->stash->{error_msg} = 
+		"Invalid range: overlaps with its parent (" . $parent->from_addr->address . " - " .
+		  $parent->to_addr->address . ")";
 	      return 0;
 	  }
 
         #Check if the range is the same of the father
 	if ( $from_addr eq $parent->from_addr && $to_addr eq $parent->to_addr ) 
 	  {
-	      $c->stash->{message} = "Invalid range: can't be the same as the parent range" ;
+	      $c->stash->{error_msg} = "Invalid range: can't be the same as the parent range" ;
 	      return 0;
 	  }
 
@@ -1041,9 +1074,9 @@ sub check_iprange_form : Private {
     }
     my @rows = $c->stash->{'resultset'}->search($conditions);
     if ( @rows ) {
-	 $c->stash->{message} = 
-	   "Invalid range: overlaps with " . $rows[0]->name . " (" . $rows[0]->from_addr . " - " .
-	     $rows[0]->to_addr . ")";
+	 $c->stash->{error_msg} = 
+	   "Invalid range: overlaps with " . $rows[0]->name . " (" . $rows[0]->from_addr->address . " - " .
+	     $rows[0]->to_addr->address . ")";
 	 return 0;
      }
 
@@ -1073,11 +1106,12 @@ sub check_iprange_form : Private {
 		      ];
 	@rows = $c->stash->{'resultset'}->search($conditions);
 	if ( @rows > 0 ) {
-	    $c->stash->{message} = "Invalid range (conflicts " . $rows[0]->name . ")" ;
+	    $c->stash->{error_msg} = "Invalid range (conflicts " . $rows[0]->name . ")" ;
 	    return 0;
 	}
     }
     
+    #put in stash ip address objects
     $c->stash->{'from_addr'} = $from_addr;
     $c->stash->{'to_addr'}   = $to_addr;
     $c->stash->{'network'}   = $network;
@@ -1090,15 +1124,15 @@ sub check_iprange_form : Private {
 sub get_neighbour {
     my ( $schema, $parent, $from_addr, $to_addr ) = @_;
     
-    my $lower_addr = int2ip(ip2int($from_addr) - 1);
-    my $upper_addr = int2ip(ip2int($to_addr) + 1);
+    my $lower_addr = int2ip(ip2int($from_addr->address) - 1);
+    my $upper_addr = int2ip(ip2int($to_addr->address) + 1);
 
     $schema->search(
         {
             parent => $parent,
             -or    => [
-                { 'to_addr'   => padded_ipaddr($lower_addr) },
-                { 'from_addr' => padded_ipaddr($upper_addr) }
+                { 'to_addr'   => Manoc::IpAddress->new($lower_addr) },
+                { 'from_addr' => Manoc::IpAddress->new($upper_addr) },
             ]
         }
     );

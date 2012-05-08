@@ -6,7 +6,7 @@ package Manoc::DB::Result::CDPNeigh;
 
 use base qw(DBIx::Class);
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
 __PACKAGE__->table('cdp_neigh');
 __PACKAGE__->add_columns(
@@ -46,6 +46,20 @@ __PACKAGE__->belongs_to(
     from_device_info => 'Manoc::DB::Result::Device',
     { 'foreign.id' => 'self.from_device' }
 );
+
+foreach my $col (qw( from_device to_device )) {
+    __PACKAGE__->inflate_column(
+        $col => {
+            inflate =>
+              sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+            deflate => sub { return scalar shift->padded },
+        }
+    );
+}
+
+
+
+
 
 # TODO is_foreign_key_constraint doesn't work!!
 #__PACKAGE__->might_have(to_device_info => 'Manoc::DB::Result::Device',

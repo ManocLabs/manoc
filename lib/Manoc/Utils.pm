@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
     padded_ipaddr
-    prefix2wildcard check_addr check_mac_addr
+    prefix2wildcard check_addr check_mac_addr check_ipv6_addr
     check_backref set_backref deny_access
 );
 
@@ -76,6 +76,11 @@ sub check_addr {
 sub check_mac_addr {
     my $addr = shift;
     return $addr =~ /^$RE{net}{MAC}$/;
+}
+
+#N.B. must be implemented
+sub check_ipv6_addr {
+  return undef;
 }
 
 ########################################################################

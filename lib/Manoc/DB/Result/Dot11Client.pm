@@ -8,7 +8,7 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core /);
+__PACKAGE__->load_components(qw/ Core InflateColumn/);
 __PACKAGE__->table('dot11client');
 
 __PACKAGE__->add_columns(
@@ -84,7 +84,7 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
         size        => 16,
     },
-    q			 'addauthen' => {
+    'addauthen' => {
         data_type   => 'varchar',
         is_nullable => 1,
         size        => 16,
@@ -105,5 +105,17 @@ __PACKAGE__->set_primary_key( 'macaddr', 'device' );
 
 __PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
 
+
+foreach my $col (qw( device ipaddr )) {
+    __PACKAGE__->inflate_column(
+        $col => {
+            inflate =>
+              sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+            deflate => sub { return scalar shift->padded },
+        }
+    );
+}
+
 1;
+
 

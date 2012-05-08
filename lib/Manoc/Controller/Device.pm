@@ -55,14 +55,14 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
     # $id = primary key
     my ( $self, $c, $id ) = @_;
 
-    return if ( $id eq '' );
-    $c->stash( object => $c->stash->{resultset}->find($id) );
+    $id ne '' and $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
         $c->detach('/error/index');
     }
 }
+
 
 =head2 view
 
@@ -113,13 +113,9 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
                                 ]
                                ]});
 
-    
-
-
-
-    my @cdp_links = map {
+        my @cdp_links = map {
         from_iface    => $_->from_interface,
-            to_device => $_->to_device,
+            to_device => $_->to_device->address,
             to_iface  => $_->to_interface,
             date      => print_timestamp( $_->last_seen ),
             to_name   => $_->get_column('name'),

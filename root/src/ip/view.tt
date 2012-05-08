@@ -3,7 +3,7 @@
    use_table=1
 -%]
 
-<p>Ip Address: [% id %]</p>
+<p>Ip Address: [% id.address %]</p>
 <div id="tabs">	
   <ul>
      <li><a href="#tabs-1">Mac Address Association</a></li>

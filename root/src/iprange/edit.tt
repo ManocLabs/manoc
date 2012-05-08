@@ -6,7 +6,7 @@
 <input type=hidden name="name" value="[% range_name %]" />
 
 <br>
-<table>
+<table class="buttons ui-widget-content ui-corner-all" >
 	<tr>
 		<td class="label">Name:</td>
 		<td><input type="text" name="new_name" value="[% new_name %]" /></td>
@@ -20,7 +20,7 @@
            <td class="label">Type:</td>
            <td>
 	       <input id="radio_subnet" type="radio" name="type" value="subnet" onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />
-                 Subnet: <input type="text" name="network" value="[% network %]" /> /
+                 Subnet: <input type="text" name="network" value="[% network.address %]" /> /
 	      	     <select name="prefix">
 		          [% FOREACH pref IN prefixes %]
                             <option value="[% pref.id %]" [% IF pref.selected
@@ -30,7 +30,7 @@
                      </select><br/>
                <input id="radio_range" type="radio" name="type" value="range"
 	       onClick="javascript:enableFields()" [% IF type_range %] checked [% END %] />
-                 Range: <input type="text" name="from_addr" value="[% from_addr %]" /> - <input type="text" name="to_addr" value="[% to_addr %]" />
+                 Range: <input type="text" name="from_addr" value="[% from_addr.address %]" /> - <input type="text" name="to_addr" value="[% to_addr.address %]" />
           </td>
 
 	   <td>
@@ -60,11 +60,11 @@
 	    object.description | html %]
 	    </textarea></input></td>
         </tr>
+        <tr>
+        <td colspan=2><input type="submit" name="submit" value="Submit">
+<input type="submit" name="discard" value="Discard"></td>
+        </tr>
 </table>
-<div class="buttons">
-<input type="submit" name="submit" value="Submit">
-<input type="submit" name="discard" value="Discard">
-</div>
 </form>
 
 <script language="javascript">

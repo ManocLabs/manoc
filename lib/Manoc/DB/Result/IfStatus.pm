@@ -7,7 +7,7 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core/);
+__PACKAGE__->load_components(qw/ Core InflateColumn/);
 __PACKAGE__->table('if_status');
 
 __PACKAGE__->add_columns(
@@ -93,5 +93,13 @@ __PACKAGE__->belongs_to( device_info => 'Manoc::DB::Result::Device', 'device' );
 __PACKAGE__->set_primary_key( 'device', 'interface' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IfStatus');
+
+__PACKAGE__->inflate_column(
+    device => {
+        inflate =>
+          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+        deflate => sub { return scalar shift->padded },
+    }
+);
 
 1;

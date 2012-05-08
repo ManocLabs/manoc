@@ -19,7 +19,7 @@
 [% IF object.network %]
 <tr>
   <td>Network:</td>
-  <td>[% object.network %]
+  <td>[% object.network.address %]
   </td>
 </tr>
 [% END %]
