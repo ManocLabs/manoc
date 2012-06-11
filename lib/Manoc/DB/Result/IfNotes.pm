@@ -25,19 +25,18 @@ __PACKAGE__->add_columns(
     'notes' => {
         data_type   => 'text',
         is_nullable => 0,
-
     },
 );
 
 __PACKAGE__->belongs_to( device => 'Manoc::DB::Result::Device' );
 __PACKAGE__->set_primary_key( 'device', 'interface' );
 
-__PACKAGE__->inflate_column(
-    device => {
-        inflate => sub { return Manoc::IpAddress::Ipv4->new( {padded=>shift} ) },
-        deflate => sub { return scalar shift->padded },
-    }
-);
+ __PACKAGE__->inflate_column(
+     device => {
+         inflate => sub { return Manoc::IpAddress::Ipv4->new( {padded=>shift} ) },
+         deflate => sub { return scalar shift->padded },
+     }
+ );
 
 
 1;

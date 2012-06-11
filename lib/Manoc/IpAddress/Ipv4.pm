@@ -8,7 +8,8 @@ use overload ('""'  =>   \&to_string,
 	      'lt'  =>   \&less_than,
 	      'gt'  =>   \&greater_than,
 	      'eq'  =>   \&equal,
-	      'le'  =>   \&less_or_equal, );
+	      'le'  =>   \&less_or_equal,
+	      'ne'  =>   \&not_equal);
 
 has 'padded' => (
     is         => 'rw',
@@ -51,6 +52,13 @@ sub greater_than {
   return unless defined $second;
   $second = $second->padded if(ref $second);
   return $first->padded gt $second;
+}
+
+sub not_equal {
+  my ($first, $second) = @_;
+  return unless defined $second;
+  $second = $second->padded if(ref $second);
+  return $first->padded ne $second;
 }
 
 sub equal {

@@ -3,7 +3,7 @@
 
 
 <form method="POST">
-<input type="hidden" name="id" value="[% object.id %]" />
+<input type="hidden" name="id" value="[% object.id.address %]" />
 <table id="info">
 <tr>
   <td>Device name:</td>
@@ -11,7 +11,7 @@
 </tr>
 <tr>
   <td>Old address:</td>
-  <td>[% object.id %]</td>
+  <td>[% object.id.address %]</td>
 </tr>
 <tr>
   <td>New address:</td>

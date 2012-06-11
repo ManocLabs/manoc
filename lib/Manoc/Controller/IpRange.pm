@@ -255,7 +255,7 @@ sub ip_list : Private {
     else {
         $backref = $c->uri_for_action(
             '/iprange/view_iprange',
-            [ $c->stash->{network}->address, $c->stash->{prefix} ],
+            [ $from, $c->stash->{prefix} ],
             { def_tab => '2', page => $page }
         );
     }
@@ -978,22 +978,25 @@ sub check_iprange_form : Private {
 
 	$to_addr   = Manoc::IpAddress->new(int2ip($to_addr_i));
 	$from_addr = Manoc::IpAddress->new(int2ip($from_addr_i));
-	
+	$netmask   = Manoc::IpAddress->new(int2ip($netmask_i));
       }
     elsif ( $type eq 'range' ) {
-            $error->{type} = "Not a valid IPv4 address" and 
-	      return 0 unless(check_addr($from_addr_str)); 
-            $error->{type}   = "Not a valid IPv4 address" and 
-	      return 0 unless(check_addr($to_addr_str));
-	    
-	    $to_addr   = Manoc::IpAddress->new($to_addr_str);
-	    $from_addr = Manoc::IpAddress->new($from_addr_str);
+      if( !check_addr($from_addr_str) ){ 
+	$error->{from_addr} = "Not a valid IPv4 address";
+	return 0;
+      } 
+      if( !check_addr($to_addr_str) ){ 
+	$error->{to_addr} = "Not a valid IPv4 address";
+	return 0;
+      }
+      $to_addr   = Manoc::IpAddress->new($to_addr_str);
+      $from_addr = Manoc::IpAddress->new($from_addr_str);
 
-	    if($to_addr le $from_addr) {                
-	      $error->{type} = "Bad range!";
-	      return 0; 
-	    }
-	    $network = $netmask = undef;
+      if($to_addr le $from_addr) {                
+	$error->{from_addr} = "Bad range!";
+	return 0; 
+      }
+      $network = $netmask = undef;
     }
     else {
 	# internal error?

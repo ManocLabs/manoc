@@ -6,6 +6,7 @@ package Manoc::Search::Driver::IpRange;
 use Moose;
 use Manoc::Search::Item::IpRange;
 use Manoc::Search::Item::IpCalc;
+use Manoc::IpAddress;
 use Manoc::Utils qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr);
 
 extends 'Manoc::Search::Driver';
@@ -24,42 +25,45 @@ sub search_subnet {
 
     my ( $from_addr, $to_addr ) = Manoc::Utils::netmask_prefix2range( $subnet, $prefix );
 
+    $from_addr = Manoc::IpAddress->new(int2ip($from_addr));
+    $to_addr   = Manoc::IpAddress->new(int2ip($to_addr));
+    
     my @ranges = $schema->resultset('IPRange')->search(
         {
             -and => [
-                'inet_aton(from_addr)' => $from_addr,
-                'inet_aton(to_addr)'   => $to_addr
+                from_addr => $from_addr,
+                to_addr   => $to_addr
             ]
-        }
-    );
-    if ( @ranges == 0 ) {
-        @ranges = $schema->resultset('IPRange')->search(
-            {
-                -and => [
-                    'inet_aton(from_addr)' => $from_addr,
-                    'inet_aton(to_addr)'   => { '<=' => $to_addr }
-                ]
-            }
-        );
-    }
+        });
 
-    if ( @ranges == 0 ) {
-        my $item = Manoc::Search::Item::IpCalc->new(
-            {
-                prefix  => $prefix,
-                iprange => $subnet,
-                match   => "$subnet/$prefix",
-            }
-        );
-        $result->add_item($item);
-        return;
-    }
+     if ( scalar(@ranges) == 0 ) {
+         @ranges = $schema->resultset('IPRange')->search(
+             {
+                 -and => [
+                     from_addr => $from_addr,
+                     to_addr   => { '<=' => $to_addr }
+                 ]
+             }
+         );
+     }
+
+     if ( scalar(@ranges) == 0 ) {
+         my $item = Manoc::Search::Item::IpCalc->new(
+             {
+                 prefix  => $prefix,
+                 iprange => $subnet,
+                 match   => "$subnet/$prefix",
+             }
+         );
+         $result->add_item($item);
+         return;
+     }
 
     foreach my $e (@ranges) {
         my $item = Manoc::Search::Item::IpRange->new(
             {
                 name    => $e->name,
-                iprange => $e->from_addr,
+                iprange => $e->from_addr->address,
                 match   => $e->name,
             }
         );
@@ -81,8 +85,8 @@ sub search_inventory {
 
     while ( $e = $it->next ) {
         my $desc =
-            $e->network ? $e->network . '/' . Manoc::Utils::netmask2prefix( $e->netmask ) :
-                          $e->from_addr . '-' . $e->to_addr;
+            $e->network ? $e->network->address . '/' . Manoc::Utils::netmask2prefix( $e->netmask->address) :
+                          $e->from_addr->address . '-' . $e->to_addr->address;
 
         my $item = Manoc::Search::Item::IpRange->new(
             {

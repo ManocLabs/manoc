@@ -94,12 +94,12 @@ __PACKAGE__->set_primary_key( 'device', 'interface' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IfStatus');
 
-__PACKAGE__->inflate_column(
-    device => {
-        inflate =>
-          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
-        deflate => sub { return scalar shift->padded },
-    }
-);
+ __PACKAGE__->inflate_column(
+     device => {
+         inflate =>
+           sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+         deflate => sub { return scalar shift->padded },
+     }
+ );
 
 1;

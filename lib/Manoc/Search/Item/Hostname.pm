@@ -3,6 +3,7 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::Search::Item::Hostname;
+use  Manoc::IpAddress;
 use Moose;
 
 extends 'Manoc::Search::Item';
@@ -29,7 +30,7 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{hostname};
         if ($b) {
-            $args->{ipaddr} = $b->ipaddr;
+            $args->{ipaddr} = $b->ipaddr->address;
             $args->{name}   = $b->name;
             $args->{match} ||= $b->name;
         }

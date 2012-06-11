@@ -109,7 +109,7 @@ __PACKAGE__->add_columns(
     snmp_ver => {
         data_type     => 'int',
         size          => 1,
-        default_value => '1',
+        default_value => 0,
     },
     backup_enable => {
         accessor      => 'backup_enabled',

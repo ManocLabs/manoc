@@ -21,8 +21,8 @@ sub search_note {
     while ( my $e = $it->next ) {
         my $item = Manoc::Search::Item::IpAddr->new(
             {
-                match => $e->ipaddr,
-                addr  => $e->ipaddr,
+                match => $e->ipaddr->address,
+                addr  => $e->ipaddr->address,
                 text  => $e->notes,
             }
         );

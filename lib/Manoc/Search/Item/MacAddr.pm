@@ -15,7 +15,7 @@ has addr => (
     lazy_build => 1,
 );
 
-sub _build_addr { $_[0]->match; }
+sub _build_addr { $_[0]->match }
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

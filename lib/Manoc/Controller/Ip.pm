@@ -47,7 +47,7 @@ sub base : Chained('/') PathPart('ip') CaptureArgs(1) {
         $c->stash( error_msg => "The ip is not a valid IPv4 address" );
         $c->detach('/error/index');
     }
-
+    
     $c->stash( id => Manoc::IpAddress->new( $id  ) );
 }
 
@@ -184,7 +184,7 @@ sub edit_notes : Chained('base') PathPart('edit_notes') Args(0) {
     my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } )
       || $c->model('ManocDB::IpNotes')->new_result( {} );
     $item->ipaddr($id);
-    $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id] ) );
+    $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id->address] ) );
 
     my $form = Manoc::Form::Ip_notes->new( item => $item );
 
@@ -209,7 +209,7 @@ sub delete_notes : Chained('base') PathPart('delete_notes') Args(0) {
     my $id = $c->stash->{id}; 
     my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } );
 
-    $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id] ) );
+    $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id->address] ) );
 
     if ( lc $c->req->method eq 'post' ) {
         $item and $item->delete;

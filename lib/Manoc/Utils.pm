@@ -71,6 +71,7 @@ sub check_addr {
     my $addr = shift;
     $addr =~ s/\s+//;
     return $addr =~ /^$RE{net}{IPv4}$/;
+#    return $addr =~ /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.?)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){0,3}$/;
 }
 
 sub check_mac_addr {

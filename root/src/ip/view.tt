@@ -209,11 +209,11 @@
  <p> [% notes | html %] </p>
   <div class="buttons">	
     [% IF notes %]
-    <a href="[% c.uri_for_action('ip/edit_notes',[id]) %]">[% ui_icon('pencil') %]Edit</a>
-    <a href="[% c.uri_for_action('ip/delete_notes',[id]) %]">[%
+    <a href="[% c.uri_for_action('ip/edit_notes',[id.address]) %]">[% ui_icon('pencil') %]Edit</a>
+    <a href="[% c.uri_for_action('ip/delete_notes',[id.address]) %]">[%
  ui_icon('closethick') %]Delete</a>
     [% ELSE %]
-    <a href="[% c.uri_for_action('ip/edit_notes',[id]) %]">[% ui_icon('plusthick') %] Add a Note</a>
+    <a href="[% c.uri_for_action('ip/edit_notes',[id.address]) %]">[% ui_icon('plusthick') %] Add a Note</a>
     [% END %]
     </div>      
 

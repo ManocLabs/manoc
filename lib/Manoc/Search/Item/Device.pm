@@ -35,7 +35,7 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{device};
         if ($b) {
-            $args->{id}   = $b->id;
+            $args->{id}   = $b->id->address;
             $args->{name} = $b->name;
             $args->{match} ||= $b->name;
             $b->get_mng_url and

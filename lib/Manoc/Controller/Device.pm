@@ -55,7 +55,7 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
     # $id = primary key
     my ( $self, $c, $id ) = @_;
 
-    $id ne '' and $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
+    $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
@@ -232,7 +232,7 @@ sub check_enable_updown {
 
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
-    my $device_id = $c->stash->{object}->id;
+    my $device_id = $c->stash->{object}->id->address;
 
 
      my %config = (
@@ -455,7 +455,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $item = $c->stash->{object};
-    my $id   = $item->id;
+    my $id   = $item->id->address;
     my $form = Manoc::Form::DeviceEdit->new( item => $item );
 
     $c->keep_flash('backref');
@@ -498,7 +498,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
                 # 3) $device->delete
                 my $del_device = $c->model('ManocDB::DeletedDevice')->create(
                     {
-                        ipaddr    => $device->id,
+                        ipaddr    => $id,
                         name      => $device->name,
                         model     => $device->model,
                         vendor    => $device->vendor,
@@ -536,7 +536,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
             $c->detach('/error/index');
         }
 
-        $c->flash( message => 'Success!! Device ' . $id . ' successful deleted.' );
+        $c->flash( message => 'Success!! Device ' . $id->address . ' successful deleted.' );
 
         $c->detach('/follow_backref');
 
@@ -578,7 +578,7 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
     # }
     my ( $self, $c ) = @_;
     my $error = {};
-    my $old_ip = $c->stash->{'object'}->id || $c->req->param('id');
+    my $old_ip = $c->stash->{'object'}->id->address || $c->req->param('id');
     $c->stash( template => 'device/change_ip.tt' );
 
     my $message;
@@ -615,16 +615,16 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
 sub process_change_ip : Private {
     my ( $self, $c, $id, $new_id ) = @_;
     my $device = $c->stash->{'object'};
-    my $new_ip = $c->stash->{'resultset'}->find($new_id);
+    my $ip_obj = Manoc::IpAddress->new($new_id);
+    my $new_ip = $c->stash->{'resultset'}->find($ip_obj);
 
     if ($new_ip) {
         return ( 0, "The ip is already in use. Try again with another one!" );
     }
     if ( check_addr($new_id) ) {
-
         $c->model('ManocDB')->schema->txn_do(
             sub {
-                $device->update( { id => $new_id } );
+                $device->update( { id => $ip_obj } );
             }
         );
         if ($@) {
@@ -649,7 +649,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my $device = $c->stash->{'object'};
 
     if ( $c->req->param('discard') ) {
-        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id->address ] ) );
         $c->detach();
     }
     my $message;
@@ -663,7 +663,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
             $c->detach();
         }
         $done and
-            $c->response->redirect( $c->uri_for_action( '/device/view', [ $device->id ] ) );
+            $c->response->redirect( $c->uri_for_action( '/device/view', [ $device->id->address ] ) );
         $c->detach();
     }
 

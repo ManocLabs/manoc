@@ -9,7 +9,7 @@ package Manoc::FormRenderTable;
 use Moose::Role;
 
 with 'HTML::FormHandler::Render::Simple' => { -excludes =>
-        [ 'render', 'render_select', 'render_field_struct', 'render_end', 'render_start' ] };
+        [ 'render', 'render_select', 'render_field_struct', 'render_end', 'render_start', 'render_text'  ] };
 
 sub render_start {
     my $self = shift;
@@ -24,9 +24,32 @@ sub render_end {
     return $output;
 }
 
+sub render_text {
+  my ( $self, $field ) = @_;
+
+  my $output = '<input type="text" name="';
+  $output .= $field->html_name . '"';
+  $output .= ' id="' . $field->id . '"';
+  $output .= ' size="' . $field->size . '"' if $field->size;
+  $output .= ' maxlength="' . $field->maxlength . '"' if $field->maxlength;
+
+  my $value = ' value="' . $field->html_filter($field->fif) . '"';
+  if (defined($field) and $field->fif ne ''  ) {
+    if ( ref($field->fif) and $field->fif->isa("Manoc::IpAddress") ) {
+      $value = ' value="' . $field->html_filter($field->fif->address) . '"';
+    }
+  }
+  $output .= $value;
+
+  $output .= $self->_add_html_attributes( $field );
+  $output .= ' />';
+  return $output;
+}
+
 sub render_field_struct {
     my ( $self, $field, $rendered_field, $class ) = @_;
     my $output = qq{\n<tr$class>};
+      
     my $l_type =
         defined $self->get_label_type( $field->widget ) ?
         $self->get_label_type( $field->widget ) :

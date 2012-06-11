@@ -12,6 +12,7 @@ use Carp;
 
 use Manoc::Utils qw(str2seconds);
 use Manoc::Search::QueryType;
+use Manoc::Utils qw(padded_ipaddr);
 
 has 'search_string' => (
     is       => 'rw',
@@ -54,7 +55,7 @@ has 'prefix' => (
 );
 
 has 'sql_pattern' => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => 'Str',
     lazy    => 1,
     builder => '_build_sql_pattern',
@@ -221,6 +222,11 @@ sub _build_sql_pattern {
     my $self = shift;
     my $pattern = join( ' ', @{ $self->words } );
     return $pattern if ( !$pattern );
+    
+    if($self->query_type eq 'ipaddr'){
+      $pattern = padded_ipaddr($pattern);
+    }
+    
     $self->match eq 'begin'   and $pattern = "$pattern%";
     $self->match eq 'end'     and $pattern = "%$pattern";
     $self->match eq 'partial' and $pattern = "%$pattern%";
