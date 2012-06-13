@@ -136,10 +136,10 @@
     <table class="display" id="cdp_links">
       <thead>  
 	<tr>
-	  <th>Interface</th>
-          <th>To device</th>
-	  <th>Interface</th>
-	  <th>Name</th>
+	  <th>Local Interface</th>
+          <th>Neigh Address</th>
+	  <th>Neigh Name</th>
+	  <th>Neigh Description</th>
           <th>Last seen</th>
 	</tr>
       </thead>  
@@ -148,23 +148,19 @@
          <tr>
            <td>
 	     <a href="[% c.uri_for_action('interface/view', 
-	     [object.id,link.from_iface]) %]">
-	     [% link.from_iface %]</a>
+	     [object.id, link.local_iface]) %]">
+	     [% link.local_iface %]</a>
 	   </td>
-	[% IF  link.to_name %]
+	[% IF  link.device_name  %]
          <td>
-	    <a href="[% c.uri_for_action('device/view', [link.to_device]) %]">[% link.to_device %]</a>
+	    <a href="[% c.uri_for_action('device/view', [link.neigh_address]) %]">[% link.neigh_address %]</a>
 	 </td>
-         <td>
-	   <a href="[% c.uri_for_action('interface/view', 
-	     [link.to_device,link.to_iface]) %]">[% link.to_iface %]</a>
-	 </td>
-	 <td>[% link.to_name %]</td>
+         <td>[% link.device_name -%]</td>
 	 [% ELSE %]
-           <td>[% link.to_device %]
-         <td>[% link.to_iface %]</td>
-	 <td>na</td>
+           <td>[% link.neigh_address -%]+
+         <td>[% link.device_id %]</td>
 	 [% END %]
+	<td>[% link.descr %]</td>
 	<td>[% link.date %]</td>
     </tr>
     [% IF loop.last %]

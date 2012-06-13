@@ -34,7 +34,17 @@ __PACKAGE__->add_columns(
     'last_seen' => {
         data_type   => 'int',
         is_nullable => 0,
-    }
+    },
+    'remote_id' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64
+    },
+    'remote_type' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64
+    },
 );
 
 __PACKAGE__->set_primary_key(
