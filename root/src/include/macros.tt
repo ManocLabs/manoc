@@ -29,7 +29,6 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
   [% END-%]
 [% END-%]
 
-
 [%# ----------------------------------------------------------------- -%]
 [%# Device Long Format-%]
 [%# ----------------------------------------------------------------- -%]
@@ -40,6 +39,13 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
   [% END-%]
 [% IF device.notes-%] ( [% device.notes -%] ) [% END-%]
+[% END-%]
+
+[%# ----------------------------------------------------------------- -%]
+[%# CDP Device View -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_device_cdp(device) BLOCK-%]
+<a href="[% c.uri_for_action('device/view',[device],{def_tab=>2}) %]">[%device%]</a>
 [% END-%]
 
 
@@ -57,6 +63,14 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 [% MACRO print_mac(mac) BLOCK-%]
 <a href=[% c.uri_for('/mac', mac) %]> [% mac %] </a>
 [% END-%]
+
+[%# ----------------------------------------------------------------- -%]
+[%# IP Phone -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_ipp(sep,device,iface) BLOCK-%]
+[% print_short_iface(device,iface) %] on [% print_device_cdp(device)%]
+[% END-%]
+
 
 
 [%# ----------------------------------------------------------------- -%]
