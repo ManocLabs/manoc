@@ -76,11 +76,6 @@
 [% MACRO item_logon(item) BLOCK -%]
 <label id="search-cat">Logon:</label>  [% item.match %]
 [% END -%]
-[% MACRO item_ipp(item) BLOCK -%]
-<label id="search-cat">IP Phone:</label>  
-[% print_ipp(item.match,item.device,item.iface) %]
-[% END -%]
-
 
 [% MACRO item_generic(item) BLOCK %]
   [% SWITCH item.item_type -%]
@@ -96,12 +91,10 @@
      [%  CASE 'ipcalc'    %][% item_ipcalc(item)        -%]
      [%  CASE 'logon'     %][% item_logon(item)         -%]
      [%  CASE 'vlanrange' %][% item_vlanrange(item)     -%]
-     [%  CASE 'ipp'       %][% item_ipp(item)           -%]
      [%  CASE 'group'     %][% item_generic_group(item) -%]
      [% END -%]
    [% IF item.text -%]<span class="result-text">[% item.text -%]</span>[% END -%]
 [% END -%]
-
 [% IF not(result.items.size) and q %]
   [% PROCESS 'message.tt' msg="There are no results!" -%]
 [% END %]

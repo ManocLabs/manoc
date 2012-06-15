@@ -157,8 +157,8 @@
 	 </td>
          <td>[% link.device_name -%]</td>
 	 [% ELSE %]
-           <td>[% print_ip(link.neigh_address) -%]
-           <td>[% link.device_id %]</td>
+           <td>[% link.neigh_address -%]+
+         <td>[% link.device_id %]</td>
 	 [% END %]
 	<td>[% link.descr %]</td>
 	<td>[% link.date %]</td>

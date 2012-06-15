@@ -6,7 +6,7 @@ package Manoc::Search::QueryType;
 use Moose::Util::TypeConstraints;
 
 @Manoc::Search::QueryType::TYPES =
-    qw(inventory building rack device logon ipaddr macaddr note subnet ipp);
+    qw(inventory building rack device logon ipaddr macaddr note subnet);
 
 enum 'QueryType' => @Manoc::Search::QueryType::TYPES;
 
