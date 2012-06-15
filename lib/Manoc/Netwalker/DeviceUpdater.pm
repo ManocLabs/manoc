@@ -282,7 +282,9 @@ sub update_cdp_neighbors {
                     from_interface => $p,
                     to_device      => $s->{addr},
                     to_interface   => $s->{port},
-                    last_seen      => $self->timestamp
+                    remote_id      => $s->{remote_id},
+                    remote_type    => $s->{remote_type},
+                    last_seen      => $self->timestamp,
                 }
                 ); 
                 $new_dev++;
