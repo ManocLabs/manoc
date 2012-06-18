@@ -34,6 +34,7 @@ our $VERSION = '1.98';
 $VERSION = eval $VERSION;
 
 use Data::Dumper;
+use Manoc::Search::QueryType;
 
 # Configure the application.
 #
@@ -147,6 +148,19 @@ after setup_finalize => sub {
 
     #ACL to protect WApi with HTTP Authentication
     __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agents' ) } );
+
+    #Load Search Plugins
+    my $search_plugins = __PACKAGE__->config->{CustomPlugin}->{search};
+    $search_plugins or return;
+
+    if(ref($search_plugins) eq 'ARRAY') {
+      foreach my $plugin (@{$search_plugins}){
+	push @Manoc::Search::QueryType::PLUGIN_TYPES, $plugin;
+      }
+    }
+    else {
+      push @Manoc::Search::QueryType::PLUGIN_TYPES, $search_plugins;
+    }
 
 };
 

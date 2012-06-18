@@ -8,6 +8,8 @@ use Moose::Util::TypeConstraints;
 @Manoc::Search::QueryType::TYPES =
     qw(inventory building rack device logon ipaddr macaddr note subnet);
 
+@Manoc::Search::QueryType::PLUGIN_TYPES = qw();
+
 enum 'QueryType' => @Manoc::Search::QueryType::TYPES;
 
 no Moose::Util::TypeConstraints;
