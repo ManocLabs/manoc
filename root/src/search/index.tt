@@ -5,6 +5,18 @@
 <input type="hidden" name="advanced" value="[% advanced_search %]">
 <table align="center" >
 
+[% FOREACH plugin IN plugins %]	
+ [% PROCESS $plugin -%] 
+[%END -%]
+
+[% IF not(result.items.size) and q %]
+  [% PROCESS 'message.tt' msg="There are no results!" -%]
+[% ELSE %]
+  [% IF q %]
+  [% PROCESS 'message.tt' msg="Found $result.items.size results!" -%]
+[% END %]
+[% END %]
+
 <tr>
 <td  class="search_cen" align="center">
 <input type="text" name="q" value="[% q | html %]" size="50"/>
@@ -76,6 +88,10 @@
 [% MACRO item_logon(item) BLOCK -%]
 <label id="search-cat">Logon:</label>  [% item.match %]
 [% END -%]
+[% MACRO item_plugin(item) BLOCK -%]
+[% render = item.item_type %]
+<label id="search-cat">[% item.item_type %]:</label> [% $render(item) %]
+[% END -%]
 
 [% MACRO item_generic(item) BLOCK %]
   [% SWITCH item.item_type -%]
@@ -92,12 +108,11 @@
      [%  CASE 'logon'     %][% item_logon(item)         -%]
      [%  CASE 'vlanrange' %][% item_vlanrange(item)     -%]
      [%  CASE 'group'     %][% item_generic_group(item) -%]
+     [%  CASE             %][% item_plugin(item) -%]
      [% END -%]
    [% IF item.text -%]<span class="result-text">[% item.text -%]</span>[% END -%]
 [% END -%]
-[% IF not(result.items.size) and q %]
-  [% PROCESS 'message.tt' msg="There are no results!" -%]
-[% END %]
+
 [% FOREACH item IN result.items -%]
   [% '<ul class="results">' IF loop.first %]
   <li>

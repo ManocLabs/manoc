@@ -12,7 +12,7 @@ use Manoc::Search::Result;
 
 has driver_registry => (
     is      => 'rw',
-    isa     => 'HashRef[QueryType]',
+   isa     => 'HashRef',
     default => sub { +{} },
 );
 
@@ -26,8 +26,11 @@ sub BUILD {
 
 sub _load_drivers {
     my ($self) = @_;
+    my @TYPES  = @Manoc::Search::QueryType::TYPES;
 
-    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver'], );
+    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver','Manoc::Search::Plugin::Driver'], );
+
+    scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) and push @TYPES, @Manoc::Search::QueryType::PLUGIN_TYPES;
 
     foreach my $class ( $locator->plugins ) {
 
@@ -44,8 +47,8 @@ sub _load_drivers {
         die $error if $error;
 
         my $o = $class->new( { engine => $self } );
-
-        foreach my $type (@Manoc::Search::QueryType::TYPES) {
+	
+        foreach my $type (@TYPES) {
             $o->can("search_$type") and
                 $self->_add_driver( $type, $o );
         }
