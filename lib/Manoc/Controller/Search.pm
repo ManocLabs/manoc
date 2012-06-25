@@ -9,6 +9,7 @@ use warnings;
 use Data::Dumper;
 use Moose;
 use namespace::autoclean;
+use Manoc::Search::QueryType;
 
 #use Manoc::Utils qw(str2seconds ip2int);
 
@@ -82,11 +83,22 @@ sub index : Path : Args(0) {
         $c->stash( message => Dumper($result) ) if ( $c->req->param('debug') );
     }
 
+    #prepare plugins variables
+    my @paths;
+    if ( scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) ) {
+      foreach my $type (@Manoc::Search::QueryType::PLUGIN_TYPES){
+	push @paths, "plugin/$type.tt";
+	push @search_types, [ $type, ucfirst($type) ];
+      }
+    }
+
+   
     $c->stash( 'q'             => $q );
     $c->stash( limit           => $limit );
     $c->stash( default_type    => $c->request->param('type') || 'ipaddr' );
     $c->stash( search_types    => \@search_types );
     $c->stash( advanced_search => $advanced_search );
+    $c->stash( plugins         => \@paths );
 
     $c->stash( template => 'search/index.tt' );
 }

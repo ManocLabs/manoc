@@ -1,0 +1,9 @@
+[%# ----------------------------------------------------------------- -%]
+[%# IP Phone -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO ipphone(item) BLOCK-%]
+[% print_short_iface(item.device,item.iface) %] on 
+   <a href="[% c.uri_for_action('device/view',[item.device], {def_tab => 2})%]">
+   [% item.device %] </a> ([%item.match%])
+[% END-%]
+
