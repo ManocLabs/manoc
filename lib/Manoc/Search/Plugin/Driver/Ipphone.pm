@@ -18,7 +18,7 @@ sub search_ipphone {
 
     my $search = { remote_id => { like => $pattern } };
     $query->limit and
-      $search->{lastseen} = { '>' => $query->start_date };
+      $search->{last_seen} = { '>' => $query->start_date };
     my $it = $schema->resultset('CDPNeigh')->search( $search );
 
     while ( my $e = $it->next ) {
