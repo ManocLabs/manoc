@@ -28,7 +28,7 @@ sub _load_drivers {
     my ($self) = @_;
     my @TYPES  = @Manoc::Search::QueryType::TYPES;
 
-    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver','Manoc::Search::Plugin::Driver'], );
+    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver','Manoc::Plugin::Search::Driver'], );
 
     scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) and push @TYPES, @Manoc::Search::QueryType::PLUGIN_TYPES;
 

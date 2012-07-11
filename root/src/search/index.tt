@@ -133,5 +133,5 @@
 [% END %]
 
 [% IF not(result.items.size) %]
-<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme"> Istruzioni per l'uso</a></p>
+<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme">Readme</a></p>
 [% END%]

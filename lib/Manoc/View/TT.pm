@@ -15,6 +15,7 @@ __PACKAGE__->config(
         Manoc->path_to( 'root', 'src' ),
         Manoc->path_to( 'root', 'src', 'include' ),
         Manoc->path_to( 'root', 'src', 'forms' ),
+        Manoc->path_to( 'lib', 'Manoc', 'Plugin', 'Search', 'TT' ),
     ],
     PRE_PROCESS => 'init.tt',
     WRAPPER     => 'wrapper.tt',

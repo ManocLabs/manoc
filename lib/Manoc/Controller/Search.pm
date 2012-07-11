@@ -87,7 +87,7 @@ sub index : Path : Args(0) {
     my @paths;
     if ( scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) ) {
       foreach my $type (@Manoc::Search::QueryType::PLUGIN_TYPES){
-	push @paths, "plugin/$type.tt";
+	push @paths, "$type.tt";
 	push @search_types, [ $type, ucfirst($type) ];
       }
     }

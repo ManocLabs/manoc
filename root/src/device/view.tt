@@ -105,7 +105,7 @@
   <td>Uplinks:</td><td>[% uplinks %]</td>
 </tr>
 <tr>
-  <td>Notes:</td><td>[% object.notes | html %]</td>
+  <td>Notes:</td><td><pre>[% object.notes | html %]</pre></td>
 </tr>
 </table>
  [% add_css_tableinfo %]
