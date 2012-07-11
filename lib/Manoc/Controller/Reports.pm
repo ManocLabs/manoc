@@ -304,6 +304,29 @@ sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
     $c->stash( table => \@table, template => 'reports/device_list.tt' );
 }
 
+sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $schema = $c->model('ManocDB');
+
+    my @rs = $schema->resultset('Rack')->search(
+        undef,
+        {
+            join     => 'building',
+            prefetch => 'building',
+            order_by => ['me.id' ],
+        }
+    );
+    my @table = map {
+            id          => $_->id,
+            build_id    => $_->building->name,
+            build_name  => $_->building->description,
+            floor       => $_->floor,
+            notes       => $_->notes,
+    }, @rs;
+
+    $c->stash( table => \@table, template => 'reports/rack_list.tt' );
+}
+
 ####################################################################
 
 sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
