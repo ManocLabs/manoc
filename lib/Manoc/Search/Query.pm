@@ -83,8 +83,8 @@ sub parse {
 
     # use non capturing brackets
     my @TYPES = @Manoc::Search::QueryType::TYPES;
-    scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) and 
-      push @TYPES,  @Manoc::Search::QueryType::PLUGIN_TYPES;
+    scalar(Manoc::Search->_plugin_types) and 
+      push @TYPES,  Manoc::Search->_plugin_types;
 
     my $types_re = '(?:' . join( '|', @TYPES ) . ')';
 

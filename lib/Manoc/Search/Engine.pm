@@ -7,6 +7,7 @@ package Manoc::Search::Engine;
 use Moose;
 use Module::Pluggable::Object;
 
+use Manoc::Search;
 use Manoc::Search::QueryType;
 use Manoc::Search::Result;
 
@@ -21,16 +22,22 @@ has schema => ( is => 'rw', );
 sub BUILD {
     my $self = shift;
 
+    #load default searches methods
     $self->_load_drivers;
+    #load plugins methods
+    my @plugin_types   = Manoc::Search->_plugin_types;
+    my $plugin_locator = Module::Pluggable::Object->new(
+						  search_path =>  ['Manoc::Plugin'],
+						  only        =>  qr/Driver$/,
+						 );
+    $self->_load_drivers($plugin_locator, \@plugin_types);
 }
 
 sub _load_drivers {
-    my ($self) = @_;
-    my @TYPES  = @Manoc::Search::QueryType::TYPES;
-
-    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver','Manoc::Plugin::Search::Driver'], );
-
-    scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) and push @TYPES, @Manoc::Search::QueryType::PLUGIN_TYPES;
+    my ($self, $locator, $types) = @_;
+    
+    $types or $types = \@Manoc::Search::QueryType::TYPES;
+    $locator or  $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver'], );
 
     foreach my $class ( $locator->plugins ) {
 
@@ -48,7 +55,7 @@ sub _load_drivers {
 
         my $o = $class->new( { engine => $self } );
 	
-        foreach my $type (@TYPES) {
+        foreach my $type (@{$types}) {
             $o->can("search_$type") and
                 $self->_add_driver( $type, $o );
         }

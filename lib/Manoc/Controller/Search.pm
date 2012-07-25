@@ -85,14 +85,12 @@ sub index : Path : Args(0) {
 
     #prepare plugins variables
     my @paths;
-    if ( scalar(@Manoc::Search::QueryType::PLUGIN_TYPES) ) {
-      foreach my $type (@Manoc::Search::QueryType::PLUGIN_TYPES){
-	push @paths, "$type.tt";
-	push @search_types, [ $type, ucfirst($type) ];
-      }
+    my @plugin = Manoc::Search->_plugin_types;
+    foreach my $type (@plugin){
+      push @paths, ucfirst($type)."/render.tt";
+      push @search_types, [ $type, ucfirst($type) ];
     }
-
-   
+       
     $c->stash( 'q'             => $q );
     $c->stash( limit           => $limit );
     $c->stash( default_type    => $c->request->param('type') || 'ipaddr' );
