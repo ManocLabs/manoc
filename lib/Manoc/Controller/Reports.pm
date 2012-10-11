@@ -313,11 +313,11 @@ sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
         {
             join     => 'building',
             prefetch => 'building',
-            order_by => ['me.id' ],
+            order_by => ['me.name' ],
         }
     );
     my @table = map {
-            id          => $_->id,
+            id          => $_->name,
             build_id    => $_->building->name,
             build_name  => $_->building->description,
             floor       => $_->floor,
