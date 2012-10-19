@@ -53,7 +53,7 @@ __PACKAGE__->set_primary_key(
 );
 
 __PACKAGE__->belongs_to(
-    from_device_info => 'Manoc::DB::Result::Device',
+    from_device => 'Manoc::DB::Result::Device',
     { 'foreign.id' => 'self.from_device' }
 );
 

@@ -254,15 +254,15 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
                 { 'to_dev.id' => 'me.to_device', }
             ],
         ],
-        join     => { 'from_device_info' => 'mng_url_format' },
-        prefetch => { 'from_device_info' => 'mng_url_format' }
+        join     => { 'from_device' => 'mng_url_format' },
+        prefetch => { 'from_device' => 'mng_url_format' }
 
     };
 
     my @results =
         $schema->resultset('CDPNeigh')->search( { 'to_dev.id' => undef }, $search_attribs );
     my @unknown_devices = map +{
-        device      => $_->from_device_info,
+        device      => $_->from_device,
         from_device => $_->from_device,
         from_iface  => $_->from_interface,
         to_device   => $_->to_device,
@@ -343,7 +343,7 @@ sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
 
     my @table = map {
         id              => $_->device,
-            device_name => $_->device_info->name,
+            device_name => $_->from_device->name,
             interface   => $_->interface,
             description => $_->description,
             cps_count   => $_->cps_count,
