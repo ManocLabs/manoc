@@ -29,11 +29,16 @@ extends 'Catalyst';
 
 with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
+with 'Catalyst::ClassData';
 
 our $VERSION = '1.98';
 $VERSION = eval $VERSION;
 
 use Data::Dumper;
+use Manoc::Search::QueryType;
+
+__PACKAGE__->mk_classdata("plugin_registry");
+__PACKAGE__->plugin_registry({});
 
 # Configure the application.
 #
@@ -119,6 +124,40 @@ sub set_backref : Private {
     }
 }
 
+sub load_plugins {
+  my $self    = shift;
+  my $plugins = __PACKAGE__->config->{LoadPlugin};
+  my ($class,$file);
+
+  foreach my $it (keys %{$plugins}){
+    my $plugin = ucfirst($it);
+    # hack stolen from catalyst:
+    # don't overwrite $@ if the load did not generate an error
+    my $error;
+    {
+      local $@;
+      $class = "Manoc::Plugin::".$plugin."::Init";
+      $file = $class . '.pm';
+      $file =~ s{::}{/}g;
+      eval { CORE::require($file) };
+      $error = $@;
+    }
+    die $error if $error;
+    
+    $class->load(__PACKAGE__->config->{LoadPlugin}->{$it});
+  }
+}
+
+sub _add_plugin {
+     my ($name,$opt) = @_;
+     $name or die "missing plugin name";
+     $opt ||= 1;
+     my $plugin = __PACKAGE__->plugin_registry; 
+     $plugin->{$name} = $opt;
+     __PACKAGE__->plugin_registry($plugin);
+}
+
+
 ########################################################################
 
 ########################################################################
@@ -147,6 +186,10 @@ after setup_finalize => sub {
 
     #ACL to protect WApi with HTTP Authentication
     __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agents' ) } );
+
+    #Load Search Plugins    
+
+    __PACKAGE__->load_plugins;
 
 };
 

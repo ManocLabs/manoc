@@ -75,7 +75,7 @@ sub search_inventory {
     my $schema  = $self->engine->schema;
 
     $it = $schema->resultset('IPRange')->search(
-        name => { '-like' => $pattern },
+        { name => { '-like' => $pattern } },
         { order_by => 'name' }
     );
 

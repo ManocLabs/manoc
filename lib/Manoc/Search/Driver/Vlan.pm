@@ -15,7 +15,7 @@ sub search_inventory {
     my $schema  = $self->engine->schema;
 
     $it = $schema->resultset('Vlan')->search(
-        name => { '-like' => $pattern },
+        {name => { '-like' => $pattern }},
         { order_by => 'id' }
     );
     while ( $e = $it->next ) {
