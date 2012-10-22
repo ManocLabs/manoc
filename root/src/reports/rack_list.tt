@@ -1,0 +1,28 @@
+[% META 
+   title='Managed rack list'
+   section='Reports'
+-%]
+
+<table>
+  <tr>
+     <th>Rack</th>
+     <th>Building Id</th>
+     <th>Building Name</th>
+     <th>Floor</th>
+     <th>Notes</th>
+  </tr>
+[% FOREACH t IN table %]
+       <tr>
+	  <td>[% t.id %]</td>
+	  <td>[% t.build_id %]</td>
+	  <td>[% t.build_name %]</td>
+	  <td>[% t.floor %]</td>
+	  <td>[% t.notes %]</td>
+       </tr>
+[% END %]
+</table>
+
+
+
+
+

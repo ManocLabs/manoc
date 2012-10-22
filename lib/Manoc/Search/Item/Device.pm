@@ -18,7 +18,6 @@ has 'id' => (
 has 'name' => (
     is       => 'ro',
     isa      => 'Str',
-    required => 1,
 );
 
 has 'mng_url' => (
@@ -43,7 +42,7 @@ around BUILDARGS => sub {
         my $b    = $args->{device};
         if ($b) {
             $args->{id}      = $b->id;
-            $args->{name}    = $b->name;
+            $args->{name}    = $b->name || '';
 	    $args->{notes}   = $b->notes if($b->notes);
             $args->{match} ||= $b->name;
             $b->get_mng_url and

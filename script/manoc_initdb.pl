@@ -33,6 +33,7 @@ sub run {
     # full init
     $self->do_reset_admin;
     $self->init_vlan;
+    $self->init_management_url;
 
 }
 
@@ -42,6 +43,9 @@ sub do_reset_admin {
     my $schema = $self->schema;
     $self->log->info('Creating admin role.');
     my $admin_role = $schema->resultset('Role')->update_or_create( { role => 'admin', } );
+    $self->log->info('Creating user role.');
+    $schema->resultset('Role')->update_or_create( { role => 'user', } );
+
     $self->log->info('Creating admin user.');
     my $admin_user = $schema->resultset('User')->update_or_create(
         {
@@ -74,6 +78,19 @@ sub init_vlan {
        });
     $vlan_range->add_to_vlans({ name => 'native', id => 1 });
 }
+
+sub init_management_url {
+    my ($self) = @_;
+    my $schema = $self->schema;
+    $self->log->info('Creating default management url...done');
+    $schema->resultset('MngUrlFormat')->update_or_create( { 
+        name  => 'telnet', 
+        format=> 'telnet:%h',
+    } );
+
+}
+
+
 
 no Moose;
 

@@ -88,7 +88,7 @@ has_field 'snmp_ver' => (
     type    => 'Select',
     label   => 'SNMP version',
     options => [
-        { value => 0, label => 'Use Default' },
+        { value => 0, label => 'Use Default', selected => '1' },
         { value => 1, label => 1 },
         { value => 2, label => '2c' },
         { value => 3, label => 3 }

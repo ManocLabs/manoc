@@ -28,7 +28,7 @@ has 'match'       => (
 
 has 'query_type' => (
     is  => 'rw',
-    isa => 'QueryType',
+#    isa => 'QueryType',
 );
 
 # in seconds
@@ -82,7 +82,11 @@ sub parse {
     my $text = $self->search_string();
 
     # use non capturing brackets
-    my $types_re = '(?:' . join( '|', @Manoc::Search::QueryType::TYPES ) . ')';
+    my @TYPES = @Manoc::Search::QueryType::TYPES;
+    scalar(Manoc::Search->_plugin_types) and 
+      push @TYPES,  Manoc::Search->_plugin_types;
+
+    my $types_re = '(?:' . join( '|', @TYPES ) . ')';
 
     #type's token (must be at the beginning of the line)
     if ( $text =~ /^($types_re)(\Z|\s)/gcos ) {
