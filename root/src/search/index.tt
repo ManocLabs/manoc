@@ -5,6 +5,18 @@
 <input type="hidden" name="advanced" value="[% advanced_search %]">
 <table align="center" >
 
+[% FOREACH plugin IN plugins %]	
+ [% PROCESS $plugin -%] 
+[%END -%]
+
+[% IF not(result.items.size) and q %]
+  [% PROCESS 'message.tt' msg="There are no results!" -%]
+[% ELSE %]
+  [% IF q %]
+  [% PROCESS 'message.tt' msg="Found $result.items.size results!" -%]
+[% END %]
+[% END %]
+
 <tr>
 <td  class="search_cen" align="center">
 <input type="text" name="q" value="[% q | html %]" size="50"/>
@@ -40,7 +52,7 @@
 <label id="search-cat">Rack:</label>  <a href="[% c.uri_for_action('rack/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
 [%  END -%]
 [% MACRO item_device(item) BLOCK -%]
-<label id="search-cat">Device:</label> [% item.name %] [% print_device(item) -%]
+<label id="search-cat">Device:</label> [% item.name %] [% print_device_long(item) -%]
 [% END -%]
 [% MACRO item_ipaddr(item) BLOCK -%]
 <label id="search-cat">IP:</label> [% print_ip(item.addr) %] 
@@ -80,6 +92,10 @@
 [% MACRO item_logon(item) BLOCK -%]
 <label id="search-cat">Logon:</label>  [% item.match %]
 [% END -%]
+[% MACRO item_plugin(item) BLOCK -%]
+[% render = item.item_type %]
+<label id="search-cat">[% item.item_type %]:</label> [% $render(item) %]
+[% END -%]
 
 [% MACRO item_generic(item) BLOCK %]
   [% SWITCH item.item_type -%]
@@ -96,14 +112,11 @@
      [%  CASE 'logon'     %][% item_logon(item)         -%]
      [%  CASE 'vlanrange' %][% item_vlanrange(item)     -%]
      [%  CASE 'group'     %][% item_generic_group(item) -%]
+     [%  CASE             %][% item_plugin(item) -%]
      [% END -%]
    [% IF item.text -%]<span class="result-text">[% item.text -%]</span>[% END -%]
 [% END -%]
-[% IF not(result.items.size) and q %]
-  [% PROCESS 'message.tt' msg="There are no results!" -%]
-[% ELSE %]
-   [% PROCESS 'message.tt' msg="Found $result.items.size objects." -%]
-[% END %]
+
 [% FOREACH item IN result.items -%]
   [% '<ul class="results">' IF loop.first %]
   <li>
@@ -124,5 +137,5 @@
 [% END %]
 
 [% IF not(result.items.size) %]
-<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme"> Istruzioni per l'uso</a></p>
+<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme">Readme</a></p>
 [% END%]

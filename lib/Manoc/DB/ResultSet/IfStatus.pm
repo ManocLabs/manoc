@@ -17,17 +17,8 @@ sub search_unused {
     $self->search(
         $conditions,
         {
-            alias => 'me',
-            from  => [
-                { me => 'if_status' },
-                [
-                    { 'mat_entry' => 'mat', -join_type => 'LEFT' },
-                    {
-                        'mat_entry.device'    => 'me.device',
-                        'mat_entry.interface' => 'me.interface',
-                    }
-                ]
-            ]
+	 alias => 'me',
+	 join     => 'mat_entry',
         }
     );
 }
@@ -42,19 +33,10 @@ sub search_mat_last_activity {
         $conditions,
         {
             alias => 'me',
-            from  => [
-                { me => 'if_status' },
-                [
-                    { 'mat_entry' => 'mat', -join_type => 'LEFT' },
-                    {
-                        'mat_entry.device'    => 'me.device',
-                        'mat_entry.interface' => 'me.interface',
-                    }
-                ]
-            ],
-            group_by => [qw(me.device me.interface)],
-            select   => [ 'me.interface', { max => 'lastseen' }, ],
-            as       => [qw(interface lastseen)]
+	    group_by => [qw(me.device me.interface)],
+            select   => [ 'me.interface', { max => 'mat_entry.lastseen' }, ],
+            as       => [qw(interface lastseen)],
+	    join     => 'mat_entry',
         }
     );
 }

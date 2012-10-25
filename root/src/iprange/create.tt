@@ -85,10 +85,11 @@
         </select>
     </td>
 </tr>
-   <tr>
-        <td colspan=2><input type="submit" name="submit" value="Submit">
-<input type="submit" name="discard" value="Discard"></td>
-        </tr>
+<tr>
+   <td class="label">Description: </td>
+   <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
+   </textarea></input></td>
+</tr>
 </table>
 </form>
 

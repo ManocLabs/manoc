@@ -6,12 +6,12 @@ use warnings;
 use LWP::UserAgent;
 use URI::Escape;
 use IO::Handle;
-
+use HTTP::Cookies;
 #----------------------------------------------------------------------#
 # Constants
 #----------------------------------------------------------------------#
 
-my $MANOC_URL = "https://manoc2.policlinico.org/wapi/winlogon";
+my $MANOC_URL = "http://manoc2/wapi/winlogon";
 
 my @FIELD_NAMES = qw(
 		     EventLogType
@@ -82,10 +82,15 @@ sub main {
     # init UA
     $User_agent = LWP::UserAgent->new;
     $User_agent->credentials(
-        'putrella.policlinico.org:443',
-        'agents',
-        'agents' => 'agent1n0'
+        '<host>:443',
+        '<username>',
+        '<username>' => '<password>'
     );
+
+    $User_agent->cookie_jar(HTTP::Cookies->new( 
+        file => './.manoc_cookies.txt', 
+        autosave => 1 ));
+
 
     open my $fh, ">>/tmp/manoctest";
     $fh->autoflush(1);

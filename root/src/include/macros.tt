@@ -18,7 +18,6 @@ _ '.gif') %]" alt="[%command%]" title="[%command%]"/>
  ui-icon-[%image%]"></span>
 [% END-%]
 
-
 [%# ----------------------------------------------------------------- -%]
 [%# Device -%]
 [%# ----------------------------------------------------------------- -%]
@@ -31,6 +30,19 @@ _ '.gif') %]" alt="[%command%]" title="[%command%]"/>
     <a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
        c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
   [% END-%]
+[% END-%]
+
+
+[%# ----------------------------------------------------------------- -%]
+[%# Device Long Format-%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_device_long(device) BLOCK-%]
+<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.id%]</a>
+  [% IF device.get_mng_url -%]
+<a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
+c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
+  [% END-%]
+[% IF device.notes-%] ( [% device.notes -%] ) [% END-%]
 [% END-%]
 
 

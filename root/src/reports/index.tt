@@ -10,6 +10,7 @@
   <li><a href="[% c.uri_for('/reports/portsecurity')  %]">Portsecurity</a></li>
   <li><a href="[% c.uri_for('/reports/unused_ifaces')  %]">Unused interfaces</a></li>
   <li><a href="[% c.uri_for('/reports/device_list')  %]">Managed devices list</a></li>
+  <li><a href="[% c.uri_for('/reports/rack_list')  %]">Managed racks list</a></li>
   <li><a href="[% c.uri_for('/reports/unknown_devices')  %]">Unknown devices</a></li>
   <li><a href="[% c.uri_for('/reports/multi_mac')  %]">Multi MAC</a></li>
 </ul>
