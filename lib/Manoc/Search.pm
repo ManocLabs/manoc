@@ -29,10 +29,19 @@ sub search {
     if ( $params->{type} && !defined( $q->query_type ) ) {
         $q->query_type( $params->{type} );
     }
-
     $q->parse;
 
     return $engine->search($q);
+}
+
+sub _plugin_types {
+  my $self = shift;
+  my @types;
+  my $reg = Manoc->plugin_registry;
+  foreach my $plugin (keys(%{$reg})){
+    push(@types, $plugin) if($reg->{$plugin}->{type} eq 'search');
+  }
+  return @types;
 }
 
 1;

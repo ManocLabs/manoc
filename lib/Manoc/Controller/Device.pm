@@ -99,7 +99,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my @neighs = $c->model('ManocDB::CDPNeigh')->search(
                  { from_device => $id },
                  {
-                     '+columns' => [ { 'name' => 'dev.name' } ],
+                     '+columns' => [ { 'devname' => 'dev.name' } ],
                      order_by   => 'last_seen DESC, from_interface',
                      from  => [
                                { 'me' => 'cdp_neigh' },  
@@ -113,12 +113,13 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
                                 ]
                                ]});
 
-        my @cdp_links = map {
-        from_iface    => $_->from_interface,
-            to_device => $_->to_device->address,
-            to_iface  => $_->to_interface,
-            date      => print_timestamp( $_->last_seen ),
-            to_name   => $_->get_column('name'),
+    my @cdp_links = map {
+            local_iface  => $_->from_interface,
+            neigh_address=> $_->to_device->address,
+	    device_name  => $_->get_column('devname'),
+	    device_id    => $_->remote_id,
+            descr        => $_->remote_type,
+            date         => print_timestamp( $_->last_seen ),
     }, @neighs;
 
 
@@ -168,7 +169,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             last_mat     => $if_last_mat{ $r->interface },
             has_notes => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
             updown_status_link => '',    #updown_status_link?device=$id&iface=".$r->interface,
-            enable_updown => check_enable_updown( $r->interface, @cdp_links ),
         };
     }
 
@@ -213,19 +213,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     );
 }
 
-sub check_enable_updown {
-    my ( $interface, @cdp_links ) = @_;
-
-    #CDP link check
-    foreach (@cdp_links) {
-        $_->{from_iface} eq $interface and return 0;
-    }
-
-    return 1;
-}
-
-
-
 =head2 refresh
 
 =cut
@@ -243,8 +230,6 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
          ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
            || 1,
-         vtpstatus_interval => $c->config->{Netwalker}->{vtpstatus_interval}
-		   || 0,
      );
 
      $ENV{DEBUG} = 0;
@@ -252,7 +237,6 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          entry        => $c->stash->{object},
          config       => \%config,
          schema       => $c->model('ManocDB'),
-         update_ifstatus  => 1,
          timestamp    => time
      );
     

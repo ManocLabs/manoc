@@ -9,7 +9,10 @@ package Manoc::FormRenderTable;
 use Moose::Role;
 
 with 'HTML::FormHandler::Render::Simple' => { -excludes =>
-        [ 'render', 'render_select', 'render_field_struct', 'render_end', 'render_start', 'render_text'  ] };
+        [ 'render', 'wrap_field', 'render_select', 'render_end', 'render_start', 'render_text'  ] };
+
+use HTML::FormHandler::Render::Util ('process_attrs');
+
 
 sub render_start {
     my $self = shift;
@@ -41,24 +44,23 @@ sub render_text {
   }
   $output .= $value;
 
-  $output .= $self->_add_html_attributes( $field );
+  $output .= process_attrs($field->element_attributes);;
   $output .= ' />';
   return $output;
 }
 
-sub render_field_struct {
-    my ( $self, $field, $rendered_field, $class ) = @_;
-    my $output = qq{\n<tr$class>};
-      
-    my $l_type =
-        defined $self->get_label_type( $field->widget ) ?
-        $self->get_label_type( $field->widget ) :
-        '';
+sub wrap_field {
+    my ( $self, $field, $rendered_field ) = @_;
+
+    my $attrs = process_attrs($field->wrapper_attributes);
+    my $output = qq{\n<tr$attrs>};
+    my $l_type = $field->widget eq 'Compound' ? 'legend' : 'label';
+
     if ( $l_type eq 'label' ) {
-        $output .= '<td>' . $self->_label($field) . '</td>';
+	$output .= '<td>' . $self->render_label($field) . '</td>';
     }
     elsif ( $l_type eq 'legend' ) {
-        $output .= '<td>' . $self->_label($field) . '</td></tr>';
+        $output .= '<td>' . $self->render_label($field) . '</td></tr>';
     }
     if ( $l_type ne 'legend' ) {
         $output .= '<td>';
@@ -78,7 +80,7 @@ sub render_select {
     $output .= ' id="' . $field->id . '"';
     $output .= ' multiple="multiple"' if $field->multiple == 1;
     $output .= ' size="' . $field->size . '"' if $field->size;
-    $output .= $self->_add_html_attributes($field);
+    $output .= process_attrs($field->element_attributes);
     $output .= '>';
     my $index = 0;
     if ( $field->empty_select ) {
@@ -125,6 +127,7 @@ sub render {
     my @buttons;
 
     my $output = $self->render_start;
+    $output .= $self->render_form_errors;
 
     foreach my $field ( $self->sorted_fields ) {
         if ( $field->type eq 'Submit' ) {
@@ -139,6 +142,17 @@ sub render {
 
     $output .= $self->render_end;
 
+    return $output;
+}
+
+sub render_form_errors {
+    my $self = shift;
+
+    return '' unless $self->has_form_errors;
+    my $output = "\n<tr class=\"form_errors\"><td colspan=\"2\">";
+    $output .= qq{\n<span class="error_message">$_</span>}
+        for $self->all_form_errors;
+    $output .= "\n</td></tr>";
     return $output;
 }
 

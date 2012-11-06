@@ -117,7 +117,7 @@ sub _guess_snmp_info_class {
         $class = "SNMP::Info::Layer3::C3550";
 
     $desc =~ /Cisco.*?IOS.*?C2960/ and
-      $class = "SNMP::Info::Layer3::C6500";
+      $class = "SNMP::Info::Layer3::C3550";
 
 
     #broken
@@ -147,22 +147,28 @@ sub _build_neighbors {
     my $c_ip           = $info->c_ip();
     my $c_port         = $info->c_port();
     my $c_capabilities = $info->c_capabilities();
+    my $c_id           = $info->c_id();
+    my $c_platform     = $info->c_platform();
 
     foreach my $neigh ( keys %$c_if ) {
         my $port = $interfaces->{ $c_if->{$neigh} };
         defined($port) or next;
 
-        my $neigh_ip   = $c_ip->{$neigh}   || "no-ip";
-        my $neigh_port = $c_port->{$neigh} || "";
+        my $neigh_ip   = $c_ip->{$neigh}         || "no-ip";
+        my $neigh_port = $c_port->{$neigh}       || "";
+        my $neigh_id   = $c_id->{$neigh}         || "";
+        my $neigh_model= $c_platform->{$neigh}   || "";
 
         my $cap = $c_capabilities->{$neigh};
         $self->log->debug("$host/$port connected to $neigh_ip ($cap)");
         $cap = pack( 'B*', $cap );
         my $entry = {
-            port   => $neigh_port,
-            addr   => $neigh_ip,
-            bridge => vec( $cap, 2, 1 ),
-            switch => vec( $cap, 4, 1 ),
+            port        => $neigh_port,
+            addr        => $neigh_ip,
+            bridge      => vec( $cap, 2, 1 ),
+            switch      => vec( $cap, 4, 1 ),
+            remote_id   => $neigh_id,
+            remote_type => $neigh_model,
         };
         push @{ $res{$port} }, $entry;
     }

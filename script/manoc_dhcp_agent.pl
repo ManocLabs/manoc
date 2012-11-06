@@ -9,13 +9,13 @@ use URI::Escape;
 
 use Date::Parse;
 use Data::Dumper;
-
+use HTTP::Cookies;
 #----------------------------------------------------------------------#
 # Constants
 #----------------------------------------------------------------------#
 
-my $MANOC_URL   = "https://putrella.policlinico.org/wapi";
-my $SERVER_ID   = "dhcpservervm";
+my $MANOC_URL   = "https://manoc/wapi";
+my $SERVER_ID   = "dhcpserver";
 my $CONF_FILE   = "/etc/dhcpd.conf";
 my $LEASES_FILE = "/var/lib/dhcpd/dhcpd.leases";
 
@@ -79,11 +79,16 @@ sub send_to_manoc {
 
     #basic authentication required
     $User_agent->credentials(
-  	'putrella.policlinico.org:443',
-  	'agents',
-  	'agents' => 'agent1n0'
+  	'manoc:443',
+  	'<username>',
+  	'<username>' => '<password>'
     );
     
+    $User_agent->cookie_jar(HTTP::Cookies->new( 
+        file => './.manoc_cookies.txt', 
+        autosave => 1 ));
+
+
     my $res  = $User_agent->request($req);
 
     

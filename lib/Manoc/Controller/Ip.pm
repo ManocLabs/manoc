@@ -120,8 +120,8 @@ sub _get_hostinfo : Private {
     my $id = $c->stash->{'id'};
 
     my @r = $c->model('ManocDB::WinHostname')->search(
-        {ipaddr => $id},
-        { order_by => 'name' }
+        { ipaddr   => $id},
+        { order_by => 'name' },
     );
     my @hostnames = map +{
         name      => $_->name,
