@@ -59,7 +59,8 @@ __PACKAGE__->set_primary_key('name');
 __PACKAGE__->add_unique_constraint( [ 'from_addr', 'to_addr' ] );
 __PACKAGE__->belongs_to( parent  => 'Manoc::DB::Result::IPRange' );
 __PACKAGE__->belongs_to( vlan_id => 'Manoc::DB::Result::Vlan' );
- __PACKAGE__->has_many(
+
+__PACKAGE__->has_many(
      children => 'Manoc::DB::Result::IPRange',
      { 'foreign.parent' => 'self.name' }
  );
@@ -76,4 +77,6 @@ foreach my $col (qw( from_addr to_addr network netmask )) {
 
 }
 
+
+__PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 1;

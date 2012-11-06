@@ -15,8 +15,8 @@ sub search_note {
     my $schema  = $self->engine->schema;
 
     my $it = $schema->resultset('IpNotes')->search(
-        notes => { '-like' => $pattern },
-        { order_by => 'notes' }
+        {notes => { '-like' => $pattern }},
+        { order_by => 'notes' },
     );
     while ( my $e = $it->next ) {
         my $item = Manoc::Search::Item::IpAddr->new(

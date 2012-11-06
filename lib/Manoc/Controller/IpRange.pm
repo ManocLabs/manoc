@@ -171,9 +171,10 @@ sub ip_list : Private {
 
     # paging arithmetics
     my $page_start_addr_i = ip2int($from);
-    my $page_end_addr_i   = ip2int($to);
+    my $page_end_addr_i   = ip2int($to) + 1;
     my $page_size         = $page_end_addr_i - $page_start_addr_i;
     my $num_pages         = ceil( $page_size / $max_page_items );
+
     if ( $page > 1 ) {
         $page_start_addr_i += $max_page_items * ( $page - 1 );
         $page_size = $page_end_addr_i - $page_start_addr_i;
@@ -362,6 +363,13 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             distinct => 1,
         }
     );
+
+    my $min_host = $range->from_addr;
+    my $max_host = $range->to_addr;
+    
+    $range->netmask and $min_host = int2ip( ip2int( $range->from_addr ) + 1 ) and 
+      $max_host = int2ip( ip2int( $range->to_addr ) - 1 );
+
     my %param;
     $param{prefix}     = $range->netmask ? netmask2prefix( $range->netmask->address ) : '';
     $param{wildcard}   = prefix2wildcard( $param{prefix} );
@@ -567,6 +575,8 @@ sub process_create : Private {
     my ( $self, $c ) = @_;
     my $name    = $c->req->param('name');
     my $vlan_id = $c->req->param('vlan');
+    my $desc    = $c->req->param('description');
+    my $error;
 
     $vlan_id eq "none" and undef $vlan_id;
 

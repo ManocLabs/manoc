@@ -32,12 +32,6 @@ has 'schema' => (
     required => 1
 );
 
-has 'update_ifstatus' => (
-    is       => 'ro',
-    required => 0,
-    default  => 0,
-);
-
 # used to to recognise neighbors and uplinks
 has 'device_set' => (
     is       => 'ro',
@@ -77,14 +71,6 @@ has 'native_vlan' => (
     lazy    => 1,
     builder => '_build_native_vlan',
 );
-
-has 'update_vtp_interval' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_update_vtp_interval',
-);
-
-
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -177,32 +163,6 @@ sub _build_uplinks {
     return \%uplinks;
 }
 
-#----------------------------------------------------------------------#
-
-sub _build_update_vtp_interval {
-    my $self                = shift;
-    my $vtp_update_interval = $self->config->{vtpstatus_interval};
-
-    my $update_status = 0;
-    if ($vtp_update_interval) {
-        my $vtp_last_update_entry =
-          $self->schema->resultset('System')->find("netwalker.vtp_update");
-        if ( !$vtp_last_update_entry ) {
-            $vtp_last_update_entry = $self->schema->resultset('System')->create(
-                {
-                    name  => "netwalker.vtp_update",
-                    value => "0"
-                }
-            );
-        }
-        my $vtp_last_update = $vtp_last_update_entry->value();
-        my $elapsed_time    = $self->timestamp - $vtp_last_update;
-        $update_status = $elapsed_time > $vtp_update_interval;
-    }
-    return $update_status;
-
-}
-
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -215,13 +175,30 @@ sub update_all_info {
 
     $self->source or return undef;
 
-    $self->log->info( "updating all device info for ", $self->entry->id );
+    $self->log->info( "Performing full update for device ", $self->entry->id );
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
-    $self->update_ifstatus and $self->update_if_table;
+    $self->update_if_table;
     $self->entry->get_mat() and $self->update_mat;
-    $self->update_vtp_interval and $self->update_vtp_database;
+    $self->entry->get_arp() and $self->update_arp_table;
+    #update_dot11;
+
+    #update last visited
+    $self->entry->last_visited($self->timestamp);
+    $self->entry->update();
+    return 1;
+}
+
+sub fast_update {
+    my $self = shift;
+
+    $self->source or return undef;
+
+    $self->log->info( "Performing fast update for device ", $self->entry->id );
+
+    $self->update_cdp_neighbors;
+    $self->entry->get_mat() and $self->update_mat;
     $self->entry->get_arp() and $self->update_arp_table;
     #update_dot11;
 
@@ -305,7 +282,9 @@ sub update_cdp_neighbors {
                     from_interface => $p,
                     to_device      => $s->{addr},
                     to_interface   => $s->{port},
-                    last_seen      => $self->timestamp
+                    remote_id      => $s->{remote_id},
+                    remote_type    => $s->{remote_type},
+                    last_seen      => $self->timestamp,
                 }
                 ); 
                 $new_dev++;
@@ -447,7 +426,7 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from", $entry->id );
+    $self->log->info( "getting vtp info from ", $entry->id );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
         $self->report->add_error("cannot retrieve vtp info");
