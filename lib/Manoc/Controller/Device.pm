@@ -221,7 +221,6 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id->address;
 
-
      my %config = (
          snmp_community => $c->config->{Credentials}->{snmp_community}
            || 'public',
@@ -239,7 +238,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          schema       => $c->model('ManocDB'),
          timestamp    => time
      );
-    
+   
      my $ret_status = $updater->update_all_info();
      unless(defined($ret_status)){
        my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";

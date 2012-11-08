@@ -90,11 +90,15 @@
    <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
    </textarea></input></td>
 </tr>
-</table>
+<tr>
+<td  colspan="2">
 <div class="buttons">
 <input type="submit" name="submit" value="Submit">
 <input type="submit" name="discard" value="Discard">
 </div>
+</td>
+</tr>
+</table>
 </form>
 
 
