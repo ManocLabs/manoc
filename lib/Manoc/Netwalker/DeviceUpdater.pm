@@ -15,6 +15,8 @@ with 'Manoc::Logger::Role';
 use Manoc::Netwalker::DeviceReport;
 use Manoc::Netwalker::Source::SNMP;
 
+use Manoc::IpAddress;
+
 # the Manoc::DB::Device entry associated to this device
 has 'entry' => (
     is       => 'ro',
@@ -82,7 +84,7 @@ has 'native_vlan' => (
 
 sub _build_report {
     my $self = shift;
-    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id );
+    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id->address );
 }
 
 #----------------------------------------------------------------------#
@@ -93,7 +95,7 @@ sub _build_source {
     my $entry = $self->entry;
 
     # get device community and version or use default
-    my $host    = $entry->id;
+    my $host    = $entry->id->address;
     my $comm    = $entry->snmp_com() || $self->config->{snmp_community};
     my $version = $entry->snmp_ver() || $self->config->{snmp_version};
 
@@ -266,21 +268,29 @@ sub update_cdp_neighbors {
     
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
+            
+            my $from_dev_obj = $entry->id;
+            my $to_dev_obj   = Manoc::IpAddress->new($s->{addr});
+
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $entry->id,
+                    from_device    => $from_dev_obj->padded,
                     from_interface => $p,
-                    to_device      => $s->{addr},
+                    to_device      => $to_dev_obj,
                     to_interface   => $s->{port},
                 }
             );
 
+            
             unless ( scalar(@cdp_entries) ) {
+                
+                my $temp_obj = Manoc::IpAddress->new($entry->id->address);
+                
                 $self->schema->resultset('CDPNeigh')->create(
                 {
-                    from_device    => $entry->id,
+                    from_device    => $temp_obj->padded,
                     from_interface => $p,
-                    to_device      => $s->{addr},
+                    to_device      => $to_dev_obj,
                     to_interface   => $s->{port},
                     remote_id      => $s->{remote_id},
                     remote_type    => $s->{remote_type},
@@ -289,7 +299,7 @@ sub update_cdp_neighbors {
                 ); 
                 $new_dev++;
                 $cdp_entries++; 
-                $self->report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id);
+                $self->report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id->address);
                 next;
             }
             my $link = $cdp_entries[0];
@@ -466,8 +476,9 @@ sub update_arp_table {
     while (($ip_addr, $mac_addr) = each(%$arp_table)) {
         $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
+        my $ip_obj =  Manoc::IpAddress->new( $ip_addr  );
 	my @entries = $self->schema->resultset('Arp')->search({
-	    ipaddr	=> $ip_addr,
+	    ipaddr	=> $ip_obj,
 	    macaddr	=> $mac_addr,
 	    vlan	=> $vlan,
 	    archived => 0
@@ -484,7 +495,7 @@ sub update_arp_table {
 	    $entry->update();
 	} else {
 	    $self->schema->resultset('Arp')->create({
-		ipaddr    => $ip_addr,
+		ipaddr    => $ip_obj,
 		macaddr   => $mac_addr,
 		firstseen => $timestamp,
 		lastseen  => $timestamp,

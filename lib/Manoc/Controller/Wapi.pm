@@ -8,14 +8,12 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-use strict;
-use warnings;
-
 use YAML::Syck;
-
 use Encode;
 use POSIX qw(strftime);
 use Data::Dumper;
+
+use Manoc::IpAddress;
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
@@ -39,13 +37,13 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $user   = $c->req->param('user');
-    my $ipaddr = $c->req->param('ipaddr');
-
+    my $ipaddr = Manoc::IpAddress->new($c->req->param('ipaddr'));
+ 
     unless ($user) {
         $c->stash( error => "Missing user param" );
         $c->detach('apierror');
     }
-    unless ( $ipaddr =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o ) {
+    unless ( $ipaddr->address =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o ) {
         $c->stash( error => "Bad ipaddr" );
         $c->detach('apierror');
     }
@@ -153,7 +151,7 @@ sub dhcp_leases : Chained('base') : PathPart('dhcp_leases') : Args(0) {
     my $n_created = 0;
     foreach my $r (@records) {
          my $macaddr = $r->{macaddr} or next;
-         my $ipaddr  = $r->{ipaddr}  or next;
+         my $ipaddr  = Manoc::IpAddress->new($r->{ipaddr})  or next;
          my $start   = $r->{start}   or next;
          my $end     = $r->{end}     or next;
 
@@ -195,7 +193,7 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
     my $n_created = 0;
     foreach my $r (@records) {
         my $macaddr  = $r->{macaddr}  or next;
-        my $ipaddr   = $r->{ipaddr}   or next;
+        my $ipaddr  = Manoc::IpAddress->new($r->{ipaddr})  or next;
         my $hostname = $r->{hostname} or next;
         my $name     = $r->{name}     or next;
 

@@ -11,6 +11,7 @@ eval { use local::lib "$FindBin::Bin/../support" };
 
 use Moose;
 use Manoc::Logger;
+use Manoc::IpAddress;
 
 extends 'Manoc::App';
 with 'MooseX::Getopt::Dashes';
@@ -55,7 +56,7 @@ sub do_reset_admin {
             password => 'admin',
         }
     );
-    $self->log->debug('Adding admin role to the admin user... done.');
+    $self->log->info('Adding admin role to the admin user (password: admin)... done.');
     if ( $admin_user->roles->search( { role => 'admin' } )->count == 0 ) {
         $admin_user->add_to_roles($admin_role);
     }
@@ -93,10 +94,10 @@ sub init_iprange {
     $rs->update_or_create({
         name => 'IPV4',
         description => 'all ipv4 addresses',
-        from_addr => '0.0.0.0',
-        to_addr   => '255.255.255.255',
-        network   => '0.0.0.0',
-        netmask   => '0.0.0.0',
+        from_addr =>  Manoc::IpAddress->new('0.0.0.0'),
+        to_addr   =>  Manoc::IpAddress->new('255.255.255.255'),
+        network   =>  Manoc::IpAddress->new('0.0.0.0'),
+        netmask   =>  Manoc::IpAddress->new('0.0.0.0'),
        });
 }
 
