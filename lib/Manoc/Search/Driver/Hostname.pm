@@ -17,7 +17,7 @@ sub search_inventory {
     $it = $schema->resultset('WinHostname')->search(
         { name => { '-like' => $pattern } },
         {
-            order_by => 'name',
+            order_by => 'ipaddr',
             group_by => 'name',
         }
     );
