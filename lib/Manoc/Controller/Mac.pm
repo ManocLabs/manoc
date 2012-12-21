@@ -127,7 +127,7 @@ sub _get_mat : Private {
 							   { prefetch => [ 'device', ]}, 
 							  );
     my @mat_archive_entries = map +{
-        arch_device_ip   => $_->device->ipaddr,
+        arch_device_ip   => $_->device->ipaddr->address,
         arch_device_name => $_->device->name,
         vlan             => $_->vlan,
         firstseen_i      => $_->firstseen,

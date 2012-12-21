@@ -69,6 +69,7 @@ sub clean_string {
 
 sub check_addr {
     my $addr = shift;
+    return if(!defined($addr));
     $addr =~ s/\s+//;
     return $addr =~ /^$RE{net}{IPv4}$/;
 #    return $addr =~ /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.?)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){0,3}$/;
@@ -186,6 +187,7 @@ sub netmask2prefix {
 
 sub padded_ipaddr {
     my $addr = shift;
+    defined($addr) or return;
     join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
 }
 

@@ -78,7 +78,7 @@
 <label id="search-cat">IpNote:</label>  [% print_note(item.ipaddr, item.notes) %] 
 [% END -%]
 [% MACRO item_hostname(item) BLOCK -%]
-<label id="search-cat">Hostname:</label>  [% print_host(item.ipaddr.address, item.name) %] 
+<label id="search-cat">Hostname:</label>  [% print_host(item.ipaddr, item.name) %] 
 [% END -%]
 [% MACRO item_iprange(item) BLOCK -%]
 <label id="search-cat">Subnet:</label>  [% print_iprange(item.name, item.iprange) %] 
