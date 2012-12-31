@@ -21,7 +21,12 @@ sub search_logon {
         $conditions->{lastseen} = { '>=', $query->start_date };
     }
 
-    $it = $schema->resultset('WinLogon')->search( $conditions, { group_by => 'ipaddr' } );
+    $it = $schema->resultset('WinLogon')->search( $conditions, 
+						  {
+						   select   => [ 'user', 'ipaddr', { max => 'lastseen' } ],
+						   as       => [ 'user', 'ipaddr', 'lastseen' ],
+						   group_by => 'ipaddr',
+						  } );
 
     while ( my $e = $it->next ) {
         my $item = Manoc::Search::Item::IpAddr->new(
