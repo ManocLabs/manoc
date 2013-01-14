@@ -17,10 +17,6 @@
 [% FOREACH link IN link_css -%]
 <link rel="stylesheet" type="text/css" href="[% link %]" />
 [% END -%]
-[% FOREACH link IN link_js -%]
-<script type="text/javascript" src="[% link %]"></script>
-[% END -%]
-[% init_scripts -%]
 </head>
 
 <body>
@@ -36,6 +32,9 @@
 
       <div id="#content">[% content %]</div>
 </div><!-- end of content-wrapper -->
-
+[% FOREACH link IN link_js -%]
+<script type="text/javascript" src="[% link %]"></script>
+[% END -%]
+[% init_scripts -%]
 </body>
 </html>
