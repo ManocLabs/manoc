@@ -4,18 +4,27 @@
 <form name="form1" method="POST">
 	<input type=hidden name="name" value="[% range_name %]" />
 	<input type=hidden name="parent" value="[% parent %]" />
-	<table>
-		<tr>
-			<th>Name:</th><td>[% range_name %]</td>
+
+	<table class="ui-widget-content ui-corner-all manoc-form">
+	       	<tr>
+			<td><label>Name:</td></label>
+			<td>[% range_name %]</td>
 		</tr>
 		<tr>
-			<th>Range:</th><td>[% from_addr %] - [% to_addr %]</td>
+			<td><label>Range:</td></label>
+			<td>[% from_addr %] - [% to_addr %]</td>
 		</tr>
-	</table>
-	
-	<h2>Merge Options</h2>
-	<table>
-		<tr>Merge with:</tr>
+		<tr>
+			<td><label>Merged subnet name: </label></td>
+			<td><input type="text" name="new_name" value="[%
+		    	    new_name %]"/></td>
+	                <td>
+	       		[% IF error.name %]
+	    		  <span class="error" id="error">[% error.name %] </span>
+	       		[%END%]
+	                </td>
+		</tr>
+		<tr><td colspan="3" ><label>Merge with:</label></td></tr>
 		<tr>
 			<th>Name</th><th>From</th><th>To</th>
 		</tr>
@@ -28,25 +37,16 @@
 				<td>[% n.to %]</td>
 			</tr>
                [% END %]
-	</table>
-	<br>
-	<table>
-		<tr>
-			<td>Merged subnet name: </td>
-			<td><input type="text" name="new_name" value="[%
-	new_name %]"/></td>
-	          <td>
-	       [% IF error.name %]
-	    	<span class="error" id="error">[% error.name %] </span>
-	       [%END%]
-	    </td>
-		</tr>
-	</table>
-	<div class="buttons"
-	<input type="submit" name="submit" value="Submit">
-        <input type="submit" name="discard" value="Discard"> 
-	</div>
-</form>
+	<tr>
+		<td colspan="3" class="buttons-form">
+		<div class="buttons">
+		 <input type="submit" name="submit" value="Submit">
+                 <input type="submit" name="discard" value="Discard"> 
+	        </div>
+	        </td>
+	</tr>
+       </form>
+    </table>
 
 <script language="javascript">
 
