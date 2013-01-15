@@ -6,16 +6,16 @@
 <input type=hidden name="parent" value="[% parent %]" />
 
 <br>
-<table>
+<table class="ui-widget-content ui-corner-all manoc-form"  >
 [% IF parent %]
 <tr>
-  <td class="label">Parent Range:</td>
+  <td><label>Parent Range:</label></td>
   <td>[% parent %]([% p_from %] [% IF p_prefix %] /[%p_prefix%] [% ELSE %] - [%p_to%] [% END %])</td>
 </tr>
 [% END %]
 
 <tr>
-  <td class="label">Name:</td>
+  <td><label>Name:</label></td>
   <td><input type="text" name="name" value="[% range %]" /></td>
       <td>
 	[% IF error.name %]
@@ -25,7 +25,7 @@
 
 </tr>
 <tr>
-<td class="label">Type:</td>
+<td><label>Type:</label></td>
 <td><input id="radio_subnet" type="radio" name="type" value="subnet"
 onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Subnet:
   <input type="text" name="network" value="[% network %]" />
@@ -50,7 +50,7 @@ onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Sub
       </td>
 </tr>
 <tr>
-    <td class="label">Vlan: </td>
+    <td><label>Vlan:</label> </td>
     <td>
         <select name="vlan">
             <option value=none>none</option>
@@ -62,15 +62,19 @@ onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Sub
     </td>
 </tr>
 <tr>
-   <td class="label">Description: </td>
+   <td><label>Description:</label> </td>
    <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
    </textarea></input></td>
 </tr>
-</table>
+<tr>
+<td colspan="2" align="center">
 <div class="buttons">
 <input type="submit" name="submit" value="Submit">
 <input type="submit" name="discard" value="Discard">
 </div>
+</td>
+</tr>
+</table>
 </form>
 
 

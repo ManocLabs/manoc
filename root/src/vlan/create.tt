@@ -2,9 +2,9 @@
    section='NetDB' %]
 <form name="form1" method="POST">
   <input type="hidden" name="forced_range_id" value="[% forced_range_id %]" />
-  <table>
+  <table class="ui-widget-content ui-corner-all manoc-form">
     <tr>
-      <td class="label">Id: </td>
+      <td><label>Id:</label> </td>
       <td><input type="text" value="[% id %]" name="id"></input></td>
       <td>
 	[% IF error.id %]
@@ -13,7 +13,7 @@
       </td> 
     </tr>
     <tr>
-      <td class="label">Name: </td>
+      <td><label>Name: </label></td>
       <td><input type="text" value="[% vlan_name %]" name="name"></input></td>
       <td>
 	[% IF error.name %]
@@ -22,12 +22,12 @@
       </td>
     </tr>
             <tr>
-              <td class="label">Description: </td>
+              <td><label>Description: </label></td>
               <td><textarea cols="40" rows="6" name="description">[%
                 description | html %] </textarea></input></td>
             </tr>
     <tr>
-      <td  colspan=2>
+      <td  colspan=2 class="buttons-form">
   	<div class="buttons">
 	  <input type="submit" name="submit" value="Submit">
 	  <input type="submit" name="discard" value="Discard">

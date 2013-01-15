@@ -18,7 +18,7 @@ sub search_inventory {
         { name => { '-like' => $pattern } },
         {
             order_by => 'name',
-            group_by => 'name',
+            group_by => 'ipaddr',
         }
     );
 

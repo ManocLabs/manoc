@@ -4,7 +4,7 @@
 [% PROCESS 'filter_script.tt' -%]
 
 <form method="post" >
-  <table style="padding: 1em">
+  <table class="ui-widget-content ui-corner-all manoc-form" >
     <tr>
       <td>
 	[% f = form.field('id') %]
@@ -94,7 +94,7 @@
       </div>
     </tr>
     <tr>
-      <td colspan="4" style="padding:2em" >
+      <td colspan="4" class="buttons-form"  >
        	<div class=buttons>
       	[% f = form.field('submit') %]
 	  <input type="submit" name="[% f.html_name %]" id="[% f.id %]" 
