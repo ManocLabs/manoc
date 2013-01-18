@@ -12,7 +12,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
-
 <!-- init media common style -->
 [% FOREACH link IN link_css -%]
 <link rel="stylesheet" type="text/css" href="[% link %]" />
@@ -20,7 +19,7 @@
 </head>
 
 <body>
-
+[% UNLESS show_popup -%]
 [% PROCESS 'menu.tt' %]
 <div id="wrapper">
    <div id="banner" class="ui-widget-header">
@@ -33,7 +32,7 @@
       </div>
    </div>
 </div>
-
+[% END -%]
 <div id="content-wrapper">
    <h2>[% title %]</h2>	
    

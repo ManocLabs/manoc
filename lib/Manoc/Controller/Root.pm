@@ -60,8 +60,8 @@ sub auto : Private {
   }
 
   if ( $c->req->param('popup') ) {
-    $c->stash( current_view => 'Popup' );
-    delete $c->req->params->{'popup'};
+      $c->stash( show_popup => 1 );
+      delete $c->req->params->{'popup'};
   }
 
   return 1;
