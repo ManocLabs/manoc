@@ -16,7 +16,7 @@ use HTML::FormHandler::Render::Util ('process_attrs');
 
 sub render_start {
     my $self = shift;
-    my $output = $self->html_form_tag . "<table class=\"ui-widget-content ui-corner-all\">\n";
+    my $output = $self->html_form_tag . "<table class=\"ui-widget-content ui-corner-all manoc-form\">\n";
     return $output;
 }
 
@@ -159,7 +159,7 @@ sub render_form_errors {
 sub render_buttons {
     my ( $self, $buttons ) = @_;
 
-    my $output = "<tr><td colspan=\"2\">";
+    my $output = "<tr><td colspan=\"2\" class=\"buttons-form\">";
 
     foreach my $b (@$buttons) {
         $output .= $self->render_submit($b);
