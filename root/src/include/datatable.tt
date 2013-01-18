@@ -6,7 +6,7 @@
               ) 
 -%]
 [% END -%]
-
+[%                                                                   -%]
 [% MACRO init_exp_table BLOCK -%]
 [% link_js.push(c.uri_for('/static/js/jExpand.js')) -%]
 [%  link_css.push( 
@@ -15,7 +15,7 @@
 
 -%]
 [%  END -%]
-
+[%                                                                   -%]
 [%# Init Table -%]
 [%MACRO init_table(id,columns, options) BLOCK -%]
 [% capture = BLOCK -%]

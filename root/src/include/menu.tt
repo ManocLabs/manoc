@@ -101,9 +101,7 @@
 		],
   }		
 -%]
-
-
-[% MACRO menu_dock BLOCK %]
+[% MACRO menu_dock BLOCK -%]
 <ul>
 [% FOREACH s IN menu_sections %]
    <li [% "class=\"selected\"" IF s.name == template.section %]>
@@ -111,14 +109,12 @@
 [%END -%]
 </ul>
 [% END -%]
-[% MACRO menu_navigation BLOCK %]
+[% MACRO menu_navigation BLOCK -%]
 <ul>
-[% name = template.section -%]
-[% FOREACH s IN menu_subsections.$name %]
-   <li [% "class=\"selected\"" IF s.name == template.title %]>   
-   <a href="[% s.path %]">[% s.name %]</a></li>
-[%END -%]
+  [% name = template.section -%]
+  [% FOREACH s IN menu_subsections.$name %]
+  <li [% "class=\"selected\"" IF s.name == template.title %]>   
+  <a href="[% s.path %]">[% s.name %]</a></li>
+  [% END -%]
 </ul>
-[% END %]
-
-
+[% END -%]
