@@ -1,4 +1,4 @@
-<script>
+[% fragment = BLOCK -%]
 var array = [
   [% FOREACH b IN buildings -%]
    {
@@ -15,12 +15,10 @@ var array = [
 ];
 
  $(function() {    
- 
  var optional_label = '<label class="label" for="building">Filter:</label>'
  $("#opt_label").html(optional_label);   
  var optional_filter = '<select name="building" id="building" class="building"></select>'; 
  $("#opt_filter").html(optional_filter);   
-
 
  var building    = [];
  var description = [];
@@ -55,4 +53,5 @@ var array = [
    }            // bind function end
  );             // bind end 
 });
-</script>
+[% END -%]
+[% js_scrips.push(fragment) %]

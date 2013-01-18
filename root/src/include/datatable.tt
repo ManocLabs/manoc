@@ -18,8 +18,7 @@
 
 [%# Init Table -%]
 [%MACRO init_table(id,columns, options) BLOCK -%]
-<script type="text/javascript">
-	 
+[% capture = BLOCK -%]
 $(function() { 
 	  if ( $("#[% id  %]").dataTable ) {
 	   
@@ -54,8 +53,6 @@ $(function() {
            	});
 	 }
 });
-
- </script>
-
-
-[%END-%]
+[% END -%]
+[% js_scripts.push(capture) -%]
+[% END -%]

@@ -35,6 +35,10 @@
 [% FOREACH link IN link_js -%]
 <script type="text/javascript" src="[% link %]"></script>
 [% END -%]
-[% init_scripts -%]
+<script type="text/javascript">
+[% FOREACH fragment IN js_scripts -%]
+[% fragment %]
+[% END -%]
+</script>
 </body>
 </html>
