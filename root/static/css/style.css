@@ -142,11 +142,6 @@ h1.logo a {
     position: relative;
 }
 
-.label {
-  font-weight:bold;
-}
-
-
 .manoc-toolbar {
     padding: 3px;
 }
@@ -194,4 +189,27 @@ table.simple td {
 
 table.report {
  border: 1px solid #4297D7;
+}
+
+.manoc-form {
+ padding: 1em;
+ border-spacing:0.2em;
+}
+
+.manoc-form label {
+  font-weight:bold;
+}
+
+table.manoc-form tr{
+ border-spacing:19em;
+}
+
+.buttons-form {
+ padding:    14px;
+ text-align: center;
+}
+
+#info {
+ padding: 0.8em;
+ border-spacing:0.2em;
 }

@@ -343,7 +343,7 @@ sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
 
     my @table = map {
         id              => $_->device,
-            device_name => $_->from_device->name,
+            device_name => $_->device_info->name,
             interface   => $_->interface,
             description => $_->description,
             cps_count   => $_->cps_count,
