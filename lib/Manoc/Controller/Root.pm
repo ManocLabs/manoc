@@ -81,6 +81,18 @@ sub default : Path {
     $c->response->status(404);
 }
 
+=head2 message
+
+Basic minimal page for showing messages
+
+=cut
+
+sub message : Path('message') Args(0) {
+    my ( $self, $c ) = @_;
+    my $page = $c->request->param('page');
+    $c->stash( template => 'message.tt' );
+}
+
 =head2 end
 
 Attempt to render a view, if needed.

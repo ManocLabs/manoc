@@ -456,7 +456,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
     return unless $form->process( params => $c->req->params, );
-    $c->flash( message => 'Success! Device edit.' );
+    $c->flash( message => 'Success! Device edited.' );
     $c->detach('/follow_backref');
 }
 

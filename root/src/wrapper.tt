@@ -37,10 +37,10 @@
    <h2>[% title %]</h2>	
    
       <!-- show messages before the content -->
-      [% PROCESS 'message.tt' msg=c.flash.message IF c.flash.message -%]
-      [% PROCESS 'message.tt' msg=message IF message -%]
-      [% PROCESS 'error_message.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
-      [% PROCESS 'error_message.tt' msg=error_msg IF error_msg -%]
+      [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
+      [% PROCESS 'message_box.tt' msg=message IF message -%]
+      [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
+      [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
 
       <div id="#content">[% content %]</div>
 </div><!-- end of content-wrapper -->
@@ -51,6 +51,14 @@
 <script type="text/javascript">
 [% FOREACH fragment IN js_scripts -%]
 [% fragment %]
+[% END -%]
+[% IF show_popup -%]
+ [%# discard buttons should close popup windows %]
+$(function() {
+  $( "#discard" ).button().click(function() {
+    window.close();
+});
+});
 [% END -%]
 </script>
 </body>
