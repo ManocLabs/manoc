@@ -67,11 +67,10 @@
  </table>
 </div>
 
-
-
-<script>
-   $("#expandall").click(function() {
+[% fragment = BLOCK -%]
+$("#expandall").click(function() {
         $("#expandible").jExpand_ExpandAll(); } );
- $("#collapseall").click(function() {
+$("#collapseall").click(function() {
         $("#expandible").jExpand_CollapseAll(); } );
-</script>
+[% END %]
+[% js_script.push(fragment) %]

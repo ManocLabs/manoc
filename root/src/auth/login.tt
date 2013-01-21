@@ -1,20 +1,25 @@
 [% META title='Login' %]
 
  <form method="POST">
- <table>
+ <table class="ui-widget-content ui-corner-all manoc-form" align="center" >
  <tr>
-   <td>Username:</td>
+   <td><label>Username:</label></td>
    <td>
    <input type="text" name="username" value="" />
    </td>
  </tr>
  <tr>
-   <td>Password:</td>
+   <td><label>Password:</label></td>
    <td><input type="password" name="password" value="" /></td>
  </tr>
- </table>
+ <tr>
+<td colspan="2" class="buttons-form">
 <div class=buttons>
  <input type="submit" name="submit" value="submit" />
 </div>
+</td>
+ </tr>
+</table>
+
  </form>
 

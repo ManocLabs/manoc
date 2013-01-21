@@ -6,7 +6,7 @@
 
 <form method="POST">
 <input type=hidden name="id" value="[% object.id %]" />
-<table>
+<table class="ui-widget-content ui-corner-all manoc-form">
 <tr>
 <th>Uplink</th><th>Interface</th><th>Description</th>
 </tr>
@@ -21,9 +21,12 @@
 <td>[% if.description %]</td>
 </tr>
 [% END %]
-</table>
+<tr>
+<td colspan="3" class="buttons-form">
 <div class="buttons">
 <input type="submit" name="submit" value="Submit">
 <input type="submit" name="discard" value="Discard">
 </div>
+</tr>
+</table>
 </form>

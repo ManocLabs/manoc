@@ -6,6 +6,7 @@ META.yml
 Makefile
 Makefile.old
 .build
+.DS_Store
 *~
 *.bak
 log/

@@ -1,20 +1,19 @@
 [% META title='Create a New  Device'
    use_popup=1 
    section='Asset' -%]
-[% PROCESS 'filter_script.tt' -%]
 
 <form method="post" >
-  <table style="padding: 1em">
-    <tr>
+  <table class="ui-widget-content ui-corner-all manoc-form" >
+    [% f = form.field('id') %]
+    <tr class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
       <td>
-	[% f = form.field('id') %]
-	<div class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
 	  <label class="label" for="[% f.id %]">[% f.label %]</label>
       </td>
       <td>
 	<input type="text" name="[% f.html_name %]" id="[% f.id %]" value="[% f.fif %]">
       </td>
-      <td colspan="2">
+      <td></td>
+      <td>
 	[% IF f.has_errors %]
 	[% FOR error IN f.errors %]
 	<span class="error" id="error">[% error %] </span>
@@ -23,16 +22,16 @@
       </td>
       </div>
     </tr>
-    <tr>
+    [% f = form.field('name') %]
+    <tr class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
       <td>
-	[% f = form.field('name') %]
-	<div class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
 	  <label class="label" for="[% f.id %]">[% f.label %]</label>
-  </td>
+      </td>
       <td>
 	<input type="text" name="[% f.html_name %]" id="[% f.id %]" value="[% f.fif %]">
       </td>
-      <td colspan="2">
+      <td></td>
+      <td>
 	[% IF f.has_errors %]
 	[% FOR error IN f.errors %]
 	<span class="error" id="error">[% error %] </span>
@@ -41,16 +40,17 @@
       </td>
       </div>
     </tr>
-    <tr>  
+    [% f = form.field('model') %]
+    <tr class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
       <td>
-	[% f = form.field('model') %]
-	<div class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
+	<div>
 	  <label class="label" for="[% f.id %]">[% f.label %]</label>
       </td>
       <td>
 	<input type="text" name="[% f.html_name %]" id="[% f.id %]" value="[% f.fif %]">
       </td>
-      <td colspan="2">
+      <td></td>
+      <td>
 	[% IF f.has_errors %]
     [% FOR error IN f.errors %]
 	<span class="error" id="error">[% error %] </span>
@@ -59,6 +59,15 @@
       </td>
       </div>
     </tr>
+  <tr>
+      <td><label class="label" for="building">Building:</label></td>
+      <td><select name="building" id="building" class="building"></select></td> 
+      <td><a href="[% c.uri_for('/building/create', {popup => 1}) %]" 
+	                                 title="new building" class="popup">
+	    [% ui_icon('plusthick') %]</a>
+      </td>
+      <td></td>
+  </tr>
   <tr>
       <td>
 	[% f = form.field('rack') %]
@@ -72,44 +81,96 @@
 	  [% END %] 
 	</select>
       </td>
-      <td id="opt_label"> </td> 
-      <td id="opt_filter"></td>
-    </tr>
-  <tr>  
       <td>
-	[% f = form.field('level') %]
-	<div class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
+	  <a href="[% c.uri_for('/rack/create', {popup=>1}) %]" title="new rack"
+	     class="popup">[% ui_icon('plusthick') %]</a> </td>
+      <td>
+	[% IF f.has_errors %]
+        [% FOR error IN f.errors %]
+	<span class="error" id="error">[% error %] </span>
+	[% END %]
+	[% END %]
+      </td>
+    </tr>
+  [% f = form.field('level') %]
+  <tr class="[% f.css_class %] [% IF f.has_errors %]error_fld[% END %]">
+      <td>
 	  <label class="label" for="[% f.id %]">[% f.label %]</label>
       </td>
       <td>
 	<input type="text" name="[% f.html_name %]" id="[% f.id %]" value="[% f.fif %]">
       </td>
-      <td colspan="2">
+      <td></td>
+      <td>
 	[% IF f.has_errors %]
     [% FOR error IN f.errors %]
 	<span class="error" id="error">[% error %] </span>
 	[% END %]
 	[% END %]
       </td>
-      </div>
     </tr>
-    <tr>
-      <td colspan="4" style="padding:2em" >
-       	<div class=buttons>
+    <tr class="buttons">
+      <td colspan="3" class="buttons-form"  >       	
       	[% f = form.field('submit') %]
 	  <input type="submit" name="[% f.html_name %]" id="[% f.id %]" 
 		 value="[% f.value %]" />
  	[% f = form.field('discard') %]
 	  <input type="submit" name="[% f.html_name %]" id="[% f.id %]" 
 		 value="[% f.value %]" />
-	  <a href="[% c.uri_for('/building/create', {popup => 1}) %]" 
-	                                 title="new building" class="popup">
-	    [% ui_icon('plusthick') %] Create a Building</a>
-	  <a href="[% c.uri_for('/rack/create', {popup=>1}) %]" title="new rack"
-	     class="popup">[% ui_icon('plusthick') %] Create a Rack</a> 
-	</div>
      </td>
 </tr>
 </table>
 </form>
 <p>* If empty will be filled by netwalker.</p>
+[% fragment = BLOCK -%]
+var array = [
+  [% FOREACH b IN buildings -%]
+   {
+     "name"        : "[% b.name %]",
+     "desc"        : "[% b.description %]",
+     "racks"       :  [ 
+[% FOREACH r IN b.racks -%] 
+		         [ "[%r.id%]","[%r.name%]" ][% ',' UNLESS loop.last %]
+[% END -%]
+                       ], 
+    }
+    [% ',' UNLESS loop.last %]
+  [% END -%]
+];
+
+ $(function() {    
+ var building    = [];
+ var description = [];
+ for(var i=0; i<array.length; i++) {
+  building[array[i].name] = array[i].racks;
+  description[array[i].name] = array[i].desc;
+ }  
+
+
+// populate building select box
+ var options = '<option value="">--- All buildings ---</option>'; 
+ for (var i = 0; i < array.length; i++) {
+  options += '<option value="' + array[i].name + '">' + array[i].name + ' ('
+ + array[i].desc + ')' + '</option>'; 
+ }
+ $("#building").html(options);   // populate select box with array
+
+  $("#building").bind("change",
+   function() {
+   var options = '' ;	
+   $("#rack").children().remove() ;       // clear select box
+   if(!this.value){     
+     options = '[% FOREACH r IN racks %]<option value="[% r.id%]">Rack [% r.name %] ([% r.building.name %]) </option>[%END%]';   
+   }
+   else {
+     for (var i = 0; i < building[this.value].length; i++) { 
+     options += '<option value="' + building[this.value][i][0] + '">Rack ' + 
+                                    building[this.value][i][1] + '</option>'; 
+      }
+    }
+   $("#rack").html(options);   // populate select box with array
+   }            // bind function end
+ );             // bind end 
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]

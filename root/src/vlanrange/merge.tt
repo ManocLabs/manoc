@@ -3,33 +3,27 @@
 [% UNLESS neighs.0 %]
 [% PROCESS  'message.tt' msg='This VlanRange dosen\'t have neighbor ranges' %]
 [% END %]
-
-<table>
-    <tr align="left">
-        <th width=80>Name:</th>
-        <td width=160>[% object.name %]</td>
-    </tr>
-    <tr align="left">
-        <th width=80>Start:</th>
-        <td width=160>[% object.start %] </td>
-    </tr>
-    <tr align="left">
-        <th width=80>End:</th>
-        <td width=160>[% object.end %]</td>
-    </tr>
-</table>
-
 [% IF neighs.0 %]
-
-<h4>Merge Options</h4>
-
 <form name="form1" method="POST">
     <input type=hidden name="id" value="[% object.id %]"> 
-    <table>
-	<tr>Merge with:</tr>
-	<tr>
-            <th align=left>Name</th><th>Start</th><th>End</th>
-	</tr>
+    <table class="ui-widget-content ui-corner-all manoc-form">
+       <tr>
+            <td><label>Range to merge:</label></td>
+	    <td colspan="2">[% object.name %] [ [% object.start %] - [% object.end %] ]</td>
+       </tr>
+        <tr>
+            <td><label>Merged vlan range name</label></td>
+            <td colspan=2><input type="text" value="[% new_name %]"
+	        name="new_name"></input></td>
+	    <td>
+	       [% IF error.name %]
+	    	<span class="error" id="error">[% error.name %] </span>
+	       [%END%]
+	    </td>
+        </tr>
+       <tr>
+            <td colspan="3"><label>Merge with:</label>
+       </tr>
 	[% FOREACH n IN neighs %]
             <tr>
                 <td><input type=radio name=sel_vlan_range_id value="[% n.id %]" 
@@ -40,17 +34,7 @@
             </tr>
 	[% END %]
         <tr>
-            <td>Merged vlan range name</td>
-            <td colspan=2><input type="text" value="[% new_name %]"
-    name="new_name"></input></td>
-	    <td>
-	       [% IF error.name %]
-	    	<span class="error" id="error">[% error.name %] </span>
-	       [%END%]
-	    </td>
-        </tr>
-        <tr>
-            <td>
+            <td colspan="3" class="buttons-form">
 	    <div class="buttons"> 
 	    <input type="submit" name="submit" value="Submit"> 
             <input type="submit" name="discard" value="Discard"> 

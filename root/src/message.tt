@@ -1,0 +1,5 @@
+[% IF show_popup -%]
+<div class="buttons">
+<a href="javascript:window.close()" >Close</a>
+</div>
+[% END -%]

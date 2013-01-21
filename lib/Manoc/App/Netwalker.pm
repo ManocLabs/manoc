@@ -80,7 +80,7 @@ sub _build_n_procs{
 sub visit_device {
     my ($self, $device_id, $config, $update) = @_;
 
-    my $device_entry = $self->schema->resultset('Device')->find( $device_id );
+    my $device_entry = $self->schema->resultset('Device')->find( Manoc::IpAddress->new($device_id) );
     unless($device_entry){
         $self->log->error("$device_id not in device list");
         return;
