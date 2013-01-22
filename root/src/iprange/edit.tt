@@ -6,9 +6,9 @@
 <input type=hidden name="name" value="[% range_name %]" />
 
 <br>
-<table class="buttons ui-widget-content ui-corner-all" >
+<table class="ui-widget-content ui-corner-all manoc-form">
 	<tr>
-		<td class="label">Name:</td>
+		<td><label>Name:</label></td>
 		<td><input type="text" name="new_name" value="[% new_name %]" /></td>
  		<td>
 		[% IF error.name %]
@@ -17,7 +17,7 @@
       		</td>
 	</tr>
         <tr>
-           <td class="label">Type:</td>
+           <td><label>Type:</label></td>
            <td>
 	       <input id="radio_subnet" type="radio" name="type" value="subnet" onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />
                  Subnet: <input type="text" name="network" value="[% network.address %]" /> /
@@ -43,7 +43,7 @@
 
         </tr>
         <tr>        
-            <td class="label">Vlan: </td>
+            <td><label>Vlan:</label> </td>
             <td>
                 <select name="vlan">
                     <option value=none>none</option>
@@ -55,36 +55,19 @@
             </td>
         </tr>
         <tr>
-            <td class="label">Description: </td>
+            <td><label>Description:</label> </td>
             <td><textarea cols="40" rows="6" name="description">[% object.description | html -%]
 	    </textarea></input></td>
         </tr>
-        <tr>
-        <td colspan=2><input type="submit" name="submit" value="Submit">
-<input type="submit" name="discard" value="Discard"></td>
-        </tr>
+	<tr>
+	<td colspan="2" class="buttons-form">
+	<div class="buttons">
+	     <input type="submit" name="submit" value="Submit">
+	     <input type="submit" name="discard" value="Discard">
+	</div>
+	</td>
+	</tr>
 </table>
 </form>
 
-<script language="javascript">
-
-function enableFields() {
-	if(document.form1.radio_range.checked) {
-		document.form1.from_addr.disabled = false;
-		document.form1.to_addr.disabled   = false;
-	} else {
-		document.form1.from_addr.disabled = true;
-		document.form1.to_addr.disabled   = true;
-	}	
-
-	if(document.form1.radio_subnet.checked) {
-		document.form1.network.disabled   = false;
-		document.form1.prefix.disabled    = false;
-	} else {
-		document.form1.network.disabled   = true;
-		document.form1.prefix.disabled    = true;
-	}
-}
-enableFields();
-</script>
-
+[% PROCESS "iprange/_enablefields.tt" %]

@@ -12,8 +12,11 @@
 
 <div id="tabs-1">
 
-
 <table>
+    <tr align=left>
+     <th width=160>Id:</th>
+        <td width=160>[% object.id %]</td>	
+    </tr>
     <tr align=left>
         <th width=160>Name:</th>
         <td width=160>[% object.name %]</td>

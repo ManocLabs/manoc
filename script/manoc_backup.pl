@@ -125,6 +125,26 @@ sub do_device {
     }
 }
 
+sub compare {
+    my ($prev_config, $config, $ignore) = @_;
+    my @ignore;
+
+    if(defined($ignore)){
+        if ( ref($ignore) eq 'ARRAY' ) {
+            @ignore = @$ignore;
+        }
+        else {
+            push @ignore, $ignore;
+        }
+        foreach my $statement (@ignore){
+            $prev_config =~ s/^$statement.*$//mg;
+            $config      =~ s/^$statement.*$//mg;
+        }
+    }
+
+    return ($prev_config eq $config);
+}
+
 sub update_device_config {
     my ( $self, $device_id, $config ) = @_;
     my $dev_config;
@@ -139,8 +159,10 @@ sub update_device_config {
     #Update entry
     if ($dev_config) {
 
+        my $ignore_statements = $self->config->{'Backup'}->{'ignore'};
+
         #Already up to date
-        if ( $config eq $dev_config->config ) {
+        if ( compare($config,$dev_config->config,$ignore_statements) ) {
 
             $dev_config->last_visited( $self->timestamp );
             $dev_config->update or return ( 0, "Impossible update DB" );

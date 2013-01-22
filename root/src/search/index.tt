@@ -72,7 +72,8 @@
    [% END-%]
 [% END -%]
 [% MACRO item_vlan(item) BLOCK -%]
-<label id="search-cat">Vlan:</label>  [% print_vlan(item.id, item.name) %]
+<label id="search-cat">Vlan:</label>  [% print_vlan(item.id, item.name) %](
+[%item.id%] )
 [% END -%]
 [% MACRO item_ipnote(item) BLOCK -%]
 <label id="search-cat">IpNote:</label>  [% print_note(item.ipaddr, item.notes) %] 

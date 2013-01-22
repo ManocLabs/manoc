@@ -71,7 +71,7 @@
        
   [% FOREACH child IN childrens %]
    [% IF loop.first %]
-    [% init_table('childrens') %]
+    [% init_table('childrens', undef, {sortby => 1, order => 'asc'}) %]
     <table class="display" id="childrens">
        <thead>  
 	 <tr>
