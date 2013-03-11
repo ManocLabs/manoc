@@ -94,7 +94,11 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 [%# Hostname -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_host(id,name) BLOCK -%]
-[% name %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
+ [% IF id and id.isa("Manoc::IpAddress") -%]
+    [% name %] <a href=[% c.uri_for_action('/ip/view', [id.address]) %]>[%id.address%]</a>
+ [% ELSE-%]
+    [% name %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
+ [% END -%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%# IpRange -%]

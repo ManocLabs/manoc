@@ -22,6 +22,8 @@ has 'name' => (
     required => 1,
 );
 
+use Data::Dumper;
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -30,8 +32,8 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{hostname};
         if ($b) {
-            $args->{ipaddr} = $b->ipaddr->address;
-            $args->{name}   = $b->name;
+            $args->{ipaddr} =  $b->ipaddr->address;
+            $args->{name}   =  $b->name;
             $args->{match} ||= $b->name;
         }
         return $class->$orig($args);
