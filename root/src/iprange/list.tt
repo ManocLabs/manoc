@@ -34,10 +34,10 @@
  	 <td><a href="[% c.uri_for_action('iprange/view', [s.name]) %]">[% s.name %]</a></td>
   	 <td><a href="[% c.uri_for_action('iprange/view', [s.parent.name])%]">
              [% s.parent.name %]</a></td>
-	 <td>[% s.network %]</td>
-  	 <td>[% s.netmask %]</td>
-	 <td>[% s.from_addr %]</td>
- 	 <td>[% s.to_addr %]</td>
+	 <td>[% s.network.address %]</td>
+  	 <td>[% s.netmask.address %]</td>
+	 <td>[% s.from_addr.address %]</td>
+ 	 <td>[% s.to_addr.address %]</td>
 	 <td>[% s.vlan_id.id %]</td>
 	 <td>[% s.description %]</td>
          </tr>

@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use HTML::FormHandler::Moose;
 use Manoc::Utils qw(check_addr);
+use Manoc::IpAddress;
+use Data::Dumper;
 
 extends 'HTML::FormHandler::Model::DBIC';
 with 'HTML::FormHandler::Render::Table';
@@ -17,6 +19,10 @@ has_field 'rack' => (
     label        => 'Rack name',
     required => 1,
     empty_select => '---Choose a Rack---',
+    apply    => [
+		 'Str',
+		 {  message => 'You must select a rack'},
+		 ],
 );
 
 has_field 'id' => (
@@ -79,6 +85,14 @@ sub options_rack {
         push @selections, { value => $rack->id, label => $label };
     }
     return { label =>"---Choose a Rack---", value => ""}, @selections;
+}
+
+sub update_model {
+    my $self   = shift;
+    my $row    = $self->values;
+    my $ipaddr = Manoc::IpAddress->new( $row->{'id'} );
+    $row->{'id'} = $ipaddr;
+    $self->resultset->update_or_create( $row );
 }
 
 1;

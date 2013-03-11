@@ -60,8 +60,8 @@ sub auto : Private {
   }
 
   if ( $c->req->param('popup') ) {
-    $c->stash( current_view => 'Popup' );
-    delete $c->req->params->{'popup'};
+      $c->stash( show_popup => 1 );
+      delete $c->req->params->{'popup'};
   }
 
   return 1;
@@ -79,6 +79,18 @@ sub default : Path {
     $c->response->body("Page not found $url");
     
     $c->response->status(404);
+}
+
+=head2 message
+
+Basic minimal page for showing messages
+
+=cut
+
+sub message : Path('message') Args(0) {
+    my ( $self, $c ) = @_;
+    my $page = $c->request->param('page');
+    $c->stash( template => 'message.tt' );
 }
 
 =head2 end

@@ -8,14 +8,16 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core/);
+
+__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('arp');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
+
     },
     'macaddr' => {
         data_type   => 'varchar',
@@ -49,6 +51,15 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
+
+
+__PACKAGE__->inflate_column(
+    ipaddr => {
+        inflate =>
+          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+        deflate => sub { return scalar shift->padded },
+    }
+);
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

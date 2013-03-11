@@ -8,7 +8,7 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core /);
+__PACKAGE__->load_components(qw/ Core InflateColumn/);
 __PACKAGE__->table('mat');
 
 __PACKAGE__->add_columns(
@@ -57,6 +57,15 @@ __PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'vlan' );
 __PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Mat');
+
+__PACKAGE__->inflate_column(
+    device => {
+        inflate =>
+          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
+        deflate => sub { return scalar shift->padded },
+    }
+);
+
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

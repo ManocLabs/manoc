@@ -32,7 +32,7 @@ sub search_logon {
         my $item = Manoc::Search::Item::IpAddr->new(
             {
                 match     => $e->user,
-                addr      => $e->ipaddr,
+                addr      => $e->ipaddr->address,
                 timestamp => $e->get_column('lastseen'),
             }
         );

@@ -76,8 +76,7 @@
   <td>
   [% IF backup_date %]
        [% backup_date %] 
-       <!-- c.uri_for_action('device/view_config', [object.id]) -->
-	<a href="[% c.uri_for_action('device/show_run', [object.id]) %]">
+	<a href="[% c.uri_for_action('device/show_run', [object.id.address]) %]">
 	  View</a>
   [% ELSE %]
 	Backup not found
@@ -111,15 +110,15 @@
  [% add_css_tableinfo %]
 
 <div class="buttons">	
-  <a href="[% c.uri_for_action('/device/edit',[object.id]) %]">[%
+  <a href="[% c.uri_for_action('/device/edit',[object.id.address]) %]">[%
   ui_icon('pencil') %]Edit</a>
-  &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
+  &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id.address]) %]">
   [% ui_icon('closethick') %]    Delete</a>
-  &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
+  &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id.address]) %]">
 [% ui_icon('gear') %] Set Uplink</a>
-  &nbsp;<a href="[% c.uri_for_action('/device/change_ip', [object.id]) %]">
+  &nbsp;<a href="[% c.uri_for_action('/device/change_ip', [object.id.address]) %]">
   [% ui_icon('transferthick-e-w') %] Change Ip</a>		 
-  &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id]) %]" id="confirm-button"> 
+  &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id.address]) %]" id="confirm-button"> 
         [% ui_icon('arrowrefresh-1-w') %] Refresh Info</a>
 </div>
 
@@ -156,10 +155,10 @@
 	    <a href="[% c.uri_for_action('device/view', [link.neigh_address]) %]">[% link.neigh_address %]</a>
 	 </td>
          <td>[% link.device_name -%]</td>
-	 [% ELSE %]
+	[% ELSE %]
            <td>[% print_ip(link.neigh_address) -%]
            <td>[% link.device_id %]</td>
-	 [% END %]
+	[% END %]
 	<td>[% link.descr %]</td>
 	<td>[% link.date %]</td>
     </tr>
@@ -195,8 +194,7 @@
   [% END %]
     <tr>
          <td>
-	   <a href="[% c.uri_for_action('interface/view', [object.id, if.interface]) %]">
-[% if.interface %]</a>
+	   [% print_short_iface(object.id, if.interface) %]
 	 </td>
 	 
 	  [% IF if.up == 'down' %]
@@ -252,8 +250,7 @@
   [% END %]
   <tr>
     <td>
-      <a href="[% c.uri_for_action('interface/view', [object.id,
-      if.interface]) %]">[% if.interface %]</a>
+      [% print_short_iface(object.id,if.interface) %]
     </td>
     
     [% IF if.up_admin == 'down' %]
@@ -287,12 +284,9 @@
      <tbody>
   [% END %]
 	 <tr>
-        <td>
-	  <a href="[% c.uri_for_action('interface/view', 
-	  [object.id, if.interface]) %]"> [% if.interface %]</a>
-	</td>
-<td>[% if.description %]</td>
-</tr>
+           <td>[% print_short_iface(object.id,if.interface) %]</td>
+           <td>[% if.description %]</td>
+        </tr>
   [% IF loop.last %]
       </tbody>
     </table>

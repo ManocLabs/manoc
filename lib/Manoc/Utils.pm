@@ -13,7 +13,8 @@ our @EXPORT_OK = qw(
     clean_string print_timestamp
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
-    prefix2wildcard check_addr check_mac_addr
+    padded_ipaddr
+    prefix2wildcard check_addr check_mac_addr check_ipv6_addr
     check_backref set_backref deny_access
 );
 
@@ -70,11 +71,17 @@ sub check_addr {
     my $addr = shift;
     $addr =~ s/\s+//;
     return $addr =~ /^$RE{net}{IPv4}$/;
+#    return $addr =~ /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.?)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){0,3}$/;
 }
 
 sub check_mac_addr {
     my $addr = shift;
     return $addr =~ /^$RE{net}{MAC}$/;
+}
+
+#N.B. must be implemented
+sub check_ipv6_addr {
+  return undef;
 }
 
 ########################################################################
@@ -175,6 +182,16 @@ sub netmask2prefix {
     my $netmask = shift || croak "Missing netmask parameter";
 
     return $INET_NETMASK{$netmask};
+}
+
+sub padded_ipaddr {
+    my $addr = shift;
+    join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
+}
+
+sub unpadded_ipaddr {
+    my $addr = shift;
+    join('.', map { sprintf('%d', $_) } split( /\./, $addr ))
 }
 
 BEGIN {

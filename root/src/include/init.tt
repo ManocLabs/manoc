@@ -1,9 +1,9 @@
 [% 
    link_css = [ c.uri_for('/static/css/style.css')      ]
    link_js  = [ ]
+   js_scripts = []
 -%]
 [% PROCESS 'macros.tt' -%]
-
 [% PROCESS 'jquery.tt' -%]
 [% PROCESS 'menu.tt' -%]
 [% PROCESS 'datatable.tt' -%]

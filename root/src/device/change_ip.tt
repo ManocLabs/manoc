@@ -3,7 +3,7 @@
 
 
 <form method="POST" >
-<input type="hidden" name="id" value="[% object.id %]" />
+<input type="hidden" name="id" value="[% object.id.address %]" />
 <table class="ui-widget-content ui-corner-all manoc-form">
 <tr>
   <td><label for="device">Device name:</label></td>
@@ -11,7 +11,7 @@
 </tr>
 <tr>
   <td><label>Old address:</label></td>
-  <td>[% object.id %]</td>
+  <td>[% object.id.address %]</td>
 </tr>
 <tr>
   <td><label>New address:</label></td>

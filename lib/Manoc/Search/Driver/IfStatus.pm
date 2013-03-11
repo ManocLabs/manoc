@@ -21,10 +21,7 @@ sub search_note {
 						 },
 						);
     while ( $e = $it->next ) {
-      #print $e->device_info->id;
-
-      use Data::Dumper;
-         my $item = Manoc::Search::Item::Iface->new(
+      my $item = Manoc::Search::Item::Iface->new(
              {
                  device    => $e->device_info,
                  interface => $e->interface,
