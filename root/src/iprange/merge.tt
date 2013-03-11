@@ -47,26 +47,3 @@
 	</tr>
        </form>
     </table>
-
-<script language="javascript">
-
-function enableFields() {
-	if(document.form1.radio_range.checked) {
-		document.form1.from_addr.disabled = false;
-		document.form1.to_addr.disabled   = false;
-	} else {
-		document.form1.from_addr.disabled = true;
-		document.form1.to_addr.disabled   = true;
-	}	
-
-	if(document.form1.radio_subnet.checked) {
-		document.form1.network.disabled   = false;
-		document.form1.prefix.disabled    = false;
-	} else {
-		document.form1.network.disabled   = true;
-		document.form1.prefix.disabled    = true;
-	}
-}
-enableFields();
-</script>
-

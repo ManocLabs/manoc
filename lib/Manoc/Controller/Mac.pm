@@ -6,6 +6,7 @@ package Manoc::Controller::Mac;
 use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int);
+use Manoc::IpAddress;
 
 BEGIN { extends 'Catalyst::Controller'; }
 

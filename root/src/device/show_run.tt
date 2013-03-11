@@ -1,6 +1,6 @@
 [% META title='View Configuration'
    section='Asset' %]
-<a href="[% c.uri_for_action('/device/view', [object.id]) %]">Back to device info</a>
+<h3> Back to device info [% print_device(object) %] </h3>
    
 
 <div id="tabs">	 

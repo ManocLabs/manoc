@@ -41,7 +41,7 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{device};
         if ($b) {
-            $args->{id}      = $b->id;
+            $args->{id}   = $b->id->address;
             $args->{name}    = $b->name || '';
 	    $args->{notes}   = $b->notes if($b->notes);
             $args->{match} ||= $b->name;

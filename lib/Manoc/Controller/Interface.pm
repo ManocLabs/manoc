@@ -7,6 +7,7 @@ use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int);
 use Manoc::Form::If_notes;
+use Manoc::IpAddress;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -42,8 +43,8 @@ sub base : Chained('/') : PathPart('interface') : CaptureArgs(0) {
 =cut
 
 sub object : Chained('base') : PathPart('id') : CaptureArgs(2) {
-    my ( $self, $c, $device, $iface ) = @_;
-
+    my ( $self, $c, $id, $iface ) = @_;
+    my $device =  Manoc::IpAddress->new($id);
     my $obj = $c->stash(
         obj => $c->stash->{resultset}->find(
             {
@@ -67,12 +68,14 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my $obj    = $c->stash->{'obj'};
     my $device = $obj->device_info;
     $c->stash( device => $device );
-    my $note = $c->model('ManocDB::IfNotes')->find(
+
+    my $note = $c->model('ManocDB::IfNotes')->search(
         {
             device    => $device->id,
             interface => $obj->interface,
         }
-    );
+    )->first;
+
     $c->stash( notes => defined($note) ? $note->notes : '' );
 
     #MAT related results
@@ -100,23 +103,26 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 sub edit_notes : Chained('object') PathPart('edit_notes') Args(0) {
     my ( $self, $c ) = @_;
-    my $iface = $c->stash->{'obj'};
-
+    my $iface        = $c->stash->{'obj'};
+    my $device_id    = $iface->device_info->id; 
+  
     $c->stash( default_backref =>
-            $c->uri_for_action( 'interface/view', [ $iface->device, $iface->interface ] ) );
+      $c->uri_for_action( 'interface/view', [ $device_id, $iface->interface ] )
+);
 
-    my $item = $c->model('ManocDB::IfNotes')->find(
-        {
-            device    => $iface->device,
-            interface => $iface->interface,
-        }
-        ) ||
-        $c->model('ManocDB::IfNotes')->new_result(
-        {
-            device    => $iface->device,
-            interface => $iface->interface,
-        }
-        );
+    my $item = $c->model('ManocDB::IfNotes')->search(
+    {
+        device    => $device_id,
+        interface => $iface->interface,
+    }
+)->first;
+    $item or $item = $c->model('ManocDB::IfNotes')->new_result(
+    {
+        device    => $device_id->padded,
+        interface => $iface->interface,
+    }
+  );
+
 
     my $form = Manoc::Form::If_notes->new( item => $item );
 
@@ -141,7 +147,7 @@ sub delete_notes : Chained('object') PathPart('delete_notes') Args(0) {
 
     $c->stash( default_backref =>
             $c->uri_for_action( 'interface/view', [ $iface->device, $iface->interface ] ) );
-    my $item = $c->model('ManocDB::IfNotes')->find(
+    my $item = $c->model('ManocDB::IfNotes')->search(
         {
             device    => $iface->device,
             interface => $iface->interface
