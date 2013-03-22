@@ -58,14 +58,15 @@ __PACKAGE__->belongs_to(
 );
 
 foreach my $col (qw( from_device to_device )) {
-    __PACKAGE__->inflate_column(
-        $col => {
-            inflate =>
-              sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
-            deflate => sub { return scalar shift->padded },
-        }
-    );
+  __PACKAGE__->inflate_column(
+			      $col => {
+				       inflate =>
+				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				      } 
+			     );
 }
+
 
 
 

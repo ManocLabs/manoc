@@ -8,7 +8,7 @@ use warnings;
 
 package Manoc::DB;
 
-$__PACKAGE__::version = '2.000000';
+$__PACKAGE__::version = '20121115';
 
 use base qw/DBIx::Class::Schema/;
 __PACKAGE__->load_namespaces();

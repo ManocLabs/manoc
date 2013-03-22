@@ -5,6 +5,8 @@
 package Manoc::Controller::Reports;
 use Moose;
 use namespace::autoclean;
+use Manoc::Utils;
+
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME
@@ -122,9 +124,11 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     my ( $r, $rs );
 
     my @conflicts =
-        map { ipaddr => $_->get_column('ipaddr'), count => $_->get_column('count'), },
+        map { ipaddr => Manoc::Utils::unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
         $schema->resultset('Arp')->search_conflicts;
 
+    
+    
     my @multihomed =
         map { macaddr => $_->get_column('macaddr'), count => $_->get_column('count'), },
         $schema->resultset('Arp')->search_multihomed;
@@ -172,7 +176,6 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
     );
 
 
-
     while ( $r = $rs->next() ) {
         my $id          = $r->get_column('device');
         my $iface       = $r->get_column('interface');
@@ -207,7 +210,7 @@ sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
         sort { $a->{label} cmp $b->{label} }
         map +{
         id       => $_->id,
-        label    => lc( $_->name ) . ' (' . $_->id . ')',
+        label    => lc( $_->name ) . ' (' . $_->id->address . ')',
         selected => $device_id eq $_->id,
         },
         $schema->resultset('Device')->all();
@@ -265,7 +268,7 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
         device      => $_->from_device,
         from_device => $_->from_device,
         from_iface  => $_->from_interface,
-        to_device   => $_->to_device,
+        to_device   => $_->to_device->address,
         to_iface    => $_->to_interface,
         date        => Manoc::Utils::print_timestamp( $_->last_seen )
     }, @results;
@@ -291,7 +294,7 @@ sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
         }
     );
     my @table = map {
-        ipaddr       => $_->id,
+        ipaddr       => $_->id->address,
             name     => $_->name,
             vendor   => $_->vendor || 'n/a',
             model    => $_->model || 'n/a',

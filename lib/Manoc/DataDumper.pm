@@ -11,6 +11,8 @@ use Manoc::DataDumper::Converter;
 use Manoc::DataDumper::VersionType;
 use Data::Dumper;
 
+use Try::Tiny;
+
 has 'filename' => (
     is       => 'ro',
     isa      => 'Str',
@@ -34,16 +36,28 @@ has 'include' => (
 );
 
 has 'exclude' => (
-    is      => 'rw',
-    isa     => 'ArrayRef',
-    default => sub { [] },
+    is        => 'rw',
+    isa       => 'ArrayRef',
+    default   => sub { [] },
 );
 
 has 'version' => (
-    is      => 'rw',
-    isa     => 'Version',
-    default => '2.000000',
+    is        => 'rw',
+    isa       => 'Version',
+    lazy      => 1,
+    builder   => '_build_dbversion',
 );
+
+has 'db_version' => (
+    is        => 'rw',
+    required  => 0,
+);
+
+sub _build_dbversion {
+    my $self = shift;
+    $self->db_version and return $self->db_version;
+    return Manoc::DB::get_version;
+}
 
 sub get_source_names {
     my $self = shift;
@@ -73,7 +87,7 @@ sub load_tables_loop {
     if ( $version < Manoc::DB::get_version ) {
         my $c = 0;
         my $converter_class =
-          Manoc::DataDumper::Converter->get_converter_class( $version );
+          Manoc::DataDumper::Converter->get_converter_class( Manoc::DB::get_version );
         
         if (defined($converter_class) ) {
             $converter = $converter_class->new({ log => $self->log });
@@ -101,12 +115,12 @@ sub load_tables_loop {
         
         $self->log->info("Loaded $count records from $table.yaml");
 
-        $converter and $converter->upgrade_table( $datadump->data, $table );
         if ( ! defined($datadump->data->{$table}) ) {
             $self->log->info("No data to import in $table");
             next;
         }
-                    
+        $converter and $converter->upgrade_table( $datadump->data, $table );
+        
         $self->load_table( $source, $datadump->data->{$table}, $overwrite, $force );
     }
 }
