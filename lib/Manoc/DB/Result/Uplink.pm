@@ -28,12 +28,12 @@ __PACKAGE__->belongs_to( device_info => 'Manoc::DB::Result::Device', 'device' );
 __PACKAGE__->set_primary_key( 'device', 'interface' );
 
 __PACKAGE__->inflate_column(
-    device => {
-        inflate =>
-          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
-        deflate => sub { return scalar shift->padded },
-    }
-);
+			    device => {
+				       inflate =>
+				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				      }
+			   );
 
 
 1;

@@ -186,13 +186,12 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->inflate_column(
-    id => {
-        inflate =>
-          sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
-        deflate => sub { return scalar shift->padded },
-    }
-);
-
+			    id => {
+				   inflate =>
+				   sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				   deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				  }
+			   );
 
 sub get_mng_url {
     my $self = shift;

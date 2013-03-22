@@ -67,14 +67,13 @@ __PACKAGE__->has_many(
 __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 
 foreach my $col (qw( from_addr to_addr network netmask )) {
-    __PACKAGE__->inflate_column(
-        $col => {
-            inflate =>
-              sub { return Manoc::IpAddress::Ipv4->new( { padded => shift } ) },
-            deflate => sub { return scalar shift->padded },
-        }
-    );
-
+  __PACKAGE__->inflate_column(
+			      $col => {
+				       inflate =>
+				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				      } 
+			     );
 }
 
 

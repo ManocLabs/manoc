@@ -112,16 +112,20 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
                                     'me.to_device' => 'dev.id'}
                                 ]
                                ]});
-
-    my @cdp_links = map {
-            local_iface  => $_->from_interface,
-            neigh_address=> $_->to_device->address,
-	    device_name  => $_->get_column('devname'),
-	    device_id    => $_->remote_id,
-            descr        => $_->remote_type,
-            date         => print_timestamp( $_->last_seen ),
-    }, @neighs;
-
+  
+    my @cdp_links;
+    foreach my $n (@neighs){
+      my $neigh_addr = $n->to_device; 
+      $neigh_addr = $n->to_device->address if(ref $neigh_addr);
+     push ( @cdp_links, {  
+			  local_iface  => $n->from_interface,
+			  neigh_address=> $neigh_addr,
+			  device_name  => $n->get_column('devname'),
+			  device_id    => $n->remote_id,
+			  descr        => $n->remote_type,
+			  date         => print_timestamp( $n->last_seen ),
+			 });
+   }
 
     #------------------------------------------------------------
     # Interfaces info
