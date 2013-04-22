@@ -55,3 +55,9 @@ name Manoc
 <Log>
 	directory /var/log/manoc
 </Log>
+
+<DataDumper>
+path_to_tar
+directory
+</DataDumper>
+

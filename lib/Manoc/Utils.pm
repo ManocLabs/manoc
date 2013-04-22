@@ -13,7 +13,8 @@ our @EXPORT_OK = qw(
     clean_string print_timestamp
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
-    prefix2wildcard check_addr check_mac_addr
+    padded_ipaddr
+    prefix2wildcard check_addr check_mac_addr check_ipv6_addr
     check_backref set_backref deny_access
 );
 
@@ -26,6 +27,7 @@ use Regexp::Common qw/net/;
 
 use Manoc::DB;
 use Carp;
+use Archive::Tar;
 
 ########################################################################
 
@@ -68,13 +70,20 @@ sub clean_string {
 
 sub check_addr {
     my $addr = shift;
+    return if(!defined($addr));
     $addr =~ s/\s+//;
     return $addr =~ /^$RE{net}{IPv4}$/;
+#    return $addr =~ /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.?)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){0,3}$/;
 }
 
 sub check_mac_addr {
     my $addr = shift;
     return $addr =~ /^$RE{net}{MAC}$/;
+}
+
+#N.B. must be implemented
+sub check_ipv6_addr {
+  return undef;
 }
 
 ########################################################################
@@ -177,6 +186,17 @@ sub netmask2prefix {
     return $INET_NETMASK{$netmask};
 }
 
+sub padded_ipaddr {
+    my $addr = shift;
+    defined($addr) or return;
+    join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
+}
+
+sub unpadded_ipaddr {
+    my $addr = shift;
+    join('.', map { sprintf('%d', $_) } split( /\./, $addr ))
+}
+
 BEGIN {
     my $netmask_i;
 
@@ -189,7 +209,7 @@ BEGIN {
         $INET_PREFIXES[$i] = int2ip($netmask_i);
         $INET_NETMASK{ int2ip($netmask_i) } = $i;
     }
-}
+  }
 
 ########################################################################
 #                                                                      #
@@ -218,5 +238,47 @@ sub decode_bitset {
 }
 
 ########################################################################
+#                                                                      #
+#                   T a r   F u n c t i o n s                          #
+#                                                                      #
+########################################################################
+
+sub tar {
+    my ($config, $tarname, @filelist )  = @_;
+    my $command = "tar";
+    my $dir;
+    #if tar isn't in path system
+    if(defined $config){
+      my $path = $config->{'path_to_tar'};
+      $path and $path =~ s/\/$//;
+      $command = $path."/tar" if(defined $path and $path ne '');
+      $dir = $config->{'directory'};
+      $dir ||= "/tmp";
+      $dir and $dir =~ s/\/$//;
+    }
+    #check the existence of tar command
+    #running tar --version 
+    `$command --version 2>&1`;
+    if($? == 0){
+      #use system tar
+      #remove leading path from filelist to avoid creating tar with 
+      #file that have complete path e.g. /tmp/device.yaml
+      my @sanitized = map { s/^\/(\w+\/)+//r }  @filelist;
+      `$command -zcf $tarname -C $dir/ @sanitized 2>&1`;
+      return $?;
+    }
+    else {
+      #use Archive::Tar    
+      my $tar = Archive::Tar->new;
+      my @obj_list = $tar->add_files( @filelist );
+      #remove /tmp prefix
+      foreach my $o (@obj_list){
+	$o->prefix('');
+      }
+      return $tar->write( $tarname, 1  );
+    }
+    
+  }
+
 
 1;

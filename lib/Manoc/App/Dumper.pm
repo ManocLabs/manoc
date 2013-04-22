@@ -68,6 +68,11 @@ has 'exclude' => (
     isa     => 'ArrayRef',
     default => sub { [] },
 );
+has 'db_version' => (
+    is      => 'rw',
+    isa     => 'Str',
+    required => 0,
+);
 
 sub run_save {
     my ($self) = @_;
@@ -76,12 +81,14 @@ sub run_save {
 
     my $datadumper = Manoc::DataDumper->new(
         {
-            filename => $self->save,
-            schema   => $self->schema,
-            log      => $self->log,
-            include  => $self->include,
-            exclude  => $self->exclude,
-        }
+            filename    => $self->save,
+            schema      => $self->schema,
+            log         => $self->log,
+            include     => $self->include,
+            exclude     => $self->exclude,
+	    db_version  => $self->db_version,
+	    config      => $self->config,
+	}
     );
 
     $datadumper->save;
@@ -101,6 +108,7 @@ sub run_load {
             log      => $self->log,
             include  => $self->include,
             exclude  => $self->exclude,
+	    config   => $self->config,
         }
     );
 
