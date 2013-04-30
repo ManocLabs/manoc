@@ -137,6 +137,7 @@ sub save_table {
     return unless(defined($array_ref) and scalar(@{$array_ref}));
     
     $filename = "$dir/$filename";
+    die "Error! Directory $dir not exists" unless(-e $filename);
     open $fh, ">", $filename;
     print $fh YAML::Syck::Dump( @{ $array_ref } );
 
@@ -151,7 +152,8 @@ sub finalize_tar {
     my ($self) = @_;
     #before finalize we must create the metadata inside the tar
     exists $self->metadata->{version} or die "Missing version in metadata";
-    $self->save_table("_metadata", [$self->metadata],$self->config->{directory});
+    my $dir = defined($self->config) ? $self->config->{directory} : undef;
+    $self->save_table("_metadata", [$self->metadata],$dir);
 
     #finally create the file .tar.gz with file included in @filelist
     Manoc::Utils::tar( $self->config, $self->filename, @{$self->filelist});

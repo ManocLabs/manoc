@@ -263,7 +263,10 @@ sub tar {
       #use system tar
       #remove leading path from filelist to avoid creating tar with 
       #file that have complete path e.g. /tmp/device.yaml
-      my @sanitized = map { s/^\/(\w+\/)+//r }  @filelist;
+       my @sanitized;
+       foreach my $file (@filelist){
+	 push @sanitized, $file =~ s/^\/(\w+\/)+//r;
+       }
       `$command -zcf $tarname -C $dir/ @sanitized 2>&1`;
       return $?;
     }
