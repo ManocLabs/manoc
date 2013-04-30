@@ -265,7 +265,8 @@ sub tar {
       #file that have complete path e.g. /tmp/device.yaml
        my @sanitized;
        foreach my $file (@filelist){
-	 push @sanitized, $file =~ s/^\/(\w+\/)+//r;
+	 $file =~ s/^\/(\w+\/)+//;
+	 push @sanitized, $file;
        }
       `$command -zcf $tarname -C $dir/ @sanitized 2>&1`;
       return $?;
