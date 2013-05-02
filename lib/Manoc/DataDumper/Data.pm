@@ -137,7 +137,7 @@ sub save_table {
     return unless(defined($array_ref) and scalar(@{$array_ref}));
     
     $filename = "$dir/$filename";
-    die "Error! Directory $dir not exists" unless(-e $filename);
+    die "Error! Directory $dir not exists" unless(-e $dir);
     open $fh, ">", $filename;
     print $fh YAML::Syck::Dump( @{ $array_ref } );
 
