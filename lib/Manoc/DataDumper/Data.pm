@@ -35,16 +35,27 @@ has version => (
     required => 0,
 );
 
+has 'config' => (
+    is       => 'ro',
+    required => 0,
+);
+
 has tar => (
     is       => 'rw',
     isa      => 'Archive::Tar',
-    required => 1,
+    required => 0,
 );
 
 has data => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub { {} },
+);
+
+has filelist => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
 );
 
 has metadata => (
@@ -106,39 +117,46 @@ sub load_data {
 }
 
 sub save {
-    my ( $self, $filename, $version ) = @_;
+    my ( $self, $filename, $version, $config ) = @_;
 
     return $self->new(
         {
             filename => $filename,
-            tar      => Archive::Tar->new,
             version  => $version,
+            config   => $config,
         }
     );
 
 }
 
 sub save_table {
-    my ( $self, $table_name, $array_ref ) = @_;
+    my ( $self, $filename, $array_ref, $dir ) = @_;
+    my $fh;
+    
+    defined($dir) or $dir = "/tmp";
+    return unless(defined($array_ref) and scalar(@{$array_ref}));
+    
+    $filename = "$dir/$filename";
+    die "Error! Directory $dir not exists" unless(-e $filename);
+    open $fh, ">", $filename;
+    print $fh YAML::Syck::Dump( @{ $array_ref } );
 
-    $self->data->{$table_name} = $array_ref;
+    #register filename in filelist
+    push @{$self->filelist}, $filename;
+    #free resources
+    close $fh;
+    undef $array_ref;
 }
 
 sub finalize_tar {
     my ($self) = @_;
     #before finalize we must create the metadata inside the tar
     exists $self->metadata->{version} or die "Missing version in metadata";
-    $self->tar->add_data( '_metadata', YAML::Syck::Dump( $self->metadata ) );
+    my $dir = defined($self->config) ? $self->config->{directory} : undef;
+    $self->save_table("_metadata", [$self->metadata],$dir);
 
-    #add the .yaml files to the archive
-    foreach my $table ( keys %{ $self->data } ) {
-        scalar( @{ $self->data->{$table} } ) and
-            $self->tar->add_data( "$table.yaml",
-            YAML::Syck::Dump( @{ $self->data->{$table} } ) );
-    }
-
-    #finally create the file .tar.gz
-    $self->tar->write( $self->filename, 'COMPRESS_GZIP' );
+    #finally create the file .tar.gz with file included in @filelist
+    Manoc::Utils::tar( $self->config, $self->filename, @{$self->filelist});
 }
 
 no Moose;

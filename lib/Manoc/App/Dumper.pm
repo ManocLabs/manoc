@@ -87,6 +87,7 @@ sub run_save {
             include     => $self->include,
             exclude     => $self->exclude,
 	    db_version  => $self->db_version,
+	    config      => $self->config,
 	}
     );
 
@@ -107,6 +108,7 @@ sub run_load {
             log      => $self->log,
             include  => $self->include,
             exclude  => $self->exclude,
+	    config   => $self->config,
         }
     );
 

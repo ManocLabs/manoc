@@ -466,7 +466,7 @@ sub update_arp_table {
     my $source   = $self->source;
     my $entry    = $self->entry;
     my $timestamp= $self->timestamp;
-    my $vlan     = $entry->vlan_arpinfo() || $self->config->{default_vlan};
+    my $vlan     = defined($entry->vlan_arpinfo) ? $entry->vlan_arpinfo->id : $self->config->{default_vlan};
     my $arp_table= $source->arp_table;
     my $arp_count= 0;
 

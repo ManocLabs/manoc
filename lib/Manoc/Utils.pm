@@ -27,6 +27,7 @@ use Regexp::Common qw/net/;
 
 use Manoc::DB;
 use Carp;
+use Archive::Tar;
 
 ########################################################################
 
@@ -208,7 +209,7 @@ BEGIN {
         $INET_PREFIXES[$i] = int2ip($netmask_i);
         $INET_NETMASK{ int2ip($netmask_i) } = $i;
     }
-}
+  }
 
 ########################################################################
 #                                                                      #
@@ -237,5 +238,51 @@ sub decode_bitset {
 }
 
 ########################################################################
+#                                                                      #
+#                   T a r   F u n c t i o n s                          #
+#                                                                      #
+########################################################################
+
+sub tar {
+    my ($config, $tarname, @filelist )  = @_;
+    my $command = "tar";
+    my $dir;
+    #if tar isn't in path system
+    if(defined $config){
+      my $path = $config->{'path_to_tar'};
+      $path and $path =~ s/\/$//;
+      $command = $path."/tar" if(defined $path and $path ne '');
+      $dir = $config->{'directory'};
+      $dir ||= "/tmp";
+      $dir and $dir =~ s/\/$//;
+    }
+    #check the existence of tar command
+    #running tar --version 
+    `$command --version 2>&1`;
+    if($? == 0){
+      #use system tar
+      #remove leading path from filelist to avoid creating tar with 
+      #file that have complete path e.g. /tmp/device.yaml
+       my @sanitized;
+       foreach my $file (@filelist){
+	 $file =~ s/^\/(\w+\/)+//;
+	 push @sanitized, $file;
+       }
+      `$command -zcf $tarname -C $dir/ @sanitized 2>&1`;
+      return $?;
+    }
+    else {
+      #use Archive::Tar    
+      my $tar = Archive::Tar->new;
+      my @obj_list = $tar->add_files( @filelist );
+      #remove /tmp prefix
+      foreach my $o (@obj_list){
+	$o->prefix('');
+      }
+      return $tar->write( $tarname, 1  );
+    }
+    
+  }
+
 
 1;
