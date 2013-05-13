@@ -64,17 +64,11 @@ jQuery.fn.dataTableExt.aTypes.push(
 
 jQuery.fn.dataTableExt.aTypes.unshift(
         function ( sData )
-        {
-
-        var iParse = Date.parse(sData);
-        if ( iParse !=  null && !isNaN(iParse))
-        {
-           return 'date-euro';
+        {         
+         if (sData !== null && sData.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d \d{2}:\d{2}:\d{2}$/))
+        {	    
+            return 'date-italy';
         }
-        /*if (sData !== null && sData.match(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20|21)\d\d$/))
-        {
-            return 'date-euro';
-        }*/
         return null;
         }
 );
