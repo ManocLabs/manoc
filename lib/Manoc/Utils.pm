@@ -246,14 +246,13 @@ sub decode_bitset {
 sub tar {
     my ($config, $tarname, @filelist )  = @_;
     my $command = "tar";
-    my $dir;
+    my $dir     = "/tmp";
     #if tar isn't in path system
     if(defined $config){
       my $path = $config->{'path_to_tar'};
       $path and $path =~ s/\/$//;
       $command = $path."/tar" if(defined $path and $path ne '');
-      $dir = $config->{'directory'};
-      $dir ||= "/tmp";
+      $dir = $config->{'directory'} if(defined $config->{'directory'});
       $dir and $dir =~ s/\/$//;
     }
     #check the existence of tar command

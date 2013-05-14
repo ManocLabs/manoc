@@ -2,7 +2,7 @@
 
 [% FOREACH ip IN addresses %]
    [% IF loop.first %]
-   [% init_table('iplist',undef,{disable_pagination => 1, cust_pag=>1 }) %]
+   [% init_table('iplist',undef,{disable_pagination => 1,disable_sorting=>1, cust_pag=>1 }) %]
 
   <div id="toolbar_buttons">
     <div class="buttons" >  
