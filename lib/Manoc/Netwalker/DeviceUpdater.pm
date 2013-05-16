@@ -106,7 +106,7 @@ sub _build_source {
         ) or return undef;
 
     unless($source->connect){
-        my $msg = "Could not connect to ".$entry->id;
+        my $msg = "Could not connect to ".$entry->id->address;
         $self->log->error($msg);
         $self->report->add_error($msg);
         return undef;
@@ -130,7 +130,7 @@ sub _build_device_set {
     my $self = shift;
 
     my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
-    my %device_set = map { $_ => 1 } @device_ids;
+    my %device_set = map { Manoc::Utils::unpadded_ipaddr($_) => 1 } @device_ids;
     return \%device_set;
 }
 
@@ -177,7 +177,7 @@ sub update_all_info {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing full update for device ", $self->entry->id );
+    $self->log->info( "Performing full update for device ", $self->entry->id->address );
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
@@ -197,7 +197,7 @@ sub fast_update {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing fast update for device ", $self->entry->id );
+    $self->log->info( "Performing fast update for device ", $self->entry->id->address );
 
     $self->update_cdp_neighbors;
     $self->entry->get_mat() and $self->update_mat;
@@ -436,7 +436,7 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from ", $entry->id );
+    $self->log->info( "getting vtp info from ", $entry->id->address );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
         $self->report->add_error("cannot retrieve vtp info");
@@ -470,7 +470,7 @@ sub update_arp_table {
     my $arp_table= $source->arp_table;
     my $arp_count= 0;
 
-    $self->log->debug("Fetching arp table from ",$self->entry->id);
+    $self->log->debug("Fetching arp table from ",$self->entry->id->address);
     
     my ($ip_addr, $mac_addr);
     while (($ip_addr, $mac_addr) = each(%$arp_table)) {
