@@ -14,7 +14,7 @@
 </div>
 [% FOREACH s IN subnet_list %]
    [% IF loop.first %]
-    [% init_table('subnet',undef,{sortby => 1, order=>'asc'}) %]
+    [% init_table('subnet',undef,{sortby => 4, order=>'asc'}) %]
     <table class="display" id="subnet">
        <thead>  
 	 <tr>
