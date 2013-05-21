@@ -55,7 +55,7 @@ sub login : Local : CaptureArgs(0) {
             )
         {
             $c->flash( message => 'Logged In!' );
-            $c->log->debug( 'User  ' . $c->user . ' logged' );
+            $c->log->debug( 'User ' . $c->user->login . ' logged' );
 
             $c->detach('/follow_backref');
         }
