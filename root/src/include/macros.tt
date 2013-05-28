@@ -29,6 +29,14 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
   [% END-%]
 [% END-%]
 
+[% MACRO print_device_with_name(device) BLOCK-%]
+<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.id%]</a>
+([%device.name%])
+  [% IF device.get_mng_url -%]
+<a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
+c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
+  [% END-%]
+[% END-%]
 
 [%# ----------------------------------------------------------------- -%]
 [%# Device Long Format-%]

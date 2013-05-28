@@ -13,4 +13,5 @@
   <li><a href="[% c.uri_for('/reports/rack_list')  %]">Managed racks list</a></li>
   <li><a href="[% c.uri_for('/reports/unknown_devices')  %]">Unknown devices</a></li>
   <li><a href="[% c.uri_for('/reports/multi_mac')  %]">Multi MAC</a></li>
+  <li><a href="[% c.uri_for('/reports/new_devices')  %]">New devices connected</a></li>
 </ul>

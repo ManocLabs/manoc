@@ -7,6 +7,8 @@ use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 
+use Manoc::Utils qw(print_timestamp str2seconds);
+
 =head1 NAME
 
 Manoc::Controller::Reports - Catalyst Controller
@@ -386,6 +388,45 @@ sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
 
     $c->stash( multimacs => \@multimacs, template => 'reports/multi_mac.tt' );
 }
+
+
+####################################################################
+
+sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $schema = $c->model('ManocDB');
+    my @results;
+    my $e;
+    my @multimacs;
+    my $days       = Manoc::Utils::clean_string( $c->req->param('days') ) || 0 ;
+    $days .= 'd' if($days =~ m/\d$/);
+    my $query_time = time - Manoc::Utils::str2seconds($days);
+
+    @results = $schema->resultset('Mat')->search(
+        { },
+        {
+            select   => [ 'macaddr', 'device', 'interface', 'firstseen',{ min => 'firstseen' } ],
+            as       => [ 'macaddr', 'device', 'interface', 'firstseen','fs'],
+            group_by => ['macaddr'],
+            having   => { 'MIN(firstseen)' => { '>', $query_time } },
+        }
+    );
+
+       my @new_devices = map +{
+        macaddr      => $_->macaddr,
+        device       => $_->device_entry,
+        iface        => $_->interface,
+        from         => Manoc::Utils::print_timestamp($_->firstseen),
+    }, @results;
+
+    $c->stash( new_devs => \@new_devices, template => 'reports/new_devices.tt' );
+}
+
+
+
+
+
+
 
 =head1 AUTHOR
 
