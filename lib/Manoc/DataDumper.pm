@@ -13,6 +13,9 @@ use Data::Dumper;
 
 use Try::Tiny;
 
+my $ROWS = 100000;
+
+
 has 'filename' => (
     is       => 'ro',
     isa      => 'Str',
@@ -59,6 +62,14 @@ has 'db_version' => (
     required  => 0,
 );
 
+
+has 'file_rows' => (
+    is        => 'rw',
+    isa       => 'Version',
+    lazy      => 1,
+    builder   => '_build_rows',
+);
+
 sub _build_dbversion {
     my $self = shift;
     $self->db_version and return $self->db_version;
@@ -86,7 +97,8 @@ sub get_source_names {
 sub load_tables_loop {
     my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
     my $converter;
-    
+    my %overwrited;
+
     # try to load a converter if needed
     my $version = $datadump->metadata->{'version'};
     if ( $version < Manoc::DB::get_version ) {
@@ -100,38 +112,35 @@ sub load_tables_loop {
         }        
     }
 
+    %overwrited = map {$_ => $overwrite}  @$source_names;
+
      foreach my $source_name (@$source_names) {
          my $source = $self->schema->source($source_name);
          next unless $source->isa('DBIx::Class::ResultSource::Table');
-
          my $table    = $source->from;
-         my $filename = "$table.yaml";
 
-         $file_set->{$filename} or next;
 
-         $self->log->debug("Trying $filename");
-
-         #load in RAM all the table records
-         my $count = $datadump->load_data($table);
-
-         unless ($count) {
-             $self->log->info("File is empty. Skipping...");
-             next;
-         }
+         my @filenames = grep(/^$table\./, keys %{$file_set});
         
-         $self->log->info("Loaded $count records from $table.yaml");
-
-         if ( ! defined($datadump->data->{$table}) ) {
-             $self->log->info("No data to import in $table");
-             next;
-         }
-         #convert them if needed
-         $converter and $converter->upgrade_table( $datadump->data, $table );
-         #commit to backend
-         $self->load_table( $source, $datadump->data->{$table}, $overwrite, $force );
-         #free memory
-         undef $datadump->data->{$table};
-     }
+          foreach my $filename (@filenames){
+              $self->log->debug("Trying $filename");
+              #load in RAM all the table records
+              my $count = $datadump->load_data($filename);
+              unless ($count) {
+                  $self->log->info("File is empty. Skipping...");
+                  next;
+              }
+              $self->log->info("Loaded $count records from $filename");
+              #convert them if needed
+              $converter and $converter->upgrade_table( $datadump->data->{$filename}, $table );
+              #commit to backend
+              #n.b. if is a splitted table overwrite it only once!
+              $self->load_table( $source, $datadump->data->{$filename}, $overwrited{$source_name}, $force );
+              $overwrited{$source_name} = 0;
+              #free memory
+              undef $datadump->data->{$filename};
+          }
+      }
 }
 
 sub load_table {
@@ -196,25 +205,29 @@ sub load {
 
 
 sub dump_table {
-    my ( $storage, $dbh, $datadump, $table, $cols, $dir ) = @_;
-
-    my $sth;
-
-#    $sth = $dbh->prepare("SELECT count(*) FROM $table");
-#    $sth->execute;
-#    my $count = $sth->fetch->[0];
-#    $sth->finish;
-
-    my $cols_list = join( ",", @$cols );
-    $sth = $dbh->prepare("SELECT $cols_list FROM $table") or die $dbh->errstr;
-    $sth->execute or die $dbh->errstr;
-
+    my ( $storage, $dbh, $datadump, $source, $rows, $dir ) = @_;
+    my $i = 1;
     my @list;
-    while ( my $hash_ref = $sth->fetchrow_hashref ) {
-        push @list, $hash_ref;
+    my $table = $source->result_source->name;
+    my $filename = "$table.yaml";
+
+    my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
+    my $page_entries = $rs->count;
+    return unless $page_entries > 0;
+
+    while( $page_entries >= $ROWS ) {
+        @list = map {$_->{_column_data}} $rs->all;
+        $filename = "$table.$i.yaml";
+        $datadump->save_table( "$filename", \@list, $dir);
+        $i++;
+        $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
+        $page_entries = $rs->count;
     }
-    $sth->finish;
-    $datadump->save_table( "$table.yaml", \@list, $dir);
+    #if resultset is only 1 page in file name dosen't appear 
+    #the page number
+    $i gt 1 and  $filename = "$table.$i.yaml";
+    @list = map {$_->{_column_data}} $rs->all;
+    $datadump->save_table( "$filename", \@list, $dir);
 }
 
 #----------------------------------------------------------------------#
@@ -226,22 +239,24 @@ sub save {
     
     my $datadump = Manoc::DataDumper::Data->save( $self->filename, $self->version , $self->config->{DataDumper} );
     my $path_to_tar = $self->config->{DataDumper}->{path_to_tar} || undef;
-    my $dir         = $self->config->{DataDumper}->{directory} || undef;
+    my $dir         = $self->config->{DataDumper}->{directory}   || undef;
+    my $rows        = $self->config->{DataDumper}->{file_rows}   || $ROWS;
 
     my $source_names = $self->get_source_names();
-
+    
     foreach my $source_name (@$source_names) {
-        my $source = $self->schema->source($source_name);
-        next unless $source->isa('DBIx::Class::ResultSource::Table');
-
-        my $table        = $source->from;
-        my @column_names = $source->columns;
-
-        $self->schema->storage->dbh_do( \&dump_table, $datadump, $table, \@column_names, $dir );
+        my $source = $self->schema->resultset($source_name);
+        next unless $source->isa('DBIx::Class::ResultSet');
+        my $table         = $source->result_source->name;
+        #my @column_names = $source->columns;
+        
+        $self->schema->storage->dbh_do(\&dump_table, $datadump, $source, $rows, $dir);
+        
+        #$self->schema->storage->dbh_do( \&dump_table, $datadump, $table, \@column_names, $dir );
         $self->log->debug("Table $table writed in archive");
 
 
-    }
+    } 
     $self->log->debug("Writing the archive...");
     defined($path_to_tar) and $self->log->debug("...if available will be used system tar located in $path_to_tar ");
 

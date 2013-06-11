@@ -18,8 +18,8 @@ sub get_converter_class {
 
     my $class_name;
     
-    $release eq '1.000000' and $class_name = 'Converter_1000000';
-
+    $release and $class_name = 'Converter_'.$release;    
+    
     $class_name or return undef;
     $class_name = "Manoc::DataDumper::Converter::$class_name";
     Class::MOP::load_class($class_name) or return undef;

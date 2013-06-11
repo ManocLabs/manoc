@@ -102,9 +102,7 @@ sub load {
 
 #returns the number of records loaded from the yaml file
 sub load_data {
-    my ( $self, $table ) = @_;
-
-    my $filename = "$table.yaml";
+    my ( $self, $filename ) = @_;
 
     my $content = $self->tar->get_content($filename);
     unless ($content) {
@@ -112,7 +110,7 @@ sub load_data {
         return 0;
     }
     my @data = YAML::Syck::Load($content);
-    $self->data->{$table} = \@data;
+    $self->data->{$filename} = \@data;
     return scalar(@data);
 }
 
