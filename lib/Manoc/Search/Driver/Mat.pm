@@ -32,11 +32,11 @@ sub search_macaddr {
      my $it = $schema->resultset('Mat')->search( $search, $options );
 
      while ( my $e = $it->next ) {
-         my $device = Manoc::Search::Item::Device->new( { device => $e->device_entry } );
+         #my $device = Manoc::Search::Item::Device->new( { device => $e->device_entry } );
          my $item = Manoc::Search::Item::Iface->new(
              {
                  match     => $e->macaddr,
-                 device    => $device,
+                 device    => $e->device_entry,#$device,
                  interface => $e->interface,
                  timestamp => $e->get_column('timestamp'),
              }

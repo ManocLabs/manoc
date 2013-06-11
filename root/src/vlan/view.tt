@@ -67,7 +67,7 @@
       	   <tbody>
          [% END %]
              <tr>
- 	      <td><a href="[%c.uri_for_action('device/view',[r.device])%]"> [% r.device %] </a>  </td>
+ 	      <td><a href="[%c.uri_for_action('device/view',[r.device.address])%]"> [% r.device.address %] </a>  </td>
   	      <td>[% r.name %]
 	      </td>
 	      <td>[% r.count %]</td>

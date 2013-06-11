@@ -8,7 +8,9 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core/);
+use Manoc::Utils;
+
+__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('ip_range');
 
 __PACKAGE__->add_columns(
@@ -57,10 +59,23 @@ __PACKAGE__->set_primary_key('name');
 __PACKAGE__->add_unique_constraint( [ 'from_addr', 'to_addr' ] );
 __PACKAGE__->belongs_to( parent  => 'Manoc::DB::Result::IPRange' );
 __PACKAGE__->belongs_to( vlan_id => 'Manoc::DB::Result::Vlan' );
+
 __PACKAGE__->has_many(
-    children => 'Manoc::DB::Result::IPRange',
-    { 'foreign.parent' => 'self.name' }
-);
+     children => 'Manoc::DB::Result::IPRange',
+     { 'foreign.parent' => 'self.name' }
+ );
+__PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
+
+foreach my $col (qw( from_addr to_addr network netmask )) {
+  __PACKAGE__->inflate_column(
+			      $col => {
+				       inflate =>
+				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				      } 
+			     );
+}
+
 
 __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 1;

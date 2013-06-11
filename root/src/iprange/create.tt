@@ -13,41 +13,65 @@
   <td>[% parent %]([% p_from %] [% IF p_prefix %] /[%p_prefix%] [% ELSE %] - [%p_to%] [% END %])</td>
 </tr>
 [% END %]
-
 <tr>
-  <td><label>Name:</label></td>
-  <td><input type="text" name="name" value="[% range %]" /></td>
-      <td>
-	[% IF error.name %]
-	  <span class="error" id="error">[% error.name %] </span>
-	[%END%]
-      </td>
-
+  <td class="label">Name:</td>
+  <td colspan="2"><input type="text" name="name" value="[% range %]" /></td>
+  <td>
+    [% IF error.name %]<span class="error" id="error">[% error.name %] </span>[%END%]
+  </td>
 </tr>
 <tr>
-<td><label>Type:</label></td>
-<td><input id="radio_subnet" type="radio" name="type" value="subnet"
-onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Subnet:
-  <input type="text" name="network" value="[% network %]" />
-  / <select name="prefix">
+<td class="label">Type:</td>
+<td>
+<table>
+<tr>
+  <td>
+     <input id="radio_subnet" type="radio" name="type" value="subnet"
+      onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />
+   Subnet:
+  </td>
+    <td colspan="2"></td>
+</tr>
+<tr>
+  <td></td>
+  <td colspan="2">
+    <input type="text" name="network" value="[% network %]" />
+    / <select name="prefix">
      [% FOREACH pref IN prefixes %]
-    <option value="[% pref.id %]"
+     <option value="[% pref.id %]"
       [% IF pref.selected %] selected="1" [% END %] >
       [% pref.label %]
     </option>
-[% END %]
+    [% END %]
     </select>
-   <br/>
+  </td>
+  <td>[% IF error.network %]<span class="error" id="error">[% error.network %] </span>[%END%]</td>
+</tr>
+<tr>
+  <td>
   <input id="radio_range" type="radio" name="type" value="range"
-  onClick="javascript:enableFields()" [% IF type_range %] checked [% END %]  />Range from
-  <input type="text" name="from_addr" value="[% from_addr %]" />
-  to <input type="text" name="to_addr" value="[% to_addr %]" />
+  onClick="javascript:enableFields()" [% IF type_range %] checked [% END %]  /> Range
+  </td>
+  <td colspan="2"></td>
+</tr>
+<tr>
+  <td></td>
+  <td>from</td>
+  <td><input type="text" name="from_addr" value="[% from_addr %]" /></td>
+  <td>
+     [% IF error.from_addr %]<span class="error" id="error">[% error.from_addr %] </span>[%END%]
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>to</td>
+  <td><input type="text" name="to_addr" value="[% to_addr %]" /></td>
+  <td>
+     [% IF error.to_addr %]<span class="error" id="error">[% error.to_addr %] </span>[%END%]
+  </td>
+</tr>
+</table>
 </td>
-     <td>
-	[% IF error.type %]
-	  <span class="error" id="error">[% error.type %] </span>
-	[%END%]
-      </td>
 </tr>
 <tr>
     <td><label>Vlan:</label> </td>
@@ -76,26 +100,4 @@ onClick="javascript:enableFields()" [% IF type_subnet %] checked [% END %] />Sub
 </tr>
 </table>
 </form>
-
-
-<script language="javascript">
-
-function enableFields() {
-	if(document.form1.radio_range.checked) {
-		document.form1.from_addr.disabled = false;
-		document.form1.to_addr.disabled   = false;
-	} else {
-		document.form1.from_addr.disabled = true;
-		document.form1.to_addr.disabled   = true;
-	}	
-
-	if(document.form1.radio_subnet.checked) {
-		document.form1.network.disabled   = false;
-		document.form1.prefix.disabled    = false;
-	} else {
-		document.form1.network.disabled   = true;
-		document.form1.prefix.disabled    = true;
-	}
-}
-enableFields();
-</script>
+[% PROCESS "iprange/_enablefields.tt" %]

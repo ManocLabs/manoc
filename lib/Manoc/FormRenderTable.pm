@@ -57,7 +57,7 @@ sub wrap_field {
     my $l_type = $field->widget eq 'Compound' ? 'legend' : 'label';
 
     if ( $l_type eq 'label' ) {
-        $output .= '<td>' . $self->render_label($field) . '</td>';
+	$output .= '<td>' . $self->render_label($field) . '</td>';
     }
     elsif ( $l_type eq 'legend' ) {
         $output .= '<td>' . $self->render_label($field) . '</td></tr>';

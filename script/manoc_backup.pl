@@ -13,7 +13,7 @@ use Manoc::Logger;
 use Manoc::Utils qw(str2seconds print_timestamp);
 use Manoc::CiscoUtils;
 use Manoc::Report::BackupReport;
-
+use Manoc::IpAddress; 
 use Data::Dumper;
 
 use Sys::Hostname qw(hostname);
@@ -44,12 +44,13 @@ has 'report' => (
 
 sub _build_timestamp { time }
 
-sub visit_all {
+sub visit_all { 
     my $self = shift;
     my ( $res, $message );
-
     #Get devices from DB
     my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
+    @device_ids    = map Manoc::Utils::unpadded_ipaddr($_), @device_ids;
+    
     my %visited = map { $_ => 0 } @device_ids;
     #Visit all devices
     foreach my $host (@device_ids) {
@@ -62,6 +63,8 @@ sub visit_all {
             $self->log->debug("$host done");
         }
     }
+    
+    
 }
 
 sub visit_device {
@@ -75,6 +78,7 @@ sub visit_device {
     }
     else {
         $self->log->debug("$host done");
+   
     }
 }
 
@@ -83,14 +87,19 @@ sub do_device {
     my ( $config, $message, $res );
 
     #Check device id
-    my $device = $self->schema->resultset('Device')->find($device_id);
+    my $device_ipobj = Manoc::IpAddress->new( $device_id );
+
+    my $device = $self->schema->resultset('Device')->find($device_ipobj);
     $device or return ( 0, "$device_id not in device list" );
 
     if ( $device->backup_enabled == 1 ) {
 
         #Get configuration via telnet
+        print Dumper($self->config->{'Credentials'});
+
+
         ( $config, $message ) =
-          Manoc::CiscoUtils->get_config( $device_id, $self->schema,
+          Manoc::CiscoUtils->get_config( $device_ipobj, $self->schema,
             $self->config->{'Credentials'} );
         $config or return ( 0, $message );
 
@@ -140,10 +149,12 @@ sub update_device_config {
     my ( $self, $device_id, $config ) = @_;
     my $dev_config;
 
+    my $ip_obj = Manoc::IpAddress->new( $device_id );
+
     #Get device configuration from DB
     $dev_config =
       $self->schema->resultset('DeviceConfig')
-      ->find( { device => $device_id } );
+      ->find( { device => $ip_obj } );
 
     #Update entry
     if ($dev_config) {
@@ -180,7 +191,7 @@ sub update_device_config {
 
         $self->schema->resultset('DeviceConfig')->create(
             {
-                device       => $device_id,
+                device       => $ip_obj,
                 config       => $config,
                 config_date  => $self->timestamp,
                 last_visited => $self->timestamp
@@ -227,31 +238,31 @@ sub run {
     
     $self->check_lastrun or $self->log->logdie("Too soon to backup again!");
 
-    #Start backup
-    $self->device ? $self->visit_device( $self->device, {$self->device => 0} ) : $self->visit_all();
+     #Start backup
+     $self->device ? $self->visit_device( $self->device, {$self->device => 0} ) : $self->visit_all();
 
-    #Print final report
-    $self->log->info("Backup Done");
-    $self->log->info(
-        "Configurations up to date:  " . $self->report->up_to_date_count );
-    $self->log->info( "Configurations updated:     " . $self->report->updated_count );
-    $self->log->info(
-        "Configurations not saved:   " . $self->report->not_updated_count );
-    $self->log->info( "New configurations created: " . $self->report->created_count );
-    $self->log->info( "Errors occurred:            " . $self->report->error_count );
+      #Print final report
+      $self->log->info("Backup Done");
+      $self->log->info(
+          "Configurations up to date:  " . $self->report->up_to_date_count );
+      $self->log->info( "Configurations updated:     " . $self->report->updated_count );
+      $self->log->info(
+          "Configurations not saved:   " . $self->report->not_updated_count );
+      $self->log->info( "New configurations created: " . $self->report->created_count );
+      $self->log->info( "Errors occurred:            " . $self->report->error_count );
 
-    $self->log->debug(Dumper($self->report));
+      $self->log->debug(Dumper($self->report));
 
-    $self->schema->resultset('ReportArchive')->create(
-        {
-            timestamp => $timestamp,
-	    name      => 'backup report',
-	    type      => 'BackupReport',
-            s_class   => $self->report,
-        }
-    );
+      $self->schema->resultset('ReportArchive')->create(
+          {
+              timestamp => $timestamp,
+              name      => 'backup report',
+              type      => 'BackupReport',
+              s_class   => $self->report,
+          }
+      );
 
-    $self->update_lastrun;
+      $self->update_lastrun;
 
     exit 0;
 }
