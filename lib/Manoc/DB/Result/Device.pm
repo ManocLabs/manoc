@@ -5,7 +5,7 @@
 package Manoc::DB::Result::Device;
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
@@ -185,6 +185,14 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
+__PACKAGE__->inflate_column(
+			    id => {
+				   inflate =>
+				   sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				   deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				  }
+			   );
+
 sub get_mng_url {
     my $self = shift;
 
@@ -192,7 +200,7 @@ sub get_mng_url {
     return unless $format;
 
     my $str    = $format->format;
-    my $ipaddr = $self->id;
+    my $ipaddr = $self->id->address;
     $str =~ s/%h/$ipaddr/go;
 
     return $str;

@@ -7,7 +7,7 @@ use base 'DBIx::Class';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core/);
+__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('win_logon');
 
 __PACKAGE__->add_columns(
@@ -45,5 +45,14 @@ sub sqlt_deploy_hook {
     $sqlt_schema->add_index( name => 'idx_user',   fields => ['user'] );
     $sqlt_schema->add_index( name => 'idx_ipaddr', fields => ['ipaddr'] );
 }
+
+__PACKAGE__->inflate_column(
+			    ipaddr => {
+				       inflate =>
+				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
+				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				      }
+			   );
+
 
 1;

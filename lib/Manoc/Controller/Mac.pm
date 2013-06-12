@@ -6,6 +6,7 @@ package Manoc::Controller::Mac;
 use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int);
+use Manoc::IpAddress;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -126,7 +127,7 @@ sub _get_mat : Private {
 							   { prefetch => [ 'device', ]}, 
 							  );
     my @mat_archive_entries = map +{
-        arch_device_ip   => $_->device->ipaddr,
+        arch_device_ip   => $_->device->ipaddr->address,
         arch_device_name => $_->device->name,
         vlan             => $_->vlan,
         firstseen_i      => $_->firstseen,

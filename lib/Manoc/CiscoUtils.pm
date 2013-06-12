@@ -40,7 +40,7 @@ sub login_device {
     #Connect and login in enable mode
     eval {
         $session = Net::Telnet::Cisco->new(
-            Host    => $device_id,
+            Host    => $device_id->address,
             Timeout => 20,
         );
         $session->login( 'admin', $telnet_pwd ) or return (undef);

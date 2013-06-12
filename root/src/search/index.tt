@@ -10,10 +10,10 @@
 [%END -%]
 
 [% IF not(result.items.size) and q %]
-  [% PROCESS 'message.tt' msg="There are no results!" -%]
+  [% PROCESS 'message.tt' message="There are no results!" -%]
 [% ELSE %]
   [% IF q %]
-  [% PROCESS 'message.tt' msg="Found $result.items.size results!" -%]
+  [% PROCESS 'message.tt' message="Found $result.items.size results!" -%]
 [% END %]
 [% END %]
 
@@ -65,7 +65,11 @@
 [% print_device(item.device) %]
 [% END -%]
 [% MACRO item_generic_group(item) BLOCK -%]
-[% item.match %]
+ [% IF item and item.isa("Manoc::IpAddress") -%]
+     [% item.match.address %] 
+   [% ELSE-%]
+     [% item.match %]
+   [% END-%]
 [% END -%]
 [% MACRO item_vlan(item) BLOCK -%]
 <label id="search-cat">Vlan:</label>  [% print_vlan(item.id, item.name) %](

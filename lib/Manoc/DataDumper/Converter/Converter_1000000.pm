@@ -32,7 +32,7 @@ sub upgrade_winlogon {
 sub upgrade_sessions {
     my ( $self, $data ) = @_;
 
-    $data->{'sessions'} = undef;
+    $data = undef;
     
     return 0;
 }

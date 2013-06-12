@@ -15,6 +15,8 @@ with 'Manoc::Logger::Role';
 use Manoc::Netwalker::DeviceReport;
 use Manoc::Netwalker::Source::SNMP;
 
+use Manoc::IpAddress;
+
 # the Manoc::DB::Device entry associated to this device
 has 'entry' => (
     is       => 'ro',
@@ -82,7 +84,7 @@ has 'native_vlan' => (
 
 sub _build_report {
     my $self = shift;
-    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id );
+    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id->address );
 }
 
 #----------------------------------------------------------------------#
@@ -93,7 +95,7 @@ sub _build_source {
     my $entry = $self->entry;
 
     # get device community and version or use default
-    my $host    = $entry->id;
+    my $host    = $entry->id->address;
     my $comm    = $entry->snmp_com() || $self->config->{snmp_community};
     my $version = $entry->snmp_ver() || $self->config->{snmp_version};
 
@@ -104,7 +106,7 @@ sub _build_source {
         ) or return undef;
 
     unless($source->connect){
-        my $msg = "Could not connect to ".$entry->id;
+        my $msg = "Could not connect to ".$entry->id->address;
         $self->log->error($msg);
         $self->report->add_error($msg);
         return undef;
@@ -128,7 +130,7 @@ sub _build_device_set {
     my $self = shift;
 
     my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
-    my %device_set = map { $_ => 1 } @device_ids;
+    my %device_set = map { Manoc::Utils::unpadded_ipaddr($_) => 1 } @device_ids;
     return \%device_set;
 }
 
@@ -175,7 +177,7 @@ sub update_all_info {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing full update for device ", $self->entry->id );
+    $self->log->info( "Performing full update for device ", $self->entry->id->address );
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
@@ -195,7 +197,7 @@ sub fast_update {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing fast update for device ", $self->entry->id );
+    $self->log->info( "Performing fast update for device ", $self->entry->id->address );
 
     $self->update_cdp_neighbors;
     $self->entry->get_mat() and $self->update_mat;
@@ -266,21 +268,29 @@ sub update_cdp_neighbors {
     
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
+            
+            my $from_dev_obj = $entry->id;
+            my $to_dev_obj   = Manoc::IpAddress->new($s->{addr});
+
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $entry->id,
+                    from_device    => $from_dev_obj->padded,
                     from_interface => $p,
-                    to_device      => $s->{addr},
+                    to_device      => $to_dev_obj,
                     to_interface   => $s->{port},
                 }
             );
 
+            
             unless ( scalar(@cdp_entries) ) {
+                
+                my $temp_obj = Manoc::IpAddress->new($entry->id->address);
+                
                 $self->schema->resultset('CDPNeigh')->create(
                 {
-                    from_device    => $entry->id,
+                    from_device    => $temp_obj->padded,
                     from_interface => $p,
-                    to_device      => $s->{addr},
+                    to_device      => $to_dev_obj,
                     to_interface   => $s->{port},
                     remote_id      => $s->{remote_id},
                     remote_type    => $s->{remote_type},
@@ -289,7 +299,7 @@ sub update_cdp_neighbors {
                 ); 
                 $new_dev++;
                 $cdp_entries++; 
-                $self->report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id);
+                $self->report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id->address);
                 next;
             }
             my $link = $cdp_entries[0];
@@ -426,7 +436,7 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from ", $entry->id );
+    $self->log->info( "getting vtp info from ", $entry->id->address );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
         $self->report->add_error("cannot retrieve vtp info");
@@ -460,14 +470,15 @@ sub update_arp_table {
     my $arp_table= $source->arp_table;
     my $arp_count= 0;
 
-    $self->log->debug("Fetching arp table from ",$self->entry->id);
+    $self->log->debug("Fetching arp table from ",$self->entry->id->address);
     
     my ($ip_addr, $mac_addr);
     while (($ip_addr, $mac_addr) = each(%$arp_table)) {
         $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
+        my $ip_obj =  Manoc::IpAddress->new( $ip_addr  );
 	my @entries = $self->schema->resultset('Arp')->search({
-	    ipaddr	=> $ip_addr,
+	    ipaddr	=> $ip_obj,
 	    macaddr	=> $mac_addr,
 	    vlan	=> $vlan,
 	    archived => 0
@@ -484,7 +495,7 @@ sub update_arp_table {
 	    $entry->update();
 	} else {
 	    $self->schema->resultset('Arp')->create({
-		ipaddr    => $ip_addr,
+		ipaddr    => $ip_obj,
 		macaddr   => $mac_addr,
 		firstseen => $timestamp,
 		lastseen  => $timestamp,

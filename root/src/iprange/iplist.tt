@@ -41,10 +41,11 @@
    [% END %]
 [% END %]
 
-<script>
+[% fragment = BLOCK %] 
 $(function() { 
   var $tb = $('#toolbar_buttons');
   $('div.toolbar').html($tb.html());
   $tb.empty();
 });
-</script>
+[% END -%]
+[% js_scripts.push(fragment) -%]

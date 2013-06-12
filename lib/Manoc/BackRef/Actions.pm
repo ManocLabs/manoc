@@ -21,6 +21,12 @@ sub follow_backref : Private {
     my $backref = $c->check_backref($c);
     $backref ||= $c->stash->{default_backref};
 
+    # popup has precedence!
+    $c->stash->{show_popup} and 
+	$backref = $c->uri_for('/message', { popup => 1 });
+
+    $c->log->debug("backref = $backref");
+
     $c->response->redirect($backref);
 }
 

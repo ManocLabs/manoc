@@ -55,14 +55,14 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
     # $id = primary key
     my ( $self, $c, $id ) = @_;
 
-    return if ( $id eq '' );
-    $c->stash( object => $c->stash->{resultset}->find($id) );
+    $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
         $c->detach('/error/index');
     }
 }
+
 
 =head2 view
 
@@ -112,20 +112,20 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
                                     'me.to_device' => 'dev.id'}
                                 ]
                                ]});
-
-    
-
-
-
-    my @cdp_links = map {
-            local_iface  => $_->from_interface,
-            neigh_address=> $_->to_device,
-	    device_name  => $_->get_column('devname'),
-	    device_id    => $_->remote_id,
-            descr        => $_->remote_type,
-            date         => print_timestamp( $_->last_seen ),
-    }, @neighs;
-
+  
+    my @cdp_links;
+    foreach my $n (@neighs){
+      my $neigh_addr = $n->to_device; 
+      $neigh_addr = $n->to_device->address if(ref $neigh_addr);
+     push ( @cdp_links, {  
+			  local_iface  => $n->from_interface,
+			  neigh_address=> $neigh_addr,
+			  device_name  => $n->get_column('devname'),
+			  device_id    => $n->remote_id,
+			  descr        => $n->remote_type,
+			  date         => print_timestamp( $n->last_seen ),
+			 });
+   }
 
     #------------------------------------------------------------
     # Interfaces info
@@ -208,9 +208,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     $c->stash( template => 'device/view.tt' );
     $c->stash(%tmpl_param);
 
-
-    use URL::Encode;
-
     $c->stash(
         iface_info    => \@iface_info,
         cdp_links     => \@cdp_links,
@@ -226,8 +223,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
-    my $device_id = $c->stash->{object}->id;
-
+    my $device_id = $c->stash->{object}->id->address;
 
      my %config = (
          snmp_community => $c->config->{Credentials}->{snmp_community}
@@ -246,7 +242,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
          schema       => $c->model('ManocDB'),
          timestamp    => time
      );
-    
+   
      my $ret_status = $updater->update_all_info();
      unless(defined($ret_status)){
        my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
@@ -446,7 +442,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $item = $c->stash->{object};
-    my $id   = $item->id;
+    my $id   = $item->id->address;
     my $form = Manoc::Form::DeviceEdit->new( item => $item );
 
     $c->keep_flash('backref');
@@ -464,7 +460,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
     return unless $form->process( params => $c->req->params, );
-    $c->flash( message => 'Success! Device edit.' );
+    $c->flash( message => 'Success! Device edited.' );
     $c->detach('/follow_backref');
 }
 
@@ -489,7 +485,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
                 # 3) $device->delete
                 my $del_device = $c->model('ManocDB::DeletedDevice')->create(
                     {
-                        ipaddr    => $device->id,
+                        ipaddr    => $id,
                         name      => $device->name,
                         model     => $device->model,
                         vendor    => $device->vendor,
@@ -527,7 +523,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
             $c->detach('/error/index');
         }
 
-        $c->flash( message => 'Success!! Device ' . $id . ' successful deleted.' );
+        $c->flash( message => 'Success!! Device ' . $id->address . ' successful deleted.' );
 
         $c->detach('/follow_backref');
 
@@ -569,7 +565,7 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
     # }
     my ( $self, $c ) = @_;
     my $error = {};
-    my $old_ip = $c->stash->{'object'}->id || $c->req->param('id');
+    my $old_ip = $c->stash->{'object'}->id->address || $c->req->param('id');
     $c->stash( template => 'device/change_ip.tt' );
 
     my $message;
@@ -606,16 +602,16 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
 sub process_change_ip : Private {
     my ( $self, $c, $id, $new_id ) = @_;
     my $device = $c->stash->{'object'};
-    my $new_ip = $c->stash->{'resultset'}->find($new_id);
+    my $ip_obj = Manoc::IpAddress->new($new_id);
+    my $new_ip = $c->stash->{'resultset'}->find($ip_obj);
 
     if ($new_ip) {
         return ( 0, "The ip is already in use. Try again with another one!" );
     }
     if ( check_addr($new_id) ) {
-
         $c->model('ManocDB')->schema->txn_do(
             sub {
-                $device->update( { id => $new_id } );
+                $device->update( { id => $ip_obj } );
             }
         );
         if ($@) {
@@ -640,7 +636,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my $device = $c->stash->{'object'};
 
     if ( $c->req->param('discard') ) {
-        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id->address ] ) );
         $c->detach();
     }
     my $message;
@@ -654,7 +650,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
             $c->detach();
         }
         $done and
-            $c->response->redirect( $c->uri_for_action( '/device/view', [ $device->id ] ) );
+            $c->response->redirect( $c->uri_for_action( '/device/view', [ $device->id->address ] ) );
         $c->detach();
     }
 

@@ -6,8 +6,8 @@
 package Manoc::DataDumper::VersionType;
 use Moose::Util::TypeConstraints;
 
-subtype 'Version' => as 'Str' => where { $_ =~ m/^\d\.\d{6}$/ } => message {
-    'Version number must have the form: <version_number>{1}.<major>{3}<minor>{3} (e.g. 2.320120)';
+subtype 'Version' => as 'Str' => where { $_ =~ m/^(\d{8}|\d{1}\.\d{6})$/  } => message {
+    'Version number must have the form: <year>{4}<month>{2}<day>{2} (e.g. 20000101)';
 };
 
 no Moose::Util::TypeConstraints;

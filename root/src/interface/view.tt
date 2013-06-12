@@ -16,7 +16,7 @@
 </tr>
 <tr>
   <td>Switch:</td><td>[% device.name | html %]
-   (<a href="[% c.uri_for_action('device/view', [device.id])%] ">[% device.id %]</a>)</td>
+   ([% print_device(device) %])</td>
 </tr>
 <tr>
   <td>Switch Model:</td><td>[% device.model | html %]</td>
@@ -70,13 +70,13 @@
 <div class="buttons">	
 [% IF notes=='' %]
    <a href="[% c.uri_for_action
-   ('interface/edit_notes', [obj.device,obj.interface])%]">
+   ('interface/edit_notes', [obj.device.address,obj.interface])%]">
    [% ui_icon('plusthick') %] Add a Note</a>
 [% ELSE %]
 <a href="[% c.uri_for_action
-   ('interface/edit_notes', [obj.device,obj.interface])%]">Edit Note</a>
+   ('interface/edit_notes', [obj.device.address,obj.interface])%]">Edit Note</a>
 <a href="[% c.uri_for_action
-   ('interface/delete_notes', [obj.device,obj.interface])%]">Delete</a> 
+   ('interface/delete_notes', [obj.device.address,obj.interface])%]">Delete Note </a> 
 [% END %]
 </div>
 
