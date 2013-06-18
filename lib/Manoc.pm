@@ -32,7 +32,7 @@ with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
 with 'Catalyst::ClassData';
 
-our $VERSION = '1.98';
+our $VERSION = '2.1';
 $VERSION = eval $VERSION;
 
 use Data::Dumper;
