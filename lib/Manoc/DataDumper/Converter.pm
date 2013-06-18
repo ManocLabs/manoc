@@ -33,7 +33,7 @@ sub upgrade_table {
     return 0 unless $self->can($method_name);
 
     $self->log->info("Running converter for table $table");
-    return $self->$method_name($data->{$table});
+    return $self->$method_name($data);
 }
 
 no Moose;    # Clean up the namespace.
