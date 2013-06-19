@@ -37,7 +37,7 @@
  <tr>
   	 <td>[% print_mac(u.macaddr) %]</td>
  	 <td>[% print_device_with_name(u.device) %]</td>
-	 <td>[% print_short_iface(u.device,u.iface) %]</td>
+	 <td>[% print_short_iface(u.device.id,u.iface) %]</td>
  	 <td>[% u.from %]</td>
 	 </tr>
    [% IF loop.last %]
