@@ -73,4 +73,4 @@ $("#expandall").click(function() {
 $("#collapseall").click(function() {
         $("#expandible").jExpand_CollapseAll(); } );
 [% END %]
-[% js_script.push(fragment) %]
+[% js_scripts.push(fragment) %]
