@@ -2,11 +2,11 @@
 function enableFields() {
   var use_range = $("#radio_range").attr("checked");
 
-  $("input[name=from_addr]").attr("disabled", use_range);
-  $("input[name=to_addr]").attr("disabled", use_range);
+  $("input[name=from_addr]").attr("disabled", !use_range);
+  $("input[name=to_addr]").attr("disabled", !use_range);
 
-  $("input[name=network]").attr("disabled",  ! use_range);
-  $("select[name=prefix]").attr("disabled", ! use_range);
+  $("input[name=network]").attr("disabled",   use_range);
+  $("select[name=prefix]").attr("disabled",  use_range);
 }
 $(document).ready(enableFields());
 [% END -%]

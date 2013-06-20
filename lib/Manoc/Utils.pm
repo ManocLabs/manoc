@@ -189,7 +189,8 @@ sub netmask2prefix {
 sub padded_ipaddr {
     my $addr = shift;
     defined($addr) or return;
-    join('.', map { sprintf('%03d', $_) } split( /\./, $addr ))
+    $addr =~ s/(^\.|\.$)//;
+    $addr ne "" and join('.', map { sprintf('%03d', $_) } split( /\./, $addr ));
 }
 
 sub unpadded_ipaddr {

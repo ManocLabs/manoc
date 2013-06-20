@@ -87,7 +87,7 @@ sub search_note {
     my $item = Manoc::Search::Item::Device->new(
 						{
 						 device => $e,
-						 match  => $e->id,
+						 match  => $e->id->address,
 						 notes  => $e->notes,
 						}
 					       );
