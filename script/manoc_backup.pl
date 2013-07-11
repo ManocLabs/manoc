@@ -95,9 +95,6 @@ sub do_device {
     if ( $device->backup_enabled == 1 ) {
 
         #Get configuration via telnet
-        print Dumper($self->config->{'Credentials'});
-
-
         ( $config, $message ) =
           Manoc::CiscoUtils->get_config( $device_ipobj, $self->schema,
             $self->config->{'Credentials'} );

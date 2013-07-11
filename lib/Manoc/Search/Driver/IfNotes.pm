@@ -24,7 +24,7 @@ sub search_note {
 	     device    => $e->device,
 	     interface => $e->interface,
 	     text      => $e->notes,
-	     match     => $e->device->name || $e->device->id->address,
+	     match     => $e->device->address,
             }
         );
         $result->add_item($item);
