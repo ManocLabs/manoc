@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
     padded_ipaddr
-    prefix2wildcard check_addr check_mac_addr check_ipv6_addr
+    prefix2wildcard check_addr check_partial_addr  check_mac_addr check_ipv6_addr
     check_backref set_backref deny_access
 );
 
@@ -74,6 +74,17 @@ sub check_addr {
     $addr =~ s/\s+//;
     return $addr =~ /^$RE{net}{IPv4}$/;
 #    return $addr =~ /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.?)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){0,3}$/;
+}
+
+sub check_partial_addr {
+  my $addr = shift;
+  return if(!defined($addr));
+  $addr =~ s/\s+//;
+  
+  if($addr =~ /^([0-9\.]+\.)$/o or $addr =~ /^(\.[0-9\.]+)$/o or
+     $addr =~ /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/o) {
+    return 1;
+  }
 }
 
 sub check_mac_addr {

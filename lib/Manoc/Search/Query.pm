@@ -216,10 +216,9 @@ sub _guess_query {
         return;
     }
 
-    if ( $text =~ /^([0-9\.]+\.)$/o or $text =~ /^(\.[0-9\.]+)$/o or
-         $text =~ /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/o ) {
-        $self->query_type('ipaddr');
-        return;
+    if ( Manoc::Utils::check_partial_addr($text) ) {
+      $self->query_type('ipaddr');
+      return;
     }
 }
 
@@ -228,7 +227,7 @@ sub _build_sql_pattern {
     my $pattern = join( ' ', @{ $self->words } );
     return $pattern if ( !$pattern );
     
-    if($self->query_type eq 'ipaddr'){
+    if( Manoc::Utils::check_partial_addr($pattern) ){
       $pattern = padded_ipaddr($pattern);
     }
     
