@@ -80,7 +80,7 @@ sub index : Path : Args(0) {
         }
 
         #Debug mode
-        $c->stash( message => Dumper($result) ) if ( $c->req->param('debug') );
+        $c->flash( message => Dumper($result) ) if ( $c->req->param('debug') );
     }
 
     #prepare plugins variables
