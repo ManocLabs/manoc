@@ -29,9 +29,9 @@
 	 </td>
 	 <td>[% ip.notes %]</td>
        <td> 
-        <a href="[% c.uri_for_action('ip/edit_notes',[ip.ipaddr],{backref=> backref}) %]">[% icon('edit') %]</a>
+        <a href="[% c.uri_for_action('ip/edit',[ip.ipaddr],{backref=> backref}) %]">[% icon('edit') %]</a>
 	[% IF ip.notes %]       
-           <a href="[% c.uri_for_action('ip/delete_notes',[ip.ipaddr],{backref=> backref } ) %]">[% icon('remove') %]</a>
+           <a href="[% c.uri_for_action('ip/delete',[ip.ipaddr],{backref=> backref } ) %]">[% icon('remove') %]</a>
     	[%END%]    
        </td>
          </tr>

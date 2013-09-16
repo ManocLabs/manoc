@@ -3,19 +3,57 @@
    use_table=1
 -%]
 
-<p>Ip Address: [% id.address %]</p>
 <div id="tabs">	
   <ul>
-     <li><a href="#tabs-1">Mac Address Association</a></li>
-     <li><a href="#tabs-2">Subnet</a></li>
-     <li><a href="#tabs-3">AD Hostname</a></li>
-     <li><a href="#tabs-4">AD Logons</a></li>
-     <li><a href="#tabs-5">DHCP Lease</a></li>
-     <li><a href="#tabs-6">DHCP Reservation</a></li>
-     <li><a href="#tabs-7">Notes</a></li>
+     <li><a href="#tabs-1">Info</a></li>
+     <li><a href="#tabs-2">Mac Address Association</a></li>
+     <li><a href="#tabs-3">Subnet</a></li>
+     <li><a href="#tabs-4">AD Hostname</a></li>
+     <li><a href="#tabs-5">AD Logons</a></li>
+     <li><a href="#tabs-6">DHCP Lease</a></li>
+     <li><a href="#tabs-7">DHCP Reservation</a></li>
  </ul>
 
-<div id="tabs-1">
+   <div id="tabs-1">	
+     <table id="info">
+         <tr>
+  	  <td>Ip: </td>
+  	  <td>[% id.address %]</td>
+ 	 </tr>
+         <tr>
+  	  <td>Description: </td>
+  	  <td>[% info.description %]</td>
+ 	 </tr>
+         <tr>
+  	  <td>Client: </td>
+  	  <td>[% info.client %]</td>
+ 	 </tr>
+ 	  <td>Client Contact: </td>
+  	  <td>[% info.contact %]</td>
+ 	 </tr>
+	  <td>Phone: </td>
+  	  <td>[% info.phone %]</td>
+ 	 </tr>
+	  <td>Email: </td>
+  	  <td>[% info.email %]</td>
+ 	 </tr>
+	  <td>Notes: </td>
+  	  <td>[% info.notes %]</td>
+ 	 </tr>
+    </table>
+    [% add_css_tableinfo %]
+
+   <p>
+     <div class="buttons">	
+	<a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
+     ui_icon('pencil') %] Edit Infos </a>
+	&nbsp;<a href=[% c.uri_for_action('ip/delete', [id.address ]) %]>
+	[% ui_icon('closethick') %]  Delete Infos </a>
+     </div>
+    </p>
+   </div>
+ 
+<div id="tabs-2">
 [% FOREACH r IN arp_results %]
    [% IF loop.first %]
       [% init_table('arp_res', undef, {sortby => 3, order => 'desc'}) %]
@@ -46,7 +84,7 @@
 
 </div>
 
-  <div id="tabs-2">	
+  <div id="tabs-3">	
  
     [% FOREACH s IN subnet %]
       [% IF loop.first %]
@@ -75,7 +113,7 @@
 
    </div>
 
-   <div id="tabs-3">	
+   <div id="tabs-4">	
    [% FOREACH h IN hostnames %]
       [% IF loop.first %]
        [% init_table('hostname',undef, {sortby=>2,order=>'desc'}) %]
@@ -103,7 +141,7 @@
 
    </div>
 
-   <div id="tabs-4">	
+   <div id="tabs-5">	
 [% FOREACH h IN logons %]
       [% IF loop.first %]
        [% init_table('logons',undef, {sortby=>2,order=>'desc'}) %]
@@ -132,7 +170,7 @@
 
 
 
-<div id="tabs-5">
+<div id="tabs-6">
 [% IF (leases.0) %]
 [% FOREACH r IN leases %]
    [% IF loop.first %]
@@ -168,9 +206,9 @@
       [% PROCESS  'message.tt' msg='There are no DHCP leases for this MAC' %]
 [% END %] 
 
-</div>     <!-- end tabs-5 -->
+</div>     <!-- end tabs-6 -->
 
-<div id="tabs-6">
+<div id="tabs-7">
 [% IF (reservations.0) %]
 [% FOREACH r IN reservations %]
    [% IF loop.first %]
@@ -202,22 +240,10 @@
       [% PROCESS  'message.tt' msg='There are no DHCP reservations for this MAC' %]
 [% END %] 
 
-</div> <!-- end tabs-6 -->
+</div> <!-- end tabs-7 -->
 
 
-<div id="tabs-7">	
- <p> [% notes | html %] </p>
-  <div class="buttons">	
-    [% IF notes %]
-    <a href="[% c.uri_for_action('ip/edit_notes',[id.address]) %]">[% ui_icon('pencil') %]Edit</a>
-    <a href="[% c.uri_for_action('ip/delete_notes',[id.address]) %]">[%
- ui_icon('closethick') %]Delete</a>
-    [% ELSE %]
-    <a href="[% c.uri_for_action('ip/edit_notes',[id.address]) %]">[% ui_icon('plusthick') %] Add a Note</a>
-    [% END %]
-    </div>      
-
-  </div>      
+  
 
   
 </div><!-- end tabs -->
