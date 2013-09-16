@@ -190,16 +190,16 @@ sub ip_list : Private {
     my $page_start_addr = Manoc::IpAddress->new(  int2ip($page_start_addr_i) );
     my $page_end_addr   = Manoc::IpAddress->new(  int2ip($page_end_addr_i) );
 
-
     my @rs;
+
     @rs = $c->model('ManocDB::Arp')->search(
         {
-            'ipaddr' => {
-                '>=' => $page_start_addr,
-                '<=' => $page_end_addr,
-            }
+            -and => [
+                ipaddr  => {'>=' => $page_start_addr},
+		ipaddr  => {'<=' => $page_end_addr },
+            ]
         },
-        {
+	{
             select   => [ 'ipaddr', { 'max' => 'lastseen' } ],
             group_by => 'ipaddr',
             as => [ 'ipaddr', 'max_lastseen' ],
@@ -208,14 +208,14 @@ sub ip_list : Private {
     my %arp_info =
         map { $_->ipaddr->address => print_timestamp( $_->get_column('max_lastseen') ) } @rs;
 
-    @rs = $c->model('ManocDB::IpNotes')->search(
-        {
-            'ipaddr' => {
-                '>=' => $page_start_addr,
-                '<=' => $page_end_addr,
-            }
-        }
+    @rs = $c->model('ManocDB::Ip')->search(
+	 -and => [
+            {'ipaddr'    => { '>=' => $page_start_addr }},
+            {'ipaddr'    => { '<=' => $page_end_addr }},
+	 ],
     );
+    
+
     my %ip_note = map { $_->ipaddr->address => $_->notes } @rs;
 
     my @addr_table;
@@ -229,20 +229,20 @@ sub ip_list : Private {
             };
     }
     $c->stash( addresses => \@addr_table );
-
+     
     my $rs = $c->model('ManocDB::Arp')->search(
-        {
-            'ipaddr' => {
-                '>=' => Manoc::IpAddress->new($from) ,
-                '<=' => Manoc::IpAddress->new($to),
-            }
-        },
-        {
-            select   => 'ipaddr',
-            order_by => 'ipaddr',
-            distinct => 1,
-        }
-    );
+					       {
+						-and => [
+							 ipaddr  => {'>=' => Manoc::IpAddress->new($from) },
+							 ipaddr  => {'<=' => Manoc::IpAddress->new($to)   },
+							]
+					       },
+					       {
+						select   => 'ipaddr',
+						order_by => 'ipaddr',
+						distinct => 1,
+					       }
+					      );
     
     #backref setting
     my $backref;
