@@ -1,9 +1,9 @@
 [% link_css.push(               
-      c.uri_for('/static/css/theme/jquery-ui-1.8.4.custom.css'),
+      c.uri_for('/static/css/theme/jquery-ui-1.10.3.custom.css'),
       )
 -%]
-[% link_js.push(c.uri_for('/static/js/jquery-1.4.2.min.js'), 
-               c.uri_for('/static/js/jquery-ui-1.8.custom.min.js'),
+[% link_js.push(c.uri_for('/static/js/jquery-1.10.2.min.js'), 
+                c.uri_for('/static/js/jquery-ui-1.10.3.custom.min.js'),
                 ) 
 -%]
 [%#                                                                  -%]
