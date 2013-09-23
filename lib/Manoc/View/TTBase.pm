@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::View::TT;
+package Manoc::View::TTBase;
 
 use strict;
 use warnings;
@@ -18,7 +18,6 @@ __PACKAGE__->config(
         Manoc->path_to( 'lib', 'Manoc', 'Plugin'),
     ],
     PRE_PROCESS => 'init.tt',
-    WRAPPER     => 'wrapper.tt',
     render_die  => 1,
 );
 

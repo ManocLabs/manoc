@@ -52,7 +52,10 @@ __PACKAGE__->plugin_registry({});
 
 __PACKAGE__->config(
     name         => 'Manoc',
-    default_view => 'TT',
+
+    # Views setup
+    default_view => 'WebPage',
+ 
     use_request_uri_for_path => 1,
 
     # Disable deprecated behavior needed by old applications

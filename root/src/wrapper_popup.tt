@@ -19,18 +19,6 @@
 </head>
 
 <body>
-[% PROCESS 'menu.tt' %]
-<div id="wrapper">
-   <div id="banner" class="ui-widget-header">
-      <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
-      <div id="dock" class="ui-widget-content ui-corner-all">      
-      [% menu_dock %]    
-      </div>
-      <div id="navigation">
-      [% menu_navigation %]
-      </div>
-   </div>
-</div>
 <div id="content-wrapper">
    <h2>[% title %]</h2>	
    
@@ -50,6 +38,12 @@
 [% FOREACH fragment IN js_scripts -%]
 [% fragment %]
 [% END -%]
+[%# discard buttons should close popup windows %]
+$(function() {
+  $( "#discard" ).button().click(function() {
+    window.close();
+});
+});
 </script>
 </body>
 </html>
