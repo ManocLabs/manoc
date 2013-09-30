@@ -10,6 +10,8 @@ use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
+with "Manoc::ControllerRole::JSONView";
+
 =head1 NAME
 
 Manoc::Controller::Building - Catalyst Controller
@@ -78,22 +80,6 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
     $c->stash( template       => 'building/list.tt' );
 }
 
-=head2 list_js
-
-=cut
-
-sub list_js : Chained('base') : PathPart('list/js') : Args(0) {
-   my ( $self, $c ) = @_;
-
-   my @r = map { $self->prepare_json_object($_) } 
-     $c->stash->{resultset}->search({}, 
-                                    {prefetch => 'racks'});
-
-   $c->stash(json_data => \@r);
-   $c->forward('View::JSON');
-}
-
-
 
 =head2 view
 
@@ -104,19 +90,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
     $c->stash( template => 'building/view.tt' );
 }
-
-=head2 view_js
-
-=cut
-
-sub view_js : Chained('object') : PathPart('view/js') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $r = $self->prepare_json_object($c->stash->{object});
-
-    $c->stash(json_data => $r);
-    $c->forward('View::JSON');
-  }
 
 =head2 edit
 
@@ -198,7 +171,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
 }
 
-sub prepare_json_object :Private {
+sub prepare_json_object : Private {
     my ($self, $building) = @_;
     return {
         id      => $building->id,
