@@ -4,7 +4,8 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-#requires 'prepare_json_object';
+requires 'fetch_list';
+requires 'prepare_json_object';
 
 =head2 view_js
 
@@ -19,6 +20,7 @@ sub view_js : Chained('object') : PathPart('view/js') : Args(0) {
     $c->forward('View::JSON');
 }
 
+
 =head2 list_js
 
 =cut
@@ -26,9 +28,8 @@ sub view_js : Chained('object') : PathPart('view/js') : Args(0) {
 sub list_js : Chained('base') : PathPart('list/js') : Args(0) {
    my ( $self, $c ) = @_;
 
-   my @r = map { $self->prepare_json_object($_) } 
-     $c->stash->{resultset}->search({}, 
-                                    {prefetch => 'racks'});
+   $c->forward('fetch_list');
+   my @r = map { $self->prepare_json_object($_) } @{$c->stash->{object_list}};
 
    $c->stash(json_data => \@r);
    $c->forward('View::JSON');

@@ -62,21 +62,29 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
 
 =cut
 
+sub fetch_list : Private {
+   my ( $self, $c ) = @_;
+
+   my $build_schema = $c->stash->{resultset};
+   $c->stash('object_list' => [ $build_schema->search({}, 
+			      {prefetch => 'racks'} ) ]
+            );
+  
+}
+
 sub list : Chained('base') : PathPart('list') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $build_schema = $c->stash->{resultset};
+    $c->forward('fetch_list');
 
-    my @building_table = map +{
+    my @r = map +{
         id      => $_->id,
         name    => $_->name,
         desc    => $_->description,
         n_racks => $_->racks->count()
-        },
-        $build_schema->search({}, 
-			      {prefetch => 'racks'});
+        }, @{$c->stash->{object_list}};
 
-    $c->stash( building_table => \@building_table );
+    $c->stash( building_table =>  \@r );
     $c->stash( template       => 'building/list.tt' );
 }
 

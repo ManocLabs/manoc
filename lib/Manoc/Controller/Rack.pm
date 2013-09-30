@@ -9,7 +9,10 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 BEGIN { extends 'Catalyst::Controller'; }
+with 'Manoc::ControllerRole::JSONView';
+
 use Manoc::Form::Rack;
+
 
 =head1 NAME
 
@@ -74,39 +77,26 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 =cut
 
-sub list : Chained('base') : PathPart('list') : Args(0) {
+sub fetch_list : Private {
     my ( $self, $c ) = @_;
 
-    my @racks = $c->stash->{resultset}->search(
+    $c->stash(object_list => [ $c->stash->{resultset}->search(
         {},
         {
             prefetch => 'building',
             join     => 'building'
-        }
+        }) ]
     );
-    $c->stash( rack_table => \@racks );
+}
+ 
+sub list : Chained('base') : PathPart('list') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->forward('fetch_list');
+    $c->stash( rack_table => $c->stash->{object_list} );
     $c->stash( template   => 'rack/list.tt' );
 }
 
-=head2 list_js
-
-=cut
-
-sub list_js : Chained('base') : PathPart('list/js') : Args(0) {
-   my ( $self, $c ) = @_;
-
-    my @r = map +{
-        id      => $_->id,
-        name    => $_->name,
-#        desc    => $_->description,
-        devices => [ map +{ id => $_->id }, $_->devices ],
-       },
-	 $c->stash->{resultset}->search({}, 
-					{prefetch => 'devices'});
-   
-   $c->stash(json_data => \@r);
-   $c->forward('View::JSON');
-}
 
 =head2 create
 
@@ -211,6 +201,20 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     $c->response->redirect( $c->uri_for_action( '/rack/view', [ $c->stash->{object}->id ] ) );
     $c->detach();
 }
+
+
+
+sub prepare_json_object : Private {
+    my ($self, $rack) = @_;
+    return {
+	    id      => $rack->id,
+	    name    => $rack->name,
+	    building => $rack->building->id,
+	    test     => "aaab",
+	    devices   => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
+	   };
+}
+
 
 =head1 AUTHOR
 
