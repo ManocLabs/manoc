@@ -1,6 +1,14 @@
 [% init_datatable IF template.use_table -%]
 [% init_exp_table IF template.use_exp_table -%]
-<div id="fragment-wrapper">   
+[% title = BLOCK -%]
+[% IF template.section AND template.section != "Home" -%]
+[% template.section -%][% " - " IF template.title -%]
+[% END -%] 
+[% template.title -%]
+[% END -%]
+<div id="content-wrapper">
+   <h2>[% title %]</h2>	
+   
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]
@@ -9,3 +17,7 @@
 
       <div id="#content">[% content %]</div>
 </div><!-- end of content-wrapper -->
+
+</script>
+</body>
+</html>

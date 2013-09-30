@@ -29,7 +29,7 @@ Catalyst Controller.
 
 sub index : Path() : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('rack/list');
+    $c->response->redirect( $c->uri_for_action( 'rack/view' ) );
     $c->detach();
 }
 
@@ -86,6 +86,26 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
     );
     $c->stash( rack_table => \@racks );
     $c->stash( template   => 'rack/list.tt' );
+}
+
+=head2 list_js
+
+=cut
+
+sub list_js : Chained('base') : PathPart('list/js') : Args(0) {
+   my ( $self, $c ) = @_;
+
+    my @r = map +{
+        id      => $_->id,
+        name    => $_->name,
+#        desc    => $_->description,
+        devices => [ map +{ id => $_->id }, $_->devices ],
+       },
+	 $c->stash->{resultset}->search({}, 
+					{prefetch => 'devices'});
+   
+   $c->stash(json_data => \@r);
+   $c->forward('View::JSON');
 }
 
 =head2 create

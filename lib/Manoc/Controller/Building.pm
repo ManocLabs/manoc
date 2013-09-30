@@ -28,7 +28,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('building/list');
+    $c->response->redirect($c->uri_for('/building/list'));
     $c->detach();
 }
 
@@ -78,6 +78,23 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
     $c->stash( template       => 'building/list.tt' );
 }
 
+=head2 list_js
+
+=cut
+
+sub list_js : Chained('base') : PathPart('list/js') : Args(0) {
+   my ( $self, $c ) = @_;
+
+   my @r = map { $self->prepare_json_object($_) } 
+     $c->stash->{resultset}->search({}, 
+                                    {prefetch => 'racks'});
+
+   $c->stash(json_data => \@r);
+   $c->forward('View::JSON');
+}
+
+
+
 =head2 view
 
 =cut
@@ -87,6 +104,19 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
     $c->stash( template => 'building/view.tt' );
 }
+
+=head2 view_js
+
+=cut
+
+sub view_js : Chained('object') : PathPart('view/js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $r = $self->prepare_json_object($c->stash->{object});
+
+    $c->stash(json_data => $r);
+    $c->forward('View::JSON');
+  }
 
 =head2 edit
 
@@ -168,9 +198,19 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
 }
 
+sub prepare_json_object :Private {
+    my ($self, $building) = @_;
+    return {
+        id      => $building->id,
+        name    => $building->name,
+        description   => $building->description,
+        racks   => [ map +{ id => $_->id, name => $_->name }, $building->racks ],
+       },
+}
+
 =head1 AUTHOR
 
-Rigo
+The Manoc Team
 
 =head1 LICENSE
 
@@ -182,3 +222,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

@@ -52,6 +52,7 @@ sub auto : Private {
     return 1;
   }
   $c->log->debug($c->request->uri);
+
   # If a user doesn't exist, force login
   if ( !$c->user_in_realm('normal') ) {
     $c->flash( backref => $c->request->uri );
@@ -59,9 +60,11 @@ sub auto : Private {
     return 0;
   }
 
-  if ( $c->req->param('popup') ) {
-      $c->stash( 'current_view' => 'PopupPage' );
-      delete $c->req->params->{'popup'};
+  if ( my $fmt = $c->req->param('format') ) {
+      $fmt eq 'popup' and $c->stash('current_view' => 'PopupPage');
+      $fmt eq 'fragment' and $c->stash('current_view' => 'HTMLFragment');
+
+      delete $c->req->params->{'format'};
   }
 
   return 1;
@@ -127,3 +130,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

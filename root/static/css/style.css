@@ -156,11 +156,10 @@ img.shortcut {
 }
 
 #description { 
-    height:200px; 
     width:300px; 
 } 
+
 #notes { 
-    height:200px; 
     width:300px; 
 } 
 #error, .error_message { 

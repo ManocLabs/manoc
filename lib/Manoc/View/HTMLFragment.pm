@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::View::PopupPage;
+package Manoc::View::HTMLFragment;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use warnings;
 use base 'Manoc::View::TTBase';
 
 __PACKAGE__->config(
-    WRAPPER     => 'wrapper_popup.tt',
+    WRAPPER     => 'wrapper_fragment.tt',
 );
 
 =head1 NAME
