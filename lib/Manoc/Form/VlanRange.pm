@@ -11,6 +11,9 @@ use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Model::DBIC';
 with 'Manoc::FormRenderTable';
 
+has '+name' => ( default => 'form-vlanrange' );
+has '+html_prefix' => ( default => 1 );
+
 has_field 'name' => (
     type     => 'Text',
     required => 1,

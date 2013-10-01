@@ -11,6 +11,9 @@ use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Model::DBIC';
 with 'Manoc::FormRenderTable';
 
+has '+name' => ( default => 'form-ipnotes' );
+has '+html_prefix' => ( default => 1 );
+
 has_field 'ipaddr' => (
     type     => 'Text',
     label    => 'Ip Address',
