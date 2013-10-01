@@ -47,28 +47,40 @@ sub index : Path : Args(0) {
 sub auto : Private {
   my ( $self, $c ) = @_;
 
-  if ( $c->controller eq $c->controller('Auth') ||
-       $c->controller eq $c->controller('Wapi') ) {
-    return 1;
-  }
-  $c->log->debug($c->request->uri);
-
-  # If a user doesn't exist, force login
-  if ( !$c->user_in_realm('normal') ) {
-    $c->flash( backref => $c->request->uri );
-    $c->response->redirect( $c->uri_for('/auth/login') );
-    return 0;
+  ##  XHR detection ##
+  if (my $req_with =  $c->req->header('X-Requested-With')) {
+      $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
+  } else {
+      $c->stash->{is_xhr} = 0;
   }
 
+  ## output format selection ##
   if ( my $fmt = $c->req->param('format') ) {
-      $fmt eq 'popup' and $c->stash('current_view' => 'PopupPage');
+      $fmt eq 'popup'    and $c->stash('current_view' => 'PopupPage');
       $fmt eq 'fragment' and $c->stash('current_view' => 'HTMLFragment');
 
       delete $c->req->params->{'format'};
   }
 
+
+  ## redirect to login if needed ##
+  my $skip_login_redirect;
+  if ( $c->stash->{is_xhr} ||
+         $c->controller eq $c->controller('Auth') ||
+           $c->controller eq $c->controller('Wapi') ) {
+      $skip_login_redirect = 1;
+  }
+
+  # If a user doesn't exist, force login
+  if ( !$c->user_in_realm('normal') && !$skip_login_redirect ) {
+    $c->flash( backref => $c->request->uri );
+    $c->response->redirect( $c->uri_for('/auth/login') );
+    return 0;
+  }
+
   return 1;
 }
+
 
 =head2 default
 
