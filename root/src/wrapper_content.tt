@@ -15,7 +15,7 @@
       [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
       [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
 
-      <div id="#content">[% content %]</div>
+      <div id="content">[% content %]</div>
 </div><!-- end of content-wrapper -->
 
 </script>
