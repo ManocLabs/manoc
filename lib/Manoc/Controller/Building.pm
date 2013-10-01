@@ -134,9 +134,15 @@ sub save : Private {
     if ( $c->req->param('discard') ) {
         $c->detach('/follow_backref');
     }
-    return unless $form->process( params => $c->req->params );
+    my $success = $form->process( params => $c->req->params );
+    $success or return;
 
-    $c->flash( message => 'Success! Building created.' );
+    if ($c->stash->{is_xhr}) {
+        $c->stash(json_data => { success => 1});
+        $c->detach('View::JSON');
+    }
+
+    $c->flash( message => 'Building created.' );
     $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
     $c->stash( default_backref => $def_br );
     $c->detach('/follow_backref');
