@@ -35,7 +35,7 @@ The root page (/)
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->redirect('/search');
+    $c->response->redirect($c->uri_for_action('/search'));
     $c->detach();
 }
 

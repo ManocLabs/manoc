@@ -33,7 +33,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('/device/list');
+    $c->response->redirect($c->uri_for_action('/device/list'));
     $c->detach();
 }
 
