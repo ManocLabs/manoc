@@ -130,12 +130,21 @@ sub create : Chained('base') : PathPart('create') : Args() {
         $c->detach('/follow_backref');
     }
 
-    unless ( $form->process( params => $c->req->params ) ) {
-        $c->keep_flash('backref');
+    my $success = $form->process( params => $c->req->params );
+    if(!$success) {
+      $c->keep_flash('backref');
+      return;
+    }
+
+    my $message = 'Success. Rack ' . $c->req->param('name') . ' created.';
+    if ($c->stash->{is_xhr}) {
+        $c->stash(message => $message);
+        $c->stash(template => 'dialog/message.tt');
+        $c->forward('View::HTMLFragment');
         return;
     }
 
-    $c->flash( message => 'Success! Rack ' . $c->req->param('name') . ' created.' );
+    $c->flash( message => $message);
     $c->detach('/follow_backref');
 }
 

@@ -16,7 +16,7 @@ function showUrlInDialog(url, options){
     })
 }
 
-function showDialogForm(form_url, title, form_id, on_success) {
+function showDialogForm(form_url, title, form_id, on_close) {
     var decorate_form = function() {
 	$( "button, input:submit, a", ".buttons").button();
 	$(form_id).submit(function(e) { e.preventDefault(e); });	
@@ -30,14 +30,8 @@ function showDialogForm(form_url, title, form_id, on_success) {
 	    type: $(form_id).attr('method'), 
 	    url:  $(form_id).attr('action'),
 	    success: function(data) {
-      	       alert("Submitted");
-	       if(typeof(data) === "string") {
-		   $('#dialog').html(data);
-		   decorate_form();
-	       } else {
- 		   $('#dialog').dialog('close');
-	 	   on_success();
-      		}
+		$('#dialog').html(data);     
+ 		decorate_form();
 	    }
 	});
     }   
@@ -46,6 +40,11 @@ function showDialogForm(form_url, title, form_id, on_success) {
 	title: title, 
 	width: 500,
 	modal: true,
-	success: decorate_form
+	success: function() {
+	    decorate_form();
+	    $( "#dialog" ).on("dialogclose", on_close);	 	    
+	}
     });	
+
+
 }

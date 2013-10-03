@@ -137,12 +137,15 @@ sub save : Private {
     my $success = $form->process( params => $c->req->params );
     $success or return;
 
+    my $message = "Success. Building created.";
     if ($c->stash->{is_xhr}) {
-        $c->stash(json_data => { success => 1});
-        $c->detach('View::JSON');
+        $c->stash(message => $message);
+        $c->stash(template => 'dialog/message.tt');
+        $c->forward('View::HTMLFragment');
+        return;
     }
 
-    $c->flash( message => 'Building created.' );
+    $c->flash( message => $message );
     $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
     $c->stash( default_backref => $def_br );
     $c->detach('/follow_backref');
