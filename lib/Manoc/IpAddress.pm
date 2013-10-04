@@ -5,7 +5,7 @@ use Manoc::Utils;
 
 use Manoc::IpAddress::Ipv4;
 #use Manoc::IpAddress::Ipv6;
-use Manoc::Utils qw(check_addr check_ipv6_addr);
+use Manoc::Utils;
 use Carp;
 use Data::Dumper;
 
@@ -25,8 +25,8 @@ has 'class_spec' => (
 sub _build_class_spec {
   my $self = shift;
   my $addr = $self->address;
-  check_addr($addr)      and return  "Manoc::IpAddress::Ipv4";
-  check_ipv6_addr($addr) and return  "Manoc::IpAddress::Ipv6"; 
+  Manoc::Utils::check_addr($addr)      and return  "Manoc::IpAddress::Ipv4";
+  Manoc::Utils::check_ipv6_addr($addr) and return  "Manoc::IpAddress::Ipv6"; 
   carp  "Argument is not a valid Ip address!";
   return;
 }
