@@ -29,7 +29,7 @@ sub index : Path : Args(0) {
 
     use Data::Dumper;
     $c->log->debug( Dumper( $c->scheduler_state ) );
-    $c->response->redirect($c->uri_for_action('/search'));
+    $c->response->redirect($c->uri_for_action('/search/index'));
 }
 
 sub remove_sessions : Path('/cron/remove_sessions ') : Args(0) {
