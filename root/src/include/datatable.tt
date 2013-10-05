@@ -21,7 +21,8 @@
 [% capture = BLOCK -%]
 $(function() { 
 	  if ( $("#[% id  %]").dataTable ) {
-	   
+             var page_rows=25;
+             var paginate=[% IF options.disable_pagination %]false[% ELSE %]$("#[% id  %] tr").lenght > 25[%END%];  
  	     /* inizializzazione della tabella */
 	     $("#[% id  %]").dataTable( {
 	       //to use JQuery UI style
@@ -30,11 +31,12 @@ $(function() {
 	       [% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
 	       //pagination button (two_button, full_numbers)
  	       "sPaginationType" : "full_numbers",
-	       "iDisplayLength" : 25,
+	       "iDisplayLength" : page_rows,
 	       //to disable sorting
 	        "bSort": [% IF options.disable_sorting %]false[% ELSE %]true[%END%],
 		     //to disable pagination
-	       	"bPaginate": [% IF options.disable_pagination %]false[% ELSE %]true[%END%],
+	       	"bPaginate": paginate,
+                "bInfo": paginate,
 		 [% IF options.cust_pag -%]
        		 "sDom": '<"H"f<"toolbar">>t<"F"i>',
       		 [% END -%]
@@ -46,13 +48,17 @@ $(function() {
 			     [% FOREACH col IN columns %]
 			     ,{ "sWidth"    : "[% col %]%"}  
 			     [% END %]
-			     ]
+			     ],
 		[% ELSE %]
-	        "test": false
-	        [% END %]
-
+	        "test": false,
+	        [% END %]               
            	});
-	 }
+                var sel = $("div.create_btn");
+		if (sel) {
+                    var dest=$("#[% id %]_wrapper div").first();
+    		    sel.appendTo(dest);
+		}
+	 }      
 });
 [% END -%]
 [% js_scripts.push(capture) -%]

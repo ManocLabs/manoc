@@ -31,9 +31,7 @@
       </div>
    </div>
 </div>
-<div id="content-wrapper">
-   <h2>[% title %]</h2>	
-   
+<div id="content-wrapper" class="fullpage">
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]

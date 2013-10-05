@@ -1,4 +1,4 @@
- [% META 
+[% META 
    title='New Devices'
    use_table=1
    section='Reports'
@@ -9,10 +9,10 @@
 <table>
 <tr>
 <td>Days:</td>
-<td><input name="days" type="text" />
+<td><input name="days" type="text" value="[% days %]"/>
 </tr>
 <tr>
-<td></td><td><div class="buttons"> <input type="submit"/></div></td>
+<td></td><td><div class="buttons"> <input type="submit" value="Search" /></div></td>
 </tr>
 </table>
 </form>
