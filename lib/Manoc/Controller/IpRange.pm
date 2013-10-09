@@ -214,9 +214,10 @@ sub ip_list : Private {
             {'ipaddr'    => { '<=' => $page_end_addr }},
 	 ],
     );
-    
 
-    my %ip_note = map { $_->ipaddr->address => $_->notes } @rs;
+    my %ip_info = map { $_->ipaddr->address => { notes => $_->notes,
+						 desc  => $_->description}
+		      } @rs;
 
     my @addr_table;
     foreach my $i ( 0 .. $page_size - 1 ) {
@@ -225,7 +226,8 @@ sub ip_list : Private {
             {
             ipaddr   => $ipaddr,
             lastseen => $arp_info{$ipaddr} || 'n/a',
-            notes    => $ip_note{$ipaddr} || '',
+            notes    => $ip_info{$ipaddr}->{notes} || '',
+	    desc     => $ip_info{$ipaddr}->{desc}  || '',
             };
     }
     $c->stash( addresses => \@addr_table );

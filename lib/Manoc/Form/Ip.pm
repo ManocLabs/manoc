@@ -19,19 +19,16 @@ has_field 'ipaddr' => (
 
 has_field 'description' => ( type  => 'TextArea' );
 
-has_field 'client'      => ( type  => 'Text', 
-			     label => 'Client' );
-
-has_field 'contact'     => ( type  =>  'Text', 
-			     label =>  'Client Contact' );
+has_field 'assigned_to' => ( type  => 'Text', 
+			     label => 'Assigned to' );
 
 has_field 'phone'       => ( type => 'Text' );
 
-has_field 'email' => ( type => 'Email', );
+has_field 'email'       => ( type => 'Email', );
 
-has_field 'notes' => ( type => 'TextArea', );
+has_field 'notes'       => ( type => 'TextArea', );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
+has_field 'submit'      => ( type => 'Submit', value => 'Submit' );
+has_field 'discard'     => ( type => 'Submit', value => 'Discard' );
 
 1;

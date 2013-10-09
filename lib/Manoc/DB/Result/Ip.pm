@@ -20,14 +20,10 @@ __PACKAGE__->add_columns(
         data_type   => 'text',
         is_nullable => 1
     },
-    'client' => {
+    'assigned_to' => {
         data_type   => 'text',
         is_nullable => 1
     }, 
-    'contact' => {
-        data_type   => 'text',
-        is_nullable => 1
-    },
     'phone' => {
         data_type   => 'text',
         is_nullable => 1

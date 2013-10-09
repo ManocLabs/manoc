@@ -86,6 +86,7 @@ sub _get_ipinfo : Private {
     }, @r;
     $c->stash( arp_results => \@arp_results );
 
+
     my $info = $c->model('ManocDB::Ip')->find( { ipaddr => $id } );
     defined($info)
       ? $c->stash( 'info' => $info )

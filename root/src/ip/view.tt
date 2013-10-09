@@ -25,11 +25,8 @@
   	  <td>[% info.description %]</td>
  	 </tr>
          <tr>
-  	  <td>Client: </td>
-  	  <td>[% info.client %]</td>
- 	 </tr>
- 	  <td>Client Contact: </td>
-  	  <td>[% info.contact %]</td>
+  	  <td>Assigned to: </td>
+  	  <td>[% info.assigned_to %]</td>
  	 </tr>
 	  <td>Phone: </td>
   	  <td>[% info.phone %]</td>
