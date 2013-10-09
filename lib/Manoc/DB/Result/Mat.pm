@@ -5,6 +5,8 @@
 package Manoc::DB::Result::Mat;
 
 use base 'DBIx::Class';
+use Manoc::IpAddress::Ipv4;
+
 use strict;
 use warnings;
 

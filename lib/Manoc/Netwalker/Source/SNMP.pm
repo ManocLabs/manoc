@@ -300,13 +300,14 @@ sub boottime {
 sub device_info {
     my $self = shift;
     my $info = $self->snmp_info or return undef;
-
+ 
     return {
         name   => $info->name,
         model  => $info->model,
         os     => $info->os,
         os_ver => $info->os_ver,
-        vendor => $info->vendor
+        vendor => $info->vendor,
+        serial => $info->serial,
     };
 
 }

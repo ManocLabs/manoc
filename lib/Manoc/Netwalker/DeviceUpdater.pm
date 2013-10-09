@@ -246,6 +246,7 @@ sub update_device_entry {
     $entry->set_column( os     => $device_info->{os} );
     $entry->set_column( os_ver => $device_info->{os_ver} );
     $entry->set_column( vendor => $device_info->{vendor} );
+    $entry->set_column( serial => $device_info->{serial} );
 
     $entry->vtp_domain( $source->vtp_domain );
     $entry->boottime( $source->boottime );

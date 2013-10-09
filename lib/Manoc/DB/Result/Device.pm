@@ -35,6 +35,12 @@ __PACKAGE__->add_columns(
         default_value => 'NULL',
         is_nullable   => 1,
     },
+    serial => {
+        data_type     => 'varchar',
+        size          => 32,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
     vendor => {
         data_type     => 'varchar',
         size          => 32,

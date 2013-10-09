@@ -85,6 +85,20 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             };
     }
 
+    my $query_time  = time - Manoc::Utils::str2seconds("60d");
+    my @tot_actives = $c->model('ManocDB::Mat')->search(
+                                                    {
+                                                     'lastseen' => {'>=' => $query_time}
+                                                    },
+                                                    {
+                                                     select  => ['macaddr',{max => 'lastseen'}],
+                                                     group_by => 'macaddr',
+                                                    }
+                                                   );
+
+
+
+
     my @db_stats = (
         {
             name => "Tot racks",
@@ -105,6 +119,10 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
         {
             name => "MAT entries",
             val  => $schema->resultset('Mat')->count
+        },
+        {
+           name => "Active Mat entries",
+           val  => scalar(@tot_actives),
         },
         {
             name => "ARP entries",
@@ -303,7 +321,8 @@ sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
             os       => ( ( $_->os || 'n/a' ) . ' ' . ( $_->os_ver || '' ) ),
             rack     => $_->rack->id,
             floor    => $_->rack->floor,
-            building => $_->rack->building->description
+            building => $_->rack->building->description,
+	    serial   => $_->serial || 'n/a',
     }, @rs;
 
     $c->stash( table => \@table, template => 'reports/device_list.tt' );
