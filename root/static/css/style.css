@@ -6,7 +6,7 @@ body {
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 32px;
 }
 
 h2 {
@@ -25,11 +25,11 @@ h2 {
 }
 
 h1.logo {
-    left: 5px;
+    left: 28px;
     margin: 0;
-    position:absolute;
-    top: 2px;
-    text-decoration:none;
+    position: absolute;
+    top: 3px;
+    text-decoration: none;
 }
 
 h1.logo a {
@@ -39,8 +39,8 @@ h1.logo a {
 #dock {
     height:25px;
     position:absolute;
-    left: 105px;
-    top: 4px;
+    right: 2px;
+    top: 0px;
 }
 
 #dock ul {
@@ -49,7 +49,6 @@ h1.logo a {
 }
 
 #dock ul, #dock ul li {
-    float:left;
     list-style-type:none;
     margin:0;
     padding:0;
@@ -85,10 +84,10 @@ h1.logo a {
     font-weight:bold;
 }
 #navigation {
-    float:left;
+    float:right;
+    position: absolute;
     height:41px;
-    position:absolute;
-    left: 105px;
+    right: 5px;
     top: 30px;
 }
 
