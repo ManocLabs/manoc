@@ -89,6 +89,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     $tmpl_param{backup_date} =
         $device->config ? print_timestamp( $device->config->config_date ) : undef;
     $tmpl_param{backup_enabled} = $device->backup_enabled ? "Enabled" : "Not enabled";
+    $tmpl_param{serial}         = $device->serial;
 
     $tmpl_param{dot11_enabled} = $device->get_dot11 ? "Enabled" : "Not enabled";
     $tmpl_param{arp_enabled}   = $device->get_arp   ? "Enabled" : "Not enabled";

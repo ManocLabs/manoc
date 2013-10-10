@@ -12,6 +12,7 @@
      <th>Name</th>
      <th>Vendor</th>
      <th>Model</th>
+     <th>Serial</th>
      <th>OS</th>
   </tr>
 [% FOREACH t IN table %]
@@ -23,6 +24,7 @@
 	  <td>[% t.name %]</td>
 	  <td>[% t.vendor %]</td>
 	  <td>[% t.model %]</td>
+          <td>[% t.serial %]</td>
 	  <td>[% t.os %]</td>
        </tr>
 [% END %]
