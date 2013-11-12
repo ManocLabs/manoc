@@ -6,7 +6,7 @@ package Manoc::Controller::Ip;
 use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int check_addr);
-use Manoc::Form::Ip_notes;
+use Manoc::Form::Ip;
 use Manoc::IpAddress;
 use Data::Dumper;
 
@@ -86,10 +86,11 @@ sub _get_ipinfo : Private {
     }, @r;
     $c->stash( arp_results => \@arp_results );
 
-    my $note = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } );
-    defined($note)
-      ? $c->stash( 'notes' => $note->notes )
-      : $c->stash( 'notes' => '' );
+
+    my $info = $c->model('ManocDB::Ip')->find( { ipaddr => $id } );
+    defined($info)
+      ? $c->stash( 'info' => $info )
+      : undef;
 
     @r = $c->model('ManocDB::IPRange')->search(
         [
@@ -98,7 +99,7 @@ sub _get_ipinfo : Private {
                 'to_addr'   => { '>=' => $id },
             }
         ],
-        { order_by => 'from_addr DESC, to_addr' }
+        { order_by => 'from_addr DESC' }
     );
 
     #Warning: iprange tables now returns an Ipv4 object
@@ -107,8 +108,12 @@ sub _get_ipinfo : Private {
         from_addr   => $_->from_addr->address,
         to_addr     => $_->to_addr->address,
     }, @r;
-
     $c->stash( subnet => \@subnet, );
+
+    if(scalar(@r)){
+        $c->stash(last_subnet => $r[0]->name);
+    }
+
 }
 
 =head2 get_hostinfo
@@ -137,6 +142,23 @@ sub _get_hostinfo : Private {
         firstseen => print_timestamp( $_->firstseen ),
         lastseen  => print_timestamp( $_->lastseen )
     }, @r;
+
+    #select last known hostname and logon
+    @r = $c->model('ManocDB::WinHostname')->search(
+    { ipaddr   => $id},
+    { order_by => 'lastseen DESC' },
+    );
+    if(scalar(@r)){
+        $c->stash( last_host => $r[0]->name);
+    }
+    @r = $c->model('ManocDB::WinLogon')->search(
+    { ipaddr   => $id},
+    { order_by => 'lastseen DESC' },
+    );
+    if(scalar(@r)){
+        $c->stash( last_logon => $r[0]->user);
+    }
+
     $c->stash( logons => \@logons, );
 }
 
@@ -173,22 +195,22 @@ sub _get_dhcpinfo : Private {
     );
 }
 
-=head2 edit_notes
+=head2 edit
 
 =cut
 
-sub edit_notes : Chained('base') PathPart('edit_notes') Args(0) {
+sub edit : Chained('base') PathPart('edit') Args(0) {
     my ( $self, $c ) = @_;
     my $id = $c->stash->{id}; 
 
-    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } )
-      || $c->model('ManocDB::IpNotes')->new_result( {} );
+    my $item = $c->model('ManocDB::Ip')->find( { ipaddr => $id } )
+      || $c->model('ManocDB::Ip')->new_result( {} );
     $item->ipaddr($id);
     $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id->address] ) );
 
-    my $form = Manoc::Form::Ip_notes->new( item => $item );
+    my $form = Manoc::Form::Ip->new( item => $item );
 
-    $c->stash( form => $form, template => 'ip/edit_notes.tt' );
+    $c->stash( form => $form, template => 'ip/edit.tt' );
 
     if ( $c->req->param('discard') ) {
         $c->detach('/follow_backref');
@@ -200,27 +222,32 @@ sub edit_notes : Chained('base') PathPart('edit_notes') Args(0) {
     $c->detach('/follow_backref');
 }
 
-=head2 delete_notes
+=head2 delete
 
 =cut
 
-sub delete_notes : Chained('base') PathPart('delete_notes') Args(0) {
+sub delete : Chained('base') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
-    my $id = $c->stash->{id}; 
-    my $item = $c->model('ManocDB::IpNotes')->find( { ipaddr => $id } );
-
-    $c->stash( default_backref => $c->uri_for_action( 'ip/view', [$id->address] ) );
+    my $id = $c->stash->{'id'};
 
     if ( lc $c->req->method eq 'post' ) {
-        $item and $item->delete;
-        $c->flash( message => 'Success!! Note successful deleted.' );
-        $c->detach('/follow_backref');
+      my $info = $c->model('ManocDB::Ip')->find( { ipaddr => $id } );
+      unless(defined($info)) {
+        $c->flash( error_msg => 'Impossible delete ip info');
+	$c->stash( default_backref => $c->uri_for_action( '/ip/view', [ $id->address ] ) );
+	$c->detach('/follow_backref');
+      }
+        $info->delete;
+        $c->flash( message => 'Success!! '.  $id->address . ' infos successful deleted.' );
 
+	$c->stash( default_backref => $c->uri_for_action( '/ip/view', [ $id->address ] ) );
+        $c->detach('/follow_backref');
     }
     else {
         $c->stash( template => 'generic_delete.tt' );
     }
 }
+
 
 =head1 AUTHOR
 
