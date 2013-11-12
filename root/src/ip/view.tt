@@ -18,13 +18,27 @@
      <table id="info">
          <tr>
   	  <td>Ip: </td>
-  	  <td>[% id.address %]</td>
+  	  <td>[% id.address %] 
+      [%IF last_subnet -%]([% last_subnet %]) [%END -%]
+      </td>
  	 </tr>
-         <tr>
+   <tr>
   	  <td>Description: </td>
   	  <td>[% info.description %]</td>
  	 </tr>
-         <tr>
+   [%IF last_host -%]
+    <tr>
+      <td>Last hostname: </td>
+      <td>[% last_host %]</name> </td>
+    </tr>
+   [%END -%]
+   [%IF last_logon -%]
+    <tr>
+      <td>Last logon: </td>
+      <td>[% last_logon %]</td>
+    </tr>
+   [%END -%]
+   <tr>
   	  <td>Assigned to: </td>
   	  <td>[% info.assigned_to %]</td>
  	 </tr>
@@ -42,10 +56,15 @@
 
    <p>
      <div class="buttons">	
-	<a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
-     ui_icon('pencil') %] Edit Infos </a>
-	&nbsp;<a href=[% c.uri_for_action('ip/delete', [id.address ]) %]>
-	[% ui_icon('closethick') %]  Delete Infos </a>
+      [%IF info -%]
+       <a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
+         ui_icon('pencil') %] Edit Infos </a>
+	     &nbsp;<a href=[% c.uri_for_action('ip/delete', [id.address ]) %]>
+	     [% ui_icon('closethick') %]  Delete Infos </a>
+      [%ELSE  -%]
+      <a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
+         ui_icon('pencil') %] Add Infos </a>
+    [%END -%]
      </div>
     </p>
    </div>

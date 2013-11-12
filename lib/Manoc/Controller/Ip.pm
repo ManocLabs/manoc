@@ -90,7 +90,7 @@ sub _get_ipinfo : Private {
     my $info = $c->model('ManocDB::Ip')->find( { ipaddr => $id } );
     defined($info)
       ? $c->stash( 'info' => $info )
-      : $c->stash( 'info' => '' );
+      : undef;
 
     @r = $c->model('ManocDB::IPRange')->search(
         [
@@ -99,7 +99,7 @@ sub _get_ipinfo : Private {
                 'to_addr'   => { '>=' => $id },
             }
         ],
-        { order_by => 'from_addr DESC, to_addr' }
+        { order_by => 'from_addr DESC' }
     );
 
     #Warning: iprange tables now returns an Ipv4 object
@@ -108,8 +108,12 @@ sub _get_ipinfo : Private {
         from_addr   => $_->from_addr->address,
         to_addr     => $_->to_addr->address,
     }, @r;
-
     $c->stash( subnet => \@subnet, );
+
+    if(scalar(@r)){
+        $c->stash(last_subnet => $r[0]->name);
+    }
+
 }
 
 =head2 get_hostinfo
@@ -138,6 +142,23 @@ sub _get_hostinfo : Private {
         firstseen => print_timestamp( $_->firstseen ),
         lastseen  => print_timestamp( $_->lastseen )
     }, @r;
+
+    #select last known hostname and logon
+    @r = $c->model('ManocDB::WinHostname')->search(
+    { ipaddr   => $id},
+    { order_by => 'lastseen DESC' },
+    );
+    if(scalar(@r)){
+        $c->stash( last_host => $r[0]->name);
+    }
+    @r = $c->model('ManocDB::WinLogon')->search(
+    { ipaddr   => $id},
+    { order_by => 'lastseen DESC' },
+    );
+    if(scalar(@r)){
+        $c->stash( last_logon => $r[0]->user);
+    }
+
     $c->stash( logons => \@logons, );
 }
 
