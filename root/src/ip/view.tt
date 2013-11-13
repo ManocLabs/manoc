@@ -19,12 +19,28 @@
          <tr>
   	  <td>Ip: </td>
   	  <td>[% id.address %] 
-      [%IF last_subnet -%]([% last_subnet %]) [%END -%]
+      [%IF last_subnet -%] [%END -%]
       </td>
  	 </tr>
    <tr>
-  	  <td>Description: </td>
-  	  <td>[% info.description %]</td>
+    [%IF last_subnet -%]
+    <tr>
+      <td>Subnet: </td>
+      <td><a href="[% c.uri_for_action('iprange/view',[last_subnet.name]) %]"> 
+          [% last_subnet.name %]</a> 
+      </td>
+    </tr>
+   [%END -%] 
+    [%IF last_vlan -%]
+    <tr>
+      <td>Vlan: </td>
+      <td><a href="[% c.uri_for_action('vlan/view',[last_vlan.id]) %]"> 
+          [% last_vlan.id %]</a> 
+      </td>
+    </tr>
+   [%END -%] 
+    <td>Description: </td>
+  	 <td>[% info.description %]</td>
  	 </tr>
    [%IF last_host -%]
     <tr>

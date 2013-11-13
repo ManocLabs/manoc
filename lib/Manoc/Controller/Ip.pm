@@ -111,7 +111,8 @@ sub _get_ipinfo : Private {
     $c->stash( subnet => \@subnet, );
 
     if(scalar(@r)){
-        $c->stash(last_subnet => $r[0]->name);
+        $c->stash(last_subnet => $r[0]);
+        $c->stash(last_vlan   => $r[0]->vlan_id);
     }
 
 }
