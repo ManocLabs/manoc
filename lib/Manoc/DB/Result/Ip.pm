@@ -14,29 +14,29 @@ __PACKAGE__->add_columns(
     'ipaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
     },
     'description' => {
         data_type   => 'text',
-        is_nullable => 1
+        is_nullable => 1,
     },
     'assigned_to' => {
         data_type   => 'varchar',
-        size        => 45
-        is_nullable => 1
+        size        => 45,
+        is_nullable => 1,
     }, 
     'phone' => {
         data_type   => 'varchar',
-        size        => 30
-	is_nullable => 1
+        size        => 30,
+	is_nullable => 1,
     },
     'email' => {
      data_type   => 'varchar',
-     is_nullable =>  45 
+     is_nullable =>  45,
     },
     'notes' => {
         data_type   => 'text',
-        is_nullable => 1
+        is_nullable => 1,
     },
 );
 
