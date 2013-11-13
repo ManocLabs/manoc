@@ -214,5 +214,57 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
 }
 
 #----------------------------------------------------------------------#
+sub ip_info : Chained('base') : PathPart('ipinfo') : Args(0) {
+    my ( $self, $c ) = @_;
 
+    my $ipaddr      = Manoc::IpAddress->new($c->req->param('ipaddr'));
+    my $descr       = $c->req->param('descr');
+    my $assigned_to = $c->req->param('assigned');
+    my $phone       = $c->req->param('phone');
+    my $email       = $c->req->param('email');
+    my $notes       = $c->req->param('notes');
+    
+
+    unless ($ipaddr) {
+        $c->stash( error => "Missing IP address param" );
+        $c->detach('apierror');
+    }
+    unless ( $ipaddr->address =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o ) {
+        $c->stash( error => "Bad ipaddr" );
+        $c->detach('apierror');
+    }
+
+    my $timestamp = time();
+
+    my $rs = $c->model('ManocDB::Ip');
+    my @entries = $rs->search(
+            {
+                ipaddr   => $ipaddr,
+            }
+        );
+
+    if ( scalar(@entries)  ) {
+        my $entry = $entries[0];
+        $descr and $entry->description($descr);
+        $assigned_to and $entry->assigned_to($assigned_to);
+	$phone and $entry->phone($phone);
+	$email and $entry->email($email);
+	$notes and $entry->notes($notes);    
+	$entry->update();
+    }
+    else {
+    	$rs->create(
+                {
+                  ipaddr      => $ipaddr,
+                  description => $descr,
+                  assigned_to => $assigned_to,
+		  phone       => $phone,
+                  email       => $email,
+		  notes       => $notes,
+                }
+            );
+    }
+    $c->response->body('ok');
+    $c->detach();
+}
 1;
