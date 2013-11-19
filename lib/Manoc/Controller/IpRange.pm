@@ -215,8 +215,8 @@ sub ip_list : Private {
 	 ],
     );
 
-    my %ip_info = map { $_->ipaddr->address => { notes => $_->notes,
-						 desc  => $_->description}
+    my %ip_info = map { $_->ipaddr->address => { assigned_to => $_->assigned_to,
+						                         desc  => $_->description}
 		      } @rs;
 
     my @addr_table;
@@ -226,8 +226,8 @@ sub ip_list : Private {
             {
             ipaddr   => $ipaddr,
             lastseen => $arp_info{$ipaddr} || 'n/a',
-            notes    => $ip_info{$ipaddr}->{notes} || '',
-	    desc     => $ip_info{$ipaddr}->{desc}  || '',
+            assigned_to    => $ip_info{$ipaddr}->{assigned_to} || '',
+	        desc     => $ip_info{$ipaddr}->{desc}  || '',
             };
     }
     $c->stash( addresses => \@addr_table );
@@ -269,7 +269,7 @@ sub ip_list : Private {
         disable_pagination => 1,
         disable_sorting    => 1,
         cur_page           => $page,
-	backref            => $backref,
+	    backref            => $backref,
     );
 }
 
