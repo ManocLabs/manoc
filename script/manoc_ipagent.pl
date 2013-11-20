@@ -3,46 +3,64 @@
 use strict;
 use warnings;
 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Manoc::Support;
+package Manoc::IPFill;
+
 use LWP::UserAgent;
-use YAML::Syck;
 use URI::Escape;
 
-use Date::Parse;
 use Data::Dumper;
 use HTTP::Cookies;
-#----------------------------------------------------------------------#
-# Constants
-#----------------------------------------------------------------------#
 
-my $MANOC_URL   = "https://manoc.policlinico.org/wapi";
-my $IP_FILE     = "/opt/manoc_clients/indirizzi100.csv";
+use Moose;
 
-#----------------------------------------------------------------------#
-# Global variables
-#----------------------------------------------------------------------#
+extends 'Manoc::App';
+with 'MooseX::Getopt::Dashes';
 
-my $User_agent;
+has 'manoc_url' => (
+    is       => 'rw',
+    isa      => 'Str',
+    required => 1,
+    #default => ""
+);
 
+has 'ip_file' => (
+    is       => 'rw',
+    isa      => 'Str',
+    required => 1,
+    #default => ""
+);
+
+has 'user_agent' => (
+    traits     => ['NoGetopt'],
+    is         => 'ro',
+    required   => 0,
+    lazy_build => 1,
+);
+
+sub _build_user_agent { return LWP::UserAgent->new ;}
 #----------------------------------------------------------------------#
 
 sub send_to_manoc {
-    my $data = shift;
-    
-    my $url= $MANOC_URL.'/ipinfo';
+    my $self = shift;
+    my $data = shift; 
+    my $url= $self->manoc_url.'/ipinfo';
 
     #basic authentication required
-    $User_agent->credentials(
-  	'manoc.policlinico.org:443',
-  	'agents',
-  	'agents' => 'agent1n0',
+    $self->user_agent->credentials(
+  	'<url>',
+  	'<name>',
+  	'<user>' => '<pass>',
     );
     
-    $User_agent->cookie_jar(HTTP::Cookies->new(
+    $self->user_agent->cookie_jar(HTTP::Cookies->new(
      file => './.manoc_cookies.txt',
      autosave => 1 ));
 
     foreach my $i (@{$data}){
-      $url  = $MANOC_URL.'/ipinfo';
+      $url  = $self->manoc_url.'/ipinfo';
       $url .= "?ipaddr=".$i->{ipaddr};
       foreach my $c (keys %{$i}){
        $c eq 'ipaddr' and next;
@@ -50,7 +68,7 @@ sub send_to_manoc {
       }
 
       my $req  = HTTP::Request->new(GET => $url);
-      my $res  = $User_agent->request($req);
+      my $res  = $self->user_agent->request($req);
 
       if($res->is_success){
         print "Request OK: $url\n";
@@ -60,13 +78,6 @@ sub send_to_manoc {
         die "Failure for request: $url\n";
       }
     }
-    ### success: $res->is_success
-    ### content: $res->content
-  
-    #unless($res->is_success){
-    # print $res->content,"\n";
-    #}
-
     return 1;
 }
 
@@ -78,21 +89,19 @@ sub parse_ipinfo {
     my $file_data;
     my $hndl;
 
-    return unless -e $IP_FILE;
+    return unless -e $self->ip_file;
 
-    ### read config file: $LEASES_FILE
     $file_data = '';
-    open($hndl, '<', $IP_FILE) or die $!;
+    open($hndl, '<', $self->ip_file) or die $!;
     while (<$hndl>) {
 	s/^([^#]*).*$/$1/;
 	$file_data .= $_;
     }   
     close $hndl;
 
-    ### search lease definitions
-    while (1) {
-	$file_data =~ m/([\d\.]+),(.*),(.*),(.*),(.*),(.*)/mxgo or last;
-	push @infos, {
+  while (1) {
+	 $file_data =~ m/([\d\.]+),(.*),(.*),(.*),(.*),(.*)/mxgo or last;
+	 push @infos, {
 		       ipaddr   => $1,
 		       descr    => $2,
 		       assigned => $3, 
@@ -105,23 +114,20 @@ sub parse_ipinfo {
     return \@infos;
 }
 
-sub do_ipinfo {
-    my $infos = parse_ipinfo;
-    send_to_manoc($infos) or
+
+sub run {
+  my $self = shift;
+
+  my $infos = $self->parse_ipinfo;
+  $self->send_to_manoc($infos) or
       die "Error sending IP informations";
-
 }
 
-#----------------------------------------------------------------------#
 
-sub main {
+no Moose;
 
-    # init UA
-    $User_agent = LWP::UserAgent->new;
+package main;
 
-    do_ipinfo;
+my $app = Manoc::IPFill->new_with_options();
+$app->run;
 
-    exit 0;
-}
-
-main;
