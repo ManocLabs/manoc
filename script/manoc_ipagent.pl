@@ -50,9 +50,9 @@ sub send_to_manoc {
 
     #basic authentication required
     $self->user_agent->credentials(
-  	'manoc.policlinico.org:443',
-  	'agents',
-  	'agents' => 'agent1n0',
+  	'<url>',
+  	'<name>',
+  	'<user>' => '<pass>',
     );
     
     $self->user_agent->cookie_jar(HTTP::Cookies->new(
