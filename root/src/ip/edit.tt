@@ -1,0 +1,6 @@
+[% META title='Edit Ip Informations'
+   section='Asset' %]
+
+<div class="buttons">
+[% form.render %]
+</div>
