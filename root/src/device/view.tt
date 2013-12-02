@@ -243,13 +243,14 @@
 <div id="tabs-4">
 [% FOREACH if IN iface_info %]
   [% IF loop.first %]
-    [% init_table('iface_act', [20,5,15,60])  -%]
+    [% init_table('iface_act', [20,5,15,15,45])  -%]
      <table class="display" id="iface_act">
      <thead>
        <tr>
 	 <th>Interface</th>
 	 <th>Admin Status</th>
 	 <th>Last MAT activity date</th>
+   <th>Vlan</th>
 	 <th>Description</th>
        </tr>
      </thead>  
@@ -268,6 +269,7 @@
     
     <td style="color:[% status_color %];">[% if.up_admin %]</td>
     <td>[% if.last_mat %]</td>
+    <td>[% IF if.vlan %] [% if.vlan%] [% ELSE%] - [%END%]</td>
     <td>[% if.description | html %]</td>
   </tr>
   [% IF loop.last %]

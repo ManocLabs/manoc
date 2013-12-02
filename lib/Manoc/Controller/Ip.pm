@@ -150,14 +150,16 @@ sub _get_hostinfo : Private {
     { order_by => 'lastseen DESC' },
     );
     if(scalar(@r)){
-        $c->stash( last_host => $r[0]->name);
+        $c->stash( last_host => { name => $r[0]->name,
+                                  lastseen => print_timestamp($r[0]->lastseen) });
     }
     @r = $c->model('ManocDB::WinLogon')->search(
     { ipaddr   => $id},
     { order_by => 'lastseen DESC' },
     );
     if(scalar(@r)){
-        $c->stash( last_logon => $r[0]->user);
+        $c->stash( last_logon => { user => $r[0]->user,
+                                   lastseen => print_timestamp($r[0]->lastseen) } );
     }
 
     $c->stash( logons => \@logons, );
