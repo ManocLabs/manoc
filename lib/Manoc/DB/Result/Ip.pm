@@ -2,23 +2,41 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::Result::IpNotes;
+package Manoc::DB::Result::Ip;
 use base 'DBIx::Class';
 use strict;
 use warnings;
 
 __PACKAGE__->load_components(qw/ Core InflateColumn/);
-__PACKAGE__->table('ip_notes');
+__PACKAGE__->table('ip');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
+    },
+    'description' => {
+        data_type   => 'text',
+        is_nullable => 1,
+    },
+    'assigned_to' => {
+        data_type   => 'varchar',
+        size        => 45,
+        is_nullable => 1,
+    }, 
+    'phone' => {
+        data_type   => 'varchar',
+        size        => 30,
+	is_nullable => 1,
+    },
+    'email' => {
+     data_type   => 'varchar',
+     is_nullable =>  45,
     },
     'notes' => {
         data_type   => 'text',
-        is_nullable => 1
+        is_nullable => 1,
     },
 );
 
