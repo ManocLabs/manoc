@@ -45,13 +45,13 @@
    [%IF last_host -%]
     <tr>
       <td>Last hostname: </td>
-      <td>[% last_host %]</name> </td>
+      <td>[% last_host.name %] ( [%last_host.lastseen%] )</td>
     </tr>
    [%END -%]
    [%IF last_logon -%]
     <tr>
       <td>Last logon: </td>
-      <td>[% last_logon %]</td>
+      <td>[% last_logon.user %] ( [%last_logon.lastseen%] ) </td>
     </tr>
    [%END -%]
    <tr>

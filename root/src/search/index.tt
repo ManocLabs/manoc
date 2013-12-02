@@ -62,7 +62,7 @@
 [% END -%]
 [% MACRO item_iface(item) BLOCK -%]
 <label id="search-cat">Interface:</label>  [% print_short_iface(item.device.id, item.interface) %] on
-[% print_device(item.device) %]
+[% print_device_with_name(item.device) %]
 [% END -%]
 [% MACRO item_generic_group(item) BLOCK -%]
  [% IF item and item.isa("Manoc::IpAddress") -%]

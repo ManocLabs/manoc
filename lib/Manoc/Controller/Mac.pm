@@ -108,8 +108,8 @@ sub _get_mat : Private {
     my @r = $c->stash->{'resultset'}->{'mat'}->search(
         {macaddr => $c->stash->{id}},
         {
-            join => [ { 'device_entry' => 'mng_url_format' }, 'device_entry', ],
-            prefetch => [ 'device_entry', { 'device_entry' => 'mng_url_format' }, ]
+            #join => [ { 'device_entry' => 'mng_url_format' }, 'device_entry', ],
+            prefetch => { 'device_entry' => ['mng_url_format'] }, 
         }
     );
     my @mat_entries = map +{

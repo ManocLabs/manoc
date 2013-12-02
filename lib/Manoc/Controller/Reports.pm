@@ -98,7 +98,6 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
 
 
 
-
     my @db_stats = (
         {
             name => "Tot racks",
