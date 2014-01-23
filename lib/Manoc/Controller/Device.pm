@@ -115,7 +115,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
                                ]});
   
     my @cdp_links;
-    my $time_group = 3600 * 12; #3 hours
+    my $time_group = $c->config->{Device}->{cdp_age} || 3600 * 12; #12 hours
     foreach my $n (@neighs){
       my $neigh_addr = $n->to_device; 
       $neigh_addr = $n->to_device->address if(ref $neigh_addr);
