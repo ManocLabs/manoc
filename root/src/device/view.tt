@@ -1,9 +1,10 @@
 [% META 
    title='Device View'
-   use_table=1
-   section='Asset'
+   use_table = 1
+   use_row_group = 1
+   section = 'Asset'
 -%]
-
+ 
 
 <div id="tabs">	 
   <ul>
@@ -138,37 +139,49 @@
 
 [% FOREACH link IN cdp_links %]
   [% IF loop.first %]
-    [% init_table('cdp_links',undef,{sortby => 4, order=>'desc'}) %]
+    [% init_row_group_table('cdp_links',undef,{sortby =>5, order=>'desc', col_group => 4}) %]
     <table class="display" id="cdp_links">
       <thead>  
-	<tr>
-	  <th>Local Interface</th>
-          <th>Neigh Address</th>
-	  <th>Neigh Name</th>
-	  <th>Neigh Description</th>
-          <th>Last seen</th>
-	</tr>
-      </thead>  
+	     <tr>
+         <th>Group</th>
+	       <th>Local Interface</th>
+         <th>Neigh Address</th>
+	       <th>Neigh Name</th>
+	       <th>Neigh Description</th>
+         <th>Last seen</th>
+	     </tr>
+      </thead> 
+       <tfoot>  
+       <tr>
+         <th>Group</th>
+         <th>Local Interface</th>
+         <th>Neigh Address</th>
+         <th>Neigh Name</th>
+         <th>Neigh Description</th>
+         <th>Last seen</th>
+       </tr>
+      </tfoot> 
+
+
       <tbody>  
     [% END %]
          <tr>
+           <td> [% link.group %] </td>
            <td>
-	     <a href="[% c.uri_for_action('interface/view', 
-	     [object.id, link.local_iface]) %]">
-	     [% link.local_iface %]</a>
-	   </td>
-	[% IF  link.device_name  %]
-         <td>
-	    <a href="[% c.uri_for_action('device/view', [link.neigh_address]) %]">[% link.neigh_address %]</a>
-	 </td>
+	           <a href="[% c.uri_for_action('interface/view', 
+	           [object.id, link.local_iface]) %]">
+	           [% link.local_iface %]</a>
+	         </td>
+	       [% IF  link.device_name  %]
+         <td><a href="[% c.uri_for_action('device/view', [link.neigh_address]) %]">[% link.neigh_address %]</a></td>
          <td>[% link.device_name -%]</td>
-	[% ELSE %]
-           <td>[% print_ip(link.neigh_address) -%]
-           <td>[% link.device_id %]</td>
-	[% END %]
-	<td>[% link.descr %]</td>
-	<td>[% link.date %]</td>
-    </tr>
+	       [% ELSE %]
+         <td>[% print_ip(link.neigh_address) -%]</td>
+         <td>[% link.device_id %]</td>
+	       [% END %]
+	       <td>[% link.descr %]</td>
+	       <td>[% link.date %]</td>
+        </tr>
     [% IF loop.last %]
       </tbody>
     </table>
