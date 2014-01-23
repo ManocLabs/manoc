@@ -1,20 +1,24 @@
+[% MACRO init_row_group BLOCK -%]
+	[% link_css.push(c.uri_for('/static/css/rowGrouping.css') ) -%]
+	[% link_js.push(c.uri_for('/static/js/jquery.dataTables.rowGrouping.js')) -%]
+[%  END -%]
+
 [% MACRO init_datatable BLOCK -%]
-[%  link_css.push(c.uri_for('/static/css/table.css'), ) -%]
+[%  link_css.push(c.uri_for('/static/css/table.css')) -%]
 [%  link_js.push(c.uri_for('/static/js/jquery.dataTables.js'),
                c.uri_for('/static/js/dataTables.typeDetectPlugin.js'),
-	       c.uri_for('/static/js/dataTables.typeSortPlugin.js'),	
-              ) 
+	       c.uri_for('/static/js/dataTables.typeSortPlugin.js'),
+             ) 
 -%]
 [% END -%]
-[%                                                                   -%]
+
 [% MACRO init_exp_table BLOCK -%]
 [% link_js.push(c.uri_for('/static/js/jExpand.js')) -%]
-[%  link_css.push( 
-		 c.uri_for('/static/css/jExpand.css'),
-    		 )
+[% link_css.push( c.uri_for('/static/css/jExpand.css')) 
 
 -%]
 [%  END -%]
+
 [%                                                                   -%]
 [%# Init Table -%]
 [%MACRO init_table(id,columns, options) BLOCK -%]
@@ -47,13 +51,39 @@ $(function() {
 			     ,{ "sWidth"    : "[% col %]%"}  
 			     [% END %]
 			     ]
-		[% ELSE %]
+		   [% ELSE %]
 	        "test": false
 	        [% END %]
-
            	});
 	 }
 });
 [% END -%]
 [% js_scripts.push(capture) -%]
 [% END -%]
+
+[%MACRO init_row_group_table(id,columns, options) BLOCK -%]
+[% capture = BLOCK -%]
+$(function() { 
+	  if ( $("#[% id  %]").dataTable ) {
+	   
+ 	     /* inizializzazione della tabella */
+	     $("#[% id  %]").dataTable( 
+	     							//to use JQuery UI style
+	      							{
+	       "bJQueryUI"       : true,
+	       //[% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
+	       //pagination button (two_button, full_numbers)
+ 	       "bLengthChange": false,
+	       //to disable sorting
+	       //"bSort": true,
+		   //to disable pagination
+	       "bPaginate": false
+	       }).rowGrouping({ bExpandableGrouping: true,
+	         				asExpandedGroups: ["Active"],
+						  });
+		}
+});
+[% END -%]
+[% js_scripts.push(capture) -%]
+[% END -%]
+

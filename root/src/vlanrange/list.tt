@@ -1,5 +1,5 @@
 [% META 
-        title='VLAN' 
+  title='VLAN' 
 	use_exp_table = 1
 	section= 'NetDB'
 -%]
