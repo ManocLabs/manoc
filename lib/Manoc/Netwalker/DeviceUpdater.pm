@@ -444,6 +444,8 @@ sub update_vtp_database {
         return;
     }
 
+    $self->report->add_warning("Vtp Vlan DB up to date");
+
     my $rs = $self->schema->resultset('VlanVtp');
     $rs->delete();
     while ( my ( $id, $name ) = each(%$vlan_db) ) {

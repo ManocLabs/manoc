@@ -92,10 +92,11 @@ sub visit_device {
                                                        timestamp       => time,
                                                       );
     #deep update?
+    my $device_ip = $device_entry->id->address;
     if($self->full_update){
         $updater->update_all_info();
         #update vtp info if is also a vtp server 
-        $config->{vtp_servers}->{$device_id} and $updater->update_vtp_database();
+        $config->{vtp_servers}->{$device_ip} and $updater->update_vtp_database();
     }
     else {
         $updater->fast_update();
