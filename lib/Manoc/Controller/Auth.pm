@@ -36,27 +36,24 @@ sub index : Path : Args(0) {
 
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
-
+    my $username = $c->req->params->{'username'};
     $c->stash( template => 'auth/login.tt' );
     $c->keep_flash("backref");
 
     $c->stash( default_backref => $c->uri_for('/search') );
 
-    if ( defined( $c->req->params->{'username'} ) ) {
+    if ( defined( $username ) ) {
         if (
             $c->authenticate(
                 {
                     login    => $c->req->params->{'username'},
                     password => $c->req->params->{'password'},
-                    active   => 1,
-                },
-                'normal'
+                }, 'progressive'
             )
             )
         {
             $c->flash( message => 'Logged In!' );
-            $c->log->debug( 'User ' . $c->user->login . ' logged' );
-
+            $c->log->debug( 'User ' . $username . ' logged');
             $c->detach('/follow_backref');
         }
         else {
