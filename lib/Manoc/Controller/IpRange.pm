@@ -216,7 +216,8 @@ sub ip_list : Private {
     );
 
     my %ip_info = map { $_->ipaddr->address => { assigned_to => $_->assigned_to,
-						                         desc  => $_->description}
+						 desc        => $_->description,
+						 notes       => $_->notes}
 		      } @rs;
 
     my @addr_table;
@@ -224,11 +225,12 @@ sub ip_list : Private {
         my $ipaddr = int2ip( $page_start_addr_i + $i );
         push @addr_table,
             {
-            ipaddr   => $ipaddr,
-            lastseen => $arp_info{$ipaddr} || 'n/a',
-            assigned_to    => $ip_info{$ipaddr}->{assigned_to} || '',
-	        desc     => $ip_info{$ipaddr}->{desc}  || '',
-            };
+            ipaddr      => $ipaddr,
+            lastseen    => $arp_info{$ipaddr} || 'n/a',
+            assigned_to => $ip_info{$ipaddr}->{assigned_to} || '',
+	    desc        => $ip_info{$ipaddr}->{desc}   || '',
+	    notes       => $ip_info{$ipaddr}->{notes}  || '',        
+    };
     }
     $c->stash( addresses => \@addr_table );
      
@@ -343,6 +345,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
         vlan_id    => $_->vlan_id ? $_->vlan_id->id : undef,
         vlan       => $_->vlan_id ? $_->vlan_id->name : "-",
         n_children => $_->children->count(),
+	netmask    => $_->netmask,
         n_neigh    => get_neighbour(
 				    $c->model('ManocDB::IPRange'), 
 				    $name,

@@ -238,7 +238,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
            || 1,
      );
 
-     $ENV{DEBUG} = 0;
+     $ENV{DEBUG} = 1;
      my $updater = Manoc::Netwalker::DeviceUpdater->new(
          entry        => $c->stash->{object},
          config       => \%config,

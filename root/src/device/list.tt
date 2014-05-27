@@ -20,6 +20,7 @@
 	   <th>Rack</th>
 	   <th>Floor</th>
 	   <th>Vendor</th>
+           <th>OS Version</th>
            <th>Serial</th>
 	   <th>Model</th>
          </tr>
@@ -33,6 +34,7 @@
 	   <td><a href="[%c.uri_for_action('/rack/view',	[d.rack.id])%]"> [% d.rack.name %]</a></td>
 	   <td>[% d.rack.floor %]</td>
 	   <td>[% d.vendor %]</td>
+           <td>[% d.os_ver %]</td>
 	   <td>[% d.serial %]</td>
 	   <td>[% d.model %]</td>
          </tr>
