@@ -62,12 +62,13 @@ __PACKAGE__->config(
         realms        => {
             progressive => {
                 class  => 'Progressive',
-                realms => [ 'normal', 'agents' ],
+                realms => [ 'normal', 'ldap','agents'],
             },
             normal => {
                 credential => {
                     class              => 'Password',
                     password_field     => 'password',
+                    username_field     => 'login',
                     password_type      => 'hashed',
                     password_hash_type => 'MD5'
                 },
@@ -78,7 +79,7 @@ __PACKAGE__->config(
                     role_field    => 'role',
                 }
             },
-            agents => {
+            agent => {
                 credential => {
                     class              => 'HTTP',
                     type               => 'basic',      # 'digest' or 'basic'
@@ -94,6 +95,36 @@ __PACKAGE__->config(
                     role_field    => 'role',
                 }
             },
+            ldap => {
+                credential => {
+                  class => "Password",
+                  username_field => "username",
+                  password_field => "password",
+                  password_type  => "self_check",
+                },
+                store => {
+                  class               => "LDAP",
+                  ldap_server         => "",
+                  ldap_server_options => { timeout => 100 , onerror => "warn"},
+                  role_basedn         => "ou=ManocRoles,dc=bla,dc=bla,dc=bla", #This should be the basedn where the LDAP Objects representing your roles are.
+                  role_field          => "cn",
+                  role_filter         => "",
+                  role_scope          => "one",
+                  role_search_options => { deref => "always" },
+                  role_value          => "cn",
+                  role_search_as_user => 0, #role disabled
+                  start_tls           => 0, #disabled
+                  start_tls_options   => { verify => "none" },
+                  entry_class         => "Net::LDAP::Entry",
+                  use_roles           => 1,
+                  user_basedn         => "ou=People,dc=bla,dc=bla,dc=bla",
+                  user_field          => "uid",
+                  user_filter         => "(&(objectClass=posixAccount)(uid=%s))",
+                  user_scope          => "sub", # 
+                  user_search_options => { deref => "always" },
+                  user_results_filter => sub { return shift->pop_entry },
+                },
+              },
         },
     },
 
@@ -186,7 +217,7 @@ after setup_finalize => sub {
     }
 
     #ACL to protect WApi with HTTP Authentication
-    __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agents' ) } );
+    __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agent' ) } );
 
     #Load Search Plugins    
 

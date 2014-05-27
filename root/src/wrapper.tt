@@ -32,7 +32,12 @@
       <div id="navigation">
       [% menu_navigation %]
       </div>
-   </div>
+      <div id="logged">
+      [% IF c.user.username %]
+      User: <i>[% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
+      [%END%]
+      </div>
+  </div>
 </div>
 [% END -%]
 <div id="content-wrapper">

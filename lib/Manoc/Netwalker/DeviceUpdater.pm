@@ -357,7 +357,7 @@ sub update_mat {
 
     my $ignore_portchannel = $self->config->{ignore_portchannel};
 
-    my $mat = $source->mat();
+    my $mat = $source->mat() or return;
 
     my $mat_count = 0;
 

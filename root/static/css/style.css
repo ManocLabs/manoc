@@ -84,6 +84,19 @@ h1.logo a {
 #dock ul li.selected a {
     font-weight:bold;
 }
+
+#logged {
+ color: #000000;
+ font-weight:bold;
+ float:left;
+ height:30px;
+ position:absolute;
+ right:0;
+ top: 35px;
+ font-size:6px;
+
+}
+
 #navigation {
     float:left;
     height:41px;

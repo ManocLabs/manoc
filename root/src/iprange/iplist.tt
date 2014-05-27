@@ -18,6 +18,7 @@
  	 <th>Lastseen</th>
 	 <th>Description</th>
 	 <th>Assigned To</th>
+         <th>Notes</th>
          <th>Commands</th>
 	 </tr>
        </thead>  
@@ -28,6 +29,7 @@
    <td> [% ip.lastseen %] </td>
 	 <td> [% ip.desc %]</td>
 	 <td> [% ip.assigned_to %]</td>
+         <td> [% ip.notes %]</td>
 	 <td> 
         <a href="[% c.uri_for_action('ip/edit',[ip.ipaddr],{backref=> backref}) %]">[% icon('edit') %]</a>
 	[% IF ip.notes %]       

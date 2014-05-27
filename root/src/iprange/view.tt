@@ -78,6 +78,7 @@
  	 <th>Subnet Name</th>
  	 <th>From</th>
 	 <th>To</th>
+         <th>Netmask</th>
 	 <th>Vlan name</th>
   	 <th>Commands</th>
          </tr>
@@ -86,8 +87,9 @@
   [% END %]
          <tr>
  	 <td><a href="[% c.uri_for_action('iprange/view',[child.name])%]">[%child.name%]</a></td>
-  	 <td>[%child.from_addr%]</td>
+	 <td>[%child.from_addr%]</td>
 	 <td>[%child.to_addr%]</td>
+         <td>[%child.netmask%]</td>
   	 <td><a href="[% c.uri_for_action('vlan/view',[child.vlan_id]) %]">[%child.vlan_id%]</a></td>
 	 <td>
 	  <a href="[% c.uri_for_action('iprange/edit',[child.name], {backref=> c.uri_for_action('iprange/view',[object.name],{def_tab=2})}) %]">[% icon('edit') %]</a>
