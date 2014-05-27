@@ -43,15 +43,18 @@ sub login : Local : CaptureArgs(0) {
     $c->stash( default_backref => $c->uri_for('/search') );
 
     if ( defined( $username ) ) {
-        if (
-            $c->authenticate(
+        if ($c->authenticate(
                 {
                     login    => $c->req->params->{'username'},
                     password => $c->req->params->{'password'},
-                }, 'progressive'
-            )
-            )
-        {
+                }, 'normal'
+            )  or $c->authenticate(
+                {
+                    login    => $c->req->params->{'username'},
+                    password => $c->req->params->{'password'},
+                }, 'ldap'
+            ) ){
+
             $c->flash( message => 'Logged In!' );
             $c->log->debug( 'User ' . $username . ' logged');
             $c->detach('/follow_backref');
