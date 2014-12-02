@@ -2,7 +2,7 @@ package Manoc;
 use Moose;
 use namespace::autoclean;
 
-use Catalyst::Runtime 5.80;
+use Catalyst::Runtime 5.90;
 
 # Set flags and add plugins for the application
 #
@@ -32,7 +32,7 @@ with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
 with 'Catalyst::ClassData';
 
-our $VERSION = '2.1';
+our $VERSION = '2.002001';
 $VERSION = eval $VERSION;
 
 use Data::Dumper;
