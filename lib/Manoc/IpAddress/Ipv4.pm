@@ -2,6 +2,7 @@ package Manoc::IpAddress::Ipv4;
 
 use Moose;
 use Manoc::Utils;
+use Scalar::Util;
 extends 'Manoc::IpAddress';
 
 use overload ('""'  =>   \&to_string,
@@ -29,6 +30,8 @@ sub _set_unpadded {
    $self->address(Manoc::Utils::unpadded_ipaddr( $new ));
 }
 
+
+# WARNING: used by comparison operators
 sub to_string {
     return $_[0]->padded;
 }
@@ -36,39 +39,30 @@ sub to_string {
 sub less_than {
   my ($first, $second) = @_;
   return unless defined $second;
-  $second = $second->padded if(ref $second);
-  return $first->padded lt $second;
+  return "$first" lt "$second";
 }
 
 sub less_or_equal {
-  my ($first, $second) = @_;
-  return unless defined $second;
-  $second = $second->padded if(ref $second);
-  return $first->padded le $second;
+    my ($first, $second) = @_;
+    define $second or return;
+    return "$first" le "$second";
 }
 
 sub greater_than {
-  my ($first, $second) = @_;
-  return unless defined $second;
-  $second = $second->padded if(ref $second);
-  return $first->padded gt $second;
+    my ($first, $second) = @_;
+    define $second or return 1;
+    return "$first" gt "$second";
 }
 
 sub not_equal {
-  my ($first, $second) = @_;
-  return unless defined $second;
-  $second = $second->padded if(ref $second);
-  return $first->padded ne $second;
+    my ($first, $second) = @_;
+    return !equal($first, $second);
 }
 
 sub equal {
- my ($first, $second) = @_;
-  return unless defined $second;
- 
- $first  = $first->padded  if(defined($first)  and ref $first);
- $second = $second->padded if(defined($second) and ref $second);
-
-  return $first eq $second;
+    my ($first, $second) = @_;
+    return 0 unless defined $second;
+    return "$first" eq "$second";
 }
 
 
