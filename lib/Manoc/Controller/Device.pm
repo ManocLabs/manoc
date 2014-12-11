@@ -55,11 +55,11 @@ sub base : Chained('/') : PathPart('device') : CaptureArgs(0) {
 =cut
 
 sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
-
-    # $id = primary key
     my ( $self, $c, $id ) = @_;
+    # $id = primary key
 
-    $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
+    my $ipaddr =  Manoc::IpAddress->new($id);
+    $c->stash(object => $c->stash->{resultset}->find($ipaddr) ) ;
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
