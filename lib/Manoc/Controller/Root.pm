@@ -72,12 +72,12 @@ sub auto : Private {
   }
 
   # If a user doesn't exist, force login
-  if ( !$c->user_exists) {
-    $c->flash( backref => $c->request->uri );
-    $c->request->path !~ m|^$|o
+  if ( !$c->user_exists && !$skip_login_redirect ) {
+      $c->flash( backref => $c->request->uri );
+      $c->request->path !~ m|^$|o
         and $c->flash( error_msg => 'You must login to view this page!');
-    $c->response->redirect($c->uri_for_action('/auth/login'));
-    return 0;
+      $c->response->redirect($c->uri_for_action('/auth/login'));
+      return 0;
   }
 
   return 1;
