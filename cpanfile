@@ -19,6 +19,7 @@ requires 'Catalyst::Plugin::Authorization::ACL';
 requires 'Catalyst::Plugin::Authorization::Roles';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::View::TT';
+requires 'Catalyst::View::JSON';
 requires 'Config::General';
 requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
@@ -29,5 +30,6 @@ requires 'NetPacket';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
-requires 'SNMP::Info';
+requires 'SQL::Translator';
+#requires 'SNMP::Info';
 

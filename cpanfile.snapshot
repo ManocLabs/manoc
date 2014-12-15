@@ -565,6 +565,19 @@ DISTRIBUTIONS
       namespace::autoclean 0.09
       namespace::clean 0.23
       perl 5.008003
+  Catalyst-View-JSON-0.33
+    pathname: M/MI/MIYAGAWA/Catalyst-View-JSON-0.33.tar.gz
+    provides:
+      Catalyst::Helper::View::JSON undef
+      Catalyst::View::JSON 0.33
+    requirements:
+      Catalyst 5.6
+      ExtUtils::MakeMaker 6.42
+      JSON::Any 1.15
+      MRO::Compat 0
+      Test::More 0
+      YAML 0
+      perl 5.008001
   Catalyst-View-TT-0.41
     pathname: J/JJ/JJNAPIORK/Catalyst-View-TT-0.41.tar.gz
     provides:
@@ -2900,6 +2913,17 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0
+  JSON-Any-1.38
+    pathname: E/ET/ETHER/JSON-Any-1.38.tar.gz
+    provides:
+      JSON::Any 1.38
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      constant 0
+      namespace::clean 0
+      strict 0
+      warnings 0
   JSON-MaybeXS-1.003003
     pathname: E/ET/ETHER/JSON-MaybeXS-1.003003.tar.gz
     provides:
