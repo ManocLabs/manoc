@@ -404,7 +404,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
 
     my $item = $c->stash->{resultset}->new_result( {} );
     $c->stash( def_rack => $rack_id ) if ($rack_id);
-    $c->stash( default_backref => $c->uri_for_action('device/list') );
+    $c->stash( default_backref => $c->uri_for_action('/device/list') );
     my $form = Manoc::Form::DeviceNew->new( item => $item );
 
     #prepare the selects input
@@ -445,7 +445,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
     }
     $c->flash( message => 'Success! Device created.' );
     $c->keep_flash('backref');
-    $c->response->redirect( $c->uri_for_action( '/device/edit', [ $c->req->param('id') ] ) );
+    $c->response->redirect( $c->uri_for_action( '/device/edit', [ $c->req->param('form-device.id') ] ) );
     $c->detach();
 }
 
@@ -595,7 +595,7 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
                 $c->response->redirect($backref);
                 $c->detach();
             }
-            $c->response->redirect( $c->uri_for_action( '/device/view', [$new_ip] ) );
+            $c->response->redirect( $c->uri_for_action( 'device/view', [$new_ip] ) );
             $c->detach();
         }
         else {
