@@ -1,7 +1,5 @@
-[% init_row_group IF template.use_row_group -%]
 [% init_datatable IF template.use_table -%]
 [% init_exp_table IF template.use_exp_table -%]
-
 [% title = BLOCK -%]
 [% IF template.section AND template.section != "Home" -%]
 [% template.section -%][% " - " IF template.title -%]
@@ -21,24 +19,9 @@
 </head>
 
 <body>
-[% PROCESS 'menu.tt' %]
-<div id="wrapper">
-   <div id="banner" class="ui-widget-header">
-      <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
-      <div id="dock" class="ui-widget-content ui-corner-all">      
-      [% menu_dock %]    
-      </div>
-      <div id="navigation">
-      [% menu_navigation %]
-      </div>
-      <div id="logged">
-      [% IF c.user.username %]
-      User: <i>[% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
-      [%END%]
-      </div>
-  </div>
-</div>
-<div id="content-wrapper" class="fullpage">
+<div id="content-wrapper">
+   <h2>[% title %]</h2>	
+   
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]
@@ -55,6 +38,12 @@
 [% FOREACH fragment IN js_scripts -%]
 [% fragment %]
 [% END -%]
+[%# discard buttons should close popup windows %]
+$(function() {
+  $( "#discard" ).button().click(function() {
+    window.close();
+});
+});
 </script>
 </body>
 </html>

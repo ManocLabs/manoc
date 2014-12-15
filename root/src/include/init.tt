@@ -1,6 +1,6 @@
 [% 
-   link_css = [ c.uri_for('/static/css/style.css')      ]
-   link_js  = [ ]
+   link_css = [ c.uri_for('/static/css/style.css') ]
+   link_js  = [ c.uri_for('/static/js/common.js')  ]
    js_scripts = []
 -%]
 [% PROCESS 'macros.tt' -%]

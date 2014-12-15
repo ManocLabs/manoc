@@ -2,29 +2,20 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::View::TT;
+package Manoc::View::PopupPage;
 
 use strict;
 use warnings;
 
-use base 'Catalyst::View::TT';
+use base 'Manoc::View::TTBase';
 
 __PACKAGE__->config(
-    TEMPLATE_EXTENSION => '.tt',
-    INCLUDE_PATH       => [
-        Manoc->path_to( 'root', 'src' ),
-        Manoc->path_to( 'root', 'src', 'include' ),
-        Manoc->path_to( 'root', 'src', 'forms' ),
-        Manoc->path_to( 'lib', 'Manoc', 'Plugin'),
-    ],
-    PRE_PROCESS => 'init.tt',
-    WRAPPER     => 'wrapper.tt',
-    render_die  => 1,
+    WRAPPER     => 'wrapper_popup.tt',
 );
 
 =head1 NAME
 
-Manoc::View::TT - TT View for Manoc
+Manoc::View::PopupPage - TT Based HTML View for Manoc popup pages
 
 =head1 DESCRIPTION
 
@@ -46,3 +37,9 @@ it under the same terms as Perl itself.
 =cut
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

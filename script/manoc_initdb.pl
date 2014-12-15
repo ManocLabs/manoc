@@ -7,7 +7,6 @@ package Manoc::InitDB;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-eval { use local::lib "$FindBin::Bin/../support" };
 
 use Moose;
 use Manoc::Logger;

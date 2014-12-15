@@ -14,6 +14,9 @@ use Data::Dumper;
 extends 'HTML::FormHandler::Model::DBIC';
 with 'HTML::FormHandler::Render::Table';
 
+has '+name' => ( default => 'form-device' );
+has '+html_prefix' => ( default => 1 );
+
 has_field 'rack' => (
     type         => 'Select',
     label        => 'Rack name',

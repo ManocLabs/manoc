@@ -3,15 +3,22 @@
    section='Reports'
 -%]
 
-<ul>
-  <li><a href="[% c.uri_for('/reports/statistics') %]">Statistics</a></li>
-  <li><a href="[% c.uri_for('/reports/ipconflict') %]">Ip conflicts</a></li>
-  <li><a href="[% c.uri_for('/reports/multihost')  %]">Multiple Hosts Interfaces</a></li>
-  <li><a href="[% c.uri_for('/reports/portsecurity')  %]">Portsecurity</a></li>
-  <li><a href="[% c.uri_for('/reports/unused_ifaces')  %]">Unused interfaces</a></li>
-  <li><a href="[% c.uri_for('/reports/device_list')  %]">Managed devices list</a></li>
-  <li><a href="[% c.uri_for('/reports/rack_list')  %]">Managed racks list</a></li>
-  <li><a href="[% c.uri_for('/reports/unknown_devices')  %]">Unknown devices</a></li>
-  <li><a href="[% c.uri_for('/reports/multi_mac')  %]">Multi MAC</a></li>
-  <li><a href="[% c.uri_for('/reports/new_devices')  %]">New devices connected</a></li>
+<ul id="menu">
+  <li><a href="[% c.uri_for_action('/reports/ipconflict')   %]">IPv4 address conflicts</a></li>
+  <li><a href="[% c.uri_for_action('/reports/multihost')    %]">Multiple hosts interfaces</a></li>
+  <li><a href="[% c.uri_for_action('/reports/portsecurity') %]">Portsecurity shutdown interfaces</a></li>
+  <li><a href="[% c.uri_for_action('/reports/unused_ifaces')  %]">Unused interfaces</a></li>
+  <li><a href="[% c.uri_for_action('/reports/unknown_devices')  %]">Unknown CDP hosts</a></li>
+  <li><a href="[% c.uri_for_action('/reports/multi_mac')    %]">MAC addresses on multiple devices</a></li>
+  <li><a href="[% c.uri_for_action('/reports/new_devices')  %]">New hosts</a></li>
+  <li><a href="[% c.uri_for_action('/reports/statistics')   %]">Statistics</a></li>
+  <li><a href="[% c.uri_for_action('/reports/device_list')  %]">Managed devices list</a></li>
+  <li><a href="[% c.uri_for_action('/reports/rack_list')    %]">Managed racks list</a></li>
 </ul>
+[% fragment = BLOCK -%]
+$(function() { 
+  $('#menu').menu();
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]
+

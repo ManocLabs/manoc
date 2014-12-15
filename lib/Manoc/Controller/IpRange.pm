@@ -43,7 +43,7 @@ my $DEF_TAB_POS        = 3;
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->redirect('/iprange/list');
+    $c->response->redirect($c->uri_for_action('/iprange/list'));
 }
 
 =head2 base

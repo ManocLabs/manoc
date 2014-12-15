@@ -419,28 +419,35 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     my @results;
     my $e;
     my @multimacs;
-    my $days       = Manoc::Utils::clean_string( $c->req->param('days') ) || 0 ;
-    $days .= 'd' if($days =~ m/\d$/);
-    my $query_time = time - Manoc::Utils::str2seconds($days);
+    my $days       = Manoc::Utils::clean_string( $c->req->param('days') ) || "" ;
+    $days =~ /^\d+$/ or $days = "";
+    
+    if ($days) {
+        my $query_time = time - Manoc::Utils::str2seconds($days . "d");
+        
+        @results = $schema->resultset('Mat')->search(
+            { },
+            {
+                select   => [ 'macaddr', 'device', 'interface', 'firstseen',{ min => 'firstseen' } ],
+                as       => [ 'macaddr', 'device', 'interface', 'firstseen','fs'],
+                group_by => ['macaddr'],
+                having   => { 'MIN(firstseen)' => { '>', $query_time } },
+            }
+           );
+        
+        my @new_devices = map +{
+            macaddr      => $_->macaddr,
+            device       => $_->device_entry,
+            iface        => $_->interface,
+            from         => Manoc::Utils::print_timestamp($_->firstseen),
+        }, @results;
 
-    @results = $schema->resultset('Mat')->search(
-        { },
-        {
-            select   => [ 'macaddr', 'device', 'interface', 'firstseen',{ min => 'firstseen' } ],
-            as       => [ 'macaddr', 'device', 'interface', 'firstseen','fs'],
-            group_by => ['macaddr'],
-            having   => { 'MIN(firstseen)' => { '>', $query_time } },
-        }
-    );
+        $c->stash( new_devs => \@new_devices );
+    }
 
-       my @new_devices = map +{
-        macaddr      => $_->macaddr,
-        device       => $_->device_entry,
-        iface        => $_->interface,
-        from         => Manoc::Utils::print_timestamp($_->firstseen),
-    }, @results;
-
-    $c->stash( new_devs => \@new_devices, template => 'reports/new_devices.tt' );
+    $c->stash(days     => $days,
+              template => 'reports/new_devices.tt' 
+             );
 }
 
 
@@ -463,3 +470,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
