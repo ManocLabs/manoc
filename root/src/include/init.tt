@@ -1,9 +1,15 @@
-[% 
-   link_css = [ c.uri_for('/static/css/style.css') ]
-   link_js  = [ c.uri_for('/static/js/common.js')  ]
+[%-
+   link_css = []
+   link_js  = []
    js_scripts = []
 -%]
 [% PROCESS 'macros.tt' -%]
 [% PROCESS 'jquery.tt' -%]
 [% PROCESS 'menu.tt' -%]
 [% PROCESS 'datatable.tt' -%]
+[%-
+   link_css.push(c.uri_for('/static/css/style.css'))
+-%]
+[%-
+   link_js.push(c.uri_for('/static/js/common.js'))
+-%]

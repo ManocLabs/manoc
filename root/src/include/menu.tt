@@ -1,25 +1,96 @@
-[%
+[%-
   menu_sections = [
   		{
 		     name = 'Search', 
 		     path = c.uri_for('/search'),
+		     subsections = [
+		        {
+		            name = 'Simple', 
+		            path = c.uri_for('/search'),
+	                },
+	                {
+		            name = 'Advanced',
+		     	    path = c.uri_for('/search',{advanced=>1}),
+		        }
+		     ]		
 	        },
 		{
 		     name = 'Asset',
 		     path = c.uri_for('/device'),
+		     subsections = [
+  	       	     {
+			name = 'Device', 
+		        path = c.uri_for('/device/list'),
+	             },
+	             {
+		         name = 'Building',
+		         path = c.uri_for('/building/list'),
+	  	     },
+		     {
+		         name = 'Rack',
+		         path = c.uri_for('/rack/list'),
+		     },		     
+		     ]
 		},
 		{
 		     name = 'NetDB',
 		     path = c.uri_for('/vlanrange'),
+		     subsections = [
+  	       		 {
+	        	     name = 'VLAN', 
+		     	     path = c.uri_for('/vlanrange/list'),
+			},
+			{
+			    name = 'VTP Vlan',
+		     	    path = c.uri_for('/vlan/list'),
+			},
+			{
+				name = 'Subnet',
+				path = c.uri_for('/iprange/list'),
+			},
+			{
+				name = 'SSid',
+				path = '#',
+			},	     
+		     ],
+
 		},		     
 		{
 		     name = 'Reports',
 		     path = c.uri_for('/reports'),
+		     subsections = [
+		     {
+		         name = 'Dynamic Reports', 
+		         path = c.uri_for('/reports'),
+		     },
+	             {
+		        name = 'Scheduled Reports',
+		        path = c.uri_for('/reportarchive'),
+		     },
+		     ]
 		},
 		{
 		     name = 'Config',
      		     path = c.uri_for('/user/list'),
- 		 },	
+		     subsections = [		     
+  	       	     {
+			name = 'Users', 
+		     	path = c.uri_for('/user/list'),
+	       	      },
+	     	      {
+		     name = 'Management Urls',
+		     path = c.uri_for('/mngurlformat'),
+		     },
+		     {
+			name = 'Credentials',
+		     	path = '#',
+			}	     
+			]
+ 		 }
+	]
+-%]
+[%-
+dock_sections = [
 		 {
 		     name = 'About',
      		     path = c.uri_for('/about'),
@@ -28,93 +99,35 @@
 		     name = 'Logout',
      		     path = c.uri_for('/auth/logout'),
  		 },
-
 		 ]
 -%]
-[% 
-  menu_subsections = {
-          Search = [
-  	       {
-		     name = 'Simple', 
-		     path = c.uri_for('/search'),
-	       },
-	       {
-		     name = 'Advanced',
-		     path = c.uri_for('/search',{advanced=>1}),
-		}	     
-		],
-	 Asset = [
-  	       {
-		     name = 'Device', 
-		     path = c.uri_for('/device/list'),
-	       },
-	       {
-		     name = 'Building',
-		     path = c.uri_for('/building/list'),
-		},
-		{
-		     name = 'Rack',
-		     path = c.uri_for('/rack/list'),
-		},		     
-		],
-	 NetDB = [
-  	       {
-		     name = 'VLAN', 
-		     path = c.uri_for('/vlanrange/list'),
-	       },
-	       {
-		     name = 'VTP Vlan',
-		     path = c.uri_for('/vlan/list'),
-		},
-		{
-		     name = 'Subnet',
-		     path = c.uri_for('/iprange/list'),
-		},
-		{
-		     name = 'SSid',
-		     path = '#',
-		},	     
-		],
-	 Config = [
-  	       {
-		     name = 'Users', 
-		     path = c.uri_for('/user/list'),
-	       },
-	       {
-		     name = 'Management Urls',
-		     path = c.uri_for('/mngurlformat'),
-		},
-		{
-		     name = 'Credentials',
-		     path = '#',
-		}	     
-		],
-	 Reports = [
-  	       {
-		     name = 'Dynamic Reports', 
-		     path = c.uri_for('/reports'),
-	       },
-	       {
-		     name = 'Scheduled Reports',
-		     path = c.uri_for('/reportarchive'),
-		},	     
-		],
-  }		
--%]
-[% MACRO menu_dock BLOCK -%]
-<ul>
+[% MACRO menu_panel BLOCK -%]
 [% FOREACH s IN menu_sections %]
-   <li [% "class=\"selected\"" IF s.name == template.section %]>
-   <a href="[% s.path %]">[% s.name %]</a></li>
-[%END -%]
+<h3 [% "class=\"panel-selected\"" IF s.name == template.section %]>[% s.name %]</h3>
+<div>
+<ul class="menu">
+   [% FOREACH i IN s.subsections %]
+   <li>
+     <a href="[% i.path %]">[% i.name %]</a>
+   </li>
+   [% END -%]
+</ul>
+</div>
+[% END -%]
+[% END -%]
+[% MACRO dock_menu BLOCK -%]
+<ul>
+[% FOREACH s IN dock_sections %]
+   <li><a href="[% s.path %]">[% s.name %]</a></li>
+[% END -%]
 </ul>
 [% END -%]
-[% MACRO menu_navigation BLOCK -%]
-<ul>
-  [% name = template.section -%]
-  [% FOREACH s IN menu_subsections.$name %]
-  <li [% "class=\"selected\"" IF s.name == template.title %]>   
-  <a href="[% s.path %]">[% s.name %]</a></li>
-  [% END -%]
-</ul>
+[% MACRO menu_js BLOCK -%]
+$(function() {
+  $("#panel").accordion({
+	     heightStyle: "content",
+	     collapsible: true,
+	     active: $('.panel-selected').index()
+	     } );
+});
 [% END -%]
