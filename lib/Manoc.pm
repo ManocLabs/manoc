@@ -253,17 +253,23 @@ Manoc - Network monitoring application
 
 L<Manoc::Controller::Root>, L<Catalyst>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-See README
+Gabriele Mambrini
+
+Enrico Liguori
 
 =head1 LICENSE
 
-Copyright 2011 by the Manoc Team
+Copyright 2011-2014 by the AUTHORS
 
 This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+no Moose;
+
+__PACKAGE__->meta->make_immutable;
 
 1;
