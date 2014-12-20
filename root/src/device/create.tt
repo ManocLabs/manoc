@@ -1,5 +1,5 @@
-[% META title='Create a New  Device'
-   use_popup=1 
+[% META title='Create'
+   subsection='Device'
    section='Asset' -%]
 
 <form method="post" id="[% form.name %]" >

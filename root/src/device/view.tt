@@ -1,10 +1,10 @@
 [% META 
    title='Device View'
+   section = 'Asset'
+   subsection='Device'
    use_table = 1
    use_row_group = 1
-   section = 'Asset'
 -%]
- 
 
 <div id="tabs">	 
   <ul>

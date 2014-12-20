@@ -1,5 +1,6 @@
 [% META title='View Configuration'
-   section='Asset' %]
+   subsection='Device'
+   section='Asset' -%]
 <h3> Back to device info [% print_device(object) %] </h3>
    
 

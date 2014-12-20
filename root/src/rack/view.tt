@@ -1,7 +1,8 @@
 [% META 
-   title='Rack'
-   use_table=1
+   title='View'
+   subsection='Rack'
    section='Asset'
+   use_table=1
 -%]
 
 	<div id="tabs">
