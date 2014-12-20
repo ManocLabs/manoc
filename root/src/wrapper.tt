@@ -42,6 +42,7 @@
    </div>
    [% END -%]
    <div id="body" class="right">
+      [% breadcrumbs %]
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]

@@ -127,7 +127,24 @@ $(function() {
   $("#panel").accordion({
 	     heightStyle: "content",
 	     collapsible: true,
-	     active: $('.panel-selected').index()
+	     active: $('.panel-selected').index() / 2,
 	     } );
 });
+[% END -%]
+[% MACRO breadcrumbs BLOCK %]
+<div id="breadcrumbs" class="ui-widget float-container">
+<ul>
+[% FOREACH s IN menu_sections %]
+  [% IF s.name == template.section -%]
+  <li><a href="[% s.path %]">[% s.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
+    [% FOREACH i IN s.subsections %]
+       [% IF i.name == template.subsection -%]
+  <li><a href="[% i.path %]">[% i.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
+       [% END -%]
+    [% END -%]
+  [% END -%]
+[% END -%]
+  <li><a href="#">[% template.title %]</a></span></li>
+</ul>
+</div>
 [% END -%]

@@ -22,6 +22,11 @@ h2 {
     visibility: hidden;
 }
 
+/**********************************************************************/
+/*                       Page layout                                  */
+/**********************************************************************/
+
+
 div.left {
     float:left;
     width: 200px;
@@ -60,11 +65,52 @@ h1.logo a {
     float:right;    
 }
 
+
+#content {
+    margin: 15px;
+}
+
+/*** Breadcrumbs ***/
+
+#breadcrumbs ul {
+    height:25px;
+    padding:0 6px;
+}
+
+#breadcrumbs ul li {
+    padding:0 6px;
+    position:relative;
+}
+
+#breadcrumbs ul li i {
+    display:inline;
+    padding-left: 18px;
+}
+
+#breadcrumbs ul, #breadcrumbs ul li {
+    float:left;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+#breadcrumbs ul li a {
+    color:black;
+    float:left;
+    font-size:14px;
+    line-height:16px;
+    padding:0 5px;
+    text-decoration:none;
+}
+
+/*** Dock  ***/
+
 #dock {
     top: 34px;
     right: 1px;
     position: absolute;   
 }
+
 
 #dock ul {
     height:25px;
@@ -101,6 +147,8 @@ h1.logo a {
     font-weight:bold;
 }
 
+/*** left panel ***/
+
 #panel ul.menu {
     padding: 0;
     margin: 0;
@@ -118,9 +166,15 @@ h1.logo a {
     border-bottom: 2px solid #FF9C08;
 }
 
-#content {
-    margin: 15px;
+/* JQuery UI theme override */
+#panel .ui-accordion  .ui-accordion-content {
+    padding-left: 10px;
 }
+
+/**********************************************************************/
+/*                          Miscellanea                               */
+/**********************************************************************/
+
 
 #search-cat {
   font-weight:bold;
@@ -199,11 +253,4 @@ table.manoc-form tr{
 #info {
  padding: 0.8em;
  border-spacing:0.2em;
-}
-
-/**********************************************************************/
-/*                   JQuery UI theme override                         */
-
-.ui-accordion  .ui-accordion-content {
-    padding-left: 10px;
 }
