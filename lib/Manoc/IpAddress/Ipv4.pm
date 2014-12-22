@@ -50,7 +50,7 @@ sub less_or_equal {
 
 sub greater_than {
     my ($first, $second) = @_;
-    define $second or return 1;
+    defined $second or return 1;
     return "$first" gt "$second";
 }
 
