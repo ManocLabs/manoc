@@ -270,6 +270,6 @@ it under the same terms as Perl itself.
 
 no Moose;
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable(replace_constructor => 1);
 
 1;
