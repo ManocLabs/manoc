@@ -44,7 +44,7 @@ sub less_than {
 
 sub less_or_equal {
     my ($first, $second) = @_;
-    define $second or return;
+    defined $second or return;
     return "$first" le "$second";
 }
 
