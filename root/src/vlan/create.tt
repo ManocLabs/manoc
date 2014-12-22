@@ -1,4 +1,5 @@
-[% META title='VTP Vlan' 
+[% META title='Create'
+   subsection='VLAN'
    section='NetDB' %]
 <form name="form1" method="POST">
   <input type="hidden" name="forced_range_id" value="[% forced_range_id %]" />

@@ -1,6 +1,6 @@
-[% META title='Save/Edit VlanRange' section='NetDB' %]
-
-
+[% META
+   title='VlanRange' subsection='VLAN' section='NetDB'
+-%]
 <div class="buttons">
 [% form.render %]
 </div>

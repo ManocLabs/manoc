@@ -1,7 +1,8 @@
-[% META 
-   title='VTP Vlan'
-   use_table=1
+[% META
+   title='List'
+   subsection='VTP VLAN'   
    section='NetDB'
+   use_table=1
 -%]
 
 

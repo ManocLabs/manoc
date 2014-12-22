@@ -2,7 +2,7 @@
    title='Dynamic Reports'
    section='Reports'
 -%]
-
+<p>Select a report:</p>
 <ul id="menu">
   <li><a href="[% c.uri_for_action('/reports/ipconflict')   %]">IPv4 address conflicts</a></li>
   <li><a href="[% c.uri_for_action('/reports/multihost')    %]">Multiple hosts interfaces</a></li>

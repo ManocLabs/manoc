@@ -1,4 +1,5 @@
-[% META title='Edit Vlan'
+[% META title='Edit'
+   subsection='VLAN'
    section='NetDB' %]
 
 <div class="buttons">

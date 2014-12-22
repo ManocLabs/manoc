@@ -1,7 +1,8 @@
 [% META 
-  title='VLAN' 
-	use_exp_table = 1
-	section= 'NetDB'
+  title='List'
+  subsection='VLAN'
+  section= 'NetDB'
+  use_exp_table = 1
 -%]
 
 <div style="width: 1000px;">

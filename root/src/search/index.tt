@@ -1,6 +1,6 @@
 [% META section="Search"
+   	title="Search"
         use_popup=1 -%]
-
 <form method="get"  enctype="multipart/form-data">
 <input type="hidden" name="advanced" value="[% advanced_search %]">
 <table align="center" >
