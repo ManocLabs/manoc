@@ -1,6 +1,6 @@
 [% META title='Create'
    subsection='VLAN'
-   section='NetDB' %]
+   section='Network' %]
 <form name="form1" method="POST">
   <input type="hidden" name="forced_range_id" value="[% forced_range_id %]" />
   <table class="ui-widget-content ui-corner-all manoc-form">

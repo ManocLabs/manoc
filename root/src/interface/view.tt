@@ -1,4 +1,6 @@
-[% META 
+[% META
+   section='Asset'
+   subsection='Device'
    title='Interface View'
    use_table=1
 -%]

@@ -1,5 +1,6 @@
-[%META title='Split Address Range'
-       section='NetDB' %]
+[%META title='Split IP Address Range'
+       subsection='Address Plan'
+       section='Network' %]
 <form name="form1" method="POST">
 <input type=hidden name="name" value="[% name %]" />
 <input type=hidden name="parent" value="[% parent %]" />

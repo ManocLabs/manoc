@@ -1,5 +1,5 @@
 [% META
-   section='NetDB'
+   section='Network'
    subsection='VLAN'
    title='Merge ranges'  
    -%]

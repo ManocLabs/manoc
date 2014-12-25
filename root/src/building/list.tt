@@ -1,7 +1,7 @@
 [% META
    section='Asset'
    subsection='Building'
-   titile='List'
+   tile='List'
    use_table=1
 -%]
 

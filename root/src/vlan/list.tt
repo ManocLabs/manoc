@@ -1,16 +1,16 @@
 [% META
-   title='List'
-   subsection='VTP VLAN'   
-   section='NetDB'
+   title='VTP VLAN list'
+   subsection='VTP'   
+   section='Network'
    use_table=1
 -%]
 
 
-	<div id="tabs">
-			<ul>
-				<li><a href="#tabs-1">Vlan List</a></li>
-				<li><a href="#tabs-2">DB-Missing Vlan</a></li>
-			</ul>
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Vlan List</a></li>
+		<li><a href="#tabs-2">DB-Missing Vlan</a></li>
+	</ul>
 
 <div id="tabs-1">
 [% FOREACH v IN vlan_list %]
@@ -95,6 +95,6 @@
     </table>
    [% END %]
 [% END %]
-
-
 </div> <!-- end of tab-2 -->
+
+</div><!-- end of #tabs -->

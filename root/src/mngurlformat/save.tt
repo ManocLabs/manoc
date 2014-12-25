@@ -1,5 +1,8 @@
-[%  META title='Management URL Format' 
-    section='Config' %]
+[%  META
+    title='Edit'
+    subsection='Management URL Format' 
+    section='Config'
+-%]
 
 <div class="buttons">
 [% form.render %]

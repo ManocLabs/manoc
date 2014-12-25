@@ -1,7 +1,8 @@
 [% META 
-   title='Subnet'
+   title='List'
+   subsection='Address Plan'
+   section='Network'
    use_table=1
-   section='NetDB'
 -%]
 [% UNLESS subnet_list.0 %]
       [% PROCESS  'message.tt' msg='There is no subnet range defined!' %]

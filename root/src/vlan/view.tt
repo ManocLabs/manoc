@@ -1,7 +1,7 @@
 [% META 
    title='View'
    subsection='VLAN'
-   section='NetDB'
+   section='Network'
    use_table = 1
 -%]
 

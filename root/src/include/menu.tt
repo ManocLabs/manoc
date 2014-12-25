@@ -33,7 +33,7 @@
 		     ]
 		},
 		{
-		     name = 'NetDB',
+		     name = 'Network',
 		     path = c.uri_for('/vlanrange'),
 		     subsections = [
   	       		 {
@@ -41,11 +41,11 @@
 		     	     path = c.uri_for('/vlanrange/list'),
 			},
 			{
-			    name = 'VTP Vlan',
+			    name = 'VTP',
 		     	    path = c.uri_for('/vlan/list'),
 			},
 			{
-				name = 'Subnet',
+				name = 'Address Plan',
 				path = c.uri_for('/iprange/list'),
 			},
 			{
@@ -107,7 +107,7 @@ dock_sections = [
 <div>
 <ul class="menu">
    [% FOREACH i IN s.subsections %]
-   <li>
+   <li [% "class=\"selected\"" IF i.name == template.subsection %]>
      <a href="[% i.path %]">[% i.name %]</a>
    </li>
    [% END -%]
