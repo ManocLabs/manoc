@@ -6,11 +6,6 @@
                 c.uri_for('/static/js/jquery-ui-1.10.3.custom.min.js'),
                 ) 
 -%]
-[%#                                                                  -%]
-[% IF template.use_popup -%]
-[%    link_js.push(c.uri_for('/static/js/jquery.popupWindow.js')) -%]
-[%  END -%]
-[%#                                                                  -%]
 [% script = BLOCK %]
 $(function() { 
 	//jExpand
@@ -24,23 +19,6 @@ $(function() {
              ELSE -%] 0 [% END -%]});
              //.find(".ui-tabs-nav").sortable({axis:'x'});
 	}
-	 //Popup
-	 if ( $(".popup").popupWindow  ) {
-	     $(".popup").popupWindow({ 
-		 height:600, 
-		 width:500, 
-		 top: 218, 
-		 left:700 
-		 });
-	 }
-	 if ( $(".readme").popupWindow  ) {
-	     $(".readme").popupWindow({ 
-		 height:1000, 
-		 width:800, 
-		 top: 218, 
-		 left:700 
-		 });
-	 }
 
 	 //Buttons
 	 $( "button, input:submit, a", ".buttons").button();

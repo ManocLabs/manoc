@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2014 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -15,7 +15,7 @@ __PACKAGE__->config(
 
 =head1 NAME
 
-Manoc::View::PopupPage - TT Based HTML View for Manoc popup pages
+Manoc::View::HTMLFragment - TT Based HTML View for Manoc html fragments
 
 =head1 DESCRIPTION
 

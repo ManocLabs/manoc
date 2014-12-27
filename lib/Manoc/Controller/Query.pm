@@ -1,8 +1,8 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2014 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Controller::Reports;
+package Manoc::Controller::Query;
 use Moose;
 use namespace::autoclean;
 use Manoc::Utils;
@@ -13,11 +13,11 @@ use Manoc::Utils qw(print_timestamp str2seconds);
 
 =head1 NAME
 
-Manoc::Controller::Reports - Catalyst Controller
+Manoc::Controller::Query - Catalyst Controller
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst Controller for showing predefined queries on Manoc DB.
 
 =head1 METHODS
 
@@ -35,7 +35,7 @@ sub index : Path : Args(0) {
 
 =cut
 
-sub base : Chained('/') : PathPart('reports') : CaptureArgs(0) {
+sub base : Chained('/') : PathPart('query') : CaptureArgs(0) {
     my ( $self, $c ) = @_;
 }
 
@@ -133,7 +133,7 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
         disable_pagination => 1,
         vlan_table         => \@vlan_table,
         db_stats           => \@db_stats,
-        template           => 'reports/stats.tt',
+        template           => 'query/stats.tt',
     );
 }
 
@@ -155,7 +155,7 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     $c->stash(
         multihomed => \@multihomed,
         conflicts  => \@conflicts,
-        template   => 'reports/ipconflict.tt',
+        template   => 'query/ipconflict.tt',
     );
 }
 
@@ -177,7 +177,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
             ],
 
             as       => [ 'device', 'interface', 'count', 'description', ],
-            group_by => [ 'device', 'interface' ],
+            group_by => [ 'me.device', 'me.interface' ],
             having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
             order_by => [ 'me.device', 'me.interface' ],
             alias    => 'me',
@@ -212,7 +212,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
             };
     }
     $c->stash( multihost_ifaces => \@multihost_ifaces );
-    $c->stash( template         => 'reports/multihost.tt' );
+    $c->stash( template         => 'query/multihost.tt' );
 }
 
 sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
@@ -255,7 +255,7 @@ sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
     $c->stash(
         device_list   => \@device_list,
         unused_ifaces => \@unused_ifaces,
-        template      => 'reports/unused_ifaces.tt',
+        template      => 'query/unused_ifaces.tt',
     );
 }
 
@@ -294,7 +294,7 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
 
     $c->stash(
         unknown_devices => \@unknown_devices,
-        template        => 'reports/unknown_devices.tt'
+        template        => 'query/unknown_devices.tt'
     );
 }
 
@@ -324,7 +324,7 @@ sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
 	    serial   => $_->serial || 'n/a',
     }, @rs;
 
-    $c->stash( table => \@table, template => 'reports/device_list.tt' );
+    $c->stash( table => \@table, template => 'query/device_list.tt' );
 }
 
 sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
@@ -347,7 +347,7 @@ sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
             notes       => $_->notes,
     }, @rs;
 
-    $c->stash( table => \@table, template => 'reports/rack_list.tt' );
+    $c->stash( table => \@table, template => 'query/rack_list.tt' );
 }
 
 ####################################################################
@@ -372,7 +372,7 @@ sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
             cps_count   => $_->cps_count,
     }, @rs;
 
-    $c->stash( table => \@table, template => 'reports/portsecurity.tt' );
+    $c->stash( table => \@table, template => 'query/portsecurity.tt' );
 
 }
 
@@ -407,7 +407,7 @@ sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
             };
     }
 
-    $c->stash( multimacs => \@multimacs, template => 'reports/multi_mac.tt' );
+    $c->stash( multimacs => \@multimacs, template => 'query/multi_mac.tt' );
 }
 
 
@@ -446,19 +446,14 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     }
 
     $c->stash(days     => $days,
-              template => 'reports/new_devices.tt' 
+              template => 'query/new_devices.tt' 
              );
 }
 
 
-
-
-
-
-
 =head1 AUTHOR
 
-Rigo
+Manoc Team
 
 =head1 LICENSE
 

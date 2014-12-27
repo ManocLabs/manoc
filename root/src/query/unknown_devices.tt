@@ -1,7 +1,8 @@
 [% META 
-   title='Unknown devices'
+   title='Unknown CDP hosts'
    use_table=1
    section='Reports'
+   subsection='Queries'
 -%]
 [% init_table('devs') %]
 [% FOREACH u IN unknown_devices %]

@@ -56,9 +56,7 @@ sub auto : Private {
 
   ## output format selection ##
   if ( my $fmt = $c->req->param('format') ) {
-      $fmt eq 'popup'    and $c->stash('current_view' => 'PopupPage');
       $fmt eq 'fragment' and $c->stash('current_view' => 'HTMLFragment');
-
       delete $c->req->params->{'format'};
   }
 

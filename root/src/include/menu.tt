@@ -8,10 +8,10 @@
 		            name = 'Simple', 
 		            path = c.uri_for('/search'),
 	                },
-	                {
-		            name = 'Advanced',
-		     	    path = c.uri_for('/search',{advanced=>1}),
-		        }
+		        {
+		            name = 'Help', 
+		            path = "#",
+	                },
 		     ]		
 	        },
 		{
@@ -59,14 +59,18 @@
 		     name = 'Reports',
 		     path = c.uri_for('/reports'),
 		     subsections = [
-		     {
-		         name = 'Dynamic Reports', 
-		         path = c.uri_for('/reports'),
-		     },
-	             {
-		        name = 'Scheduled Reports',
-		        path = c.uri_for('/reportarchive'),
-		     },
+                        {
+			   name = "Queries",
+			   path = c.uri_for('/query'),
+			}
+	                {
+		           name = 'Report Archive',
+		           path = c.uri_for('/reportarchive'),
+		        },
+			{
+			    path=c.uri_for_action('/query/statistics'),
+			    name="Manoc DB Statistics",
+			},
 		     ]
 		},
 		{
@@ -144,7 +148,7 @@ $(function() {
     [% END -%]
   [% END -%]
 [% END -%]
-  <li><a href="#">[% template.title %]</a></span></li>
+  <li><a href="#">[% template.title %]</a></li>
 </ul>
 </div>
 [% END -%]

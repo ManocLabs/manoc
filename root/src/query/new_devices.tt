@@ -2,10 +2,11 @@
    title='New Devices'
    use_table=1
    section='Reports'
+   subsection='Queries'
 -%]
 
 
-<form method="get" action="[% c.uri_for_action('/reports/new_devices') %]">
+<form method="get" action="[% c.uri_for_action('/query/new_devices') %]">
 <table>
 <tr>
 <td>Days:</td>

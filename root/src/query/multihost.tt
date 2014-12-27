@@ -1,7 +1,8 @@
 [% META 
-   title='Multiple Hosts Interfaces'
+   title='Interfaces with Multiple Hosts'
    use_table=1
    section='Reports'
+   subsection='Queries'
 -%]
 
 [%init_table('host')%]

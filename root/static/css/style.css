@@ -167,8 +167,9 @@ h1.logo a {
 }
 
 /* JQuery UI theme override */
-#panel .ui-accordion  .ui-accordion-content {
+#panel .ui-accordion-content {
     padding-left: 10px;
+    padding-right: 10px;
 }
 
 /**********************************************************************/

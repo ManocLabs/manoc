@@ -36,7 +36,7 @@ sub index : Path : Args(0) {
 
     my $q               = $c->request->param('q') || '';
     my $button          = $c->request->param('submit');
-    my $advanced_search = $c->request->param('advanced') || 0;
+    my $advanced        = $c->request->param('advanced') || 0;
     my $limit           = $c->request->param('limit') || '';
     my $type            = $c->request->param('type');
 
@@ -67,7 +67,7 @@ sub index : Path : Args(0) {
 
         my $query = $result->query;
         my $type  = $query->query_type;
-        if ( !$advanced_search and $rdrctd_types->{$type} ) {
+        if ( !$advanced && $rdrctd_types->{$type} ) {
             foreach my $item ( @{ $result->items } ) {
                 my $item2 = $item->items->[0];
                 if ( lc( $item2->match ) eq lc( $query->query_as_word ) ) {
@@ -95,9 +95,8 @@ sub index : Path : Args(0) {
     $c->stash( limit           => $limit );
     $c->stash( default_type    => $c->request->param('type') || 'ipaddr' );
     $c->stash( search_types    => \@search_types );
-    $c->stash( advanced_search => $advanced_search );
     $c->stash( plugins         => \@paths );
-
+    $c->stash( advanced        => $advanced);
     $c->stash( template => 'search/index.tt' );
 }
 

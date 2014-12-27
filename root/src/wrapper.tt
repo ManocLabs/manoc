@@ -27,30 +27,30 @@
      <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
      [% IF c.user %]
      <div id="logged">
-	<i>User:</i> [% c.user.login %] ([% FOR role = c.user.roles %] [% role %] [% END %])</i>
+	<i>User:</i> [% c.user.login %] ([% FOR role = c.user.roles %] [% role %] [% END %])
 	<div id="dock" class="ui-widget-content ui-corner-all">
         [% dock_menu %]
-        </div>
-     </div>
+        </div><!-- dock -->
+     </div><!-- logged -->
      [%END%]
-   </div>
-  </div>
+  </div><!-- banner -->
   <div id="content-wrapper" class="float-container">
-   [% IF c.user %]
-   <div id="panel" class="left">
+    [% IF c.user %]
+    <div id="panel" class="left">
      [% menu_panel %]
-   </div>
-   [% END -%]
-   <div id="body" class="right">
+    </div>
+    [% END -%]
+    <div id="body" class="right">
       [% breadcrumbs %]
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]
       [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
       [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
-      <div id="content">[% content %]</div>
-   </div><!-- end of content-wrapper -->
-</div><!- end of wrapper -->
+      <div id="content">[% content %]</div><!-- end of content -->
+    </div><!-- end of body -->
+  </div><!-- end of content-wrapper -->
+</div><!-- end of wrapper -->
 [% FOREACH link IN link_js -%]
 <script type="text/javascript" src="[% link %]"></script>
 [% END -%]
