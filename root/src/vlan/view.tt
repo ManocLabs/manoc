@@ -1,7 +1,8 @@
 [% META 
-   title='Vlan View'
+   title='View'
+   subsection='VLAN'
+   section='Network'
    use_table = 1
-   section='NetDB'
 -%]
 
 	<div id="tabs">

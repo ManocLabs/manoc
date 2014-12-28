@@ -1,0 +1,62 @@
+ [% META 
+   title='Unused interfaces'
+   use_table=1
+   section='Reports'
+-%]
+
+
+<form method="get" action="[% c.uri_for_action('/query/unused_ifaces') %]">
+<table>
+<tr>
+<td>Device:</td>
+<td>
+	<select name=device>
+	[% FOREACH d IN device_list %]
+	<option value="[% d.id %]" 
+        	[% IF d.selected %] selected="1"[% END %] >[% d.label%]
+      	</option>
+	[% END %]
+	</select>
+</td>
+</tr>
+<tr>
+<td>Days:</td>
+<td><input name="days" type="text" />
+</tr>
+<tr>
+<td></td><td><div class="buttons"> <input type="submit"/></div></td>
+</tr>
+</table>
+</form>
+
+
+[% init_table('un')%]
+[% FOREACH u IN unused_ifaces %]
+   [% IF loop.first %]
+    
+    <table class="display" id="un">
+       <thead>  
+	 <tr>
+ 	 <th>Device</th>
+ 	 <th>Interface</th>
+ 	 <th>Description</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+
+ <tr>
+  	 <td>[% print_device(u) %]</td>
+	 <td>[% print_short_iface(u.id,u.interface) %]</td>
+ 	 <td>[% u.description | html %]</td>
+	 </tr>
+   [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]
+
+
+
+
+

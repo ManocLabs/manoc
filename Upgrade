@@ -1,0 +1,5 @@
+To update to 2.1 from version 1.98 or below:
+-do a full db dump with manoc_dump.pl script running
+ perl script/manoc_dump.pl --save fulldump.tar.gz
+-load the dump with the same script to make it do the conversions needed by version 2.1 
+ perl script/manoc_dump.pl --load fulldump.tar.gz --disable-fk --overwrite --force

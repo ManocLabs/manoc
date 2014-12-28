@@ -14,3 +14,4 @@ manoc.conf
 manoc_log.conf
 scheduler.state
 lib/Manoc/Plugin
+local/

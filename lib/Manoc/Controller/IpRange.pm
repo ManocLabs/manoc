@@ -43,7 +43,7 @@ my $DEF_TAB_POS        = 3;
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->redirect('/iprange/list');
+    $c->response->redirect($c->uri_for_action('/iprange/list'));
 }
 
 =head2 base
@@ -465,7 +465,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
     $tmpl_param{range_name}  = $name;
     $tmpl_param{new_name}    = $new_name;
-    $tmpl_param{error_msg}   = $c->{stash}->{message};
+    $tmpl_param{error_msg}   = $c->stash->{message};
     $tmpl_param{type_subnet} = $type eq 'subnet';
     $tmpl_param{type_range}  = $type eq 'range';
     $tmpl_param{vlans}       = \@vlans;
@@ -500,17 +500,17 @@ sub process_edit : Private {
 	return 0;
     }
 
+    # check parameters and store cleaned values in stash
     $c->forward('check_iprange_form') or return 0;
-
-
-    #Update range
-     $range->set_column( 'name',        $new_name );
-     $range->set_column( 'from_addr',   $c->{stash}->{from_addr});
-     $range->set_column( 'to_addr',     $c->{stash}->{to_addr});
-     $range->set_column( 'network',     $c->{stash}->{network});
-     $range->set_column( 'netmask',     $c->{stash}->{netmask});
-     $range->set_column( 'vlan_id',     $vlan_id );
-     $range->set_column( 'description', $desc );
+        
+    #Update range    
+    $range->set_column( 'name',        $new_name );
+    $range->set_column( 'from_addr',   $c->stash->{from_addr});
+    $range->set_column( 'to_addr',     $c->stash->{to_addr});
+    $range->set_column( 'network',     $c->stash->{network});
+    $range->set_column( 'netmask',     $c->stash->{netmask});
+    $range->set_column( 'vlan_id',     $vlan_id );
+    $range->set_column( 'description', $desc || '');
     $range->update or return 0;
 
     return 1;
@@ -994,8 +994,7 @@ sub check_iprange_form : Private {
 	$to_addr   = Manoc::IpAddress->new(int2ip($to_addr_i));
 	$from_addr = Manoc::IpAddress->new(int2ip($from_addr_i));
 	$netmask   = Manoc::IpAddress->new(int2ip($netmask_i));
-      }
-    elsif ( $type eq 'range' ) {
+    } elsif ( $type eq 'range' ) {
       if( !check_addr($from_addr_str) ){ 
 	$error->{from_addr} = "Not a valid IPv4 address";
 	return 0;
@@ -1012,8 +1011,7 @@ sub check_iprange_form : Private {
 	return 0; 
       }
       $network = $netmask = undef;
-    }
-    else {
+    } else {
 	# internal error?
 	$c->stash->{'message'} = "No type selected";
 	return 0;
@@ -1099,8 +1097,8 @@ sub check_iprange_form : Private {
      }
 
 
-    # when editing a range check that it cannot overlap any son range
-    # and must have all chidren inside the range
+    # when editing a range check that it cannot overlap any descendant range
+    # and must have every children inside the range
     if ( $range ) {
 	$conditions = [
 		       {
@@ -1128,12 +1126,14 @@ sub check_iprange_form : Private {
 	    return 0;
 	}
     }
+
+    scalar( keys(%$error) ) and return 0;
     
-    #put in stash ip address objects
-    $c->stash->{'from_addr'} = $from_addr;
-    $c->stash->{'to_addr'}   = $to_addr;
-    $c->stash->{'network'}   = $network;
-    $c->stash->{'netmask'}   = $netmask;
+    # put in stash ip address objects
+    $c->stash->{'from_addr'} = $from_addr || die;
+    $c->stash->{'to_addr'}   = $to_addr   || die;
+    $c->stash->{'network'}   = $network   || die;
+    $c->stash->{'netmask'}   = $netmask   || die;
 
     return 1;
 }

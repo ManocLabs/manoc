@@ -1,6 +1,9 @@
-[%META title='Merge Address Range'
-       section='NetDB' %]
+[%META
+	title='Merge IP Address Ranges'
+	subsection='Address Plan'
+       	section='Network'
 
+-%]
 <form name="form1" method="POST">
 	<input type=hidden name="name" value="[% range_name %]" />
 	<input type=hidden name="parent" value="[% parent %]" />

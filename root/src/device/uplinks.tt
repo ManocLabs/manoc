@@ -1,5 +1,6 @@
 [% META title='Set Uplinks'
-   section='Asset' %]
+   subsection='Device'
+   section='Asset' -%]
 
 <p>Uplinks for <a href="[% c.uri_for_action('/device/view', [object.id])%]">
 	       [% object.name %]</a>.</p>

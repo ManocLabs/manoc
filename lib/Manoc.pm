@@ -2,7 +2,7 @@ package Manoc;
 use Moose;
 use namespace::autoclean;
 
-use Catalyst::Runtime 5.80;
+use Catalyst::Runtime 5.90;
 
 # Set flags and add plugins for the application
 #
@@ -32,7 +32,7 @@ with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
 with 'Catalyst::ClassData';
 
-our $VERSION = '2.1';
+our $VERSION = '2.002001';
 $VERSION = eval $VERSION;
 
 use Data::Dumper;
@@ -52,11 +52,15 @@ __PACKAGE__->plugin_registry({});
 
 __PACKAGE__->config(
     name         => 'Manoc',
-    default_view => 'TT',
+
+    # Views setup
+    default_view => 'WebPage',
+ 
     use_request_uri_for_path => 1,
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
+
     'Plugin::Authentication'                    => {
         default_realm => 'progressive',
         realms        => {
@@ -95,36 +99,36 @@ __PACKAGE__->config(
                     role_field    => 'role',
                 }
             },
-            ldap => {
-                credential => {
-                  class => "Password",
-                  username_field => "username",
-                  password_field => "password",
-                  password_type  => "self_check",
-                },
-                store => {
-                  class               => "LDAP",
-                  ldap_server         => "",
-                  ldap_server_options => { timeout => 100 , onerror => "warn"},
-                  role_basedn         => "ou=ManocRoles,dc=bla,dc=bla,dc=bla", #This should be the basedn where the LDAP Objects representing your roles are.
-                  role_field          => "cn",
-                  role_filter         => "",
-                  role_scope          => "one",
-                  role_search_options => { deref => "always" },
-                  role_value          => "cn",
-                  role_search_as_user => 0, #role disabled
-                  start_tls           => 0, #disabled
-                  start_tls_options   => { verify => "none" },
-                  entry_class         => "Net::LDAP::Entry",
-                  use_roles           => 1,
-                  user_basedn         => "ou=People,dc=bla,dc=bla,dc=bla",
-                  user_field          => "uid",
-                  user_filter         => "(&(objectClass=posixAccount)(uid=%s))",
-                  user_scope          => "sub", # 
-                  user_search_options => { deref => "always" },
-                  user_results_filter => sub { return shift->pop_entry },
-                },
-              },
+#            ldap => {
+#                credential => {
+#                  class => "Password",
+#                  username_field => "username",
+#                  password_field => "password",
+#                  password_type  => "self_check",
+#                },
+#                store => {
+#                  class               => "LDAP",
+#                  ldap_server         => "",
+#                  ldap_server_options => { timeout => 100 , onerror => "warn"},
+#                  role_basedn         => "ou=ManocRoles,dc=bla,dc=bla,dc=bla", #This should be the basedn where the LDAP Objects representing your roles are.
+#                  role_field          => "cn",
+#                  role_filter         => "",
+#                  role_scope          => "one",
+#                  role_search_options => { deref => "always" },
+#                  role_value          => "cn",
+#                  role_search_as_user => 0, #role disabled
+#                  start_tls           => 0, #disabled
+#                  start_tls_options   => { verify => "none" },
+#                  entry_class         => "Net::LDAP::Entry",
+#                  use_roles           => 1,
+#                  user_basedn         => "ou=People,dc=bla,dc=bla,dc=bla",
+#                  user_field          => "uid",
+#                  user_filter         => "(&(objectClass=posixAccount)(uid=%s))",
+#                  user_scope          => "sub", # 
+#                  user_search_options => { deref => "always" },
+#                  user_results_filter => sub { return shift->pop_entry },
+#                },
+#              },
         },
     },
 
@@ -249,17 +253,23 @@ Manoc - Network monitoring application
 
 L<Manoc::Controller::Root>, L<Catalyst>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-See README
+Gabriele Mambrini
+
+Enrico Liguori
 
 =head1 LICENSE
 
-Copyright 2011 by the Manoc Team
+Copyright 2011-2014 by the AUTHORS
 
 This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+no Moose;
+
+__PACKAGE__->meta->make_immutable(replace_constructor => 1);
 
 1;

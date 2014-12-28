@@ -1,7 +1,8 @@
-[% META 
-   title='Building'
-   use_table=1
+[% META
    section='Asset'
+   subsection='Building'  
+   title='View'
+   use_table=1
 -%]
 <div id="tabs">	 
   <ul>

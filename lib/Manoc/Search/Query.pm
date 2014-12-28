@@ -20,7 +20,7 @@ has 'search_string' => (
     required => 1,
 );
 
-enum 'QueryMatch' => qw(begin end exact partial);
+enum 'QueryMatch' => [ qw(begin end exact partial) ];
 has 'match'       => (
     is     => 'ro',
     isa    => 'QueryMatch',

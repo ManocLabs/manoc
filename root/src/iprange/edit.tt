@@ -1,5 +1,7 @@
-[% META title='Edit an IpRange'
-   section='NetDB'  %]
+[% META
+   subsection='Address Plan'
+   title='Edit IP Address Range'
+   section='Network'  -%]
 
 <form name="form1" method="POST">
 

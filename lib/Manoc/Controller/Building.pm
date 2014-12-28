@@ -10,6 +10,8 @@ use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
+with "Manoc::ControllerRole::JSONView";
+
 =head1 NAME
 
 Manoc::Controller::Building - Catalyst Controller
@@ -28,7 +30,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('building/list');
+    $c->response->redirect($c->uri_for('/building/list'));
     $c->detach();
 }
 
@@ -60,23 +62,32 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
 
 =cut
 
+sub fetch_list : Private {
+   my ( $self, $c ) = @_;
+
+   my $build_schema = $c->stash->{resultset};
+   $c->stash('object_list' => [ $build_schema->search({}, 
+			      {prefetch => 'racks'} ) ]
+            );
+  
+}
+
 sub list : Chained('base') : PathPart('list') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $build_schema = $c->stash->{resultset};
+    $c->forward('fetch_list');
 
-    my @building_table = map +{
+    my @r = map +{
         id      => $_->id,
         name    => $_->name,
         desc    => $_->description,
         n_racks => $_->racks->count()
-        },
-        $build_schema->search({}, 
-			      {prefetch => 'racks'});
+        }, @{$c->stash->{object_list}};
 
-    $c->stash( building_table => \@building_table );
+    $c->stash( building_table =>  \@r );
     $c->stash( template       => 'building/list.tt' );
 }
+
 
 =head2 view
 
@@ -123,9 +134,18 @@ sub save : Private {
     if ( $c->req->param('discard') ) {
         $c->detach('/follow_backref');
     }
-    return unless $form->process( params => $c->req->params );
+    my $success = $form->process( params => $c->req->params );
+    $success or return;
 
-    $c->flash( message => 'Success! Building created.' );
+    my $message = "Success. Building created.";
+    if ($c->stash->{is_xhr}) {
+        $c->stash(message => $message);
+        $c->stash(template => 'dialog/message.tt');
+        $c->forward('View::HTMLFragment');
+        return;
+    }
+
+    $c->flash( message => $message );
     $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
     $c->stash( default_backref => $def_br );
     $c->detach('/follow_backref');
@@ -168,9 +188,19 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
 }
 
+sub prepare_json_object : Private {
+    my ($self, $building) = @_;
+    return {
+        id      => $building->id,
+        name    => $building->name,
+        description   => $building->description,
+        racks   => [ map +{ id => $_->id, name => $_->name }, $building->racks ],
+       },
+}
+
 =head1 AUTHOR
 
-Rigo
+The Manoc Team
 
 =head1 LICENSE
 
@@ -182,3 +212,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

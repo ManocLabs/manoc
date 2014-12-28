@@ -1,7 +1,6 @@
-[% META title='Change IP' 
-   section='Asset' %]
-
-
+[% META title='Change IP'
+   subsection='Device'
+   section='Asset' -%]
 <form method="POST" >
 <input type="hidden" name="id" value="[% object.id.address %]" />
 <table class="ui-widget-content ui-corner-all manoc-form">

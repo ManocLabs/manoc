@@ -6,31 +6,28 @@
 	$("tr.master").addClass('ui-state-focus');
 	$("tr.header").addClass('ui-widget-header ui-corner-all');
 
+	$('#expandible').width($('#expandible').width());
 
         $("#expandible tr.master .arrow").click(function() {
-		$(this).closest("tr").nextAll("tr").each(function(index) {
-			if ($(this).is(".master")) 
-			    return false;
-			if($(this).is(":visible"))
-   			 $(this).fadeOut();
-			else 
-			 $(this).fadeIn();
-		});
+	    $(this).closest("tr").nextUntil("tr.master", "tr")
+		.stop(true, true).animate({
+	    	    height:"toggle",
+		    opacity:"toggle"
+		}, 1000);
 		$(this).toggleClass("up");
         });
-  
-    }
+    }		
     $.fn.jExpand_CollapseAll = function(){
 	$("#expandible tr:not(.master)").hide();
 	$("#expandible .header").show();
 	$(".arrow").each(function(){
-	  $(":not(.up)").toggleClass("up");
+	    $(":not(.up)").toggleClass("up");
 	});
     }
     $.fn.jExpand_ExpandAll = function(){
     	$("#expandible tr:not(.master)").show();
 	$(".arrow").each(function(){
-	  $(".up").toggleClass("up");
+	    $(".up").toggleClass("up");
 	});
     }
     

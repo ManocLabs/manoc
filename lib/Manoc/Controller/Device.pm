@@ -9,9 +9,13 @@ use Manoc::Utils qw(clean_string print_timestamp check_addr );
 use Text::Diff;
 use Manoc::Form::DeviceNew;
 use Manoc::Form::DeviceEdit;
-use Manoc::Netwalker::DeviceUpdater;
 use Manoc::Report::NetwalkerReport;
 use Data::Dumper;
+
+# moved to conditional block in refresh
+#  use Manoc::Netwalker::DeviceUpdater;
+# where we need
+use Module::Load;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -33,7 +37,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('/device/list');
+    $c->response->redirect($c->uri_for_action('/device/list'));
     $c->detach();
 }
 
@@ -51,11 +55,11 @@ sub base : Chained('/') : PathPart('device') : CaptureArgs(0) {
 =cut
 
 sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
-
-    # $id = primary key
     my ( $self, $c, $id ) = @_;
+    # $id = primary key
 
-    $c->stash(object => $c->stash->{resultset}->find( Manoc::IpAddress->new($id) ) ) ;
+    my $ipaddr =  Manoc::IpAddress->new($id);
+    $c->stash(object => $c->stash->{resultset}->find($ipaddr) ) ;
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
@@ -90,7 +94,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
         $device->config ? print_timestamp( $device->config->config_date ) : undef;
     $tmpl_param{backup_enabled} = $device->backup_enabled ? "Enabled" : "Not enabled";
     $tmpl_param{serial}         = $device->serial;
-
+    
     $tmpl_param{dot11_enabled} = $device->get_dot11 ? "Enabled" : "Not enabled";
     $tmpl_param{arp_enabled}   = $device->get_arp   ? "Enabled" : "Not enabled";
     $tmpl_param{mat_enabled}   = $device->get_mat   ? "Enabled" : "Not enabled";
@@ -227,79 +231,87 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id->address;
+    
+    my $has_netwalker = eval { load Manoc::Device::Netwalker; 1 };
+    if (!$has_netwalker) {
+	$c->flash( message => "Netwalker not installer");
+	$c->response->redirect(
+			       $c->uri_for_action( '/device/view', [$device_id] ) );
+	$c->detach();
+    }
 
-     my %config = (
-         snmp_community => $c->config->{Credentials}->{snmp_community}
-           || 'public',
-         snmp_version       => '2c',
-         default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
-         iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
-         ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
-           || 1,
-     );
-
-     $ENV{DEBUG} = 1;
-     my $updater = Manoc::Netwalker::DeviceUpdater->new(
+    my %config = (
+		  snmp_community => $c->config->{Credentials}->{snmp_community}
+		  || 'public',
+		  snmp_version       => '2c',
+		  default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
+		  iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
+		  ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
+		  || 1,
+		 );
+    
+    # TODO why an hardcoded debug?
+    $ENV{DEBUG} = 1;
+    my $updater = Manoc::Netwalker::DeviceUpdater->new(
          entry        => $c->stash->{object},
          config       => \%config,
          schema       => $c->model('ManocDB'),
          timestamp    => time
      );
    
-     my $ret_status = $updater->update_all_info();
-     unless(defined($ret_status)){
-       my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
-       $c->flash( error_msg => $err_msg );
-       $c->response->redirect(
- 			     $c->uri_for_action( '/device/view', [$device_id] ) );
-       $c->detach();
-     }
+    my $ret_status = $updater->update_all_info();
+    unless(defined($ret_status)){
+	my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
+	$c->flash( error_msg => $err_msg );
+	$c->response->redirect(
+			       $c->uri_for_action( '/device/view', [$device_id] ) );
+	$c->detach();
+    }
     
-      my $worker_report = $updater->report;
-      my $report        = Manoc::Report::NetwalkerReport->new;
-
-      #create the report
-      my $errors = $worker_report->error;
-      scalar(@$errors) and $report->add_error(
-          {
-              id       => $device_id,
-              messages => $errors
-          }
+    my $worker_report = $updater->report;
+    my $report        = Manoc::Report::NetwalkerReport->new;
+    
+    #create the report
+    my $errors = $worker_report->error;
+    scalar(@$errors) and $report->add_error(
+					    {
+					     id       => $device_id,
+					     messages => $errors
+					    }
       );
-      my $warning = $worker_report->warning;
-      scalar(@$warning) and $report->add_warning(
-          {
-              id       => $device_id,
-              messages => $warning
-          }
-      );
-
-      $report->mat_entries( $worker_report->mat_entries );
-      $report->arp_entries( $worker_report->arp_entries );
-      $report->cdp_entries( $worker_report->cdp_entries );
-      $report->new_devices( $worker_report->new_devices );
-      $report->visited( $worker_report->visited );
-
-      my $new_report = $c->model('ManocDB::ReportArchive')->create(
-          {
-              'timestamp' => time,
-              'name'      => 'Netwalker',
-              'type'      => 'NetwalkerReport',
-              's_class'   => $report,
-          }
-      );
-
-      my $report_url =
-        $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
-
-      my $msg = "Success! Device infomations are now up to date!"
-        . " See the <a href=\"$report_url\">report</a> for details.";
-
+    my $warning = $worker_report->warning;
+    scalar(@$warning) and $report->add_warning(
+					       {
+						id       => $device_id,
+						messages => $warning
+					       }
+					      );
+    
+    $report->mat_entries( $worker_report->mat_entries );
+    $report->arp_entries( $worker_report->arp_entries );
+    $report->cdp_entries( $worker_report->cdp_entries );
+    $report->new_devices( $worker_report->new_devices );
+    $report->visited( $worker_report->visited );
+    
+    my $new_report = $c->model('ManocDB::ReportArchive')->create(
+								 {
+								  'timestamp' => time,
+								  'name'      => 'Netwalker',
+								  'type'      => 'NetwalkerReport',
+								  's_class'   => $report,
+								 }
+								);
+    
+    my $report_url =
+      $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
+    
+    my $msg = "Success! Device infomations are now up to date!"
+      . " See the <a href=\"$report_url\">report</a> for details.";
+    
     $c->flash( message => $msg);
     $c->response->redirect(
 			   $c->uri_for_action( '/device/view', [$device_id] ) );
     $c->detach();
-
 }
 
 =head2 list
@@ -392,7 +404,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
 
     my $item = $c->stash->{resultset}->new_result( {} );
     $c->stash( def_rack => $rack_id ) if ($rack_id);
-    $c->stash( default_backref => $c->uri_for_action('device/list') );
+    $c->stash( default_backref => $c->uri_for_action('/device/list') );
     my $form = Manoc::Form::DeviceNew->new( item => $item );
 
     #prepare the selects input
@@ -433,7 +445,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
     }
     $c->flash( message => 'Success! Device created.' );
     $c->keep_flash('backref');
-    $c->response->redirect( $c->uri_for_action( '/device/edit', [ $c->req->param('id') ] ) );
+    $c->response->redirect( $c->uri_for_action( '/device/edit', [ $c->req->param('form-device.id') ] ) );
     $c->detach();
 }
 
@@ -583,7 +595,7 @@ sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
                 $c->response->redirect($backref);
                 $c->detach();
             }
-            $c->response->redirect( $c->uri_for_action( '/device/view', [$new_ip] ) );
+            $c->response->redirect( $c->uri_for_action( 'device/view', [$new_ip] ) );
             $c->detach();
         }
         else {

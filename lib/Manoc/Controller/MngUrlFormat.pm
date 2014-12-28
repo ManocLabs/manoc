@@ -28,7 +28,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('/mngurlformat/list');
+    $c->response->redirect($c->uri_for_action('/mngurlformat/list'));
     $c->detach();
 }
 

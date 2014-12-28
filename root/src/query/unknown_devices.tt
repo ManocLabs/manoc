@@ -1,0 +1,35 @@
+[% META 
+   title='Unknown CDP hosts'
+   use_table=1
+   section='Reports'
+   subsection='Queries'
+-%]
+[% init_table('devs') %]
+[% FOREACH u IN unknown_devices %]
+   [% IF loop.first %]
+    
+    <table class="display" id="devs">
+       <thead>  
+	 <tr>
+ 	 <th>From Device</th>
+ 	 <th>Interface</th>
+ 	 <th>To Device</th>
+ 	 <th>Interface</th>
+ 	 <th>Last Seen</th>
+	 </tr>
+       </thead>  
+       <tbody>
+  [% END %]
+
+ <tr>
+  	 <td>[% print_device(u.device) %]</td>
+	 <td>[% print_short_iface(u.from_device,u.from_iface) %]</td>
+ 	 <td>[% u.to_device %]</td>
+  	 <td>[% u.to_iface %]</td>
+	 <td>[% u.date | html %]</td>
+	 </tr>
+   [% IF loop.last %]
+        </tbody>
+    </table>
+   [% END %]
+[% END %]

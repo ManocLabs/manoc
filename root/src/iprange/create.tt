@@ -1,5 +1,8 @@
-[% META title='Create a Subnet/IpRange'
-   section='NetDB' %]
+[% META
+   title='Create a Subnet/IpRange'
+   subsection='Address Plan'
+   section='Network'
+   -%]
 
 <form name="form1" method="POST">
 

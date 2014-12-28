@@ -1,8 +1,7 @@
-[% META title='Edit Rack'
-   section='Asset' %]
-
-<p>Edit rack in building [% object.building.name %]</p>
-
+[% META
+   title='Edit'
+   subsection='Rack'
+   section='Asset' -%]
 <div class="buttons">
 [% form.render %]
 </div>
