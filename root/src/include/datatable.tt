@@ -1,13 +1,13 @@
 [% MACRO init_row_group BLOCK -%]
-	[% link_css.push(c.uri_for('/static/css/rowGrouping.css') ) -%]
-	[% link_js.push(c.uri_for('/static/js/jquery.dataTables.rowGrouping.js')) -%]
+	[% link_css.push(c.uri_for('/static/external/datatable/rowGrouping.css') ) -%]
+	[% link_js.push(c.uri_for('/static/external/datatable/jquery.dataTables.rowGrouping.js')) -%]
 [%  END -%]
 
 [% MACRO init_datatable BLOCK -%]
-[%  link_css.push(c.uri_for('/static/css/table.css')) -%]
-[%  link_js.push(c.uri_for('/static/js/jquery.dataTables.js'),
-               c.uri_for('/static/js/dataTables.typeDetectPlugin.js'),
-	       c.uri_for('/static/js/dataTables.typeSortPlugin.js'),
+[%  link_css.push(c.uri_for('/static/external/datatable/table.css')) -%]
+[%  link_js.push(c.uri_for('/static/external/datatable/jquery.dataTables.js'),
+               c.uri_for('/static/external/datatable/dataTables.typeDetectPlugin.js'),
+	       c.uri_for('/static/external/datatable/dataTables.typeSortPlugin.js'),
              ) 
 -%]
 [% END -%]
