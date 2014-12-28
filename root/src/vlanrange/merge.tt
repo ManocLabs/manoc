@@ -4,7 +4,7 @@
    title='Merge ranges'  
    -%]
 [% UNLESS neighs.0 %]
-[% PROCESS  'message.tt' msg='This VlanRange doesn\'t have neighbor ranges' %]
+[% PROCESS  'message_box.tt' msg='This VlanRange doesn\'t have neighbor ranges' %]
 [% END %]
 [% IF neighs.0 %]
 <form name="form1" method="POST">

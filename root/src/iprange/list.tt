@@ -5,7 +5,7 @@
    use_table=1
 -%]
 [% UNLESS subnet_list.0 %]
-      [% PROCESS  'message.tt' msg='There is no subnet range defined!' %]
+      [% PROCESS  'message_box.tt' msg='There is no subnet range defined!' %]
 [% END %]
     
 <div class="buttons create_btn">

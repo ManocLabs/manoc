@@ -79,7 +79,7 @@
         [% END %]
      [% END %]
    [% ELSE %]
-      [% PROCESS  'message.tt' msg='No device on  VLAN ' _ object.id %]
+      [% PROCESS  'message_box.tt' msg='No device on  VLAN ' _ object.id %]
    [% END %]
 
 

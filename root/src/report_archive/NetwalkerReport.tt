@@ -60,7 +60,7 @@
 
 
 <div id="tabs-2">
-[% PROCESS message.tt msg="No errors occurred." 
+[% PROCESS message_box.tt msg="No errors occurred." 
                          UNLESS report_obj.error_count -%]
 <table class="report ui-priority-primary ui-corner-all">
   [% FOREACH error IN report_obj.error %]
@@ -78,7 +78,7 @@
 
 
 <div id="tabs-3">
-[% PROCESS message.tt msg="No warning occurred." 
+[% PROCESS message_box.tt msg="No warning occurred." 
                          UNLESS report_obj.warning_count -%]
 
 <table class="report ui-priority-primary ui-corner-all">

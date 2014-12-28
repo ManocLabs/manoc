@@ -188,7 +188,7 @@
     [% END %]
     [% END %] <!-- end of loop -->
    [% ELSE %]
-      [% PROCESS  'message.tt' msg='This Device has no neighbor' %]  
+      [% PROCESS  'message_box.tt' msg='This Device has no neighbor' %]  
    [% END %]
  </div> <!-- tabs-2 div --> 
 
@@ -348,7 +348,7 @@
   [% END %]
 [% END %] 
 [% ELSE %]
-      [% PROCESS  'message.tt' msg='No SSIDs on this device' %]
+      [% PROCESS  'message_box.tt' msg='No SSIDs on this device' %]
 [% END %]
 </div> <!-- end tab-6 -->
 
@@ -387,7 +387,7 @@
      [% END %]
    [% END %]
 [% ELSE %]
-      [% PROCESS  'message.tt' msg='No wireless clients on this device ' %]
+      [% PROCESS  'message_box.tt' msg='No wireless clients on this device ' %]
 [% END %] 
 </div> <!-- end tab-7 -->
 

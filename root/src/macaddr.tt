@@ -117,7 +117,7 @@
  [% END %]
 
 [% ELSE %]
-      [% PROCESS  'message.tt' msg='There are no DHCP leases for this MAC' %]
+      [% PROCESS  'message_box.tt' msg='There are no DHCP leases for this MAC' %]
 [% END %] 
 
 </div>     <!-- end tabs-3 -->
@@ -151,7 +151,7 @@
  [% END %]
 
 [% ELSE %]
-      [% PROCESS  'message.tt' msg='There are no DHCP reservations for this MAC' %]
+      [% PROCESS  'message_box.tt' msg='There are no DHCP reservations for this MAC' %]
 [% END %] 
 
 </div> <!-- end tabs-4 -->
@@ -188,7 +188,7 @@
   [% END %]
  [% END %]
 [% ELSE %]
-      [% PROCESS  'message.tt' msg='No associations for this MAC' %]
+      [% PROCESS  'message_box.tt' msg='No associations for this MAC' %]
 [% END %] 
 
     </div> <!-- end tabs-5 -->

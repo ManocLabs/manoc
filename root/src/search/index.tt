@@ -9,10 +9,10 @@
 [%END -%]
 
 [% IF not(result.items.size) and q %]
-  [% PROCESS 'message.tt' message="There are no results!" -%]
+  [% PROCESS 'message_box.tt' message="There are no results!" -%]
 [% ELSE %]
   [% IF q %]
-  [% PROCESS 'message.tt' message="Found $result.items.size results!" -%]
+  [% PROCESS 'message_box.tt' message="Found $result.items.size results!" -%]
 [% END %]
 [% END %]
 

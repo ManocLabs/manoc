@@ -45,7 +45,7 @@
 </div> <!--end of tab1 -->
 
 <div id="tabs-2">
-[% PROCESS message.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view" 
                          UNLESS report_obj.updated_count -%]
                          
 <table class="report ui-priority-primary ui-corner-all">
@@ -58,7 +58,7 @@
  </div><!--end of tab2 -->
 
 <div id="tabs-3">
-[% PROCESS message.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view" 
                          UNLESS report_obj.up_to_date_count -%]
 <table class="report  ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_up_to_date %]
@@ -70,7 +70,7 @@
 </div><!--end of tab3 -->
 
 <div id="tabs-4">
-[% PROCESS message.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view" 
                          UNLESS report_obj.not_updated_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_not_updated %]
@@ -82,7 +82,7 @@
 </div><!--end of tab4 -->
 
 <div id="tabs-5">
-[% PROCESS message.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view" 
                          UNLESS report_obj.created_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_created %]
@@ -94,7 +94,7 @@
 </div><!--end of tab5 -->
 
 <div id="tabs-6">
-[% PROCESS message.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view" 
                          UNLESS report_obj.error_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_error %]
