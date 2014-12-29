@@ -5,7 +5,7 @@ requires 'Log::Log4perl', '1.46';
 requires 'DBI';
 requires 'DBIx::Class';
 requires 'DBIx::Class::EncodedColumn';
-requires 'Catalyst::Runtime';
+requires 'Catalyst::Runtime', '5.90077';
 requires 'Catalyst::Authentication::Credential::HTTP';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
