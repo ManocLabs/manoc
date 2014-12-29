@@ -131,7 +131,7 @@ sub save : Private {
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-building.discard') ) {
         $c->detach('/follow_backref');
     }
     my $success = $form->process( params => $c->req->params );

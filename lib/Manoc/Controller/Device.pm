@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2014 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -12,9 +12,8 @@ use Manoc::Form::DeviceEdit;
 use Manoc::Report::NetwalkerReport;
 use Data::Dumper;
 
-# moved to conditional block in refresh
-#  use Manoc::Netwalker::DeviceUpdater;
-# where we need
+# moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
+# where we need it
 use Module::Load;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -429,7 +428,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
     $c->stash( buildings => \@buildings );
     $c->stash( racks     => \@racks );
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-device.discard') ) {
         $c->detach('/follow_backref');
     }
     my $param = $c->req->params;
@@ -466,7 +465,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
     #prepare the selects input
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-device.discard') ) {
         $c->detach('/follow_backref');
     }
 

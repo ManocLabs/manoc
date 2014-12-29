@@ -126,7 +126,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
     $form or $form = Manoc::Form::Rack->new( item => $new_obj );
     $c->stash( form => $form, template => 'rack/create.tt' );
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-rack.discard') ) {
         $c->detach('/follow_backref');
     }
 
@@ -190,7 +190,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
     $c->stash( form => $form, template => 'rack/edit.tt' );
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-rack.discard') ) {
         $c->response->redirect(
             $c->uri_for_action( 'rack/view', [ $c->stash->{object}->id ] ) );
         $c->detach();
