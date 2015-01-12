@@ -256,43 +256,34 @@ sub decode_bitset {
 ########################################################################
 
 sub tar {
-    my ($config, $tarname, @filelist )  = @_;
+    my ($tarname, $basedir, $filelist_ref )  = @_;
     my $command = "tar";
-    my $dir     = "/tmp";
-    #if tar isn't in path system
-    if(defined $config){
-      my $path = $config->{'path_to_tar'};
-      $path and $path =~ s/\/$//;
-      $command = $path."/tar" if(defined $path and $path ne '');
-      $dir = $config->{'directory'} if(defined $config->{'directory'});
-      $dir and $dir =~ s/\/$//;
-    }
+    
     #check the existence of tar command
     #running tar --version 
     `$command --version 2>&1`;
     if($? == 0){
-      #use system tar
-      #remove leading path from filelist to avoid creating tar with 
-      #file that have complete path e.g. /tmp/device.yaml
-       my @sanitized;
-       foreach my $file (@filelist){
-	 $file =~ s/^\/(\w+\/)+//;
-	 push @sanitized, $file;
-       }
-      `$command -zcf $tarname -C $dir/ @sanitized 2>&1`;
-      return $?;
-    }
-    else {
-      #use Archive::Tar    
-      my $tar = Archive::Tar->new;
-      my @obj_list = $tar->add_files( @filelist );
-      #remove /tmp prefix
-      foreach my $o (@obj_list){
-	$o->prefix('');
-      }
-      return $tar->write( $tarname, 1  );
-    }
-    
+	#use system tar
+	#remove leading path from filelist to avoid creating tar with 
+	#file that have complete path e.g. /tmp/device.yaml
+	my @sanitized;
+	foreach my $file (@$filelist_ref) {
+	    $file =~ s/^$basedir\/?//o;
+	    push @sanitized, $file;
+	}
+	`$command -zcf $tarname -C $basedir/ @sanitized 2>&1`;
+	return $?;
+    } else {
+	#use Archive::Tar    
+	my $tar = Archive::Tar->new;
+	my @obj_list = $tar->add_files( @$filelist_ref );
+	
+	#remove prefix
+	foreach my $o (@obj_list){
+	    $o->prefix('');
+	}
+	return $tar->write( $tarname, 1  );
+    }    
   }
 
 

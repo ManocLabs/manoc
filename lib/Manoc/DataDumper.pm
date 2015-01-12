@@ -1,5 +1,4 @@
 package Manoc::DataDumper;
-
 # Copyright 2011 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
@@ -9,7 +8,7 @@ use Moose;
 use Manoc::DB;
 use Manoc::DataDumper::Converter;
 use Manoc::DataDumper::VersionType;
-use Data::Dumper;
+
 
 use Try::Tiny;
 
@@ -54,25 +53,12 @@ has 'version' => (
     is        => 'rw',
     isa       => 'Version',
     lazy      => 1,
-    builder   => '_build_dbversion',
-);
-
-has 'db_version' => (
-    is        => 'rw',
-    required  => 0,
+    builder   => '_build_version',
 );
 
 
-has 'file_rows' => (
-    is        => 'rw',
-    isa       => 'Version',
-    lazy      => 1,
-    builder   => '_build_rows',
-);
-
-sub _build_dbversion {
+sub _build_version {
     my $self = shift;
-    $self->db_version and return $self->db_version;
     return Manoc::DB::get_version;
 }
 
@@ -97,14 +83,14 @@ sub get_source_names {
 sub load_tables_loop {
     my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
     my $converter;
-    my %overwrited;
+    my %overwrite;
 
     # try to load a converter if needed
     my $version = $datadump->metadata->{'version'};
     if ( $version < Manoc::DB::get_version ) {
         my $c = 0;
         my $converter_class =
-          Manoc::DataDumper::Converter->get_converter_class( Manoc::DB::get_version );
+          Manoc::DataDumper::Converter->get_converter_class( $version );
         
         if (defined($converter_class) ) {
             $converter = $converter_class->new({ log => $self->log });
@@ -112,7 +98,7 @@ sub load_tables_loop {
         }        
     }
 
-    %overwrited = map {$_ => $overwrite}  @$source_names;
+    %overwrite = map {$_ => $overwrite}  @$source_names;
 
      foreach my $source_name (@$source_names) {
          my $source = $self->schema->source($source_name);
@@ -133,10 +119,10 @@ sub load_tables_loop {
               $self->log->info("Loaded $count records from $filename");
               #convert them if needed
               $converter and $converter->upgrade_table( $datadump->data->{$filename}, $table );
-              #commit to backend
-              #n.b. if is a splitted table overwrite it only once!
-              $self->load_table( $source, $datadump->data->{$filename}, $overwrited{$source_name}, $force );
-              $overwrited{$source_name} = 0;
+              # commit to backend
+              # if it is a splitted table overwrite it only once!
+              $self->load_table( $source, $datadump->data->{$filename}, $overwrite{$source_name}, $force );
+              $overwrite{$source_name} = 0;
               #free memory
               undef $datadump->data->{$filename};
           }
@@ -204,12 +190,13 @@ sub load {
 
 
 
-sub dump_table {
-    my ( $storage, $dbh, $datadump, $source, $rows, $dir ) = @_;
-    my $i = 1;
-    my @list;
+sub _dump_table {
+    my ( $storage, $dbh, $datadump, $source, $rows) = @_;
     my $table = $source->result_source->name;
-    my $filename = "$table.yaml";
+
+    my $filename;
+    my @list;
+    my $i = 1;
 
     my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
     my $page_entries = $rs->count;
@@ -218,16 +205,22 @@ sub dump_table {
     while( $page_entries >= $ROWS ) {
         @list = map {$_->{_column_data}} $rs->all;
         $filename = "$table.$i.yaml";
-        $datadump->save_table( "$filename", \@list, $dir);
+        $datadump->add_table( "$filename", \@list);
+        @list = undef;
         $i++;
         $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
         $page_entries = $rs->count;
     }
-    #if resultset is only 1 page in file name dosen't appear 
-    #the page number
-    $i gt 1 and  $filename = "$table.$i.yaml";
+
+    # the following code is used both fot the last page for multipage 
+    # tables and the full table for smaller ones.
+
+    # When there is just one page do not add the page number in filename
+    $filename = $i == 1 ? "$table.yaml" : "$table.$i.yaml";
+
     @list = map {$_->{_column_data}} $rs->all;
-    $datadump->save_table( "$filename", \@list, $dir);
+    $datadump->add_table( $filename, \@list);
+    @list = undef;
 }
 
 #----------------------------------------------------------------------#
@@ -237,31 +230,28 @@ sub dump_table {
 sub save {
     my ($self) = @_;
     
-    my $datadump = Manoc::DataDumper::Data->save( $self->filename, $self->version , $self->config->{DataDumper} );
-    my $path_to_tar = $self->config->{DataDumper}->{path_to_tar} || undef;
-    my $dir         = $self->config->{DataDumper}->{directory}   || undef;
-    my $rows        = $self->config->{DataDumper}->{file_rows}   || $ROWS;
-
+    my $datadump = Manoc::DataDumper::Data->init(
+        $self->filename,
+        $self->version,
+        $self->config->{DataDumper} );
+    
+    my $path_to_tar  = $self->config->{DataDumper}->{path_to_tar} || undef;    
     my $source_names = $self->get_source_names();
     
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->resultset($source_name);
         next unless $source->isa('DBIx::Class::ResultSet');
-        my $table         = $source->result_source->name;
-        #my @column_names = $source->columns;
-        
-        $self->schema->storage->dbh_do(\&dump_table, $datadump, $source, $rows, $dir);
-        
-        #$self->schema->storage->dbh_do( \&dump_table, $datadump, $table, \@column_names, $dir );
-        $self->log->debug("Table $table writed in archive");
 
-
-    } 
+        my $table = $source->result_source->name;
+        $self->schema->storage->dbh_do(\&_dump_table, $datadump, $source, $ROWS);
+        $self->log->debug("Table $table dumped");
+    }
+    
     $self->log->debug("Writing the archive...");
-    defined($path_to_tar) and $self->log->debug("...if available will be used system tar located in $path_to_tar ");
+    defined($path_to_tar) and $self->log->debug("use system tar in $path_to_tar ");
 
-    $datadump->finalize_tar;
-    $self->log->info("Database dumped!");
+    $datadump->save;
+    $self->log->info("Database dumped.");
 
 }
 
