@@ -1,13 +1,14 @@
 [% META 
-   title='Ip Range View'
+   title='IP Address Range'
+   subsection='Address Plan'
+   section='Network'
    use_table=1
-   section='NetDB'
 -%]
 
 	<div id="tabs">
 			<ul>
 				<li><a href="#tabs-1">Info</a></li>
-				<li><a href="#tabs-2">Ip List</a></li>
+				<li><a href="#tabs-2">IP Address List</a></li>
 			</ul>
 
 		
@@ -46,7 +47,7 @@
 </div>
 
    <div id="tabs-2">
-     [% PROCESS iprange/iplist.tt %]
+     [% PROCESS iprange/_iplist.tt %]
    </div>
 
 </div>

@@ -1,6 +1,6 @@
 [% META title='Edit Device'
-   section='Asset' %]
-
+   subsection='Device'
+   section='Asset' -%]
 <h3>IP Address: [% object.id.address %]</h3>
 
 <div class="buttons">

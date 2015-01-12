@@ -1,0 +1,11 @@
+[% init_datatable IF template.use_table -%]
+[% init_exp_table IF template.use_exp_table -%]
+<div id="fragment-wrapper">   
+      <!-- show messages before the content -->
+      [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
+      [% PROCESS 'message_box.tt' msg=message IF message -%]
+      [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
+      [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
+
+      <div id="content">[% content %]</div>
+</div><!-- end of content-wrapper -->

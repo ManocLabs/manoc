@@ -9,7 +9,10 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 BEGIN { extends 'Catalyst::Controller'; }
+with 'Manoc::ControllerRole::JSONView';
+
 use Manoc::Form::Rack;
+
 
 =head1 NAME
 
@@ -29,7 +32,7 @@ Catalyst Controller.
 
 sub index : Path() : Args(0) {
     my ( $self, $c ) = @_;
-    $c->response->redirect('rack/list');
+    $c->response->redirect( $c->uri_for_action( 'rack/view' ) );
     $c->detach();
 }
 
@@ -74,19 +77,26 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 =cut
 
-sub list : Chained('base') : PathPart('list') : Args(0) {
+sub fetch_list : Private {
     my ( $self, $c ) = @_;
 
-    my @racks = $c->stash->{resultset}->search(
+    $c->stash(object_list => [ $c->stash->{resultset}->search(
         {},
         {
             prefetch => 'building',
             join     => 'building'
-        }
+        }) ]
     );
-    $c->stash( rack_table => \@racks );
+}
+ 
+sub list : Chained('base') : PathPart('list') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->forward('fetch_list');
+    $c->stash( rack_table => $c->stash->{object_list} );
     $c->stash( template   => 'rack/list.tt' );
 }
+
 
 =head2 create
 
@@ -116,16 +126,25 @@ sub create : Chained('base') : PathPart('create') : Args() {
     $form or $form = Manoc::Form::Rack->new( item => $new_obj );
     $c->stash( form => $form, template => 'rack/create.tt' );
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-rack.discard') ) {
         $c->detach('/follow_backref');
     }
 
-    unless ( $form->process( params => $c->req->params ) ) {
-        $c->keep_flash('backref');
+    my $success = $form->process( params => $c->req->params );
+    if(!$success) {
+      $c->keep_flash('backref');
+      return;
+    }
+
+    my $message = 'Success. Rack ' . $c->req->param('name') . ' created.';
+    if ($c->stash->{is_xhr}) {
+        $c->stash(message => $message);
+        $c->stash(template => 'dialog/message.tt');
+        $c->forward('View::HTMLFragment');
         return;
     }
 
-    $c->flash( message => 'Success! Rack ' . $c->req->param('name') . ' created.' );
+    $c->flash( message => $message);
     $c->detach('/follow_backref');
 }
 
@@ -171,7 +190,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
     $c->stash( form => $form, template => 'rack/edit.tt' );
 
-    if ( $c->req->param('discard') ) {
+    if ( $c->req->param('form-rack.discard') ) {
         $c->response->redirect(
             $c->uri_for_action( 'rack/view', [ $c->stash->{object}->id ] ) );
         $c->detach();
@@ -191,6 +210,20 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     $c->response->redirect( $c->uri_for_action( '/rack/view', [ $c->stash->{object}->id ] ) );
     $c->detach();
 }
+
+
+
+sub prepare_json_object : Private {
+    my ($self, $rack) = @_;
+    return {
+	    id      => $rack->id,
+	    name    => $rack->name,
+	    building => $rack->building->id,
+	    test     => "aaab",
+	    devices   => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
+	   };
+}
+
 
 =head1 AUTHOR
 

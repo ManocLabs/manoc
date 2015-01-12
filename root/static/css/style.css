@@ -2,19 +2,45 @@ body {
     margin : 0;
     padding: 0; 
     font-family: "Arial","Helvetica","Verdana","sans-serif";
-    font-size: 14px;
+    font-size: 13Px;
 }
 
 h1 {
-    font-size: 3em;
+    font-size: 32px;
 }
 
 h2 {
-    font-size: 2.3em;
+    font-size: 1.6em;
+    margin: 0 0 0 0;
+}
+
+.float-container:after {
+    clear: both;
+    content: ".";
+    display: "block";
+    height: 0;
+    visibility: hidden;
+}
+
+/**********************************************************************/
+/*                       Page layout                                  */
+/**********************************************************************/
+
+
+div.left {
+    float:left;
+    width: 200px;
+}
+
+div.right {
+    margin-top: 20px;
+    margin-left: 230px;
+    overflow: hidden;
 }
 
 #banner {
-    height: 90px;
+    top: 0;
+    height: 65px;
 }
 
 #wrapper {
@@ -24,51 +50,85 @@ h2 {
 }
 
 h1.logo {
-    left:28px;
-    margin:0;
-    position:absolute;
-    top: 45px;
-    text-decoration:none;
+    left: 28px;
+    margin: 0;
+    position: absolute;
+    top: 3px;
+    text-decoration: none;
 }
 
 h1.logo a {
- text-decoration:none;
+    text-decoration:none;
 }
+
+#logged {
+    float:right;    
+}
+
+
+#content {
+    margin: 15px;
+}
+
+/*** Breadcrumbs ***/
+
+#breadcrumbs ul {
+    height:25px;
+    padding:0 6px;
+}
+
+#breadcrumbs ul li {
+    padding:0 6px;
+    position:relative;
+}
+
+#breadcrumbs ul li i {
+    display:inline;
+    padding-left: 18px;
+}
+
+#breadcrumbs ul, #breadcrumbs ul li {
+    float:left;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+#breadcrumbs ul li a {
+    color:black;
+    float:left;
+    font-size:14px;
+    line-height:16px;
+    padding:0 5px;
+    text-decoration:none;
+}
+
+/*** Dock  ***/
 
 #dock {
-    float:left;
-    height:25px;
-    position:absolute;
-    right:2px;
-    top:0;
+    top: 34px;
+    right: 1px;
+    position: absolute;   
 }
+
 
 #dock ul {
     height:25px;
     padding:0 6px;
 }
 
-#dock ul, #dock ul li {
-    float:left;
-    list-style-type:none;
-    margin:0;
-    padding:0;
-}
-
-#dock ul, #dock ul li {
-    float:left;
-    list-style-type:none;
-    margin:0;
-    padding:0;
-}
-#dock ul {
-    height:25px;
-    padding:0 6px;
-}
 #dock ul li {
     padding:0 6px;
     position:relative;
 }
+
+#dock ul, #dock ul li {
+    float:left;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
 #dock ul li a {
     color:black;
     display:block;
@@ -78,67 +138,44 @@ h1.logo a {
     padding:0 5px;
     text-decoration:none;
 }
+
 #dock ul li a:hover, #dock ul li.selected a {
     border-bottom: 2px solid #FF9C08;
 }
+
 #dock ul li.selected a {
     font-weight:bold;
 }
 
-#logged {
- color: #000000;
- font-weight:bold;
- float:left;
- height:30px;
- position:absolute;
- right:0;
- top: 35px;
- font-size:6px;
+/*** left panel ***/
 
+#panel ul.menu {
+    padding: 0;
+    margin: 0;
 }
 
-#navigation {
-    float:left;
-    height:41px;
-    position:absolute;
-    right:0;
-    top: 52px;
-}
-
-#navigation ul, #navigation ul li {
-    float:left;
-    font-size:15px;
-    line-height:38px;
+#panel ul.menu li {
     list-style-type:none;
-    margin:0;
-    padding:0;
-}
-#navigation ul {
-    height:41px;
-}
-#navigation ul li a {
-    color:#DDDDDD;
-    display:block;
-    float:left;
-    height:33px;
-    padding:0 18px;
-    text-decoration:none;
-}
-#navigation ul li.selected a {
-    color:#FFFFFF;
-    border-bottom: 2px solid #FFFFFF;
-    font-weight:bold;
-}
-#navigation ul li.last a {
-
-}
-#navigation ul li a:hover {
-    color:#FFFFFF;
 }
 
-#content-wrapper {
-    margin: 15px;
+#panel ul.menu li a { 
+    text-decoration: none;
 }
+
+#panel ul li a:hover, #panel ul li.selected a {
+    border-bottom: 2px solid #FF9C08;
+}
+
+/* JQuery UI theme override */
+#panel .ui-accordion-content {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/**********************************************************************/
+/*                          Miscellanea                               */
+/**********************************************************************/
+
 
 #search-cat {
   font-weight:bold;
@@ -149,8 +186,8 @@ h1.logo a {
   float: right;
 }
 
-.create_btn {
-    float:right;
+.create_btn a {
+    float:left;
     font-size:10px; 
     position: relative;
 }
@@ -168,14 +205,6 @@ img.shortcut {
     height: 14px;
 }
 
-#description { 
-    height:200px; 
-    width:300px; 
-} 
-#notes { 
-    height:200px; 
-    width:300px; 
-} 
 #error, .error_message { 
     color:red; 
 } 

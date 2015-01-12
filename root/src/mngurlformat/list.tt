@@ -1,7 +1,8 @@
 [% META 
-   title='Management Urls'
-   use_table=1
+   title="List"
+   subsection='Management Urls'
    section='Config'
+   use_table=1
 %]
 
 <div class="buttons create_btn">

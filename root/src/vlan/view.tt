@@ -1,7 +1,8 @@
 [% META 
-   title='Vlan View'
+   title='View'
+   subsection='VLAN'
+   section='Network'
    use_table = 1
-   section='NetDB'
 -%]
 
 	<div id="tabs">
@@ -78,7 +79,7 @@
         [% END %]
      [% END %]
    [% ELSE %]
-      [% PROCESS  'message.tt' msg='No device on  VLAN ' _ object.id %]
+      [% PROCESS  'message_box.tt' msg='No device on  VLAN ' _ object.id %]
    [% END %]
 
 

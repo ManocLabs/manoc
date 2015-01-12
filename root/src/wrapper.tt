@@ -21,37 +21,36 @@
 </head>
 
 <body>
-[% UNLESS show_popup -%]
 [% PROCESS 'menu.tt' %]
 <div id="wrapper">
-   <div id="banner" class="ui-widget-header">
-      <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
-      <div id="dock" class="ui-widget-content ui-corner-all">      
-      [% menu_dock %]    
-      </div>
-      <div id="navigation">
-      [% menu_navigation %]
-      </div>
-      <div id="logged">
-      [% IF c.user.username %]
-      User: <i>[% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
-      [%END%]
-      </div>
-  </div>
-</div>
-[% END -%]
-<div id="content-wrapper">
-   <h2>[% title %]</h2>	
-   
+   <div id="banner" class="ui-widget-header float-container">
+     <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
+     [% IF c.user %]
+     <div id="logged">
+	<i>User:</i> [% c.user.login %] ([% FOR role = c.user.roles %] [% role %] [% END %])
+	<div id="dock" class="ui-widget-content ui-corner-all">
+        [% dock_menu %]
+        </div><!-- dock -->
+     </div><!-- logged -->
+     [%END%]
+  </div><!-- banner -->
+  <div id="content-wrapper" class="float-container">
+    [% IF c.user %]
+    <div id="panel" class="left">
+     [% menu_panel %]
+    </div>
+    [% END -%]
+    <div id="body" class="right">
+      [% breadcrumbs %]
       <!-- show messages before the content -->
       [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
       [% PROCESS 'message_box.tt' msg=message IF message -%]
       [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
       [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
-
-      <div id="#content">[% content %]</div>
-</div><!-- end of content-wrapper -->
-
+      <div id="content">[% content %]</div><!-- end of content -->
+    </div><!-- end of body -->
+  </div><!-- end of content-wrapper -->
+</div><!-- end of wrapper -->
 [% FOREACH link IN link_js -%]
 <script type="text/javascript" src="[% link %]"></script>
 [% END -%]
@@ -59,14 +58,7 @@
 [% FOREACH fragment IN js_scripts -%]
 [% fragment %]
 [% END -%]
-[% IF show_popup -%]
- [%# discard buttons should close popup windows %]
-$(function() {
-  $( "#discard" ).button().click(function() {
-    window.close();
-});
-});
-[% END -%]
+[% menu_js %]
 </script>
 </body>
 </html>

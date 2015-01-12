@@ -1,0 +1,54 @@
+[% META 
+   title='Queries'
+   section='Reports'
+-%]
+[% list=[
+			{
+			    path=c.uri_for_action('/query/ipconflict')
+			    name="IPv4 address conflicts",
+			},
+			{
+			    path=c.uri_for_action('/query/multihost'),
+			    name="Multiple hosts interfaces", },
+			{
+			    path=c.uri_for_action('/query/portsecurity'),
+			    name="Portsecurity shutdown interfaces",
+			},
+			{
+			    path=c.uri_for_action('/query/unused_ifaces'),
+			    name="Unused interfaces",
+			},
+			{
+			    path=c.uri_for_action('/query/unknown_devices'),
+			    name="Unknown CDP hosts",
+			},
+			{
+			    path=c.uri_for_action('/query/multi_mac'),
+			    name="MAC addresses on multiple devices",
+			},
+			{
+			    path=c.uri_for_action('/query/new_devices'),
+			    name="New hosts",
+			},
+			{
+			   path=c.uri_for_action('/query/device_list'),
+			   name="Managed devices list",
+			},
+			{
+			   path=c.uri_for_action('/query/rack_list'),
+			   name="Managed racks list",
+			},
+	]
+-%]
+<ul id="menu">
+[% FOREACH l IN list %]
+  <li><a href="[% l.path %]">[% l.name %]</a></li>
+[% END -%]
+</ul>
+[% fragment = BLOCK -%]
+$(function() { 
+  $('#menu').menu();
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]
+

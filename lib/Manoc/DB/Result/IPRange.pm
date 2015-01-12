@@ -71,7 +71,8 @@ foreach my $col (qw( from_addr to_addr network netmask )) {
 			      $col => {
 				       inflate =>
 				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				       deflate => 
+				       sub { return $_[0]->padded if defined($_[0]) },
 				      } 
 			     );
 }

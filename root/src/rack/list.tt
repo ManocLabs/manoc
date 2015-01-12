@@ -1,7 +1,8 @@
 [% META 
-   title='Rack'
+   title='List'
+   subsection='Rack'
+   section='Asset'	
    use_table=1
-   section='Asset'
 -%]
 
 <div class="buttons create_btn">

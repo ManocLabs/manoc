@@ -1,5 +1,8 @@
-[%META title='Split Vlan Range' %]
-
+[%META
+	section='Network'
+	subsection='VLAN'
+	title='Split Range'
+-%]
 <form name="form1" method="POST">
     <input type=hidden name="id" value="[% object.id %]" >
     <table class="ui-widget-content ui-corner-all manoc-form">

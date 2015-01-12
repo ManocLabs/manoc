@@ -1,8 +1,7 @@
 [% META section="Search"
-        use_popup=1 -%]
-
+   	title="Simple"
+-%]
 <form method="get"  enctype="multipart/form-data">
-<input type="hidden" name="advanced" value="[% advanced_search %]">
 <table align="center" >
 
 [% FOREACH plugin IN plugins %]	
@@ -10,40 +9,44 @@
 [%END -%]
 
 [% IF not(result.items.size) and q %]
-  [% PROCESS 'message.tt' message="There are no results!" -%]
+  [% PROCESS 'message_box.tt' message="There are no results!" -%]
 [% ELSE %]
   [% IF q %]
-  [% PROCESS 'message.tt' message="Found $result.items.size results!" -%]
+  [% PROCESS 'message_box.tt' message="Found $result.items.size results!" -%]
 [% END %]
 [% END %]
+
 
 <tr>
 <td  class="search_cen" align="center">
 <input type="text" name="q" value="[% q | html %]" size="50"/>
 </td>
-
 </tr>
 
-[% IF advanced_search %]
 <tr>
+  <td colspan="2">
+  <input type="checkbox" name="advanced" id="advanced"
+  	 [% "checked=\"checked\"" IF advanced %]><label for="check">Advanced</label>
+  </td>
+</tr>
+<tr class="advanced-search">
 <td class="search_cen"> Type: 
 [% manoc_radiobox(options=search_types,name='type', default=default_type) %]
 </tr>
-<tr>
+<tr class="advanced-search">
 <td class="search_cen" >Limit:
 <input type="text" name="limit" value="[% limit %]"/>  
 (Default is [% default_limit OR 'no limits' %])
 </td>
 </tr>
-[% END %]
-                  
+                 
 <tr>
 <td class="buttons" align="center">
 <input value="Search" type="submit" />
 </td>
 </tr>
-
 </table>
+</form>
 
 [% MACRO item_building(item) BLOCK -%]
 <label id="search-cat">Building</label> <a href="[% c.uri_for_action('building/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
@@ -137,6 +140,16 @@
   [% '</ul>' IF loop.last %]
 [% END %]
 
-[% IF not(result.items.size) %]
-<p><a href="[%c.uri_for('/search/readme',{popup=>1})%]" class="readme">Readme</a></p>
-[% END%]
+[% fragment = BLOCK -%]
+$("#advanced").click(function() {
+   var opacity = $("#advanced").is(':checked') ? "1" : "0";
+   $("tr.advanced-search").stop(true, true).animate({
+    				       height:"toggle",
+				       opacity:"toggle"
+				       }, 1000);
+        });
+$(function() { if(!$("#advanced").is(':checked')) { $("tr.advanced-search").hide() }  });	
+[% END %]
+
+[% js_scripts.push(fragment) %]
+

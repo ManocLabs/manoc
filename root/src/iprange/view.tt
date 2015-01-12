@@ -1,7 +1,9 @@
 [% META 
-   title='Subnet'
+   title='View'
+   section='Network'
+   subsection='Address Plan'
    use_table=1
-   section='NetDB'
+
 -%]
 
 	<div id="tabs">
@@ -121,7 +123,7 @@
    </div>
 
    <div id="tabs-3">	
-   [% PROCESS iprange/iplist.tt %]
+   [% PROCESS iprange/_iplist.tt %]
    </div>
 
 </div>

@@ -191,11 +191,18 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
+sub _inflate_id {
+    return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0])
+}
+
+sub _deflate_id {
+    return scalar $_[0]->padded if defined($_[0]);
+}
+
 __PACKAGE__->inflate_column(
 			    id => {
-				   inflate =>
-				   sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				   deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
+				   inflate => \&_inflate_id,
+				   deflate => \&_deflate_id
 				  }
 			   );
 

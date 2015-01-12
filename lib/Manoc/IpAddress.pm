@@ -52,4 +52,9 @@ sub BUILD {
       return ;
 }
 
+sub TO_JSON {
+    my $self = shift;
+    return $self->to_string;
+}
+
 1;
