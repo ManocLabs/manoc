@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -11,17 +11,11 @@ use lib "$FindBin::Bin/../lib";
 use Moose;
 use Archive::Tar;
 use YAML::Syck;
-use Data::Dumper;
+use File::Temp qw/tempdir/;
 use File::Spec;
-use Moose::Util::TypeConstraints;
-
-use Manoc::DataDumper;
-use Manoc::DataDumper::Converter;
-use Manoc::DataDumper::VersionType;
-
-use Manoc::DB;
-
 use Try::Tiny;
+
+use Manoc::DataDumper::VersionType;
 
 has 'filename' => (
     is       => 'ro',
@@ -64,6 +58,11 @@ has metadata => (
     lazy_build => 1,
 );
 
+has tmpdir => (
+    is         => 'rw',
+    lazy_build => 1,
+);
+
 sub _build_metadata {
     my $self = shift;
 
@@ -81,6 +80,10 @@ sub _build_metadata {
     return YAML::Syck::Load($content);
 }
 
+sub _build_tmpdir {
+    return tempdir( CLEANUP => 1 );
+}
+
 sub load {
     my ( $self, $filename ) = @_;
 
@@ -89,7 +92,7 @@ sub load {
     -f $filename or return undef;
     try {
        $tar = Archive::Tar->new($filename);
-    }
+    };
     $tar or return undef;    
     
     return $self->new(
@@ -106,7 +109,7 @@ sub load_data {
 
     my $content = $self->tar->get_content($filename);
     unless ($content) {
-        # if the table have 0 records the YAML file is empty (and YAML doesn't love empty files)
+        # if the table has no records the YAML file is empty (and YAML doesn't love empty files)
         return 0;
     }
     my @data = YAML::Syck::Load($content);
@@ -114,7 +117,7 @@ sub load_data {
     return scalar(@data);
 }
 
-sub save {
+sub init {
     my ( $self, $filename, $version, $config ) = @_;
 
     return $self->new(
@@ -124,42 +127,66 @@ sub save {
             config   => $config,
         }
     );
-
 }
 
-sub save_table {
-    my ( $self, $filename, $array_ref, $dir ) = @_;
-    my $fh;
-    
-    defined($dir) or $dir = "/tmp";
+sub add_table {
+    my ( $self, $filename, $array_ref ) = @_;
     return unless(defined($array_ref) and scalar(@{$array_ref}));
-    
-    $filename = "$dir/$filename";
-    die "Error! Directory $dir not exists" unless(-e $dir);
+
+    # build filename inside tmpdir
+    $filename = File::Spec->catfile($self->tmpdir, $filename);
+
+    my $fh;
     open $fh, ">", $filename;
     print $fh YAML::Syck::Dump( @{ $array_ref } );
 
     #register filename in filelist
     push @{$self->filelist}, $filename;
+
     #free resources
     close $fh;
-    undef $array_ref;
 }
 
-sub finalize_tar {
+sub save {
     my ($self) = @_;
-    #before finalize we must create the metadata inside the tar
+
+    # before finalizing create the metadata inside the tar
     exists $self->metadata->{version} or die "Missing version in metadata";
-    my $dir = defined($self->config) ? $self->config->{directory} : undef;
-    $self->save_table("_metadata", [$self->metadata],$dir);
+    $self->add_table("_metadata", [$self->metadata]);
 
     #finally create the file .tar.gz with file included in @filelist
-    Manoc::Utils::tar( $self->config, $self->filename, @{$self->filelist});
+    Manoc::Utils::tar($self->filename, $self->tmpdir, $self->filelist);
 }
 
 no Moose;
 # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Manoc::DataDumper::Data - Represents a data file
+
+=head1 AUTHORS
+
+The Manoc Team
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2011-2015 by the Manoc Team
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=end
 
 # Local Variables:
 # mode: cperl

@@ -3,12 +3,12 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::DataDumper::Converter::Converter_1000000;
+package Manoc::DataDumper::Converter::v1000000;
 
 use Moose;
 use Data::Dumper;
 
-extends 'Manoc::DataDumper::Converter';
+extends 'Manoc::DataDumper::Converter:v2000000';
 
 
 # check for spurious data
