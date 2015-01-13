@@ -75,7 +75,7 @@ sub _build_metadata {
 }
 
 sub _build_tmpdir {
-    return tempdir( CLEANUP => 1 );
+    return tempdir( "manocdumpXXXXXX", TMPDIR=>1, CLEANUP => 1 );
 }
 
 sub load {
