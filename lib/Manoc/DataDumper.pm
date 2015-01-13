@@ -83,58 +83,65 @@ sub get_source_names {
 sub load_tables_loop {
     my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
     my $converter;
-    my %overwrite;
-
+    
     # try to load a converter if needed
     my $version = $datadump->metadata->{'version'};
     if ( $version < Manoc::DB::get_version ) {
-        my $c = 0;
         my $converter_class =
-          Manoc::DataDumper::Converter->get_converter_class( $version );
+            Manoc::DataDumper::Converter->get_converter_class( $version );
         
         if (defined($converter_class) ) {
             $converter = $converter_class->new({ log => $self->log });
             $self->log->info("Using converter $converter_class.");
         }        
     }
-
-    %overwrite = map {$_ => $overwrite}  @$source_names;
-
-     foreach my $source_name (@$source_names) {
-         my $source = $self->schema->source($source_name);
-         next unless $source->isa('DBIx::Class::ResultSource::Table');
-         my $table    = $source->from;
-
-
-         my @filenames = grep(/^$table\./, keys %{$file_set});
+    
+    foreach my $source_name (@$source_names) {
+        my $source = $self->schema->source($source_name);
+        next unless $source->isa('DBIx::Class::ResultSource::Table');
+        my $table = $source->from;
         
-          foreach my $filename (@filenames){
-              $self->log->debug("Trying $filename");
-              #load in RAM all the table records
-              my $count = $datadump->load_data($filename);
-              unless ($count) {
-                  $self->log->info("File is empty. Skipping...");
-                  next;
-              }
-              $self->log->info("Loaded $count records from $filename");
-              #convert them if needed
-              $converter and $converter->upgrade_table( $datadump->data->{$filename}, $table );
-              # commit to backend
-              # if it is a splitted table overwrite it only once!
-              $self->load_table( $source, $datadump->data->{$filename}, $overwrite{$source_name}, $force );
-              $overwrite{$source_name} = 0;
-              #free memory
-              undef $datadump->data->{$filename};
-          }
-      }
+        $self->log->debug("Cleaning $source_name");
+        $overwrite and $source->resultset->delete();
+        
+        my @filenames = grep(/^$table\./, keys %{$file_set});
+        if (@filenames > 1 ) {
+            # sort by page
+            @filenames =
+                map  { $_->[0] }
+                sort { $a->[1] <=> $b->[1] }
+                map  { [ $_, /\.(\d+)/ ] } @filenames;             
+        }
+        
+        foreach my $filename (@filenames) {
+            $self->log->debug("Loading $filename");
+
+            #load in RAM all the table records
+            my $records = $datadump->load_file($filename);
+            my $count = scalar(@$records);
+            unless ($count) {
+                $self->log->info("Skipped empy file $filename");
+                next;
+            }
+            $self->log->info("Loaded $count records from $filename");
+
+            # convert records if needed
+            $converter and $converter->upgrade_table( $records, $table );
+
+            # load into db
+            $self->load_table( $source, $records, $force );
+
+            #free memory
+            undef $records;
+        }
+    }
 }
 
 sub load_table {
-    my ( $self, $source, $data, $overwrite, $force ) = @_;
+    my ( $self, $source, $data, $force ) = @_;
 
     my $rs = $source->resultset;
 
-    $overwrite and $rs->delete();
     my $count = 0;
     if ($force) {
         foreach my $row (@$data) {
@@ -150,10 +157,7 @@ sub load_table {
         $rs->populate( [@$data] );
     }
     $self->log->error("Warning: $count errors ignored!") if ($count);
-    $self->log->info( scalar(@$data), " records loaded in table " . $source->name );
-    #free the memory!!
-    $data = undef;
-    
+    $self->log->info( scalar(@$data), " records loaded in table " . $source->name );    
 }
 
 sub load {
@@ -189,40 +193,6 @@ sub load {
 }
 
 
-
-sub _dump_table {
-    my ( $storage, $dbh, $datadump, $source, $rows) = @_;
-    my $table = $source->result_source->name;
-
-    my $filename;
-    my @list;
-    my $i = 1;
-
-    my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-    my $page_entries = $rs->count;
-    return unless $page_entries > 0;
-
-    while( $page_entries >= $ROWS ) {
-        @list = map {$_->{_column_data}} $rs->all;
-        $filename = "$table.$i.yaml";
-        $datadump->add_table( "$filename", \@list);
-        @list = undef;
-        $i++;
-        $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-        $page_entries = $rs->count;
-    }
-
-    # the following code is used both fot the last page for multipage 
-    # tables and the full table for smaller ones.
-
-    # When there is just one page do not add the page number in filename
-    $filename = $i == 1 ? "$table.yaml" : "$table.$i.yaml";
-
-    @list = map {$_->{_column_data}} $rs->all;
-    $datadump->add_table( $filename, \@list);
-    @list = undef;
-}
-
 #----------------------------------------------------------------------#
 #                      S A V E   A C T I O N                           #
 #----------------------------------------------------------------------#
@@ -253,6 +223,40 @@ sub save {
     $datadump->save;
     $self->log->info("Database dumped.");
 
+}
+
+
+sub _dump_table {
+    my ( $storage, $dbh, $datadump, $source, $rows) = @_;
+    my $table = $source->result_source->name;
+
+    my $filename;
+    my @list;
+    my $i = 1;
+
+    my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
+    my $page_entries = $rs->count;
+    return unless $page_entries > 0;
+
+    while( $page_entries >= $ROWS ) {
+        @list = map {$_->{_column_data}} $rs->all;
+        $filename = "$table.$i.yaml";
+        $datadump->add_file( "$filename", \@list);
+        @list = undef;
+        $i++;
+        $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
+        $page_entries = $rs->count;
+    }
+
+    # the following code is used both fot the last page for multipage 
+    # tables and the full table for smaller ones.
+
+    # When there is just one page do not add the page number in filename
+    $filename = $i == 1 ? "$table.yaml" : "$table.$i.yaml";
+
+    @list = map {$_->{_column_data}} $rs->all;
+    $datadump->add_file( $filename, \@list);
+    @list = undef;
 }
 
 no Moose;    # Clean up the namespace.

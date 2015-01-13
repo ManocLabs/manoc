@@ -40,12 +40,6 @@ has tar => (
     required => 0,
 );
 
-has data => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { {} },
-);
-
 has filelist => (
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -103,8 +97,8 @@ sub load {
     );
 }
 
-#returns the number of records loaded from the yaml file
-sub load_data {
+#returns a reference to the array of records loaded from the yaml file
+sub load_file {
     my ( $self, $filename ) = @_;
 
     my $content = $self->tar->get_content($filename);
@@ -113,8 +107,7 @@ sub load_data {
         return 0;
     }
     my @data = YAML::Syck::Load($content);
-    $self->data->{$filename} = \@data;
-    return scalar(@data);
+    return \@data;
 }
 
 sub init {
@@ -129,7 +122,7 @@ sub init {
     );
 }
 
-sub add_table {
+sub add_file {
     my ( $self, $filename, $array_ref ) = @_;
     return unless(defined($array_ref) and scalar(@{$array_ref}));
 
@@ -152,7 +145,7 @@ sub save {
 
     # before finalizing create the metadata inside the tar
     exists $self->metadata->{version} or die "Missing version in metadata";
-    $self->add_table("_metadata", [$self->metadata]);
+    $self->add_file("_metadata", [$self->metadata]);
 
     #finally create the file .tar.gz with file included in @filelist
     Manoc::Utils::tar($self->filename, $self->tmpdir, $self->filelist);
