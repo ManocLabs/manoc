@@ -62,12 +62,15 @@ __PACKAGE__->config(
     disable_component_resolution_regex_fallback => 1,
 
     'Plugin::Authentication'                    => {
-        default_realm => 'progressive',
+        default_realm => 'progressive_ui',
         realms        => {
-            progressive => {
+            progressive_ui => {
                 class  => 'Progressive',
-                realms => [ 'normal', 'ldap','agents'],
+                realms => [ 'normal',
+			    #'ldap',
+			],
             },
+	   
             normal => {
                 credential => {
                     class              => 'Password',
@@ -131,7 +134,6 @@ __PACKAGE__->config(
 #              },
         },
     },
-
     #remove stale sessions from db
     'Plugin::Session' => {
         expires           => 28800,
@@ -247,7 +249,7 @@ Manoc - Network monitoring application
 
 =head1 DESCRIPTION
 
-[enter your description here]
+Manoc configuration class
 
 =head1 SEE ALSO
 
