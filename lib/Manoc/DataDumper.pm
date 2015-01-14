@@ -9,11 +9,12 @@ use Manoc::DB;
 use Manoc::DataDumper::Converter;
 use Manoc::DataDumper::VersionType;
 
+use DBIx::Class::ResultClass::HashRefInflator;
 
 use Try::Tiny;
 
 my $ROWS = 100000;
-
+my $LOAD_BLOCK_SIZE = 1000;
 
 has 'filename' => (
     is       => 'ro',
@@ -100,9 +101,11 @@ sub load_tables_loop {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
         my $table = $source->from;
-        
-        $self->log->debug("Cleaning $source_name");
-        $overwrite and $source->resultset->delete();
+
+        if ($overwrite) {
+            $self->log->debug("Cleaning $source_name");
+            $source->resultset->delete();
+        }
         
         my @filenames = grep(/^$table\./, keys %{$file_set});
         if (@filenames > 1 ) {
@@ -119,11 +122,12 @@ sub load_tables_loop {
             #load in RAM all the table records
             my $records = $datadump->load_file($filename);
             my $count = scalar(@$records);
+            
+            $self->log->info("Read $count records from $filename");
             unless ($count) {
                 $self->log->info("Skipped empy file $filename");
                 next;
             }
-            $self->log->info("Loaded $count records from $filename");
 
             # convert records if needed
             $converter and $converter->upgrade_table( $records, $table );
@@ -138,26 +142,45 @@ sub load_tables_loop {
 }
 
 sub load_table {
-    my ( $self, $source, $data, $force ) = @_;
+    my ( $self, $source, $records, $force ) = @_;
 
     my $rs = $source->resultset;
+    $self->log->debug("load table");
 
     my $count = 0;
-    if ($force) {
-        foreach my $row (@$data) {
-            try {
-                $rs->populate( [$row] );
+    my $block_size = $LOAD_BLOCK_SIZE;
+    my $offset = 0;
+
+    while ($offset < @$records - 1) {
+        my $last_record_index = $offset + $block_size - 1;
+        $last_record_index > @$records - 1 and $last_record_index = @$records - 1;
+        
+        my $data = [ @$records[$offset, $last_record_index] ];
+        
+        try {
+            $rs->populate( $data );       
+        } catch {
+            if ($force) {
+                $self->log->debug("forcing populate offset=$offset");
+                foreach my $row (@$data) {
+                    try {
+                        $rs->populate( [$row] );
+                    } catch {
+                        $count++;
+                        $self->log->debug("Recovering error: $_");
+
+                    };
+                }
+            } else {
+                $self->log->logdie("Fatal error: $_");
             }
-            catch {
-                $count++;
-            }
-        }
+        };
+
+        $offset += $block_size;
     }
-    else {
-        $rs->populate( [@$data] );
-    }
+    
     $self->log->error("Warning: $count errors ignored!") if ($count);
-    $self->log->info( scalar(@$data), " records loaded in table " . $source->name );    
+    $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );    
 }
 
 sub load {
@@ -213,8 +236,10 @@ sub save {
         next unless $source->isa('DBIx::Class::ResultSet');
 
         my $table = $source->result_source->name;
-        $self->schema->storage->dbh_do(\&_dump_table, $datadump, $source, $ROWS);
-        $self->log->debug("Table $table dumped");
+        
+        $self->log->debug("Processing table $table");             
+        $self->schema->storage->dbh_do(\&_dump_table, $self->log, $datadump, $source, $ROWS);
+        $self->log->info("Table $table dumped");
     }
     
     $self->log->debug("Writing the archive...");
@@ -227,36 +252,45 @@ sub save {
 
 
 sub _dump_table {
-    my ( $storage, $dbh, $datadump, $source, $rows) = @_;
-    my $table = $source->result_source->name;
+    my ( $storage, $dbh, $log, $datadump, $source, $rows) = @_;
+    my $table = $source->result_source->name;    
 
-    my $filename;
-    my @list;
-    my $i = 1;
+    my $n_entries = $source->count;   
 
-    my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-    my $page_entries = $rs->count;
-    return unless $page_entries > 0;
-
-    while( $page_entries >= $ROWS ) {
-        @list = map {$_->{_column_data}} $rs->all;
-        $filename = "$table.$i.yaml";
-        $datadump->add_file( "$filename", \@list);
-        @list = undef;
-        $i++;
-        $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-        $page_entries = $rs->count;
+    $source->result_class('DBIx::Class::ResultClass::HashRefInflator');   
+    return unless $n_entries > 0;
+  
+    if ($n_entries <= $ROWS) {
+        my @data = $source->all;
+        my $filename = "$table.yaml";
+        $datadump->add_file($filename, \@data);
+        $log->debug("saved $filename");
+        return;
     }
 
-    # the following code is used both fot the last page for multipage 
-    # tables and the full table for smaller ones.
+    # split data in files of $ROWS records   
+    # to optimize arrays usage set $#array=n to preallocate storage
+    # creating an array of n undefs then clear the array to be
+    # able to use push the normal way: 
+    
+    my $page = 1;
+    my @data;
+    $#data = $n_entries;
+    @data = ();    
+    my $rs = $source->search();
+    $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');   
 
-    # When there is just one page do not add the page number in filename
-    $filename = $i == 1 ? "$table.yaml" : "$table.$i.yaml";
+    while (my $entry = $rs->next) {
+        push @data, $entry;
 
-    @list = map {$_->{_column_data}} $rs->all;
-    $datadump->add_file( $filename, \@list);
-    @list = undef;
+        if (@data == $ROWS) {
+            my $filename = "$table.$page.yaml";
+            $datadump->add_file($filename, \@data);
+            $log->debug("saved $filename");
+            @data = ();
+            $page++;
+        }
+    }
 }
 
 no Moose;    # Clean up the namespace.
