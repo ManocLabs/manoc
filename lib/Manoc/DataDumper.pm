@@ -14,7 +14,7 @@ use DBIx::Class::ResultClass::HashRefInflator;
 use Try::Tiny;
 
 my $ROWS = 100000;
-my $LOAD_BLOCK_SIZE = 1000;
+my $LOAD_BLOCK_SIZE = 5000;
 
 has 'filename' => (
     is       => 'ro',
@@ -155,10 +155,11 @@ sub load_table {
         my $last_record_index = $offset + $block_size - 1;
         $last_record_index > @$records - 1 and $last_record_index = @$records - 1;
         
-        my $data = [ @$records[$offset, $last_record_index] ];
+        my $data = [ @$records[$offset .. $last_record_index] ];
         
         try {
-            $rs->populate( $data );       
+            $self->log->debug("populate $offset, $last_record_index - " . scalar(@$data));
+            $rs->populate( $data );
         } catch {
             if ($force) {
                 $self->log->debug("forcing populate offset=$offset");
@@ -291,6 +292,11 @@ sub _dump_table {
             $page++;
         }
     }
+
+    # save last page
+    my $filename = "$table.$page.yaml";
+    $datadump->add_file($filename, \@data);
+    $log->debug("saved $filename");
 }
 
 no Moose;    # Clean up the namespace.
