@@ -47,14 +47,8 @@ sub login : Local : CaptureArgs(0) {
                 {
                     login    => $c->req->params->{'username'},
                     password => $c->req->params->{'password'},
-                }, 'normal'
-            )  or $c->authenticate(
-                {
-                    login    => $c->req->params->{'username'},
-                    password => $c->req->params->{'password'},
-                }, 'ldap'
-            ) ){
-
+                })
+	) {
             $c->flash( message => 'Logged In!' );
             $c->log->debug( 'User ' . $username . ' logged');
             $c->detach('/follow_backref');
