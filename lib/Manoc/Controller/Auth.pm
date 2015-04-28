@@ -50,7 +50,7 @@ sub login : Local : CaptureArgs(0) {
                 }, 'normal'
             )  or $c->authenticate(
                 {
-                    login    => $c->req->params->{'username'},
+                    id    => $c->req->params->{'username'},
                     password => $c->req->params->{'password'},
                 }, 'ldap'
             ) ){
