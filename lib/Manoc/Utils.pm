@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     clean_string print_timestamp
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
-    padded_ipaddr
+    padded_ipaddr unpadded_ipaddr
     prefix2wildcard check_addr check_partial_addr  check_mac_addr check_ipv6_addr
     check_backref set_backref deny_access
 );

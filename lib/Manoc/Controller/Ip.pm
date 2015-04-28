@@ -99,7 +99,7 @@ sub _get_ipinfo : Private {
                 'to_addr'   => { '>=' => $id },
             }
         ],
-        { order_by => 'from_addr DESC' }
+        { order_by => 'to_addr ASC' }
     );
 
     #Warning: iprange tables now returns an Ipv4 object

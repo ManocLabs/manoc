@@ -93,8 +93,7 @@ h1.logo a {
  position:absolute;
  right:0;
  top: 35px;
- font-size:6px;
-
+ font-size:11px;
 }
 
 #navigation {
@@ -183,6 +182,7 @@ img.shortcut {
 .manoc-corner { -moz-border-radius: 5px; -webkit-border-radius: 5px;  }
 
 div.toolbar { 
+    float: left;
     font-size: 8px;
 }
 
