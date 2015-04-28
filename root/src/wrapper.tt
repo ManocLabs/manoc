@@ -34,7 +34,7 @@
       </div>
       <div id="logged">
       [% IF c.user.username %]
-      User: <i>[% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
+      <i> User: [% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])</i>
       [%END%]
       </div>
   </div>

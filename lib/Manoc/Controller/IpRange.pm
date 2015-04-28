@@ -8,7 +8,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Manoc::IpAddress;
 use Manoc::Utils qw/netmask_prefix2range int2ip ip2int padded_ipaddr
-    print_timestamp prefix2wildcard netmask2prefix
+    print_timestamp prefix2wildcard netmask2prefix unpadded_ipaddr
     check_addr /;
 use POSIX qw/ceil/;
 BEGIN { extends 'Catalyst::Controller'; }
@@ -340,12 +340,12 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my $name     = $range->name;
     my @children = map +{
         name       => $_->name,
-        from_addr  => $_->from_addr->address,
-        to_addr    => $_->to_addr->address,
+        from_addr  => unpadded_ipaddr($_->from_addr->address),
+        to_addr    => unpadded_ipaddr($_->to_addr->address),
         vlan_id    => $_->vlan_id ? $_->vlan_id->id : undef,
         vlan       => $_->vlan_id ? $_->vlan_id->name : "-",
         n_children => $_->children->count(),
-	netmask    => $_->netmask,
+	netmask    => unpadded_ipaddr($_->netmask),
         n_neigh    => get_neighbour(
 				    $c->model('ManocDB::IPRange'), 
 				    $name,

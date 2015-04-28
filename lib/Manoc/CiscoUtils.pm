@@ -128,6 +128,31 @@ sub get_config {
     return ( $config, "Ok" );
 }
 
+sub get_ver {
+    my ( $self, $device_id, $schema, $appconf ) = @_;
+    my ( $telnet_pwd, $enable_pwd, $session, @config_arr, $config );
+
+    #Get passwords to login
+    ( $telnet_pwd, $enable_pwd ) = get_pwds( $device_id, $schema, $appconf );
+    ( $telnet_pwd && $enable_pwd ) or
+        return ( undef, "Impossible retrieve device passwords to login" );
+
+    #Login in enable mode
+    $session = login_device( $device_id, $telnet_pwd, $enable_pwd );
+    $session or return ( undef, "Impossible login to device" );
+
+    #Get device configuration
+    eval { @config_arr = $session->cmd("show ver"); };
+    $@ and return ( undef, "Impossible get device configuration" );
+
+    $session->close();
+
+    return ( \@config_arr, "Ok" );
+}
+
+
+
+
 sub save_config {
     my ( $self, $device_id, $schema ) = @_;
 

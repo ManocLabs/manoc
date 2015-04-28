@@ -40,7 +40,7 @@ $(function() {
 		     //to disable pagination
 	       	"bPaginate": [% IF options.disable_pagination %]false[% ELSE %]true[%END%],
 		 [% IF options.cust_pag -%]
-       		 "sDom": '<"H"f<"toolbar">>t<"F"i>',
+       		 "sDom": '<"H"<"toolbar">f>t<"F"<"toolbar">>',
       		 [% END -%]
 	       //in columns trovo l'array per l'inizializzazione delle colonne della tabella
 	       [% IF columns %]
