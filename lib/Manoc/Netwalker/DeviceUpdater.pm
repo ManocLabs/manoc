@@ -95,14 +95,16 @@ sub _build_source {
     my $entry = $self->entry;
 
     # get device community and version or use default
-    my $host    = $entry->id->address;
-    my $comm    = $entry->snmp_com() || $self->config->{snmp_community};
-    my $version = $entry->snmp_ver() || $self->config->{snmp_version};
+    my $host           = $entry->id->address;
+    my $comm           = $entry->snmp_com() || $self->config->{snmp_community};
+    my $version        = $entry->snmp_ver() || $self->config->{snmp_version};
+    my $mat_force_vlan = $self->config->{mat_force_vlan};
 
     my $source = Manoc::Netwalker::Source::SNMP->new(
         host      => $host,
         community => $comm,
         version   => $version,
+        mat_force_vlan => $mat_force_vlan,
         ) or return undef;
 
     unless($source->connect){
