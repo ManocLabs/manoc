@@ -98,7 +98,7 @@ sub _build_source {
     my $host           = $entry->id->address;
     my $comm           = $entry->snmp_com() || $self->config->{snmp_community};
     my $version        = $entry->snmp_ver() || $self->config->{snmp_version};
-    my $mat_force_vlan = $self->config->{mat_force_vlan};
+    my $mat_force_vlan = $self->config->{mat_force_vlan} || '';
 
     my $source = Manoc::Netwalker::Source::SNMP->new(
         host      => $host,
@@ -125,7 +125,7 @@ sub _build_native_vlan {
     my $vlan = $self->entry->mat_native_vlan->id || $self->config->{default_vlan};
     return defined($vlan) ? $vlan : 1;
 }
-
+#----------------------------------------------------------------------#
 #----------------------------------------------------------------------#
 
 sub _build_device_set {
