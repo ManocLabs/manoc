@@ -48,8 +48,9 @@ has 'snmp_info' => (
 
 has 'mat_force_vlan' => (
     is      => 'ro',
-    isa     => 'Str',
 );
+
+
 
 #-----------------------------------------------------------------------#
 sub _build_snmp_info {
@@ -187,12 +188,11 @@ sub _build_mat {
     my $self = shift;
     my $info = $self->snmp_info || croak "SNMP source not initialized!";
 
-    my $interfaces = $info->interfaces();
-    my $fw_mac     = $info->fw_mac();
-    my $fw_port    = $info->fw_port();
-    my $fw_status  = $info->fw_status();
-    my $bp_index   = $info->bp_index();
-    my $mat_force_vlan = $self->mat_force_vlan || undef;
+    my $interfaces     = $info->interfaces();
+    my $fw_mac         = $info->fw_mac();
+    my $fw_port        = $info->fw_port();
+    my $fw_status      = $info->fw_status();
+    my $bp_index       = $info->bp_index();
 
     my ( $status, $mac, $bp_id, $iid, $port );
     my $mat = {};
@@ -221,8 +221,18 @@ sub _build_mat {
             my $vlan = $i_vlan->{$key};
             $vlans{$vlan}++;
         }
-        defined $mat_force_vlan and 
-            $vlans{$mat_force_vlan}++;
+
+        if(defined($self->mat_force_vlan)){
+            if ( ref($self->mat_force_vlan) eq 'ARRAY' ) {
+                foreach my $v (@{$self->mat_force_vlan}){
+	            $v =~  m/^\d+$/o and $vlans{$v}++;     
+                } 
+            }
+            else{
+              $self->mat_force_vlan =~  m/^\d+$/o  and  
+                 $vlans{$self->mat_force_vlan}++;  
+            }   
+	}
 
         # For each VLAN: connect, get mat and merge
         while ( my ( $vid, $vlan_name ) = each(%$v_name) ) {
