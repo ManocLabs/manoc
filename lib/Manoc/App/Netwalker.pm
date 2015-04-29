@@ -176,6 +176,7 @@ sub run {
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
                   vtp_server           => $self->config->{Netwalker}->{vtp_server} || '',
+                  mat_force_vlan       => $self->config->{Netwalker}->{mat_force_vlan} || '',
                  ); 
 
    #parse vtp servers
