@@ -432,7 +432,7 @@ sub create : Chained('base') : PathPart('create') : Args() {
 
 sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
-    $c->stash(template => 'create/form.tt');
+    $c->stash(template => 'device/form.tt');
     return $self->process_form($c);
 }
 

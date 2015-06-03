@@ -118,7 +118,7 @@
  [% add_css_tableinfo %]
 
 <div class="buttons">	
-  <a href="[% c.uri_for_action('/device/edit',[object.id.address]) %]">[%
+  <a href="[% c.uri_for_action('/device/edit',[object.id]) %]">[%
   ui_icon('pencil') %]Edit</a>
   &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id.address]) %]">
   [% ui_icon('closethick') %]    Delete</a>
