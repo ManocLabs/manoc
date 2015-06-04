@@ -57,11 +57,20 @@ has 'version' => (
     builder   => '_build_version',
 );
 
-
 sub _build_version {
     my $self = shift;
     return Manoc::DB::get_version;
 }
+
+my $SOURCE_DEPENDECIES = {
+    'Device'   => 'Rack',
+    'Rack'     => 'Building',
+    'Mat'      => 'Device',
+    'IfStatus' => 'Device',
+    'IfNotes'  => 'Device',
+    'CDPNeigh' => 'Device',
+    'DeviceConfig' => 'Device',
+};
 
 sub get_source_names {
     my $self = shift;
@@ -75,6 +84,38 @@ sub get_source_names {
     }
     return \@include_list;
 }
+
+sub order_sources {
+    my ($self, $sources) = @_;
+ 
+    my %set = map { $_ => 1} @$sources;
+    my @ordered_list;
+    
+    my $connections_to = {};
+    while ( my ($from, $to) = each %$SOURCE_DEPENDECIES) {
+        $set{$from} or next;
+        $set{$to}   or next;
+        $connections_to->{$from}->{$to} = 1;
+    }
+    
+    while (%set) {
+        my ($start_node) =
+            grep {!$connections_to->{$_} || !%{$connections_to->{$_}} }
+            keys %set;
+
+        if (! $start_node ) {
+            die "circular dependency found";
+        }
+
+        print "remove $start_node\n";
+        
+        push @ordered_list, $start_node;
+        delete $set{$start_node};
+        delete $connections_to->{$_}->{$start_node} for keys %$connections_to;
+    }
+    return \@ordered_list;
+}
+
 
 #----------------------------------------------------------------------#
 #                      L O A D   A C T I O N                           #
@@ -90,17 +131,19 @@ sub load_tables_loop {
     if ( $version < Manoc::DB::get_version ) {
         my $converter_class =
             Manoc::DataDumper::Converter->get_converter_class( $version );
-        
+
         if (defined($converter_class) ) {
             $converter = $converter_class->new({ log => $self->log });
             $self->log->info("Using converter $converter_class.");
-        }        
+        }
     }
-    
+
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
         my $table = $source->from;
+
+        $converter and $table = $converter->get_table_name($table);
 
         if ($overwrite) {
             $self->log->debug("Cleaning $source_name");
@@ -113,7 +156,7 @@ sub load_tables_loop {
             @filenames =
                 map  { $_->[0] }
                 sort { $a->[1] <=> $b->[1] }
-                map  { [ $_, /\.(\d+)/ ] } @filenames;             
+                map  { [ $_, /\.(\d+)/ ] } @filenames;
         }
         
         foreach my $filename (@filenames) {
@@ -197,7 +240,10 @@ sub load {
     #filter metadata file from sources 
     my $file_set = { map { $_ => 1 } grep(!/_metadata/, $datadump->tar->list_files) };
     my $source_names = $self->get_source_names();
+    $source_names = $self->order_sources($source_names);
 
+    $self->log->debug('Sources: ', join(',', @$source_names));
+    
     if ($disable_fk) {
         # force loading the correct storage backend before
         # calling with_deferred_fk_checks

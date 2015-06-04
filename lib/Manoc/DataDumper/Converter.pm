@@ -18,12 +18,17 @@ sub get_converter_class {
 
     my $class_name;
     
-    $release and $class_name = 'Converter_'.$release;    
+    $release and $class_name = 'Converter_'.$release;
     
     $class_name or return undef;
     $class_name = "Manoc::DataDumper::Converter::$class_name";
     Class::MOP::load_class($class_name) or return undef;
     return $class_name;
+}
+
+sub get_table_name {
+    my ($self, $table) = @_;
+    return $table;
 }
 
 sub upgrade_table {
