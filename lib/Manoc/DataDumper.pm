@@ -137,7 +137,7 @@ sub load_tables_loop {
             $self->log->info("Using converter $converter_class.");
         }
     }
-
+    
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
@@ -294,7 +294,6 @@ sub save {
 
     $datadump->save;
     $self->log->info("Database dumped.");
-
 }
 
 
