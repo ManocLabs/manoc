@@ -6,9 +6,16 @@
 package Manoc::DataDumper::VersionType;
 use Moose::Util::TypeConstraints;
 
+# regex is also for old version numbers x.yyyyyy
 subtype 'Version' => as 'Str' => where { $_ =~ m/^(\d{8}|\d{1}\.\d{6})$/  } => message {
     'Version number must have the form: <year>{4}<month>{2}<day>{2} (e.g. 20000101)';
 };
 
 no Moose::Util::TypeConstraints;
 
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

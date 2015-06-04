@@ -2,18 +2,19 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-
+package Manoc::App::Dumper;
 use warnings;
 use strict;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
 
-package Manoc::App::Dumper;
+use Moose;
+
+use Manoc::Support;
+use Manoc::DataDumper;
 use Manoc::DataDumper::Data;
 use Manoc::Logger;
-use Moose;
 
 use File::Temp;
 use File::Spec;
@@ -32,47 +33,43 @@ has 'disable_fk' => (
     required => 0,
     default  => 0
 );
-has 'sort_tables' => (
-    is       => 'rw',
-    isa      => 'Bool',
-    required => 0,
-    default  => 0
-);
+
 has 'overwrite' => (
     is       => 'rw',
     isa      => 'Bool',
     required => 0,
     default  => 0
 );
+
 has 'force' => (
     is       => 'rw',
     isa      => 'Bool',
     required => 0,
     default  => 0
 );
+
 has 'load' => (
     is  => 'rw',
     isa => 'Str',
 );
+
 has 'save' => (
     is  => 'rw',
     isa => 'Str',
 );
+
 has 'include' => (
     is      => 'rw',
     isa     => 'ArrayRef',
     default => sub { [] },
 );
+
 has 'exclude' => (
     is      => 'rw',
     isa     => 'ArrayRef',
     default => sub { [] },
 );
-has 'db_version' => (
-    is      => 'rw',
-    isa     => 'Str',
-    required => 0,
-);
+
 
 sub run_save {
     my ($self) = @_;
@@ -86,7 +83,6 @@ sub run_save {
             log         => $self->log,
             include     => $self->include,
             exclude     => $self->exclude,
-	    db_version  => $self->db_version,
 	    config      => $self->config,
 	}
     );
@@ -132,3 +128,9 @@ no Moose;
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
