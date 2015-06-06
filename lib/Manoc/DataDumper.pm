@@ -1,5 +1,4 @@
 package Manoc::DataDumper;
-
 # Copyright 2011 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
@@ -9,12 +8,13 @@ use Moose;
 use Manoc::DB;
 use Manoc::DataDumper::Converter;
 use Manoc::DataDumper::VersionType;
-use Data::Dumper;
+
+use DBIx::Class::ResultClass::HashRefInflator;
 
 use Try::Tiny;
 
 my $ROWS = 100000;
-
+my $LOAD_BLOCK_SIZE = 5000;
 
 has 'filename' => (
     is       => 'ro',
@@ -54,27 +54,23 @@ has 'version' => (
     is        => 'rw',
     isa       => 'Version',
     lazy      => 1,
-    builder   => '_build_dbversion',
+    builder   => '_build_version',
 );
 
-has 'db_version' => (
-    is        => 'rw',
-    required  => 0,
-);
-
-
-has 'file_rows' => (
-    is        => 'rw',
-    isa       => 'Version',
-    lazy      => 1,
-    builder   => '_build_rows',
-);
-
-sub _build_dbversion {
+sub _build_version {
     my $self = shift;
-    $self->db_version and return $self->db_version;
     return Manoc::DB::get_version;
 }
+
+my $SOURCE_DEPENDECIES = {
+    'Device'   => 'Rack',
+    'Rack'     => 'Building',
+    'Mat'      => 'Device',
+    'IfStatus' => 'Device',
+    'IfNotes'  => 'Device',
+    'CDPNeigh' => 'Device',
+    'DeviceConfig' => 'Device',
+};
 
 sub get_source_names {
     my $self = shift;
@@ -89,6 +85,38 @@ sub get_source_names {
     return \@include_list;
 }
 
+sub order_sources {
+    my ($self, $sources) = @_;
+ 
+    my %set = map { $_ => 1} @$sources;
+    my @ordered_list;
+    
+    my $connections_to = {};
+    while ( my ($from, $to) = each %$SOURCE_DEPENDECIES) {
+        $set{$from} or next;
+        $set{$to}   or next;
+        $connections_to->{$from}->{$to} = 1;
+    }
+    
+    while (%set) {
+        my ($start_node) =
+            grep {!$connections_to->{$_} || !%{$connections_to->{$_}} }
+            keys %set;
+
+        if (! $start_node ) {
+            die "circular dependency found";
+        }
+
+        print "remove $start_node\n";
+        
+        push @ordered_list, $start_node;
+        delete $set{$start_node};
+        delete $connections_to->{$_}->{$start_node} for keys %$connections_to;
+    }
+    return \@ordered_list;
+}
+
+
 #----------------------------------------------------------------------#
 #                      L O A D   A C T I O N                           #
 #----------------------------------------------------------------------#
@@ -97,77 +125,106 @@ sub get_source_names {
 sub load_tables_loop {
     my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
     my $converter;
-    my %overwrited;
-
+    
     # try to load a converter if needed
     my $version = $datadump->metadata->{'version'};
     if ( $version < Manoc::DB::get_version ) {
-        my $c = 0;
         my $converter_class =
-          Manoc::DataDumper::Converter->get_converter_class( Manoc::DB::get_version );
-        
+            Manoc::DataDumper::Converter->get_converter_class( $version );
+
         if (defined($converter_class) ) {
             $converter = $converter_class->new({ log => $self->log });
             $self->log->info("Using converter $converter_class.");
-        }        
+        }
     }
 
-    %overwrited = map {$_ => $overwrite}  @$source_names;
+    foreach my $source_name (@$source_names) {
+        my $source = $self->schema->source($source_name);
+        next unless $source->isa('DBIx::Class::ResultSource::Table');
+        my $table = $source->from;
 
-     foreach my $source_name (@$source_names) {
-         my $source = $self->schema->source($source_name);
-         next unless $source->isa('DBIx::Class::ResultSource::Table');
-         my $table    = $source->from;
+        $converter and $table = $converter->get_table_name($table);
 
-
-         my @filenames = grep(/^$table\./, keys %{$file_set});
+        if ($overwrite) {
+            $self->log->debug("Cleaning $source_name");
+            $source->resultset->delete();
+        }
         
-          foreach my $filename (@filenames){
-              $self->log->debug("Trying $filename");
-              #load in RAM all the table records
-              my $count = $datadump->load_data($filename);
-              unless ($count) {
-                  $self->log->info("File is empty. Skipping...");
-                  next;
-              }
-              $self->log->info("Loaded $count records from $filename");
-              #convert them if needed
-              $converter and $converter->upgrade_table( $datadump->data->{$filename}, $table );
-              #commit to backend
-              #n.b. if is a splitted table overwrite it only once!
-              $self->load_table( $source, $datadump->data->{$filename}, $overwrited{$source_name}, $force );
-              $overwrited{$source_name} = 0;
-              #free memory
-              undef $datadump->data->{$filename};
-          }
-      }
+        my @filenames = grep(/^$table\./, keys %{$file_set});
+        if (@filenames > 1 ) {
+            # sort by page
+            @filenames =
+                map  { $_->[0] }
+                sort { $a->[1] <=> $b->[1] }
+                map  { [ $_, /\.(\d+)/ ] } @filenames;
+        }
+        
+        foreach my $filename (@filenames) {
+            $self->log->debug("Loading $filename");
+
+            #load in RAM all the table records
+            my $records = $datadump->load_file($filename);
+            my $count = scalar(@$records);
+            
+            $self->log->info("Read $count records from $filename");
+            unless ($count) {
+                $self->log->info("Skipped empy file $filename");
+                next;
+            }
+
+            # convert records if needed
+            $converter and $converter->upgrade_table( $records, $table );
+
+            # load into db
+            $self->load_table( $source, $records, $force );
+
+            #free memory
+            undef $records;
+        }
+    }
 }
 
 sub load_table {
-    my ( $self, $source, $data, $overwrite, $force ) = @_;
+    my ( $self, $source, $records, $force ) = @_;
 
     my $rs = $source->resultset;
+    $self->log->debug("load table");
 
-    $overwrite and $rs->delete();
     my $count = 0;
-    if ($force) {
-        foreach my $row (@$data) {
-            try {
-                $rs->populate( [$row] );
+    my $block_size = $LOAD_BLOCK_SIZE;
+    my $offset = 0;
+
+    while ($offset < @$records - 1) {
+        my $last_record_index = $offset + $block_size - 1;
+        $last_record_index > @$records - 1 and $last_record_index = @$records - 1;
+        
+        my $data = [ @$records[$offset .. $last_record_index] ];
+        
+        try {
+            $self->log->debug("populate $offset, $last_record_index - " . scalar(@$data));
+            $rs->populate( $data );
+        } catch {
+            if ($force) {
+                $self->log->debug("forcing populate offset=$offset");
+                foreach my $row (@$data) {
+                    try {
+                        $rs->populate( [$row] );
+                    } catch {
+                        $count++;
+                        $self->log->debug("Recovering error: $_");
+
+                    };
+                }
+            } else {
+                $self->log->logdie("Fatal error: $_");
             }
-            catch {
-                $count++;
-            }
-        }
+        };
+
+        $offset += $block_size;
     }
-    else {
-        $rs->populate( [@$data] );
-    }
-    $self->log->error("Warning: $count errors ignored!") if ($count);
-    $self->log->info( scalar(@$data), " records loaded in table " . $source->name );
-    #free the memory!!
-    $data = undef;
     
+    $self->log->error("Warning: $count errors ignored!") if ($count);
+    $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );    
 }
 
 sub load {
@@ -183,7 +240,10 @@ sub load {
     #filter metadata file from sources 
     my $file_set = { map { $_ => 1 } grep(!/_metadata/, $datadump->tar->list_files) };
     my $source_names = $self->get_source_names();
+    $source_names = $self->order_sources($source_names);
 
+    $self->log->debug('Sources: ', join(',', @$source_names));
+    
     if ($disable_fk) {
         # force loading the correct storage backend before
         # calling with_deferred_fk_checks
@@ -203,33 +263,6 @@ sub load {
 }
 
 
-
-sub dump_table {
-    my ( $storage, $dbh, $datadump, $source, $rows, $dir ) = @_;
-    my $i = 1;
-    my @list;
-    my $table = $source->result_source->name;
-    my $filename = "$table.yaml";
-
-    my $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-    my $page_entries = $rs->count;
-    return unless $page_entries > 0;
-
-    while( $page_entries >= $ROWS ) {
-        @list = map {$_->{_column_data}} $rs->all;
-        $filename = "$table.$i.yaml";
-        $datadump->save_table( "$filename", \@list, $dir);
-        $i++;
-        $rs  = $source->search(undef, { page => $i, rows=>$ROWS });
-        $page_entries = $rs->count;
-    }
-    #if resultset is only 1 page in file name dosen't appear 
-    #the page number
-    $i gt 1 and  $filename = "$table.$i.yaml";
-    @list = map {$_->{_column_data}} $rs->all;
-    $datadump->save_table( "$filename", \@list, $dir);
-}
-
 #----------------------------------------------------------------------#
 #                      S A V E   A C T I O N                           #
 #----------------------------------------------------------------------#
@@ -237,32 +270,79 @@ sub dump_table {
 sub save {
     my ($self) = @_;
     
-    my $datadump = Manoc::DataDumper::Data->save( $self->filename, $self->version , $self->config->{DataDumper} );
-    my $path_to_tar = $self->config->{DataDumper}->{path_to_tar} || undef;
-    my $dir         = $self->config->{DataDumper}->{directory}   || undef;
-    my $rows        = $self->config->{DataDumper}->{file_rows}   || $ROWS;
-
+    my $datadump = Manoc::DataDumper::Data->init(
+        $self->filename,
+        $self->version,
+        $self->config->{DataDumper} );
+    
+    my $path_to_tar  = $self->config->{DataDumper}->{path_to_tar} || undef;    
     my $source_names = $self->get_source_names();
     
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->resultset($source_name);
         next unless $source->isa('DBIx::Class::ResultSet');
-        my $table         = $source->result_source->name;
-        #my @column_names = $source->columns;
-        
-        $self->schema->storage->dbh_do(\&dump_table, $datadump, $source, $rows, $dir);
-        
-        #$self->schema->storage->dbh_do( \&dump_table, $datadump, $table, \@column_names, $dir );
-        $self->log->debug("Table $table writed in archive");
 
-
-    } 
+        my $table = $source->result_source->name;
+        
+        $self->log->debug("Processing table $table");             
+        $self->schema->storage->dbh_do(\&_dump_table, $self->log, $datadump, $source, $ROWS);
+        $self->log->info("Table $table dumped");
+    }
+    
     $self->log->debug("Writing the archive...");
-    defined($path_to_tar) and $self->log->debug("...if available will be used system tar located in $path_to_tar ");
+    defined($path_to_tar) and $self->log->debug("use system tar in $path_to_tar ");
 
-    $datadump->finalize_tar;
-    $self->log->info("Database dumped!");
+    $datadump->save;
+    $self->log->info("Database dumped.");
 
+}
+
+
+sub _dump_table {
+    my ( $storage, $dbh, $log, $datadump, $source, $rows) = @_;
+    my $table = $source->result_source->name;    
+
+    my $n_entries = $source->count;   
+
+    $source->result_class('DBIx::Class::ResultClass::HashRefInflator');   
+    return unless $n_entries > 0;
+  
+    if ($n_entries <= $ROWS) {
+        my @data = $source->all;
+        my $filename = "$table.yaml";
+        $datadump->add_file($filename, \@data);
+        $log->debug("saved $filename");
+        return;
+    }
+
+    # split data in files of $ROWS records   
+    # to optimize arrays usage set $#array=n to preallocate storage
+    # creating an array of n undefs then clear the array to be
+    # able to use push the normal way: 
+    
+    my $page = 1;
+    my @data;
+    $#data = $n_entries;
+    @data = ();    
+    my $rs = $source->search();
+    $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');   
+
+    while (my $entry = $rs->next) {
+        push @data, $entry;
+
+        if (@data == $ROWS) {
+            my $filename = "$table.$page.yaml";
+            $datadump->add_file($filename, \@data);
+            $log->debug("saved $filename");
+            @data = ();
+            $page++;
+        }
+    }
+
+    # save last page
+    my $filename = "$table.$page.yaml";
+    $datadump->add_file($filename, \@data);
+    $log->debug("saved $filename");
 }
 
 no Moose;    # Clean up the namespace.
