@@ -47,12 +47,7 @@ sub login : Local : CaptureArgs(0) {
                 {
                     login    => $c->req->params->{'username'},
                     password => $c->req->params->{'password'},
-                }, 'normal'
-            )  or $c->authenticate(
-                {
-                    id    => $c->req->params->{'username'},
-                    password => $c->req->params->{'password'},
-                }, 'ldap'
+                }, 'progressive_ui'
             ) ){
 
             $c->flash( message => 'Logged In!' );
