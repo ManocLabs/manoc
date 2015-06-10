@@ -31,5 +31,5 @@ requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
 requires 'SQL::Translator';
-#requires 'SNMP::Info';
+#requires 'SNMP::Info', '3.27';
 
