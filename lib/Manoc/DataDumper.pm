@@ -63,13 +63,17 @@ sub _build_version {
 }
 
 my $SOURCE_DEPENDECIES = {
-    'Device'   => 'Rack',
-    'Rack'     => 'Building',
-    'Mat'      => 'Device',
-    'IfStatus' => 'Device',
-    'IfNotes'  => 'Device',
-    'CDPNeigh' => 'Device',
+    'Device'    => 'Rack',
+    'Rack'      => 'Building',
+    'Mat'       => 'Device',
+    'IfStatus'  => 'Device',
+    'IfNotes'   => 'Device',
+    'CDPNeigh'  => 'Device',
     'DeviceConfig' => 'Device',
+    'Uplink'     => 'Device',
+    'SSIDList'   => 'Device',
+    'Dot11Assoc' => 'Device',
+    'Dot11Client' => 'Device',
 };
 
 sub get_source_names {
