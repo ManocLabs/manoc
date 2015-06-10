@@ -171,7 +171,7 @@ sub run {
 
     my %config = (
                   snmp_community       => $self->config->{Credentials}->{snmp_community}   || 'public',
-                  snmp_version         => '2c',
+                  snmp_version         => $self->config->{Netwalker}->{snmp_version}       || 2,
                   default_vlan         => $self->config->{Netwalker}->{default_vlan}       || 1,
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,

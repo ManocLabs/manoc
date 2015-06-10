@@ -228,18 +228,19 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id->address;
 
-     my %config = (
-         snmp_community => $c->config->{Credentials}->{snmp_community}
-           || 'public',
-         snmp_version       => '2c',
-         default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
-         iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
-         ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
-           || 1,
-     );
-
-     $ENV{DEBUG} = 1;
-     my $updater = Manoc::Netwalker::DeviceUpdater->new(
+    my %config = (
+		  snmp_community => $c->config->{Credentials}->{snmp_community}
+		  || 'public',
+		  snmp_version   => $c->config->{Netwalker}->{snmp_version} || 2,
+		  default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
+		  iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
+		  ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
+		  || 1,
+		 );
+    
+    # TODO why an hardcoded debug?
+    $ENV{DEBUG} = 1;
+    my $updater = Manoc::Netwalker::DeviceUpdater->new(
          entry        => $c->stash->{object},
          config       => \%config,
          schema       => $c->model('ManocDB'),
