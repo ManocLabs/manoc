@@ -12,10 +12,9 @@ __PACKAGE__->table('if_notes');
 
 __PACKAGE__->add_columns(
     'device' => {
-        data_type      => 'varchar',
+        data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
-        size           => 15
     },
     'interface' => {
         data_type   => 'varchar',

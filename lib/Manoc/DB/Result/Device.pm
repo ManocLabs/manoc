@@ -10,9 +10,13 @@ __PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
     id => {
-        data_type   => 'varchar',
+        data_type   => 'int',
         is_nullable => 0,
-        size        => 15,
+    },
+    mng_address => {
+	data_type   => 'varchar',
+	is_nullable => 0,
+	size        => 15,
     },
     rack => {
         data_type      => 'int',
@@ -156,7 +160,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint( [qw/id/] );
+__PACKAGE__->add_unique_constraint( [qw/id/], [qw/mng_address/] );
 
 __PACKAGE__->belongs_to( rack => 'Manoc::DB::Result::Rack' );
 __PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus' );

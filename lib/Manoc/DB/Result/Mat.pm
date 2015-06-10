@@ -20,9 +20,8 @@ __PACKAGE__->add_columns(
         size        => 17
     },
     'device' => {
-        data_type      => 'varchar',
+        data_type      => 'int',
         is_nullable    => 0,
-        size           => 15,
         is_foreign_key => 1,
     },
     'interface' => {
