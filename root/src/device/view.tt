@@ -82,7 +82,7 @@
 <tr>
   <td>Last backup:</td>
   <td>
-  [% IF backup_date | html %]
+  [% IF backup_date %]
        [% backup_date %] 
 	<a href="[% c.uri_for_action('device/show_run', [object.id.address]) %]">
 	  View</a>
@@ -124,8 +124,6 @@
   [% ui_icon('closethick') %]    Delete</a>
   &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id.address]) %]">
 [% ui_icon('gear') %] Set Uplink</a>
-  &nbsp;<a href="[% c.uri_for_action('/device/change_ip', [object.id.address]) %]">
-  [% ui_icon('transferthick-e-w') %] Change Ip</a>		 
   &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id.address]) %]" id="confirm-button"> 
         [% ui_icon('arrowrefresh-1-w') %] Refresh Info</a>
 </div>

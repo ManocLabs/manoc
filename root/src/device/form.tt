@@ -1,0 +1,52 @@
+
+<div class="ui-widget">
+<div class="buttons">
+[% form.render %] 
+</div>
+</div>
+[% fragment = BLOCK -%]
+function clear_select(id) {
+    var sel=$(id);
+    var savedFirst=$( id + " :first");
+    sel.empty();
+    sel.append(savedFirst);
+}
+function reload_racks() {
+    clear_select('#form-device\\.rack');
+    var url =  "[% c.uri_for_action("/rack/list_js") %]";
+    $.getJSON(url, function(data) {
+	$.each(data, function(i, value) {
+	    var text = "Rack " + value.name;
+	    $("#form-device\\.rack").append($('<option></option>').attr("value", this.id).text(text));
+	});
+    }); 
+}
+
+function createAddButton() {
+    var a = $( "<a>",
+	       {
+		   id: "#form-device.new-rack",
+		   tabIndex: -1,
+		   title: "Add rack"
+	       })
+        .insertAfter( "#form-device\\.rack" )
+        .click(function() {
+             showDialogForm(
+		 '[% c.uri_for("/rack/create",{format => "fragment"}) %]',
+		 'New rack',
+		 '#form-rack',
+		 function() { reload_racks(); }
+	     )});
+    $( "<span>")
+	.attr("style", "float:right")
+	.addClass("ui-icon-plusthick")
+    	.addClass("ui-icon")
+	.appendTo(a)
+
+};
+
+$( document ).ready(function() {
+    createAddButton();
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]

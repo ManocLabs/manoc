@@ -6,8 +6,7 @@ package Manoc::Controller::Interface;
 use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int);
-use Manoc::Form::If_notes;
-use Manoc::IpAddress;
+use Manoc::Form::IfNotes;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -44,16 +43,17 @@ sub base : Chained('/') : PathPart('interface') : CaptureArgs(0) {
 
 sub object : Chained('base') : PathPart('id') : CaptureArgs(2) {
     my ( $self, $c, $id, $iface ) = @_;
-    my $device =  Manoc::IpAddress->new($id);
-    my $obj = $c->stash(
-        obj => $c->stash->{resultset}->find(
+    my $object = $c->stash(
+        object => $c->stash->{resultset}->find(
             {
-                device    => $device,
+                device    => $id,
                 interface => $iface,
-            }
-        )
+            },
+        ),
+	device_id => $id,
+	interface_name => $iface,
     );
-    if ( !$c->stash->{obj} ) {
+    if ( !$c->stash->{object} ) {
         $c->stash( error_msg => "Object not found!" );
         $c->detach('/error/index');
     }
@@ -65,14 +65,14 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(2) {
 
 sub view : Chained('object') : PathPart('view') : Args(0) {
     my ( $self, $c ) = @_;
-    my $obj    = $c->stash->{'obj'};
-    my $device = $obj->device_info;
+    my $object = $c->stash->{'object'};
+    my $device = $object->device_info;
     $c->stash( device => $device );
 
     my $note = $c->model('ManocDB::IfNotes')->search(
         {
             device    => $device->id,
-            interface => $obj->interface,
+            interface => $object->interface,
         }
     )->first;
 
@@ -82,7 +82,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my @mat_rs = $c->model('ManocDB::Mat')->search(
         {
             device    => $device->id,
-            interface => $obj->interface,
+            interface => $object->interface,
         },
         { order_by => 'lastseen DESC, firstseen DESC', }
     );
@@ -103,36 +103,37 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 sub edit_notes : Chained('object') PathPart('edit_notes') Args(0) {
     my ( $self, $c ) = @_;
-    my $iface        = $c->stash->{'obj'};
-    my $device_id    = $iface->device_info->id; 
+    my $iface        = $c->stash->{'object'};
+    my $device_id    = $c->stash->{'device_id'};
   
     $c->stash( default_backref =>
       $c->uri_for_action( 'interface/view', [ $device_id, $iface->interface ] )
 );
 
-    my $item = $c->model('ManocDB::IfNotes')->search(
-    {
-        device    => $device_id,
-        interface => $iface->interface,
-    }
-)->first;
-    $item or $item = $c->model('ManocDB::IfNotes')->new_result(
-    {
-        device    => $device_id->padded,
-        interface => $iface->interface,
-    }
-  );
-
-
-    my $form = Manoc::Form::If_notes->new( item => $item );
-
-    $c->stash( form => $form, template => 'interface/edit_notes.tt' );
-
+    my $item = $c->model('ManocDB::IfNotes')->find(
+	{
+	    device    => $device_id,
+	    interface => $iface->interface,
+	});
+    $item or $item = $c->model('ManocDB::IfNotes')->new_result( {} );
+    my $form = Manoc::Form::IfNotes->new(
+	device    => $device_id,
+	interface => $iface->interface,
+    );
+    $c->log->info("ITEM $device_id " .$item->interface);
     if ( $c->req->param('discard') ) {
         $c->detach('/follow_backref');
     }
+    
+    $c->stash(
+	form => $form,
+	template => 'interface/edit_notes.tt'
+    );
+    
+    return unless $form->process(
+	params => $c->req->params,
+	item => $item );
 
-    return unless $form->process( params => $c->req->params, );
     $c->flash( message => 'Success! Note edit.' );
     $c->detach('/follow_backref');
 }
@@ -143,7 +144,7 @@ sub edit_notes : Chained('object') PathPart('edit_notes') Args(0) {
 
 sub delete_notes : Chained('object') PathPart('delete_notes') Args(0) {
     my ( $self, $c ) = @_;
-    my $iface = $c->stash->{'obj'};
+    my $iface = $c->stash->{'object'};
 
     $c->stash( default_backref =>
             $c->uri_for_action( 'interface/view', [ $iface->device, $iface->interface ] ) );

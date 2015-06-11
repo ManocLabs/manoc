@@ -219,7 +219,6 @@ sub prepare_json_object : Private {
 	    id      => $rack->id,
 	    name    => $rack->name,
 	    building => $rack->building->id,
-	    test     => "aaab",
 	    devices   => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
 	   };
 }

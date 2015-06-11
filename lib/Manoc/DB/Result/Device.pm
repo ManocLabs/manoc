@@ -160,7 +160,8 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint( [qw/id/], [qw/mng_address/] );
+__PACKAGE__->add_unique_constraint( [qw/id/] );
+__PACKAGE__->add_unique_constraint( [qw/mng_address/] );
 
 __PACKAGE__->belongs_to( rack => 'Manoc::DB::Result::Rack' );
 __PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus' );
@@ -195,18 +196,18 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
-sub _inflate_id {
+sub _inflate_addr {
     return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0])
 }
 
-sub _deflate_id {
+sub _deflate_addr {
     return scalar $_[0]->padded if defined($_[0]);
 }
 
 __PACKAGE__->inflate_column(
-			    id => {
-				   inflate => \&_inflate_id,
-				   deflate => \&_deflate_id
+			    mng_address => {
+				   inflate => \&_inflate_addr,
+				   deflate => \&_deflate_addr
 				  }
 			   );
 
@@ -217,7 +218,7 @@ sub get_mng_url {
     return unless $format;
 
     my $str    = $format->format;
-    my $ipaddr = $self->id->address;
+    my $ipaddr = $self->mng_address->address;
     $str =~ s/%h/$ipaddr/go;
 
     return $str;

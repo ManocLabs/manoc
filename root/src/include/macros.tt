@@ -22,8 +22,8 @@ _ '.gif') %]" alt="[%command|html%]" title="[%command|html%]"/>
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_device(device) BLOCK -%]
   [% IF device -%]
-    <a href="[% c.uri_for_action('device/view',[device.id.address])%]">
-       [%device.id.address|html%]</a>
+    <a href="[% c.uri_for_action('device/view',[device.id])%]">
+       [%device.mng_address.address|html%]</a>
   [% END-%]
   [% IF device.get_mng_url -%]
     <a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
