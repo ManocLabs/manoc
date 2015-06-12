@@ -242,7 +242,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my %config = (
 		  snmp_community => $c->config->{Credentials}->{snmp_community}
 		  || 'public',
-		  snmp_version       => '2c',
+		  snmp_version   => $c->config->{Netwalker}->{snmp_version} || 2,
 		  default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
 		  iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
 		  ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
