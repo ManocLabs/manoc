@@ -152,7 +152,7 @@ sub _build_uplinks {
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
 
-            next unless $s->{switch};
+            next unless $s->{type}->{'Switch'};
             next unless $device_set->{ $s->{addr} };
 
             $uplinks{$p} = 1;
