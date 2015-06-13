@@ -278,8 +278,7 @@ sub _build_uplinks {
         foreach my $s (@$n) {
 
             # only links to a switch
-            next unless $s->{switch};
-
+            next unless $s->{type}->{'Switch'};
             # only links to a kwnown device
             next unless $device_set->{ $s->{addr} };
 

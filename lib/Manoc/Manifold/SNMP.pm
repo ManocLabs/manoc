@@ -162,7 +162,7 @@ sub _build_neighbors {
     my $c_if           = $info->c_if();
     my $c_ip           = $info->c_ip();
     my $c_port         = $info->c_port();
-    my $c_capabilities = $info->cdp_capabilities_raw();
+    my $c_capabilities = $info->cdp_cap();
     my $c_id           = $info->c_id();
     my $c_platform     = $info->c_platform();
 
@@ -175,14 +175,13 @@ sub _build_neighbors {
         my $neigh_id    = $c_id->{$neigh}       || "";
         my $neigh_model = $c_platform->{$neigh} || "";
 
-        my $cap = $c_capabilities->{$neigh};
-        $self->log->debug("$host/$port connected to $neigh_ip");
-        $cap = pack( 'B*', $cap );
+        my %cap = map {$_ => 1} @{$c_capabilities->{$neigh}};
+        $cap{'Switch'} and $self->log->debug("$host/$port connected to $neigh_ip");
+
         my $entry = {
             port        => $neigh_port,
             addr        => $neigh_ip,
-            bridge      => vec( $cap, 2, 1 ),
-            switch      => vec( $cap, 4, 1 ),
+            type        => \%cap,
             remote_id   => $neigh_id,
             remote_type => $neigh_model,
         };
