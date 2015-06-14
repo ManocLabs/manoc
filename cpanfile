@@ -1,3 +1,5 @@
+# -*- mode: perl -*-
+
 requires 'Module::Runtime';
 requires 'Moose';
 requires 'namespace::autoclean';
@@ -25,11 +27,24 @@ requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
 requires 'MooseX::Types::IPv4';
 requires 'MooseX::Storage';
-requires 'Net::Pcap';
-requires 'NetPacket';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
 requires 'SQL::Translator';
-#requires 'SNMP::Info', '3.27';
 
+recommends 'Net::Pcap';
+recommends 'NetPacket';
+recommends 'SNMP::Info', '3.27';
+
+on 'develop' => sub {
+  recommends 'Devel::NYTProf';
+  recommends 'Catalyst::Devel', '5.90077';
+};
+
+feature 'sqlite', 'SQLite support' => sub {
+   recommends 'DBD::SQLite';
+};
+
+feature 'mysql', 'MySQL support' => sub {
+   recommends 'DBD::mysql';
+};
