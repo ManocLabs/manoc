@@ -15,7 +15,7 @@ sub search_inventory {
 
 sub search_device {
     my ( $self, $query, $result ) = @_;
-    my $rs = $self->_search_id($query);
+    my $rs = $self->_search_addr($query);
 
     while ( my $e = $rs->next ) {
         my $item = Manoc::Search::Item::Device->new(
@@ -41,7 +41,7 @@ sub search_device {
 
 sub search_ipaddr {
     my ( $self, $query, $result ) = @_;
-    my $rs = $self->_search_id($query);
+    my $rs = $self->_search_addr($query);
 
     while ( my $e = $rs->next ) {
         my $item = Manoc::Search::Item::Device->new(
@@ -54,12 +54,12 @@ sub search_ipaddr {
     }
 }
 
-sub _search_id {
+sub _search_addr {
     my ( $self, $query ) = @_;
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
     return $schema->resultset('Device')->search(
-        {'id' => { -like => $pattern }},
+        {'mng_address' => { -like => $pattern }},
         { order_by => ['name'] },
 	);
 }
