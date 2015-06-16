@@ -1,4 +1,4 @@
-package Janine::ControllerRole::JQDatatable;
+package Manoc::ControllerRole::JQDatatable;
 
 use Moose::Role;
 use MooseX::MethodAttributes::Role;
