@@ -42,23 +42,23 @@ sub upgrade_table {
 }
 
 sub before_import_table {
-    my ( $self, $table, $schema ) = @_;
+    my ( $self, $table, $schema, $data ) = @_;
 
     my $method_name = "before_import_$table";
     return 0 unless $self->can($method_name);
 
     $self->log->info("Running callback for table $table");
-    return $self->$method_name($schema);
+    return $self->$method_name($schema, $data);
 }
 
 sub after_import_table {
-    my ( $self, $table, $schema ) = @_;
+    my ( $self, $table, $schema, $data ) = @_;
 
     my $method_name = "after_import_$table";
     return 0 unless $self->can($method_name);
 
     $self->log->info("Running callback for table $table");
-    return $self->$method_name($schema);
+    return $self->$method_name($schema, $data);
 }
 
 no Moose;    # Clean up the namespace.

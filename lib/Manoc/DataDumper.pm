@@ -192,13 +192,17 @@ sub _load_tables_loop {
             $converter and $converter->upgrade_table( $table, $records );
 
             # converter callback
-            $converter and $ $converter->before_import_table($table, $self->schema);
+            $converter and
+                $converter->before_import_table($table, $self->schema,
+                                                $records);
 
             # load into db
             $self->_load_table( $source, $records, $force );
 
             # converter callback
-            $converter and $ $converter->after_import_table($table, $self->schema);
+            $converter and
+                $converter->after_import_table($table, $self->schema,
+                                               $records);
 
             #free memory
             undef $records;
