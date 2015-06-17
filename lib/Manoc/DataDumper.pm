@@ -16,6 +16,21 @@ use Try::Tiny;
 my $ROWS = 100000;
 my $LOAD_BLOCK_SIZE = 5000;
 
+my $SOURCE_DEPENDECIES = {
+    'Device'    => 'Rack',
+    'Rack'      => 'Building',
+    'Mat'       => 'Device',
+    'IfStatus'  => 'Device',
+    'IfNotes'   => 'Device',
+    'CDPNeigh'  => 'Device',
+    'DeviceConfig' => 'Device',
+    'Uplink'     => 'Device',
+    'SSIDList'   => 'Device',
+    'Dot11Assoc' => 'Device',
+    'Dot11Client' => 'Device',
+};
+
+
 has 'filename' => (
     is       => 'ro',
     isa      => 'Str',
@@ -57,39 +72,36 @@ has 'version' => (
     builder   => '_build_version',
 );
 
+has 'source_names' => (
+    is        => 'ro',
+    isa       => 'ArrayRef',
+    lazy      => 1,
+    builder   => '_build_source_names'
+);
+
 sub _build_version {
     my $self = shift;
     return Manoc::DB::get_version;
 }
 
-my $SOURCE_DEPENDECIES = {
-    'Device'    => 'Rack',
-    'Rack'      => 'Building',
-    'Mat'       => 'Device',
-    'IfStatus'  => 'Device',
-    'IfNotes'   => 'Device',
-    'CDPNeigh'  => 'Device',
-    'DeviceConfig' => 'Device',
-    'Uplink'     => 'Device',
-    'SSIDList'   => 'Device',
-    'Dot11Assoc' => 'Device',
-    'Dot11Client' => 'Device',
-};
-
-sub get_source_names {
+sub _build_source_names {
     my $self = shift;
-
+    my @sources;
+    
     my @include_list = @{ $self->include };
-    @include_list = $self->schema->sources unless ( scalar(@include_list) );
     my @exclude_list = @{ $self->exclude };
+    
+    @sources =  scalar(@include_list) ? @include_list : $self->schema->sources;
+
     if ( scalar(@exclude_list) ) {
         my %filter = map { $_ => 1 } @exclude_list;
-        @include_list = grep { !$filter{$_} } @include_list;
+        @sources = grep { !$filter{$_} } @sources;
     }
-    return \@include_list;
+        
+    return $self->_order_sources(\@sources);
 }
 
-sub order_sources {
+sub _order_sources {
     my ($self, $sources) = @_;
  
     my %set = map { $_ => 1} @$sources;
@@ -111,8 +123,6 @@ sub order_sources {
             die "circular dependency found";
         }
 
-        print "remove $start_node\n";
-        
         push @ordered_list, $start_node;
         delete $set{$start_node};
         delete $connections_to->{$_}->{$start_node} for keys %$connections_to;
@@ -126,8 +136,8 @@ sub order_sources {
 #----------------------------------------------------------------------#
 
 
-sub load_tables_loop {
-    my ( $self, $source_names, $datadump, $file_set, $overwrite, $force ) = @_;
+sub _load_tables_loop {
+    my ( $self,  $datadump, $file_set, $overwrite, $force ) = @_;
     my $converter;
     
     # try to load a converter if needed
@@ -142,10 +152,12 @@ sub load_tables_loop {
         }
     }
 
+    my $source_names = $self->source_names;
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
         my $table = $source->from;
+        $self->log->debug("Loading $source_name");
 
         $converter and $table = $converter->get_table_name($table);
 
@@ -153,7 +165,7 @@ sub load_tables_loop {
             $self->log->debug("Cleaning $source_name");
             $source->resultset->delete();
         }
-        
+
         my @filenames = grep(/^$table\./, keys %{$file_set});
         if (@filenames > 1 ) {
             # sort by page
@@ -162,14 +174,14 @@ sub load_tables_loop {
                 sort { $a->[1] <=> $b->[1] }
                 map  { [ $_, /\.(\d+)/ ] } @filenames;
         }
-        
+
         foreach my $filename (@filenames) {
             $self->log->debug("Loading $filename");
 
             #load in RAM all the table records
             my $records = $datadump->load_file($filename);
             my $count = scalar(@$records);
-            
+
             $self->log->info("Read $count records from $filename");
             unless ($count) {
                 $self->log->info("Skipped empy file $filename");
@@ -177,10 +189,20 @@ sub load_tables_loop {
             }
 
             # convert records if needed
-            $converter and $converter->upgrade_table( $records, $table );
+            $converter and $converter->upgrade_table( $table, $records );
+
+            # converter callback
+            $converter and
+                $converter->before_import_table($table, $self->schema,
+                                                $records);
 
             # load into db
-            $self->load_table( $source, $records, $force );
+            $self->_load_table( $source, $records, $force );
+
+            # converter callback
+            $converter and
+                $converter->after_import_table($table, $self->schema,
+                                               $records);
 
             #free memory
             undef $records;
@@ -188,16 +210,16 @@ sub load_tables_loop {
     }
 }
 
-sub load_table {
+sub _load_table {
     my ( $self, $source, $records, $force ) = @_;
 
     my $rs = $source->resultset;
-    $self->log->debug("load table");
+    $self->log->debug("loading table");
 
     my $count = 0;
     my $block_size = $LOAD_BLOCK_SIZE;
     my $offset = 0;
-
+    
     while ($offset < @$records - 1) {
         my $last_record_index = $offset + $block_size - 1;
         $last_record_index > @$records - 1 and $last_record_index = @$records - 1;
@@ -228,7 +250,7 @@ sub load_table {
     }
     
     $self->log->error("Warning: $count errors ignored!") if ($count);
-    $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );    
+    $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );
 }
 
 sub load {
@@ -242,10 +264,9 @@ sub load {
     }
     
     #filter metadata file from sources 
-    my $file_set = { map { $_ => 1 } grep(!/_metadata/, $datadump->tar->list_files) };
-    my $source_names = $self->get_source_names();
-    $source_names = $self->order_sources($source_names);
-
+    my $file_set = { map { $_ => 1 } @{ $datadump->filelist } };
+    
+    my $source_names = $self->source_names;
     $self->log->debug('Sources: ', join(',', @$source_names));
     
     if ($disable_fk) {
@@ -255,13 +276,12 @@ sub load {
 
         $self->schema->storage->with_deferred_fk_checks(
             sub {
-                $self->load_tables_loop( $source_names, $datadump, $file_set, $overwrite,
-                    $force );
+                $self->_load_tables_loop($datadump, $file_set, $overwrite, $force );
             }
         );
     }
     else {
-        $self->load_tables_loop( $source_names, $datadump, $file_set, $overwrite, $force );
+        $self->_load_tables_loop( $datadump, $file_set, $overwrite, $force );
     }
     $self->log->info("Database restored!");
 }
@@ -280,7 +300,7 @@ sub save {
         $self->config->{DataDumper} );
     
     my $path_to_tar  = $self->config->{DataDumper}->{path_to_tar} || undef;    
-    my $source_names = $self->get_source_names();
+    my $source_names = $self->source_names;
     
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->resultset($source_name);
@@ -304,11 +324,11 @@ sub save {
 
 sub _dump_table {
     my ( $storage, $dbh, $log, $datadump, $source, $rows) = @_;
-    my $table = $source->result_source->name;    
+    my $table = $source->result_source->name;
 
-    my $n_entries = $source->count;   
+    my $n_entries = $source->count;
 
-    $source->result_class('DBIx::Class::ResultClass::HashRefInflator');   
+    $source->result_class('DBIx::Class::ResultClass::HashRefInflator');
     return unless $n_entries > 0;
   
     if ($n_entries <= $ROWS) {

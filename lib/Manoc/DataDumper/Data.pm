@@ -87,14 +87,16 @@ sub load {
     try {
        $tar = Archive::Tar->new($filename);
     };
-    $tar or return undef;    
-    
-    return $self->new(
+    $tar or return undef;
+
+    my $obj=  $self->new(
         {
             filename => $filename,
             tar      => $tar
         }
     );
+    $obj->filelist([ grep(!/_metadata/, $obj->tar->list_files) ]);
+    return $obj;
 }
 
 #returns a reference to the array of records loaded from the yaml file
