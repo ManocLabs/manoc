@@ -4,10 +4,11 @@ package Manoc::DataDumper;
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
+use 5.010;
+
 use Moose;
 use Manoc::DB;
 use Manoc::DataDumper::Converter;
-use Manoc::DataDumper::VersionType;
 
 use DBIx::Class::ResultClass::HashRefInflator;
 
@@ -67,7 +68,7 @@ has 'exclude' => (
 
 has 'version' => (
     is        => 'rw',
-    isa       => 'Version',
+    isa       => 'Int',
     lazy      => 1,
     builder   => '_build_version',
 );
@@ -142,7 +143,12 @@ sub _load_tables_loop {
     
     # try to load a converter if needed
     my $version = $datadump->metadata->{'version'};
-    if ( $version < Manoc::DB::get_version ) {
+
+    # convert old version formats to DB version
+    $version eq '2.000000' and $version = 2;
+    $version eq '20121115' and $version = 3;
+    
+    if ( $version < $self->version ) {
         my $converter_class =
             Manoc::DataDumper::Converter->get_converter_class( $version );
 
