@@ -63,39 +63,30 @@ __PACKAGE__->config(
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
 
-    'Plugin::Authentication'                    => {
-        default_realm => 'progressive_ui',
+    'Plugin::Authentication' => {
+        default_realm => 'userdb',
         realms        => {
-            progressive_ui => {
-                class  => 'Progressive',
-                realms => [ 'normal',
-			    #'ldap',
-			],
-            },
-	   
-            normal => {
+            userdb => {
                 credential => {
+		    id_field           => 'login',
                     class              => 'Password',
                     password_field     => 'password',
-                    username_field     => 'login',
-                    password_type      => 'hashed',
-                    password_hash_type => 'MD5'
+                    password_type      => 'self_check',
                 },
                 store => {
                     class         => 'DBIx::Class',
                     user_model    => 'ManocDB::User',
                     role_relation => 'roles',
                     role_field    => 'role',
-                }
+                },
             },
             agent => {
                 credential => {
                     class              => 'HTTP',
-                    type               => 'basic',      # 'digest' or 'basic'
+                    type               => 'basic',
                     password_field     => 'password',
                     username_field     => 'login',
-                    password_type      => 'hashed',
-                    password_hash_type => 'MD5',
+		    password_type      => 'self_check',
                 },
                 store => {
                     class         => 'DBIx::Class',
@@ -104,38 +95,9 @@ __PACKAGE__->config(
                     role_field    => 'role',
                 }
             },
-#            ldap => {
-#                credential => {
-#                  class => "Password",
-#                  username_field => "username",
-#                  password_field => "password",
-#                  password_type  => "self_check",
-#                },
-#                store => {
-#                  class               => "LDAP",
-#                  ldap_server         => "",
-#                  ldap_server_options => { timeout => 100 , onerror => "warn"},
-#                  role_basedn         => "ou=ManocRoles,dc=bla,dc=bla,dc=bla", #This should be the basedn where the LDAP Objects representing your roles are.
-#                  role_field          => "cn",
-#                  role_filter         => "",
-#                  role_scope          => "one",
-#                  role_search_options => { deref => "always" },
-#                  role_value          => "cn",
-#                  role_search_as_user => 0, #role disabled
-#                  start_tls           => 0, #disabled
-#                  start_tls_options   => { verify => "none" },
-#                  entry_class         => "Net::LDAP::Entry",
-#                  use_roles           => 1,
-#                  user_basedn         => "ou=People,dc=bla,dc=bla,dc=bla",
-#                  user_field          => "uid",
-#                  user_filter         => "(&(objectClass=posixAccount)(uid=%s))",
-#                  user_scope          => "sub", # 
-#                  user_search_options => { deref => "always" },
-#                  user_results_filter => sub { return shift->pop_entry },
-#                },
-#              },
         },
     },
+
     #remove stale sessions from db
     'Plugin::Session' => {
         expires           => 28800,

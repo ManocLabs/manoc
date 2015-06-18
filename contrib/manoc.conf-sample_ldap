@@ -1,0 +1,114 @@
+name Manoc
+
+<ArpSniffer>
+    # a list of vlan to ignore
+    vlan_filter 2
+    vlan_filter 4
+
+    # optional 
+    # device eth0
+
+    refresh_interval 600
+
+    # native vlan
+    vlan 1
+</ArpSniffer>
+
+
+<"Model::ManocDB">
+     connect_info DBI:SQLite:dbname=manoc.db
+     #	connect_info DBI:mysql:database=manoc;host=localhost
+     connect_info manoc
+     connect_info manoc
+</"Model::ManocDB"> 
+
+
+<Netwalker>
+    ifstatus_interval	3600
+    iface_filter	1
+    check_db		1
+    n_procs	        8	
+    vtpstatus_interval	3600
+</Netwalker> 
+
+<Credentials>
+    snmp_community 	 public
+    telnet_user      admin
+    telnet_password  password	
+    telnet_enable	 enablepassword
+</Credentials>
+
+<Archiver>
+    archive_age 86400
+    discard_age 0
+    # 3 months
+    reports_age 7776000
+</Archiver>
+
+<Backup>
+    interval 1m
+    directory /opt/manoc/manoc2/backup
+</Backup>
+
+<Log>
+    directory /var/log/manoc
+</Log>
+
+<DataDumper>
+    path_to_tar
+</DataDumper>
+
+<Plugin::Authentication>
+    # use the newly created realm as default
+    default_realm progressive_ui
+
+    <realms progressive_ui>
+        class  Progressive
+	# check internal users first
+	realms userdb
+	realms ldap
+    </realms>
+
+    <realms ldap>
+        <credential>
+	    class          Password
+	    username_field username
+	    password_field password
+	    password_type  self_check
+    	</credential>
+    	<store>
+	    class              LDAP
+	    ldap_server        ldap.manoc.com
+	    <ldap_server_options>
+	        timeout   100
+	        onerror   warn
+            </ldap_server_options>
+
+#This should be the basedn where the LDAP Objects representing your roles are.
+
+      	    role_basedn         ou=ManocRoles,dc=bla,dc=bla,dc=bla
+	    role_field          cn
+	    role_filter         
+	    role_scope          one
+	    <role_search_options>
+	        deref	always
+	    </role_search_options>
+	    role_value          cn
+	    role_search_as_user  0 #role disabled
+	    start_tls            0 #disabled
+	    <start_tls_options>
+	        verify		none
+	    </start_tls_options>
+	    entry_class         Net::LDAP::Entry
+	    use_roles           1
+	    user_basedn         ou=People,dc=bla,dc=bla,dc=bla
+	    user_field          uid
+	    user_filter         (&(objectClass=posixAccount)(uid=%s))
+	    user_scope          sub
+	    <user_search_options>
+	        deref		always
+	    </user_search_options>
+	    user_results_filter "sub { return shift->pop_entry }"
+	</store>
+    </realms>
+</Plugin::Authentication>
