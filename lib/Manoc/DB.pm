@@ -8,13 +8,13 @@ use warnings;
 
 package Manoc::DB;
 
-$__PACKAGE__::version = '20121115';
+our $VERSION = 3;
 
 use base qw/DBIx::Class::Schema/;
 __PACKAGE__->load_namespaces();
 
 sub get_version {
-    return $__PACKAGE__::version;
+    return $VERSION;
 }
 
 1;

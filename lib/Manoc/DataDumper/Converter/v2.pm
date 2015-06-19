@@ -3,7 +3,7 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::DataDumper::Converter::v2000000;
+package Manoc::DataDumper::Converter::v2;
 
 use Moose;
 use Data::Dumper;

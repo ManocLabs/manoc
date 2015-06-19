@@ -15,8 +15,6 @@ use File::Temp qw/tempdir/;
 use File::Spec;
 use Try::Tiny;
 
-use Manoc::DataDumper::VersionType;
-
 has 'filename' => (
     is       => 'ro',
     isa      => 'Str',
@@ -25,7 +23,7 @@ has 'filename' => (
 
 has version => (
     is       => 'ro',
-    isa      => 'Version',
+    isa      => 'Int',
     required => 0,
 );
 
@@ -60,14 +58,14 @@ has tmpdir => (
 sub _build_metadata {
     my $self = shift;
 
+    #we are in a save action
     if ( $self->version ) {
-        #we are in a save action
         return { version => $self->version };
     }
 
     #in the first version, the dumper dosen't create metadata file
     unless ( $self->tar->contains_file('_metadata') ) {
-        return { version => '1.000000' };
+        return { version => 1 };
     }
 
     my $content = $self->tar->get_content('_metadata');
