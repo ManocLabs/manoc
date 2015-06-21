@@ -6,7 +6,7 @@
 package Manoc::DataDumper::Converter;
 
 use Moose;
-use Class::MOP;
+use Class::Load;
 
 has 'log' => (
     is       => 'ro',
@@ -18,7 +18,7 @@ sub get_converter_class {
 
     my $class_name = "v$version";
     $class_name = "Manoc::DataDumper::Converter::$class_name";
-    Class::MOP::load_class($class_name) or return undef;
+    Class::Load::load_class($class_name) or return undef;
     return $class_name;
 }
 
