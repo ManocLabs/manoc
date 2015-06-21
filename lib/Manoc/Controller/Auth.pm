@@ -36,7 +36,10 @@ sub index : Path : Args(0) {
 
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
+
     my $username = $c->req->params->{'username'};
+    my $password => $c->req->params->{'password'};
+
     $c->stash( template => 'auth/login.tt' );
     $c->keep_flash("backref");
 
@@ -44,8 +47,8 @@ sub login : Local : CaptureArgs(0) {
 
     if ( defined( $username ) ) {
 	my $userinfo = {
-	    username => $c->req->params->{'username'},
-	    password => $c->req->params->{'password'},
+	    username => $username,
+	    password => $password,
 	};
         if ($c->authenticate($userinfo) ) {
             $c->flash( message => 'Logged In!' );
