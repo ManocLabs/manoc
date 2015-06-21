@@ -1,6 +1,7 @@
 # -*- mode: perl -*-
 
 requires 'Module::Runtime';
+requires 'Class::Load';
 requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Log::Log4perl', '1.46';
