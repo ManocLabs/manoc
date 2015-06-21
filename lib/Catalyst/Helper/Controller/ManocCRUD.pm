@@ -160,7 +160,7 @@ __list_tt__
 [% FOREACH o IN objects %]
          <tr>
 <+ FOREACH col IN columns +>
- 	 <td>[% o.<+ attr+> %]</td>
+ 	 <td>[% o.<+ attr+> | html %]</td>
 <+ END +>
  	 <td><a href=[% c.uri_for_action('/<+ model.lower +>/view', [o.id]) %]>View</a></td>
          </tr>
@@ -176,18 +176,12 @@ __view_tt__
    use_table=1
 -%]
     <table id="info">
-      <tr>
-	<td>Vendor:</td><td>[% object.vendor %] </td>
-      </tr>
-      <tr>
-	<td>Model:</td><td>[% object.model %] </td>
-      </tr>
-      <tr>
-	<td>Serial:</td><td>[% object.serial %]</td>
-      </tr>
-      <tr>
-	<td>Inventory:</td><td>[% object.inventory %]</td>
-      </tr>
+      <+ FOREACH col IN columns +>
+        <tr>
+        <th><+ col +></th>
+        <td>[% o.<+ attr+> | html %]</td>
+        </tr>
+      <+ END +>
     </table>
     [% add_css_tableinfo -%]
     <p>
