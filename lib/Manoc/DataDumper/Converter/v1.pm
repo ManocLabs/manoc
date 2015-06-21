@@ -28,15 +28,6 @@ sub upgrade_winlogon {
     return $count;
 }
 
-# delete session datas
-sub upgrade_sessions {
-    my ( $self, $data ) = @_;
-
-    $data = undef;
-    
-    return 0;
-}
-
 no Moose;    # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
 1;

@@ -186,8 +186,12 @@ sub _load_tables_loop {
 
             #load in RAM all the table records
             my $records = $datadump->load_file($filename);
-            my $count = scalar(@$records);
+            if (!$records) {
+                $self->log->info("File $filename not found, skipping");
+                next;
+            }
 
+            my $count = scalar(@$records);
             $self->log->info("Read $count records from $filename");
             unless ($count) {
                 $self->log->info("Skipped empy file $filename");
