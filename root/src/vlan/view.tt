@@ -16,15 +16,15 @@
 <table>
     <tr align=left>
      <th width=160>Id:</th>
-        <td width=160>[% object.id %]</td>	
+        <td width=160>[% object.id | html %]</td>	
     </tr>
     <tr align=left>
         <th width=160>Name:</th>
-        <td width=160>[% object.name %]</td>
+        <td width=160>[% object.name | html %]</td>
     </tr>
     <tr align=left>
         <th>Description:</th>
-        <td>[% object.description %]</td>
+        <td>[% object.description | html %]</td>
     </tr>
     <tr align=left>
         <th>Vlan Range:</th>
@@ -37,7 +37,7 @@
       [% ELSE %]
 	<td></td>
       [% END %]
-        <td><a href="[%c.uri_for_action('iprange/view',[r.name])%]">[% r.name %] </a></td>
+        <td><a href="[%c.uri_for_action('iprange/view',[r.name])%]">[% r.name | html %] </a></td>
     </tr>
     [% END %]
 </table>

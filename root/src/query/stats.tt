@@ -26,9 +26,9 @@
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% v.vlan %]</td>
-	 <td>[% v.macaddr %]</td>
- 	 <td>[% v.ipaddr %]</td>
+  	 <td>[% v.vlan | html %]</td>
+	 <td>[% v.macaddr | html %]</td>
+ 	 <td>[% v.ipaddr | html %]</td>
 	 </tr>
    [% IF loop.last %]
         </tbody>

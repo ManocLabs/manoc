@@ -11,8 +11,8 @@
     <table class="display" id="macs">
        <thead>  
 	 <tr>
-	 <th>Mac Address</th>
- 	 <th># Devices</th>
+	 <th>MAC Address</th>
+ 	 <th>Number of devices</th>
 	 </tr>
        </thead>  
        <tbody>

@@ -14,7 +14,7 @@
 <div id="tabs-1">
 <table id="info">
 <tr>
-  <td>Interface:</td><td>[% obj.interface %] </td>
+  <td>Interface:</td><td>[% obj.interface | html %] </td>
 </tr>
 <tr>
   <td>Switch:</td><td>[% device.name | html %]
@@ -33,31 +33,31 @@
 <tr>
   <td>Status (admin):</td>
   <td>
-    [% obj.up %] ([% obj.up_admin %])	
+    [% obj.up | html %] ([% obj.up_admin %])	
   </td>
 </tr>
 <tr>
   <td>Duplex (admin):</td>
   <td>
-	[% obj.duplex %]([% obj.duplex_admin %])
+	[% obj.duplex | html %]([% obj.duplex_admin %])
   </td>
 </tr>
 <tr>
   <td>Vlan:</td>
   <td>
-      [% obj.vlan %]
+      [% obj.vlan | html %]
   </td>
 </tr>
 <tr>
   <td>STP Status</td>
-  <td> [% obj.stp_state %] </td>
+  <td> [% obj.stp_state | html %] </td>
 </tr>
 <tr>
   <td>Portsecurity:</td>
   <td>
     [% IF obj.cps_enable %]
-	[% obj.cps_status %] -
-        [% obj.cps_count %] violations
+	[% obj.cps_status | html %] -
+        [% obj.cps_count | html %] violations
     [% ELSE %]
     Disabled
     [% END %]
@@ -103,8 +103,8 @@
          <tr>
  	 <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
  	 <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
- 	 <td> [% m.firstseen %]</td>
-	 <td> [% m.lastseen  %]</td>
+ 	 <td> [% m.firstseen | html %]</td>
+	 <td> [% m.lastseen  | html %]</td>
          </tr>
   [% IF loop.last %]
       </tbody>

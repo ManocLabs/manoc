@@ -12,15 +12,15 @@
     <table class="ui-widget-content ui-corner-all manoc-form">
        <tr>
             <td><label>Range to merge:</label></td>
-	    <td colspan="2">[% object.name %] [ [% object.start %] - [% object.end %] ]</td>
+	    <td colspan="2">[% object.name | html %] [ [% object.start | html %] - [% object.end | html %] ]</td>
        </tr>
         <tr>
             <td><label>Merged vlan range name</label></td>
-            <td colspan=2><input type="text" value="[% new_name %]"
+            <td colspan=2><input type="text" value="[% new_name | html %]"
 	        name="new_name"></input></td>
 	    <td>
 	       [% IF error.name %]
-	    	<span class="error" id="error">[% error.name %] </span>
+	    	<span class="error" id="error">[% error.name | html %] </span>
 	       [%END%]
 	    </td>
         </tr>
@@ -31,9 +31,9 @@
             <tr>
                 <td><input type=radio name=sel_vlan_range_id value="[% n.id %]" 
 		[% IF sel_vlan_range_id == n.id %] checked [% END %]>
-		<a href="[% c.uri_for('/vlanrange/list') %]">[% n.name %] </a></td>
-                <td align=center>[% n.start %]</td>
-                <td align=center>[% n.end %]</td>
+		<a href="[% c.uri_for('/vlanrange/list') %]">[% n.name | html %] </a></td>
+                <td align=center>[% n.start | html %]</td>
+                <td align=center>[% n.end | html %]</td>
             </tr>
 	[% END %]
         <tr>

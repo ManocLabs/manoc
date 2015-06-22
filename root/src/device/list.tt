@@ -30,14 +30,14 @@
 [% FOREACH d IN device_table %]
          <tr>
  	   <td>[% print_device(d) %]</td>
-   	   <td>[% d.name %]</td>
+   	   <td>[% d.name | html %]</td>
 	   <td><a href="[%c.uri_for_action('/building/view',[d.rack.building.id])%]">[% d.rack.building.name %]</a></td>
-	   <td><a href="[%c.uri_for_action('/rack/view',	[d.rack.id])%]"> [% d.rack.name %]</a></td>
-	   <td>[% d.rack.floor %]</td>
-	   <td>[% d.vendor %]</td>
-           <td>[% d.os_ver %]</td>
-	   <td>[% d.serial %]</td>
-	   <td>[% d.model %]</td>
+	   <td><a href="[%c.uri_for_action('/rack/view', [d.rack.id])%]"> [% d.rack.name | html %]</a></td>
+	   <td>[% d.rack.floor | html %]</td>
+	   <td>[% d.vendor | html %]</td>
+           <td>[% d.os_ver | html %]</td>
+	   <td>[% d.serial | html %]</td>
+	   <td>[% d.model | html%]</td>
          </tr>
 [% END %]
         </tbody>

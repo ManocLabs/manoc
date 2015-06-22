@@ -33,7 +33,6 @@
 [% init_table('un')%]
 [% FOREACH u IN unused_ifaces %]
    [% IF loop.first %]
-    
     <table class="display" id="un">
        <thead>  
 	 <tr>
@@ -44,19 +43,13 @@
        </thead>  
        <tbody>
   [% END %]
-
- <tr>
+       <tr>
   	 <td>[% print_device(u) %]</td>
 	 <td>[% print_short_iface(u.id,u.interface) %]</td>
  	 <td>[% u.description | html %]</td>
-	 </tr>
+       </tr>
    [% IF loop.last %]
-        </tbody>
+       </tbody>
     </table>
    [% END %]
 [% END %]
-
-
-
-
-

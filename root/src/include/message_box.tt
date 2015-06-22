@@ -1,5 +1,5 @@
 <div class="ui-state-highlight ui-corner-all"> 
      <p> <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;" ></span>
-		<strong>[% msg %]</strong> 
+		<strong>[% msg | html %]</strong> 
      </p>   	
 </div>

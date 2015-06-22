@@ -9,7 +9,7 @@
       <td><input type="text" value="[% id %]" name="id"></input></td>
       <td>
 	[% IF error.id %]
-   	<span class="error" id="error">[% error.id %] </span>
+   	<span class="error" id="error">[% error.id | html %] </span>
 	[%END%]
       </td> 
     </tr>
@@ -18,7 +18,7 @@
       <td><input type="text" value="[% vlan_name %]" name="name"></input></td>
       <td>
 	[% IF error.name %]
-	  <span class="error" id="error">[% error.name %] </span>
+	  <span class="error" id="error">[% error.name | html %] </span>
 	[%END%]
       </td>
     </tr>
@@ -37,4 +37,3 @@
     </tr>
   </table>
 </form>
-  

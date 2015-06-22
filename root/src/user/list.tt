@@ -28,9 +28,9 @@
        <tbody>
   [% END %]
          <tr>
- 	 <td><a href=[% c.uri_for_action('/user/view', [u.id]) %]>[% u.login %]</a></td>
- 	 <td>[% u.fullname %]</td>
- 	 <td>[% u.email %]</td>
+ 	 <td><a href=[% c.uri_for_action('/user/view', [u.id]) %]>[% u.login | html %]</a></td>
+ 	 <td>[% u.fullname | html %]</td>
+ 	 <td>[% u.email | html %]</td>
 	 <td>
 	 [% FOREACH r IN u.roles %]
           [% r.role %] 

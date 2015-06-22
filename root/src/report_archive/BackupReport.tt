@@ -21,24 +21,24 @@
    
    <table id="info">
          <tr>
-  	  <td> Configurations up to date: </td>
-  	  <td> [% report_obj.up_to_date_count %] </td>
+  	  <th> Configurations up to date: </th>
+  	  <td> [% report_obj.up_to_date_count | html %] </td>
  	 </tr>
           <tr>
-  	  <td> Configurations updated: </td>
-  	  <td> [% report_obj.updated_count %] </td>
+  	  <th> Configurations updated: </th>
+  	  <td> [% report_obj.updated_count | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> Configurations not saved: </td>
-  	  <td> [% report_obj.not_updated_count  %] </td>
+  	  <th> Configurations not saved: </th>
+  	  <td> [% report_obj.not_updated_count | html %] </td>
  	 </tr>
  	  <tr>
-  	  <td> New configurations created: </td>
-  	  <td> [% report_obj.created_count %] </td>
+  	  <th> New configurations created: </th>
+  	  <td> [% report_obj.created_count | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> Errors occurred:  </td>
-  	  <td> [% report_obj.error_count %] </td>
+  	  <th> Errors occurred:  </th>
+  	  <td> [% report_obj.error_count | html %] </td>
  	 </tr>
   </table>
     [% add_css_tableinfo %]
@@ -51,7 +51,7 @@
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_updated %]
  	 <tr class="[% loop.parity %]">
- 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %]</a></td>
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element | html%]</a></td>
  	 </tr>
  [% END %]
  </table>
@@ -63,7 +63,7 @@
 <table class="report  ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_up_to_date %]
  	 	 <tr class="[% loop.parity %]" >
-                 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %]</a></td>
+                 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element | html %]</a></td>
                  </tr>
  [% END %]
  </table>
@@ -75,7 +75,7 @@
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_not_updated %]
 	 <tr class="[% loop.parity %]">
- 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %] </a></td>
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element | html %] </a></td>
  	 </tr>
  [% END %]
 </table>
@@ -87,7 +87,7 @@
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_created %]
  	 <tr class="[% loop.parity %]">
- 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element %] </a></td>
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element ]) %]> [%  element | html %] </a></td>
  	 </tr>
  [% END %]
 </table>
@@ -99,8 +99,8 @@
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_error %]
          <tr class="[% loop.parity %]">
- 	 <td><a href=[% c.uri_for_action('/device/view', [ element.id ]) %]> [%  element.id %] </a></td>
-         <td>[% element.message %]</td>
+ 	 <td><a href=[% c.uri_for_action('/device/view', [ element.id ]) %]> [%  element.id | html %] </a></td>
+         <td>[% element.message | html %]</td>
  	 </td>
          </tr>
  [% END %]

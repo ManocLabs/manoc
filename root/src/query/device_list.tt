@@ -17,20 +17,15 @@
   </tr>
 [% FOREACH t IN table %]
        <tr>
-	  <td>[% t.building %]</td>
-	  <td>[% t.rack %]</td>
-	  <td>[% t.floor %]</td>
-	  <td>[% t.ipaddr %]</td>
-	  <td>[% t.name %]</td>
-	  <td>[% t.vendor %]</td>
-	  <td>[% t.model %]</td>
-          <td>[% t.serial %]</td>
-	  <td>[% t.os %]</td>
+	  <td>[% t.building | html %]</td>
+	  <td>[% t.rack | html %]</td>
+	  <td>[% t.floor | html %]</td>
+	  <td>[% t.ipaddr | html %]</td>
+	  <td>[% t.name | html %]</td>
+	  <td>[% t.vendor | html %]</td>
+	  <td>[% t.model | html %]</td>
+          <td>[% t.serial | html %]</td>
+	  <td>[% t.os | html %]</td>
        </tr>
 [% END %]
 </table>
-
-
-
-
-

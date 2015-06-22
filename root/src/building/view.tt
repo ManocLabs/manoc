@@ -50,7 +50,7 @@
       <tbody>
 	[% END %]
         <tr>
- 	  <td>[% r.floor %]</td>
+ 	  <td>[% r.floor | html %]</td>
  	  <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]>[% r.name %]</a></td>
         </tr>
 	[% IF loop.last %]
@@ -60,5 +60,3 @@
     [% END %]
   </div>
 </div>
-
-

@@ -42,7 +42,7 @@
 -%]
 <ul id="menu">
 [% FOREACH l IN list %]
-  <li><a href="[% l.path %]">[% l.name %]</a></li>
+  <li><a href="[% l.path %]">[% l.name | html %]</a></li>
 [% END -%]
 </ul>
 [% fragment = BLOCK -%]

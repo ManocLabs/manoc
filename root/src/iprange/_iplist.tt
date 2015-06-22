@@ -24,10 +24,10 @@
   [% END %]
          <tr>
  	 <td><a href="[% c.uri_for_action('ip/view',[ip.ipaddr]) %]">[% ip.ipaddr %]</a></td>
-   <td> [% ip.lastseen %] </td>
-	 <td> [% ip.desc %]</td>
-	 <td> [% ip.assigned_to %]</td>
-         <td> [% ip.notes %]</td>
+   <td> [% ip.lastseen | html %] </td>
+	 <td> [% ip.desc | html %]</td>
+	 <td> [% ip.assigned_to | html %]</td>
+         <td> [% ip.notes | html %]</td>
 	 <td> 
         <a href="[% c.uri_for_action('ip/edit',[ip.ipaddr],{backref=> backref}) %]">[% icon('edit') %]</a>
 	[% IF ip.notes %]       
