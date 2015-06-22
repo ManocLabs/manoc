@@ -6,6 +6,7 @@ package Manoc::DB::Result::User;
 
 use base qw(DBIx::Class);
 use Digest::MD5 qw(md5_base64); # for old password
+use Try::Tiny;
 
 __PACKAGE__->load_components(qw(PK::Auto EncodedColumn Core));
 
@@ -23,11 +24,11 @@ __PACKAGE__->add_columns(
     },
     password => {
         data_type           => 'CHAR',
-        size                => 22,
+        size                => 255,
         encode_column       => 1,
 	encode_class        => 'Crypt::Eksblowfish::Bcrypt',
 	encode_args         => { key_nul => 0, cost => 8 },
-        encode_check_method => 'check_password_new',
+        encode_check_method => 'check_password_bcrypt',
     },
     fullname => {
         data_type   => 'varchar',
@@ -73,7 +74,11 @@ sub check_password {
 	return 1;
     }
 
-    return $self->check_password_new($attempt);
+    my $ret = 0;
+    try {
+	$ret =  $self->check_password_bcrypt($attempt);
+    };
+    return $ret;
 }
 
 1;

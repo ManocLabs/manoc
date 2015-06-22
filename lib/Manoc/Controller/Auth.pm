@@ -38,7 +38,7 @@ sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
     my $username = $c->req->params->{'username'};
-    my $password => $c->req->params->{'password'};
+    my $password = $c->req->params->{'password'};
 
     $c->stash( template => 'auth/login.tt' );
     $c->keep_flash("backref");
