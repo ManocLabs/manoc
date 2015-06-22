@@ -68,7 +68,6 @@ __PACKAGE__->config(
         realms        => {
             userdb => {
                 credential => {
-		    id_field           => 'login',
                     class              => 'Password',
                     password_field     => 'password',
                     password_type      => 'self_check',
@@ -85,7 +84,6 @@ __PACKAGE__->config(
                     class              => 'HTTP',
                     type               => 'basic',
                     password_field     => 'password',
-                    username_field     => 'login',
 		    password_type      => 'self_check',
                 },
                 store => {
