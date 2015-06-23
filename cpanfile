@@ -32,6 +32,7 @@ requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
 requires 'SQL::Translator';
+requires 'Crypt::Eksblowfish::Bcrypt';
 
 recommends 'Net::Pcap';
 recommends 'NetPacket';

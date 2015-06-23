@@ -36,20 +36,21 @@ sub index : Path : Args(0) {
 
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
+
     my $username = $c->req->params->{'username'};
+    my $password = $c->req->params->{'password'};
+
     $c->stash( template => 'auth/login.tt' );
     $c->keep_flash("backref");
 
     $c->stash( default_backref => $c->uri_for('/search') );
 
     if ( defined( $username ) ) {
-        if ($c->authenticate(
-                {
-                    login    => $c->req->params->{'username'},
-                    password => $c->req->params->{'password'},
-                }, 'progressive_ui'
-            ) ){
-
+	my $userinfo = {
+	    username => $username,
+	    password => $password,
+	};
+        if ($c->authenticate($userinfo) ) {
             $c->flash( message => 'Logged In!' );
             $c->log->debug( 'User ' . $username . ' logged');
             $c->detach('/follow_backref');
@@ -72,6 +73,7 @@ sub logout : Local : CaptureArgs(0) {
     $c->stash( template => 'auth/logout.tt' );
 
     $c->logout();
+    $c->delete_session();
     $c->stash( message => 'You have been logged out.' );
 }
 

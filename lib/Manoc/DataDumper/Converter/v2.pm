@@ -8,7 +8,7 @@ package Manoc::DataDumper::Converter::v2;
 use Moose;
 use Data::Dumper;
 use Manoc::Utils qw(padded_ipaddr check_addr);
-extends 'Manoc::DataDumper::Converter';
+extends 'Manoc::DataDumper::Converter::v3';
 
 use Manoc::IpAddress;
 
@@ -147,13 +147,6 @@ sub upgrade_device_config {
   upgrade_ipcolumn("device",$data);
 }
 
-# delete session datas
-sub upgrade_sessions {
-    my ( $self, $data ) = @_;
-
-    @$data = ();
-    return 0;
-}
 
 no Moose;    # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();

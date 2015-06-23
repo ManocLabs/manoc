@@ -209,7 +209,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( lc $c->req->method eq 'post' ) {
 
         $user->delete;
-        $c->flash->{message} = 'Success!! User ' . $user->login . ' successful deleted.';
+        $c->flash->{message} = 'Success!! User ' . $user->username . ' successful deleted.';
 
         $c->detach('/follow_backref');
     }

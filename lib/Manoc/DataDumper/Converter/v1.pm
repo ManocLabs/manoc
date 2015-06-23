@@ -10,7 +10,6 @@ use Data::Dumper;
 
 extends 'Manoc::DataDumper::Converter::v2';
 
-
 # check for spurious data
 sub upgrade_winlogon {
     my ( $self, $data ) = @_;

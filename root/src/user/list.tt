@@ -28,7 +28,7 @@
        <tbody>
   [% END %]
          <tr>
- 	 <td><a href=[% c.uri_for_action('/user/view', [u.id]) %]>[% u.login | html %]</a></td>
+ 	 <td><a href=[% c.uri_for_action('/user/view', [u.id]) %]>[% u.username | html %]</a></td>
  	 <td>[% u.fullname | html %]</td>
  	 <td>[% u.email | html %]</td>
 	 <td>
@@ -39,7 +39,7 @@
 	 </td>
  	 <td align="center">
 	  [% IF u.active %] 
-              [% IF u.login == 'admin' %]  [% icon('ok_white') %] 
+              [% IF u.username == 'admin' %]  [% icon('ok_white') %] 
               [% ELSE %] <a href="[% c.uri_for_action('user/switch_status',[u.id]) %]"> [% icon('ok') %] </a> 
 	      [% END %]
 	  [% ELSE %]   

@@ -5,6 +5,8 @@
 package Manoc::DB::Result::User;
 
 use base qw(DBIx::Class);
+use Digest::MD5 qw(md5_base64); # for old password
+use Try::Tiny;
 
 __PACKAGE__->load_components(qw(PK::Auto EncodedColumn Core));
 
@@ -15,18 +17,18 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
         is_auto_increment => 1,
     },
-    login => {
+    username => {
         data_type   => 'varchar',
         size        => 255,
         is_nullable => 0
     },
     password => {
         data_type           => 'CHAR',
-        size                => 22,
+        size                => 255,
         encode_column       => 1,
-        encode_class        => 'Digest',
-        encode_args         => { algorithm => 'MD5', format => 'base64' },
-        encode_check_method => 'check_password',
+	encode_class        => 'Crypt::Eksblowfish::Bcrypt',
+	encode_args         => { key_nul => 0, cost => 8 },
+        encode_check_method => 'check_password_bcrypt',
     },
     fullname => {
         data_type   => 'varchar',
@@ -46,14 +48,15 @@ __PACKAGE__->add_columns(
     }
 );
 __PACKAGE__->set_primary_key(qw(id));
-__PACKAGE__->add_unique_constraint( ['login'] );
+__PACKAGE__->add_unique_constraint( ['username'] );
 
 __PACKAGE__->has_many( map_user_role => 'Manoc::DB::Result::UserRole', 'user_id' );
 __PACKAGE__->many_to_many( roles => 'map_user_role', 'role' );
 
 =head1 NAME
 
-Manoc:DB::User - A model object representing a person with access to the system.
+Manoc:DB::User - A model object representing a person with access to
+the system.
 
 =head1 DESCRIPTION
 
@@ -61,5 +64,21 @@ This is an object that represents a row in the 'users' table of your
 application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
 
 =cut
+
+sub check_password {
+    my ($self, $attempt) = @_;
+
+    if ( md5_base64($attempt) eq $self->password ) {
+	$self->password($attempt);
+	$self->update();
+	return 1;
+    }
+
+    my $ret = 0;
+    try {
+	$ret =  $self->check_password_bcrypt($attempt);
+    };
+    return $ret;
+}
 
 1;

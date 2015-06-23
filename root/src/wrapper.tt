@@ -27,7 +27,7 @@
      <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
      [% IF c.user %]
      <div id="logged">
-	<i>User:</i> [% c.user.login %] ([% FOR role = c.user.roles %] [% role %] [% END %])
+	<i>User:</i> [% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
 	<div id="dock" class="ui-widget-content ui-corner-all">
         [% dock_menu %]
         </div><!-- dock -->

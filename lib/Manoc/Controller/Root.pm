@@ -92,7 +92,6 @@ sub default : Path {
     my ( $self, $c ) = @_;
     my $url = $c->request->uri;
     $c->response->body("Page not found $url");
-    
     $c->response->status(404);
 }
 
