@@ -215,6 +215,7 @@ sub _load_tables_loop {
                                                $records);
 
             #free memory
+            undef @$records;
             undef $records;
         }
     }
