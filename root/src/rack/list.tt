@@ -11,8 +11,8 @@
 [% add_css_create_btn %]
 </div>
 
- [% init_table('rack_list')%] 
- <table class="display" id="rack_list">
+[% init_table('rack_list')%] 
+ <table id="rack_list">
        <thead>  
 	 <tr>
  	 <th>Rack</th>

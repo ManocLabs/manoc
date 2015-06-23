@@ -1,56 +1,39 @@
-[% init_row_group IF template.use_row_group -%]
-[% init_datatable IF template.use_table -%]
-[% init_exp_table IF template.use_exp_table -%]
-
 [% title = BLOCK -%]
 [% IF template.section AND template.section != "Home" -%]
 [% template.section -%][% " - " IF template.title -%]
 [% END -%] 
 [% template.title -%]
 [% END -%]
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
-<!-- init media common style -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
+    <!-- init media common style -->
 [% FOREACH link IN link_css -%]
-<link rel="stylesheet" type="text/css" href="[% link %]" />
+    <link rel="stylesheet" type="text/css" href="[% link %]" />
 [% END -%]
-</head>
+  </head>
 
-<body>
-[% PROCESS 'menu.tt' %]
-<div id="wrapper">
-   <div id="banner" class="ui-widget-header float-container">
-     <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
-     [% IF c.user %]
-     <div id="logged">
-	<i>User:</i> [% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
-	<div id="dock" class="ui-widget-content ui-corner-all">
-        [% dock_menu %]
-        </div><!-- dock -->
-     </div><!-- logged -->
-     [%END%]
-  </div><!-- banner -->
-  <div id="content-wrapper" class="float-container">
-    [% IF c.user %]
-    <div id="panel" class="left">
-     [% menu_panel %]
-    </div>
-    [% END -%]
-    <div id="body" class="right">
-      [% breadcrumbs %]
-      <!-- show messages before the content -->
-      [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
-      [% PROCESS 'message_box.tt' msg=message IF message -%]
-      [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
-      [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
-      <div id="content">[% content %]</div><!-- end of content -->
-    </div><!-- end of body -->
-  </div><!-- end of content-wrapper -->
-</div><!-- end of wrapper -->
+  <body>
+
+   [% navbar %]
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+        [% sidebar %]
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <!-- show messages before the content -->
+        [% PROCESS 'message_box.tt' %]
+        <h1 class="page-header">[% template.title %]</h1>
+        <div id="content">[% content %]</div><!-- end of content -->
+        </div>
+      </div><!-- end of row -->
+   </div><!-- end of container -->
 [% FOREACH link IN link_js -%]
 <script type="text/javascript" src="[% link %]"></script>
 [% END -%]

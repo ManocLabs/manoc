@@ -1,19 +1,5 @@
 [%-
   menu_sections = [
-  		{
-		     name = 'Search', 
-		     path = c.uri_for('/search'),
-		     subsections = [
-		        {
-		            name = 'Simple', 
-		            path = c.uri_for('/search'),
-	                },
-		        {
-		            name = 'Help', 
-		            path = "#",
-	                },
-		     ]		
-	        },
 		{
 		     name = 'Asset',
 		     path = c.uri_for('/device'),
@@ -93,62 +79,40 @@
  		 }
 	]
 -%]
-[%-
-dock_sections = [
-		 {
-		     name = 'About',
-     		     path = c.uri_for('/about'),
- 		 },
-		 {
-		     name = 'Logout',
-     		     path = c.uri_for('/auth/logout'),
- 		 },
-		 ]
--%]
-[% MACRO menu_panel BLOCK -%]
-[% FOREACH s IN menu_sections %]
-<h3 [% "class=\"panel-selected\"" IF s.name == template.section %]>[% s.name %]</h3>
-<div>
-<ul class="menu">
-   [% FOREACH i IN s.subsections %]
-   <li [% "class=\"selected\"" IF i.name == template.subsection %]>
-     <a href="[% i.path %]">[% i.name %]</a>
-   </li>
-   [% END -%]
-</ul>
-</div>
+[% MACRO navbar BLOCK -%]
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Manoc</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+[% FOREACH s IN menu_sections -%]	  
+            <li><a href="[% s.path %]">[% s.name | html %]</a></li>
 [% END -%]
+            <li><a href="[% c.uri_for('/auth/about') %]">About</a></li>
+          </ul>
+          <form action="[% c.uri_for('/search') %]" class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
 [% END -%]
-[% MACRO dock_menu BLOCK -%]
-<ul>
-[% FOREACH s IN dock_sections %]
-   <li><a href="[% s.path %]">[% s.name %]</a></li>
-[% END -%]
-</ul>
-[% END -%]
-[% MACRO menu_js BLOCK -%]
-$(function() {
-  $("#panel").accordion({
-	     heightStyle: "content",
-	     collapsible: true,
-	     active: $('.panel-selected').index() / 2,
-	     } );
-});
-[% END -%]
-[% MACRO breadcrumbs BLOCK %]
-<div id="breadcrumbs" class="ui-widget float-container">
-<ul>
+[% MACRO sidebar BLOCK -%]
+<ul class="nav nav-sidebar">
 [% FOREACH s IN menu_sections %]
   [% IF s.name == template.section -%]
-  <li><a href="[% s.path %]">[% s.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
     [% FOREACH i IN s.subsections %]
-       [% IF i.name == template.subsection -%]
-  <li><a href="[% i.path %]">[% i.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
-       [% END -%]
+  <li><a href="[% i.path %]">[% i.name %]</a></li>
     [% END -%]
   [% END -%]
 [% END -%]
-  <li><a href="#">[% template.title %]</a></li>
 </ul>
-</div>
 [% END -%]

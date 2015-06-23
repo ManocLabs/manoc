@@ -13,11 +13,6 @@
 _ '.gif') %]" alt="[%command|html%]" title="[%command|html%]"/>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO ui_icon(image) BLOCK -%]
-<span style="float:left" class="ui-icon
- ui-icon-[%image%]"></span>
-[%- END -%]
-[%# ----------------------------------------------------------------- -%]
 [%# Device -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_device(device) BLOCK -%]
@@ -30,16 +25,14 @@ _ '.gif') %]" alt="[%command|html%]" title="[%command|html%]"/>
        c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
   [% END-%]
 [% END-%]
-
-[% MACRO print_device_with_name(device) BLOCK-%]
+[% MACRO print_device_with_name(device) BLOCK -%]
 <a href="[% c.uri_for_action('device/view',[device.id.address]) %]">[%device.id.address%]</a>
 ([%device.name%])
   [% IF device.get_mng_url -%]
 <a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
 c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
-  [% END-%]
-[% END-%]
-
+  [% END -%]
+[% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%# Device Long Format-%]
 [%# ----------------------------------------------------------------- -%]

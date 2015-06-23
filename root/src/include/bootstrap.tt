@@ -1,0 +1,14 @@
+[% link_css.push(               
+      c.uri_for('/static/external/bootstrap/css/bootstrap.min.css'),
+      c.uri_for('/static/external/bootstrap/css/bootstrap-theme.min.css'),
+      )
+-%]
+[% link_js.push(
+      c.uri_for('/static/external/jquery/jquery-2.1.4.min.js'),
+      c.uri_for('/static/external/bootstrap/js/bootstrap.min.js'),
+      ) 
+-%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_icon(name) BLOCK -%]
+<span class="glyphicon glyphicon-[% name %]" aria-hidden="true"></span>
+[%- END -%]
