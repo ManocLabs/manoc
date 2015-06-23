@@ -25,8 +25,8 @@
        <tbody>
   [% END %]
          <tr>
- 	 <td>[% o.name %]</td>
- 	 <td>[% o.format %]</td>
+ 	 <td>[% o.name | html %]</td>
+ 	 <td>[% o.format | html %]</td>
 	  <td>
 	   <a href="[% c.uri_for_action('/mngurlformat/edit', [o.id],{backref=>c.req.uri})%] ">[% icon('edit') %]</a>
            <a href="[% c.uri_for_action('/mngurlformat/delete',[o.id],{backref=>c.req.uri})%] ">[% icon('remove') %]</a>

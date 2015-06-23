@@ -54,8 +54,8 @@
 <tr>
   <td>OS:</td>
   <td>
-  [% object.os %]
-  [% object.os_ver %]
+  [% object.os | html %]
+  [% object.os_ver | html %]
   </td>
 </tr>
 <tr>
@@ -74,15 +74,15 @@
   <td><a href="[% c.uri_for_action('rack/view', [object.rack.id] ) %]">[% object.rack.name %] </a></td>
 </tr>
 <tr>
- <td>Up from:</td><td>[% boottime %]</td>
+ <td>Up from:</td><td>[% boottime | html %]</td>
 </tr>
 <tr>
-  <td>Backup status:</td><td>[% backup_enabled %]</td>
+  <td>Backup status:</td><td>[% backup_enabled | html %]</td>
 </tr>
 <tr>
   <td>Last backup:</td>
   <td>
-  [% IF backup_date %]
+  [% IF backup_date | html %]
        [% backup_date %] 
 	<a href="[% c.uri_for_action('device/show_run', [object.id.address]) %]">
 	  View</a>

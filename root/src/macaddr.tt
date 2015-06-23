@@ -3,8 +3,8 @@
    use_table=1
 -%]
 <table>
-<tr><td>Mac Address  : [% macaddr%]
-<tr><td>Device vendor: [% vendor %]
+<tr><td>Mac Address  : [% macaddr | html %]
+<tr><td>Device vendor: [% vendor | html %]
 </table>
 
 <div id="tabs">	
@@ -35,8 +35,8 @@
          <tr>
  	 <td> [% print_ip(r.ipaddr) %]</td>
  	 <td> [% print_vlan(r.vlan,r.vlan) %]</td>
- 	 <td> [% r.firstseen %]</td>
-	 <td> [% r.lastseen  %]</td>
+ 	 <td> [% r.firstseen | html %]</td>
+	 <td> [% r.lastseen  | html %]</td>
          </tr>
   [% IF loop.last %]
       </tbody>
@@ -69,12 +69,12 @@
             [% print_device_with_name(r.device) %]</td>
  	 <td>[% print_short_iface(r.device.id,r.iface) %]</td>
 	[% ELSE %]
- 	 <td>[% r.arch_device_ip %] ([% r.arch_device_name %])</td>
+ 	 <td>[% r.arch_device_ip %] ([% r.arch_device_name | html %])</td>
       <td align="center">--Archived--</td>
 	[% END %]   
 	 <td>[% print_vlan(r.vlan,r.vlan) %]</td>
- 	 <td>[% r.firstseen %] </td>
- 	 <td>[% r.lastseen %] </td>
+ 	 <td>[% r.firstseen | html %] </td>
+ 	 <td>[% r.lastseen | html %] </td>
 	</tr>
       [% IF loop.last %]
       </tbody>
@@ -103,12 +103,12 @@
       <tbody>
    [% END %]
          <tr>
- 	 <td>[% r.server -%]</td>
+ 	 <td>[% r.server | html %]</td>
  	 <td>[% print_ip(r.ipaddr) %]</td>
-	 <td>[% r.start %]</td>
- 	 <td>[% r.end %] </td>
- 	 <td>[% r.status %] </td>
- 	 <td>[% r.hostname %] </td>
+	 <td>[% r.start | html %]</td>
+ 	 <td>[% r.end | html%] </td>
+ 	 <td>[% r.status | html %] </td>
+ 	 <td>[% r.hostname | html %] </td>
 	</tr>
   [% IF loop.last %]
       </tbody>

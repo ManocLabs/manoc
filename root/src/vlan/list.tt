@@ -31,10 +31,10 @@
   [% END %]
        <tr>
  	 <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.id %]</a></td>
-  	 <td>[% v.name %]</td>
-  	 <td>[% v.name_vtp %]</td>
+  	 <td>[% v.name | html %]</td>
+  	 <td>[% v.name_vtp | html %]</td>
 	 <td><a href="[% c.uri_for('/vlanrange/list') %]">[% v.vlan_range.name %]</a></td>
-  	 <td>[% v.description %]</td>
+  	 <td>[% v.description  | html %]</td>
 	 <td>
 	   <a href="[% c.uri_for_action('vlan/edit',[v.id],{backref=>c.req.uri})%] ">[% icon('edit') %]</a>
            <a href="[% c.uri_for_action('vlan/delete',[v.id],{backref=>c.req.uri})%] ">[% icon('remove') %]</a>
@@ -68,8 +68,8 @@
       <tbody>
   [% END %]
        <tr>
- 	 <td>[% v.id %]</td>
-  	 <td>[% v.name %]</td>
+ 	 <td>[% v.id | html %]</td>
+  	 <td>[% v.name | html %]</td>
 	 <td>
 	  [% IF v.vlan_range.name %]
 	   <a href="[% c.uri_for('/vlanrange/list') %]">[% v.vlan_range.name %]</a>

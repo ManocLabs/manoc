@@ -9,28 +9,28 @@
        </ul>
    <table id="info">
          <tr>
-  	  <td> Total Racks </td>
-  	  <td> [% report_obj.racks %] </td>
+  	  <th> Total Racks </th>
+  	  <td> [% report_obj.racks | html %] </td>
  	 </tr>
           <tr>
-  	  <td> Total Devices </td>
-  	  <td> [% report_obj.devices %] </td>
+  	  <th> Total Devices </th>
+  	  <td> [% report_obj.devices | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> Total Interfaces </td>
-  	  <td> [% report_obj.ifaces %] </td>
+  	  <th> Total Interfaces </th>
+  	  <td> [% report_obj.ifaces | html %] </td>
  	 </tr>
  	  <tr>
-  	  <td> CDP Entries </td>
-  	  <td> [% report_obj.cdps %] </td>
+  	  <th> CDP Entries </th>
+  	  <td> [% report_obj.cdps | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> MAT entries </td>
-  	  <td> [% report_obj.mats %] </td>
+  	  <th> MAT entries </th>
+  	  <td> [% report_obj.mats | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> ARP entries </td>
-  	  <td> [% report_obj.arps %] </td>
+  	  <th> ARP entries </th>
+  	  <td> [% report_obj.arps | html %] </td>
  	 </tr>
   </table>
     [% add_css_tableinfo %]

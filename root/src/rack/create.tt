@@ -5,5 +5,3 @@
 <div class="buttons">
 [% form.render %]
 </div>
-
-

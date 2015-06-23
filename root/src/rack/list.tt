@@ -24,10 +24,10 @@
   <tbody>
 [% FOREACH r IN rack_table %]
          <tr>
- 	 <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]> [% r.name %] </a></td>
- 	 <td>[% r.building.id %]</td>
- 	 <td>[% r.floor %]</td>
- 	 <td>[% r.notes %]</td>
+ 	 <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]> [% r.name | html %] </a></td>
+ 	 <td>[% r.building.id | html %]</td>
+ 	 <td>[% r.floor | html %]</td>
+ 	 <td>[% r.notes | html %]</td>
          </tr>
  [% END %]
   </tbody>

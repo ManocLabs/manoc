@@ -13,11 +13,11 @@
   </tr>
 [% FOREACH t IN table %]
        <tr>
-	  <td>[% t.id %]</td>
-	  <td>[% t.build_id %]</td>
-	  <td>[% t.build_name %]</td>
-	  <td>[% t.floor %]</td>
-	  <td>[% t.notes %]</td>
+	  <td>[% t.id | html %]</td>
+	  <td>[% t.build_id | html %]</td>
+	  <td>[% t.build_name | html %]</td>
+	  <td>[% t.floor | html %]</td>
+	  <td>[% t.notes | html %]</td>
        </tr>
 [% END %]
 </table>

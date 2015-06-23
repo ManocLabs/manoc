@@ -26,8 +26,8 @@
 
          <tr>
  	 <td><a href=[% c.uri_for_action('/building/view', [b.id]) %]>[% b.name %]</a></td>
- 	 <td>[% b.desc %]</td>
- 	 <td>[% b.n_racks %]</td>
+ 	 <td>[% b.desc | html %]</td>
+ 	 <td>[% b.n_racks | html %]</td>
          </tr>
 [% END %]
    </tbody>

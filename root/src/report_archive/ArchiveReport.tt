@@ -19,17 +19,17 @@
    
    <table id="info">
          <tr>
-  	  <td> Totale records archived: </td>
-  	  <td> [% report_obj.tot_archived %] </td>
+  	  <th>Records archived:</tdh>
+  	  <td>[% report_obj.tot_archived | html %]</td>
  	 </tr>
           <tr>
-  	  <td> Totale records discarded: </td>
-  	  <td> [% report_obj.tot_discarded %] </td>
+  	  <th>Records discarded:</th>
+  	  <td>[% report_obj.tot_discarded | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> Number of errors occurred: </td>
+  	  <th>Errors occurred:</th>
   	  <td> [% IF report_obj.all_error.0 %]
-               [% report_obj.error_count  %] 
+               [% report_obj.error_count | html  %] 
                [% ELSE %] 0
                [% END %]
           </td> 
@@ -46,8 +46,8 @@
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_archived %]
  	 <tr class="[% loop.parity %]">
- 	 <td>[% element.source  %]</td>
-       	 <td>[% element.n_archived  %]</td>
+ 	 <td>[% element.source 	| html %]</td>
+       	 <td>[% element.n_archived | html %]</td>
  	 </tr>
  [% END %]
  </table>
@@ -60,11 +60,11 @@
 
 <table class="report  ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_discarded %]
- 	 	 <tr class="[% loop.parity %]" >
-               	 <td>[% element.source  %]    </td>
-		 <td>[% element.n_discarded %]</td>
-                 </tr>
- [% END %]
+   <tr class="[% loop.parity %]" >
+      <td>[% element.source | html %]</td>
+      <td>[% element.n_discarded | html %]</td>
+   </tr>
+[% END %]
  </table>
 </div><!--end of tab3 -->
 
@@ -73,16 +73,13 @@
                          UNLESS report_obj.all_error.0 -%]
 
 <table class="report ui-priority-primary ui-corner-all">
-
-
 [% FOREACH element IN report_obj.all_error %]
-	 <tr class="[% loop.parity %]">
- 	 <td>[% element.type %] </td>
-  	 <td>[% element.message %] </td>
-
-	 </tr>
- [% END %]
+  <tr class="[% loop.parity %]">
+     <td>[% element.type | html %] </td>
+     <td>[% element.message | html %] </td>
+  </tr>
+[% END %]
 </table>
 </div><!--end of tab4 -->
 
-</div>
+</div><!--end of tabs -->

@@ -3,20 +3,9 @@
 -%]
 <form method="get"  enctype="multipart/form-data">
 <table align="center" >
-
 [% FOREACH plugin IN plugins %]	
  [% PROCESS $plugin -%] 
 [%END -%]
-
-[% IF not(result.items.size) and q %]
-  [% PROCESS 'message_box.tt' message="There are no results!" -%]
-[% ELSE %]
-  [% IF q %]
-  [% PROCESS 'message_box.tt' message="Found $result.items.size results!" -%]
-[% END %]
-[% END %]
-
-
 <tr>
 <td  class="search_cen" align="center">
 <input type="text" name="q" value="[% q | html %]" size="50"/>

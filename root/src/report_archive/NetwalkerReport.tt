@@ -4,7 +4,7 @@
    section='Reports'
 -%]
 
-<h3>  [% report_name %] ([% timestamp %])</h3>
+<h3>[% report_name | html %] ([% timestamp | html %])</h3>
 
 <div id="tabs">
 	<ul>
@@ -18,27 +18,27 @@
    
    <table id="info">
           <tr>
-  	  <td> Total devices visited: </td>
-  	  <td> [% report_obj.visited %] </td>
+  	  <th> Total devices visited: </th>
+  	  <td> [% report_obj.visited | html %] </td>
  	 </tr>
 	 <tr>
-  	  <td> Total MAT Entries: </td>
-  	  <td> [% report_obj.mat_entries %] </td>
+  	  <th> MAT Entries: </th>
+  	  <td> [% report_obj.mat_entries | html %] </td>
  	 </tr>
           <tr>
-  	  <td> Total ARP Entries: </td>
-  	  <td> [% report_obj.arp_entries %] </td>
+  	  <th> ARP Entries: </th>
+  	  <td> [% report_obj.arp_entries | html %] </td>
  	 </tr>
           <tr>
-  	  <td> Total CDP Entries: </td>
-  	  <td> [% report_obj.cdp_entries %] </td>
+  	  <th> CDP Entries: </th>
+  	  <td> [% report_obj.cdp_entries | html %] </td>
  	 </tr>
           <tr>
-  	  <td> New devices discovered: </td>
-  	  <td> [% report_obj.new_devices %] </td>
+  	  <th> New devices discovered: </th>
+  	  <td> [% report_obj.new_devices | html %] </td>
  	 </tr>
  	 <tr>
-  	  <td> Number of errors occurred: </td>
+  	  <th> Number of errors occurred: </th>
   	  <td> [% IF report_obj.all_error.0 %]
                [% report_obj.error_count  %] 
                [% ELSE %] 0
@@ -67,8 +67,8 @@
      [% parity = loop.parity %]
      [% FOREACH msg IN error.messages %]
        <tr class="[% parity %]">
- 	 <td>[% error.id %] </td>
-  	 <td>[% msg %] </td>
+ 	 <td>[% error.id | html %] </td>
+  	 <td>[% msg | html %] </td>
        </tr>
   [% END %]
   [% END %]
@@ -86,8 +86,8 @@
     [% parity=loop.parity %]
     [% FOREACH entry IN element.messages %]
        <tr class="[% parity %]">
- 	 <td>[% element.id %] </td>
-  	 <td>[% entry %] </td>
+ 	 <td>[% element.id | html %] </td>
+  	 <td>[% entry | html %] </td>
        </tr>
     [% END %]
   [% END %]
