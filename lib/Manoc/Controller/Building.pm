@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -6,7 +6,6 @@ package Manoc::Controller::Building;
 use Moose;
 use namespace::autoclean;
 use Manoc::Form::Building;
-use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -105,6 +104,7 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
+    $c->stash( template => 'building/edit.tt' );
     $c->forward('save');
 }
 
@@ -126,8 +126,8 @@ sub save : Private {
     $c->stash( default_backref => $def_br );
 
     my $form = Manoc::Form::Building->new( item => $item );
-    $c->stash( form => $form, template => 'building/save.tt' );
-
+    $c->stash(form => $form);
+    
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
 
@@ -137,7 +137,7 @@ sub save : Private {
     my $success = $form->process( params => $c->req->params );
     $success or return;
 
-    my $message = "Success. Building created.";
+    my $message = "Building created.";
     if ($c->stash->{is_xhr}) {
         $c->stash(message => $message);
         $c->stash(template => 'dialog/message.tt');
@@ -157,6 +157,7 @@ sub save : Private {
 
 sub create : Chained('base') : PathPart('create') : Args(0) {
     my ( $self, $c ) = @_;
+    $c->stash( template => 'building/create.tt' );
     $c->forward('save');
 }
 
@@ -180,7 +181,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
         $building->delete;
 
-        $c->flash( message => 'Success!!  ' . $name . ' successful deleted.' );
+        $c->flash( message => $name . ' successful deleted.' );
         $c->detach('/follow_backref');
     }
     else {

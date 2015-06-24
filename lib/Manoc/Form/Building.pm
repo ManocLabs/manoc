@@ -8,13 +8,14 @@ use strict;
 use warnings;
 use HTML::FormHandler::Moose;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
+with 'Manoc::Form::Base::Actions';
 
 has '+name' => ( default => 'form-building' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (
+    label    => 'Name',
     type     => 'Text',
     required => 1,
     apply    => [
@@ -25,11 +26,14 @@ has_field 'name' => (
         },
     ]
 );
-has_field 'description' => ( type => 'TextArea', required => 1 );
+has_field 'description' => (
+    label => 'Description',
+    type  => 'TextArea',
+    required => 1
+);
 has_field 'notes' => ( type => 'TextArea' );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
+
 
 1;
 

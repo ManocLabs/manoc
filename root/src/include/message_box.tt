@@ -1,20 +1,20 @@
 [% IF c.flash.message -%]
 <div class="alert alert-success" role="alert">
-<strong>Success!</strong><strong>[% c.flash.message | html %]</strong> 
+<strong>Success!</strong><strong> [% c.flash.message | html %]</strong> 
 </div>
 [% END %]
 [% IF message -%]
 <div class="alert alert-success" role="alert">
-<strong>Success!</strong><strong>[% message | html %]</strong> 
+<strong>Success!</strong><strong> [% message | html %]</strong> 
 </div>
 [% END %]
 [% IF c.flash.error_msg %]
 <div class="alert alert-error" role="alert">
-<strong>Error</strong><strong>[% c.flash.error_msg | html %]</strong> 
+<strong>Error</strong><strong> [% c.flash.error_msg | html %]</strong> 
 </div>
 [% END %]
 [% IF error_msg %]
 <div class="alert alert-error" role="alert">
-<strong>Error</strong><strong>[% error_msg | html %]</strong> 
+<strong>Error</strong><strong> [% error_msg | html %]</strong> 
 </div>
 [% END %]

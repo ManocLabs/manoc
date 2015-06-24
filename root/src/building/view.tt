@@ -1,20 +1,21 @@
 [% META
    section='Asset'
    subsection='Building'  
-   title='View'
+   title='View building'
    use_table=1
 -%]
-<div id="tabs">	 
-  <ul>
-    <li><a href="#tabs-1">General</a></li>
-    <li><a href="#tabs-2">Racks</a></li>
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#general" role="tab" data-toggle="tab" aria-controls="general">Building info</a></li>
+    <li role="presentation"><a href="#racks" role="tab" data-toggle="tab" aria-controls="racks">Racks</a></li>
   </ul>
-  		
 
-  <div id="tabs-1">
-    <table id="info">
+  <!-- Tab panes -->
+  <div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="general">
+    <table class="table">
       <tr>
-	<td>Name:</td><td>[% object.name %]</td>
+	<td>Name:</td><td>[% object.name | html %]</td>
       </tr>
       <tr>
 	<td>Description:</td><td>[% object.description | html %] </td>
@@ -22,21 +23,19 @@
 	<td>Notes:</td><td>[% object.notes | html%]</td>
       </tr>
     </table>
-    [% add_css_tableinfo -%]
     <p>
-      <div class="buttons">	
-	<a href=[%c.uri_for_action('building/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
-	&nbsp;<a href=[% c.uri_for_action('building/delete', [object.id]) %]>
+      <div>	
+	<a class="btn btn-primary" href=[%c.uri_for_action('building/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
+	&nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('building/delete', [object.id]) %]>
 	[% ui_icon('closethick') %]  Delete</a>
-	&nbsp;<a href="[% c.uri_for('/rack/create', object.id,{backref
+	&nbsp;<a class="btn btn-default" href="[% c.uri_for('/rack/create', object.id,{backref
   =>c.req.uri}) %]">
 	[% ui_icon('plusthick') %] Add Rack</a>
       </div>
     </p>
-  [% add_css_tableinfo %]
   </div>
   
-  <div id="tabs-2">	
+  <div role="tabpanel" class="tab-pane"  id="racks">
     [% FOREACH r IN object.racks %]
     [% IF loop.first %]
     [% init_table('rack_list') %]
@@ -59,4 +58,7 @@
     [% END %]
     [% END %]
   </div>
+</div>
+
+
 </div>

@@ -1,0 +1,7 @@
+[%  META
+    title='Create building'
+    subsection='Building'    
+    section='Asset'
+%]
+
+[% form.render %]
