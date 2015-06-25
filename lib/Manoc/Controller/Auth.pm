@@ -5,6 +5,7 @@
 package Manoc::Controller::Auth;
 use Moose;
 use namespace::autoclean;
+use Manoc::Form::Login;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -15,6 +16,7 @@ Manoc::Controller::Auth - Catalyst Controller
 =head1 DESCRIPTION
 
 Catalyst Controller.
+
 
 =head1 METHODS
 
@@ -37,30 +39,22 @@ sub index : Path : Args(0) {
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
-    my $username = $c->req->params->{'username'};
-    my $password = $c->req->params->{'password'};
-
-    $c->stash( template => 'auth/login.tt' );
     $c->keep_flash("backref");
 
-    $c->stash( default_backref => $c->uri_for('/search') );
-
-    if ( defined( $username ) ) {
-	my $userinfo = {
-	    username => $username,
-	    password => $password,
-	};
-        if ($c->authenticate($userinfo) ) {
-            $c->flash( message => 'Logged In!' );
-            $c->log->debug( 'User ' . $username . ' logged');
-            $c->detach('/follow_backref');
-        }
-        else {
-            $c->flash( error_msg => 'Invalid Login' );
-            $c->response->redirect( $c->uri_for('/auth/login') );
-            $c->detach();
-        }
+    my $form = Manoc::Form::Login->new( ctx => $c );
+    my $success = $form->process( params => $c->req->params );
+    if ($success ) {
+	my $username = $c->user->username;
+	$c->flash( message => 'Logged In!' );
+	$c->log->info( 'User ' . $username . ' logged');
+	$c->detach('/follow_backref');
     }
+
+    $c->stash(
+	form => $form,
+	template => 'auth/login.tt',
+	default_backref => $c->uri_for('/search'),
+    );
 }
 
 =head2 logout
@@ -69,12 +63,9 @@ sub login : Local : CaptureArgs(0) {
 
 sub logout : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
-
-    $c->stash( template => 'auth/logout.tt' );
-
     $c->logout();
     $c->delete_session();
-    $c->stash( message => 'You have been logged out.' );
+    $c->response->redirect($c->uri_for('/auth/login'));
 }
 
 =head1 AUTHOR
