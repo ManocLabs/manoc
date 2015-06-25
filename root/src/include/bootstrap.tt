@@ -12,3 +12,9 @@
 [% MACRO bootstrap_icon(name) BLOCK -%]
 <span class="glyphicon glyphicon-[% name %]" aria-hidden="true"></span>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_pagetitle(title) BLOCK -%]
+[% IF title -%]
+<h1 class="page-header">[% template.title %]</h1>
+[% END -%]
+[%- END -%]

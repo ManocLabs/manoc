@@ -1,0 +1,32 @@
+[% title = BLOCK -%]sm
+[% IF template.section AND template.section != "Home" -%]
+[% template.section -%][% " - " IF template.title -%]
+[% END -%] 
+[% template.title -%]
+[% END -%]
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
+    <!-- init media common style -->
+    [% make_css_links %]
+  </head>
+
+  <body>
+   [% navbar UNLESS template.no_navbar %]
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 main">
+        <!-- show messages before the content -->
+        [% PROCESS 'message_box.tt' %]
+        [% bootstrap_pagetitle(template.title) %]	
+        <div id="content">[% content %]</div>
+        </div>
+      </div><!-- end of row -->
+   </div><!-- end of container -->
+   [% make_js_block %]  
+</body>
+</html>

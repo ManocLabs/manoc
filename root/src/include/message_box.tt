@@ -9,12 +9,12 @@
 </div>
 [% END %]
 [% IF c.flash.error_msg %]
-<div class="alert alert-error" role="alert">
+<div class="alert alert-warning" role="alert">
 <strong>Error</strong><strong> [% c.flash.error_msg | html %]</strong> 
 </div>
 [% END %]
 [% IF error_msg %]
-<div class="alert alert-error" role="alert">
+<div class="alert alert-warning" role="alert">
 <strong>Error</strong><strong> [% error_msg | html %]</strong> 
 </div>
 [% END %]

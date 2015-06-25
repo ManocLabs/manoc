@@ -3,10 +3,10 @@
    link_js  = []
    js_scripts = []
 -%]
-[% PROCESS 'macros.tt' -%]
 [% PROCESS 'bootstrap.tt' -%]
-[% PROCESS 'menu.tt'   -%]
+[% PROCESS 'menu.tt'      -%]
 [% PROCESS 'datatable.tt' -%]
+[% PROCESS 'macros.tt'    -%]
 [%-
    link_css.push(c.uri_for('/static/css/style.css'))
 -%]
@@ -15,3 +15,20 @@
          c.uri_for('/static/js/common.js'),
          )
 -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO make_css_links BLOCK -%]
+[% FOREACH link IN link_css -%]
+    <link rel="stylesheet" type="text/css" href="[% link %]" />
+[% END -%]
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO make_js_block BLOCK -%]
+[% FOREACH link IN link_js -%]
+<script type="text/javascript" src="[% link %]"></script>
+[% END -%]
+<script type="text/javascript">
+[% FOREACH fragment IN js_scripts -%]
+[% fragment %]
+[% END -%]
+</script>
+[% END -%]

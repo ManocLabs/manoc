@@ -1,47 +1,10 @@
-[% title = BLOCK -%]
-[% IF template.section AND template.section != "Home" -%]
-[% template.section -%][% " - " IF template.title -%]
-[% END -%] 
-[% template.title -%]
-[% END -%]
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
-    <!-- init media common style -->
-[% FOREACH link IN link_css -%]
-    <link rel="stylesheet" type="text/css" href="[% link %]" />
-[% END -%]
-  </head>
-
-  <body>
-
-   [% navbar %]
-
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-        [% sidebar %]
-        </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <!-- show messages before the content -->
-        [% PROCESS 'message_box.tt' %]
-        <h1 class="page-header">[% template.title %]</h1>
-        <div id="content">[% content %]</div><!-- end of content -->
-        </div>
-      </div><!-- end of row -->
-   </div><!-- end of container -->
-[% FOREACH link IN link_js -%]
-<script type="text/javascript" src="[% link %]"></script>
-[% END -%]
-<script type="text/javascript">
-[% FOREACH fragment IN js_scripts -%]
-[% fragment %]
-[% END -%]
-[% menu_js %]
-</script>
-</body>
-</html>
+[% IF no_wrapper;
+        debug("Passing page through as text: $template.name");
+        content;
+    ELSE;
+        layout = template.layout || 'standard';
+        wrapper = "layouts/${layout}.tt";
+        debug("Applying wrapper $wrapper to $template.name");
+        content WRAPPER $wrapper;
+    END;
+-%]
