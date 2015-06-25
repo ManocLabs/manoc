@@ -115,24 +115,30 @@ sub mk_compclass {
   my $tmpl_dir = catdir( $manoc_base_path, "root", "src", lc($model_name));
   $helper->mk_dir($tmpl_dir);
   $helper->render_file('list_tt', catfile($tmpl_dir, 'list.tt'), $params);
-  $helper->render_file('form_tt', catfile($tmpl_dir, 'form.tt'), $params);
+  $helper->render_file('create_tt', catfile($tmpl_dir, 'create.tt'), $params);
+  $helper->render_file('edit_tt', catfile($tmpl_dir, 'edit.tt'), $params);
   $helper->render_file('view_tt', catfile($tmpl_dir, 'view.tt'), $params);
 }
 
 1;
 __DATA__
 =begin pod_to_ignore
-__form_tt__
+__create_tt__
 [% TAGS <+ +> %]
 [%  META
-    title='Create/Edit <+ model +> '
+    title='Create <+ model +> '
     section='Section'
     subsection='Subsection'
 %]
-
-<div class="buttons">
 [% form.render %]
-    </div>
+__edit_tt__
+[% TAGS <+ +> %]
+[%  META
+    title='Edit <+ model +> '
+    section='Section'
+    subsection='Subsection'
+%]
+[% form.render %]
 __list_tt__
 [% TAGS <+ +> %]
 [% META
@@ -140,14 +146,12 @@ __list_tt__
    section='Section'
    subsection='Subsection'
    use_table=1
--%]
-<div class="buttons create_btn">
-<a href="[% c.uri_for_action('/<+ $model.lower +>/create') %]" >
-   [% ui_icon('circle-plus') %] Create</a>
- [% add_css_create_btn %]
+   -%]
+<div id="<+ model +>_create">
+<a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-[% init_table('list') %]
- <table class="display" id="list">
+[% init_table('<+ model +>_list', { toolbar="<+ model +>_create"}) %]
+ <table class="display" id="<+ model +>_list">
    <thead>
      <tr>
 <+ FOREACH col IN columns +>
@@ -183,12 +187,91 @@ __view_tt__
         </tr>
       <+ END +>
     </table>
-    [% add_css_tableinfo -%]
+
     <p>
-      <div class="buttons">	
-	<a href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
-	&nbsp;<a href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>
-	[% ui_icon('closethick') %] Delete</a>
+      <div>	
+	<a "<+ model +>_create"}) %]
+ <table class="display" id="<+ model +>_list">
+   <thead>
+     <tr>
+<+ FOREACH col IN columns +>
+        <th><+ col +></th>
+<+ END +>
+        <th></th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH o IN objects %]
+         <tr>
+<+ FOREACH col IN columns +>
+ 	 <td>[% o.<+ attr+> | html %]</td>
+<+ END +>
+ 	 <td><a href=[% c.uri_for_action('/<+ model.lower +>/view', [o.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>
+__view_tt__
+[% TAGS <+ +> %]
+[% META
+   title='View <+ model +>'
+   section='Section'
+   subsection='Subsection'
+   use_table=1
+-%]
+    <table id="info">
+      <+ FOREACH col IN columns +>
+        <tr>
+        <th><+ col +></th>
+        <td>[% o.<+ attr+> | html %]</td>
+        </tr>
+      <+ END +>
+    </table>
+
+    <p>
+      <div>	
+	<a "<+ model +>_create"}) %]
+ <table class="display" id="<+ model +>_list">
+   <thead>
+     <tr>
+<+ FOREACH col IN columns +>
+        <th><+ col +></th>
+<+ END +>
+        <th></th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH o IN objects %]
+         <tr>
+<+ FOREACH col IN columns +>
+ 	 <td>[% o.<+ attr+> | html %]</td>
+<+ END +>
+ 	 <td><a href=[% c.uri_for_action('/<+ model.lower +>/view', [o.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>
+__view_tt__
+[% TAGS <+ +> %]
+[% META
+   title='View <+ model +>'
+   section='Section'
+   subsection='Subsection'
+   use_table=1
+-%]
+    <table id="info">
+      <+ FOREACH col IN columns +>
+        <tr>
+        <th><+ col +></th>
+        <td>[% o.<+ attr+> | html %]</td>
+        </tr>
+      <+ END +>
+    </table>
+
+    <p>
+      <div>	
+	<a class="btn btn-default" href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]>Edit</a>
+	&nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>Delete</a>
       </div>
     </p>
 __controller__
@@ -292,8 +375,9 @@ sub create : Chained('base') PathPart('create') Args(0)
 {
     my ( $self, $c ) = @_;
 
-    my $attrs = {}
+    my $attrs = {};
     $c->stash( object  => $c->stash->{resultset}->new_result($attrs) );
+    $c->stash(template => '[% model.lower %]/create.tt'),
     return $self->form($c);
 }
 
@@ -304,6 +388,7 @@ sub create : Chained('base') PathPart('create') Args(0)
 sub edit : Chained('object') PathPart('edit') Args(0)
 {
     my ( $self, $c ) = @_;
+    $c->stash(template => '[% model.lower %]/edit.tt'),
     return $self->form($c);
 }
 
@@ -319,7 +404,6 @@ sub form
 
     $c->stash(
 	form => $self->object_form,
-	template => '[% model.lower %]/form.tt',
 	action => $c->uri_for($c->action, $c->req->captures)
     );
 
