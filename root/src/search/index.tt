@@ -1,5 +1,8 @@
-[% META section="Search"
-   	title="Simple"
+[% META
+   section="Search"
+   title="Manoc search"
+   layout="onecol"
+   disable_search=1
 -%]
 <form method="get"  enctype="multipart/form-data">
 <table align="center" >

@@ -1,30 +1,27 @@
-[% META section = 'About' %]
+[% META
+   section = 'About'
+   layout = 'onecol'
+%]
 
-<img  class="logo" src="[% c.uri_for('/static/images/manoc-logo.jpg') %]">
-<div style="position:fixed;left:250px">
-<div id="fir">One Query to know them all,</div>
-<div id="sec">One Query to find them,</div>
-<div id="thi">One Query to bring them all and</div>
-<div id="fou">in the darkness shut them</div>
+<div>
+<img class="center-block" src="[% c.uri_for('/static/images/manoc-logo.jpg') %]">
+<p class="text-center" id="fir">One Query to know them all,</p>
+<p class="text-center" id="sec">One Query to find them,</p>
+<p class="text-center" id="thi">One Query to bring them all and</p>
+<p class="text-center" id="fou">in the darkness shut them</p>
 </div>
 
 
 [% script = BLOCK %]
 $(function() { 
- function second() {
-   $( "#sec" ).show("slide",null,1100,third);
-};
- function third() {
-   $( "#thi" ).show("slide",null,1250,four);
-};	
-function four() {
-   $( "#fou" ).show("slide",null,1400,null);
-};
-$( "#fir" ).hide();
-$( "#sec" ).hide();
-$( "#thi" ).hide();
-$( "#fou" ).hide();
-$( "#fir" ).show("slide",null,1000,second);  
+  $( "#fir" ).hide();
+  $( "#sec" ).hide();
+  $( "#thi" ).hide();
+  $( "#fou" ).hide();
+  $( "#fir" ).fadeIn("slow");
+  $( "#sec" ).delay(1000).fadeIn("slow");
+  $( "#thi" ).delay(2000).fadeIn("slow");
+  $( "#fou" ).delay(3000).fadeIn("slow");
 });
 [% END -%]
 [% js_scripts.push(script) -%]
