@@ -23,6 +23,8 @@ sub html_attributes {
     return $attr;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 # Local Variables:
 # mode: cperl
