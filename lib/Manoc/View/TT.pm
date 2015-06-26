@@ -14,7 +14,7 @@ __PACKAGE__->config(
     INCLUDE_PATH       => [
         Manoc->path_to( 'root', 'src' ),
         Manoc->path_to( 'root', 'src', 'include' ),
-        Manoc->path_to( 'root', 'src', 'forms' ),
+        Manoc->path_to( 'root', 'src', 'pages' ),
         Manoc->path_to( 'lib', 'Manoc', 'Plugin'),
     ],
     PRE_PROCESS => 'init.tt',
