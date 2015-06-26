@@ -123,18 +123,9 @@ sub mk_compclass {
 1;
 __DATA__
 =begin pod_to_ignore
-__create_tt__
+__form_tt__
 [% TAGS <+ +> %]
 [%  META
-    title='Create <+ model +> '
-    section='Section'
-    subsection='Subsection'
-%]
-[% form.render %]
-__edit_tt__
-[% TAGS <+ +> %]
-[%  META
-    title='Edit <+ model +> '
     section='Section'
     subsection='Subsection'
 %]
@@ -145,7 +136,7 @@ __list_tt__
    tile='List <+ model +>'
    section='Section'
    subsection='Subsection'
-   use_table=1
+   use_datatable=1
    -%]
 <div id="<+ model +>_create">
 <a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
@@ -377,7 +368,7 @@ sub create : Chained('base') PathPart('create') Args(0)
 
     my $attrs = {};
     $c->stash( object  => $c->stash->{resultset}->new_result($attrs) );
-    $c->stash(template => '[% model.lower %]/create.tt'),
+    $c->stash(title => 'New [% model.lower %]');
     return $self->form($c);
 }
 
@@ -388,7 +379,7 @@ sub create : Chained('base') PathPart('create') Args(0)
 sub edit : Chained('object') PathPart('edit') Args(0)
 {
     my ( $self, $c ) = @_;
-    $c->stash(template => '[% model.lower %]/edit.tt'),
+    $c->stash(title => 'Edit [% model.lower %]');
     return $self->form($c);
 }
 
@@ -404,7 +395,8 @@ sub form
 
     $c->stash(
 	form => $self->object_form,
-	action => $c->uri_for($c->action, $c->req->captures)
+	action => $c->uri_for($c->action, $c->req->captures),
+	template => '[% model.lower %]/form.tt',
     );
 
     return unless $self->object_form->process( item => $c->stash->{object},
