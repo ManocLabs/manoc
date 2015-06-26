@@ -1,9 +1,4 @@
-[% title = BLOCK -%]sm
-[% IF template.section AND template.section != "Home" -%]
-[% template.section -%][% " - " IF template.title -%]
-[% END -%] 
-[% template.title -%]
-[% END -%]
+[% title = page.title || template.title -%]
 <!DOCTYPE html>
 <html lang="en">
   <head>
