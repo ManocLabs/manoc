@@ -104,30 +104,38 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
 
 sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
-    $c->stash( template => 'building/edit.tt' );
-    $c->forward('save');
+    $c->stash(title => 'Edit building');
+    $c->forward('form');
 }
 
-=head2 save
+
+=head2 create
+
+=cut
+
+sub create : Chained('base') : PathPart('create') : Args(0) {
+    my ( $self, $c ) = @_;
+    $c->stash( template => 'building/form.tt' );
+    $c->forward('form');
+}
+
+=head2 form
 
 Handle create and edit resources
 
 =cut
 
-sub save : Private {
+sub form : Private {
     my ( $self, $c ) = @_;
     my $item = $c->stash->{object} ||
         $c->stash->{resultset}->new_result( {} );
 
-    #set the default backref according to the action (create or edit)
-    my $def_br = $c->uri_for('/building/list');
-    $def_br = $c->uri_for_action( 'building/view', [ $c->stash->{object}->id ] )
-        if ( defined( $c->stash->{object} ) );
-    $c->stash( default_backref => $def_br );
-
     my $form = Manoc::Form::Building->new( item => $item );
-    $c->stash(form => $form);
-    
+    $c->stash(
+        form => $form,
+        template => 'building/form.tt' );
+
+
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
 
@@ -137,28 +145,14 @@ sub save : Private {
     my $success = $form->process( params => $c->req->params );
     $success or return;
 
-    my $message = "Building created.";
+    $c->stash(message => "Building created.");
     if ($c->stash->{is_xhr}) {
-        $c->stash(message => $message);
-        $c->stash(template => 'dialog/message.tt');
-        $c->forward('View::HTMLFragment');
+        $c->stash(no_wrapper => 1);
         return;
     }
-
-    $c->flash( message => $message );
-    $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
+    my $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
     $c->stash( default_backref => $def_br );
-    $c->detach('/follow_backref');
-}
-
-=head2 create
-
-=cut
-
-sub create : Chained('base') : PathPart('create') : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( template => 'building/create.tt' );
-    $c->forward('save');
+    $c->detach( '/follow_backref' );
 }
 
 =head2 delete
