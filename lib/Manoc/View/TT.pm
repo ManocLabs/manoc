@@ -1,21 +1,30 @@
-# Copyright 2011-2014 by the Manoc Team
+# Copyright 2011 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::View::HTMLFragment;
+package Manoc::View::TT;;
 
 use strict;
 use warnings;
 
-use base 'Manoc::View::TTBase';
+use base 'Catalyst::View::TT';
 
 __PACKAGE__->config(
-    WRAPPER     => 'wrapper_fragment.tt',
+    TEMPLATE_EXTENSION => '.tt',
+    INCLUDE_PATH       => [
+        Manoc->path_to( 'root', 'src' ),
+        Manoc->path_to( 'root', 'src', 'include' ),
+        Manoc->path_to( 'root', 'src', 'forms' ),
+        Manoc->path_to( 'lib', 'Manoc', 'Plugin'),
+    ],
+    PRE_PROCESS => 'init.tt',
+    WRAPPER     => 'wrapper.tt',
+    render_die  => 1,
 );
 
 =head1 NAME
 
-Manoc::View::HTMLFragment - TT Based HTML View for Manoc html fragments
+Manoc::View::TT - TT View for Manoc
 
 =head1 DESCRIPTION
 

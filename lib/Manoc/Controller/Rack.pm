@@ -140,8 +140,8 @@ sub create : Chained('base') : PathPart('create') : Args() {
     if ($c->stash->{is_xhr}) {
         $c->stash(message => $message);
         $c->stash(template => 'dialog/message.tt');
-        $c->forward('View::HTMLFragment');
-        return;
+	$c->stash(no_wrapper => 1);
+        $c->detach();
     }
 
     $c->flash( message => $message);
