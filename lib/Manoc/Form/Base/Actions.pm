@@ -26,7 +26,7 @@ has_field 'form_actions.cancel' => (
     widget => 'ButtonTag',
     element_attr => { class => ['btn'] },
     widget_wrapper => 'None',
-    value => "Cancel"
+    value => "Reset"
 );
 1;
 # Local Variables:
