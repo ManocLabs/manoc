@@ -40,7 +40,7 @@ sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
     $c->keep_flash("backref");
-
+    $c->stash( 	default_backref => $c->uri_for('/search') );
     my $form = Manoc::Form::Login->new( ctx => $c );
     my $success = $form->process( params => $c->req->params );
     if ($success ) {
@@ -53,7 +53,6 @@ sub login : Local : CaptureArgs(0) {
     $c->stash(
 	form => $form,
 	template => 'auth/login.tt',
-	default_backref => $c->uri_for('/search'),
     );
 }
 
