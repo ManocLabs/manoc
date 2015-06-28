@@ -1,13 +1,6 @@
-
-<table>
-<tr>
-  <td>Are you sure to delete this Object?</td>
-<td>
+<p>Are you sure to delete this object?</p>
 <form method="POST" >
-<div class="buttons">
-<input type="submit" name="submit" value="Submit"/>
-</div>
+<form class="form-horizontal" method="post">
+<button type="submit" class="btn btn-danger" name="submit" value="Submit"/>Confirm</button>
 </form>
-</td>
-</tr>
-</table>
+

@@ -1,13 +1,5 @@
-
-<table>
-<tr>
-  <td>Are you sure?</td>
-<td>
-<form method="POST" >
-<div class="buttons">
-<input type="submit" name="submit" value="Submit"/>
-</div>
+<p>Are you sure?</p>
+<form class="form-horizontal" method="POST" >
+<button type="submit" class="btn btn-primary" name="submit" value="Submit"/>Yes</button>
 </form>
-</td>
-</tr>
-</table>
+
