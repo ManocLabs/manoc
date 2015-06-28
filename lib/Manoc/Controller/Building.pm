@@ -63,27 +63,18 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
 
 sub fetch_list : Private {
    my ( $self, $c ) = @_;
-
+   
    my $build_schema = $c->stash->{resultset};
    $c->stash('object_list' => [ $build_schema->search({}, 
-			      {prefetch => 'racks'} ) ]
-            );
-  
+                                                      {prefetch => 'racks'} ) ]
+         );
+   
 }
 
 sub list : Chained('base') : PathPart('list') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->forward('fetch_list');
-
-    my @r = map +{
-        id      => $_->id,
-        name    => $_->name,
-        desc    => $_->description,
-        n_racks => $_->racks->count()
-        }, @{$c->stash->{object_list}};
-
-    $c->stash( building_table =>  \@r );
     $c->stash( template       => 'building/list.tt' );
 }
 
@@ -115,7 +106,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
 
 sub create : Chained('base') : PathPart('create') : Args(0) {
     my ( $self, $c ) = @_;
-    $c->stash( template => 'building/form.tt' );
+    $c->stash(title => 'New building');
     $c->forward('form');
 }
 
@@ -133,26 +124,21 @@ sub form : Private {
     my $form = Manoc::Form::Building->new( item => $item );
     $c->stash(
         form => $form,
-        template => 'building/form.tt' );
-
+        template => 'building/form.tt'
+    );
 
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
-
-    if ( $c->req->param('form-building.discard') ) {
-        $c->detach('/follow_backref');
-    }
     my $success = $form->process( params => $c->req->params );
     $success or return;
 
-    $c->stash(message => "Building created.");
+    $c->stash(message => "Building updated.");
     if ($c->stash->{is_xhr}) {
         $c->stash(no_wrapper => 1);
         return;
     }
-    my $def_br = $c->uri_for_action( 'building/view', [ $item->id ] );
-    $c->stash( default_backref => $def_br );
-    $c->detach( '/follow_backref' );
+    $c->response->redirect($c->uri_for_action( 'building/list') );
+    $c->detach();
 }
 
 =head2 delete
@@ -164,19 +150,21 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my $building = $c->stash->{'object'};
     my $id       = $building->id;
     my $name     = $building->name;
-    $c->stash( default_backref => $c->uri_for_action('building/list') );
+
 
     if ( lc $c->req->method eq 'post' ) {
         if ( $c->model('ManocDB::Rack')->search( { building => $id } )->count ) {
             $c->flash( error_msg => 'Building is not empty. Cannot be deleted.' );
-            $c->stash( default_backref => $c->uri_for_action( 'building/view', [$id] ) );
-            $c->detach('/follow_backref');
+            $c->response->redirect( $c->uri_for_action( 'building/view', [$id] ) );
+            $c->detach();
         }
-
-        $building->delete;
-
-        $c->flash( message => $name . ' successful deleted.' );
-        $c->detach('/follow_backref');
+        if ( $building->delete ) {
+            $c->flash( message => $name . ' deleted.' );
+        } else {
+            $c->flash( error_msg => 'Error deleting builind' );
+        }
+        $c->response->redirect( $c->uri_for_action('building/list') );
+        $c->detach()
     }
     else {
         $c->stash( template => 'generic_delete.tt' );

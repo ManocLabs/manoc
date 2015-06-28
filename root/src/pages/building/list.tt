@@ -20,11 +20,11 @@
      </tr>
    </thead>  
    <tbody>
-[% FOREACH b IN building_table %]
+[% FOREACH b IN object_list %]
          <tr>
- 	 <td><a href=[% c.uri_for_action('/building/view', [b.id]) %]>[% b.name %]</a></td>
- 	 <td>[% b.desc | html %]</td>
- 	 <td>[% b.n_racks | html %]</td>
+ 	 <td><a href=[% c.uri_for_action('/building/view', [b.id]) %]>[% b.name | html %]</a></td>
+ 	 <td>[% b.description | html %]</td>
+ 	 <td>[% IF b.racks.isa('HASH') %]1[% ELSE %][% b.racks.size %][% END %]</td>
          </tr>
 [% END %]
    </tbody>

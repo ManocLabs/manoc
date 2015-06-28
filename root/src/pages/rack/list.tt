@@ -1,17 +1,15 @@
 [% META 
-   title='List'
+   title='Racks'
    subsection='Rack'
    section='Asset'	
    use_table=1
 -%]
 
-<div class="buttons create_btn">
-<a href="[% c.uri_for_action('/rack/create') %]" >
-   [% ui_icon('circle-plus') %] Create a Rack</a>
-[% add_css_create_btn %]
+<div id="rack_create">
+     <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
 
-[% init_table('rack_list')%] 
+[% init_table('rack_list', { toolbar="rack_create" })%] 
  <table id="rack_list">
        <thead>  
 	 <tr>
@@ -22,10 +20,10 @@
          </tr>
        </thead>  
   <tbody>
-[% FOREACH r IN rack_table %]
+[% FOREACH r IN object_list %]
          <tr>
  	 <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]> [% r.name | html %] </a></td>
- 	 <td>[% r.building.id | html %]</td>
+ 	 <td>[% r.building.name | html %]</td>
  	 <td>[% r.floor | html %]</td>
  	 <td>[% r.notes | html %]</td>
          </tr>

@@ -28,9 +28,8 @@
 	<a class="btn btn-primary" href=[%c.uri_for_action('building/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
 	&nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('building/delete', [object.id]) %]>
 	[% ui_icon('closethick') %]  Delete</a>
-	&nbsp;<a class="btn btn-default" href="[% c.uri_for('/rack/create', object.id,{backref
-  =>c.req.uri}) %]">
-	[% ui_icon('plusthick') %] Add Rack</a>
+	&nbsp;<a class="btn btn-default" href="[% c.uri_for('/rack/create', { building => object.id}) %]">
+	[% bootstrap_icon('plus') %] Add Rack</a>
       </div>
     </p>
   </div>

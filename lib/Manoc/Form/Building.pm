@@ -9,7 +9,6 @@ use warnings;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::Base::Actions';
 
 has '+name' => ( default => 'form-building' );
 has '+html_prefix' => ( default => 1 );
@@ -33,7 +32,13 @@ has_field 'description' => (
 );
 has_field 'notes' => ( type => 'TextArea' );
 
-
+has_field 'save' => (
+    type => 'Submit',
+    widget => 'ButtonTag',
+    element_attr => { class => ['btn', 'btn-primary'] },
+    widget_wrapper => 'None',
+    value => "Save"
+);
 
 1;
 

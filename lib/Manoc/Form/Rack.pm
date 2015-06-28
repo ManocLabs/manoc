@@ -8,8 +8,7 @@ use strict;
 use warnings;
 use HTML::FormHandler::Moose;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
 
 has '+name' => ( default => 'form-rack' );
 has '+html_prefix' => ( default => 1 );
@@ -31,30 +30,38 @@ has_field 'building' => (
     type         => 'Select',
     empty_select => '---Choose a Building---',
     required     => 1,
+    label        => 'Building',
 );
 
-has_field 'floor' => ( type => 'Integer', required => 1 );
-has_field 'notes' => ( type => 'TextArea' );
-
-has 'default_building_id' => (
-    is       => 'ro',
-    required => 0
+has_field 'floor' => (
+    type => 'Integer',
+    required => 1,
+    label  => 'Floor',
+);
+has_field 'notes' => (
+    type => 'TextArea',
+    label => 'Notes',
 );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
+has_field 'save' => (
+    type => 'Submit',
+    widget => 'ButtonTag',
+    element_attr => { class => ['btn', 'btn-primary'] },
+    widget_wrapper => 'None',
+    value => "Save"
+);
 
 sub options_building {
     my $self = shift;
     return unless $self->schema;
-    my $buildings = $self->schema->resultset('Building')->search( {}, { order_by => 'id' } );
+    my @buildings = $self->schema->resultset('Building')->search( {}, { order_by => 'name' } )->all();
     my @selections;
-    while ( my $build = $buildings->next ) {
-        my $label = $build->name . " (" . $build->description . ")";
-        my $option = { label => $label, value => $build->id };
-        $self->default_building_id and
-            $self->default_building_id == $build->id and
-            $option->{selected} = 1;
+    foreach my $b (@buildings) {
+        my $label = $b->name . " (" . $b->description . ")";
+        my $option = {
+	    label => $label,
+	    value => $b->id
+	};
         push @selections, $option;
     }
     return @selections;

@@ -1,7 +1,5 @@
 [% META
-   title='Edit'
    subsection='Rack'
-   section='Asset' -%]
-<div class="buttons">
+   section='Asset' 
+-%]
 [% form.render %]
-</div>

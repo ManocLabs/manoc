@@ -88,12 +88,11 @@ sub fetch_list : Private {
         }) ]
     );
 }
- 
+
 sub list : Chained('base') : PathPart('list') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->forward('fetch_list');
-    $c->stash( rack_table => $c->stash->{object_list} );
     $c->stash( template   => 'rack/list.tt' );
 }
 
@@ -103,80 +102,34 @@ sub list : Chained('base') : PathPart('list') : Args(0) {
 =cut
 
 sub create : Chained('base') : PathPart('create') : Args() {
-    my ( $self, $c, $id_build ) = @_;
-    my $buildings = $c->model('ManocDB::Building');
-    my $new_obj = $c->stash->{resultset}->new_result( {} );
-    my ( $b, $form );
-    $c->stash( default_backref => $c->uri_for('/rack/list') );
+    my ( $self, $c) = @_;
 
-    #if the building is not specified in req->params
-    if ( defined($id_build) ) {
-        if ( !defined( $b = $buildings->find($id_build) ) ) {
-            $c->stash( error_msg => "Trying to create a rack without a valid building" );
-            $c->detach('/error/index');
-        }
-        $c->stash( building => $b->name, id => $id_build );
-        $form = Manoc::Form::Rack->new(
-            item                => $new_obj,
-            default_building_id => $id_build
-        );
+    my $building_id = $c->req->query_parameters->{'building'};
+    $c->log->debug("new rack in $building_id");
+    my $object = $c->stash->{resultset}->new_result({});
+    my $form = Manoc::Form::Rack->new(
+	item     => $object,
+    );
 
-    }
+    $c->stash( form => $form, template => 'rack/form.tt' );
 
-    $form or $form = Manoc::Form::Rack->new( item => $new_obj );
-    $c->stash( form => $form, template => 'rack/create.tt' );
-
-    if ( $c->req->param('form-rack.discard') ) {
-        $c->detach('/follow_backref');
-    }
-
-    my $success = $form->process( params => $c->req->params );
+    my $success = $form->process(
+	params => $c->req->params,
+	defaults => { building => $building_id, name => 'ciao' },
+	use_defaults_over_obj => 1
+    );
     if(!$success) {
-      $c->keep_flash('backref');
-      return;
+	return;
     }
 
-    my $message = 'Success. Rack ' . $c->req->param('name') . ' created.';
+    my $message = 'Rack ' . $c->req->param('name') . ' created.';
+    $c->flash( message => $message);
     if ($c->stash->{is_xhr}) {
-        $c->stash(message => $message);
         $c->stash(template => 'dialog/message.tt');
 	$c->stash(no_wrapper => 1);
-        $c->detach();
-    }
-
-    $c->flash( message => $message);
-    $c->detach('/follow_backref');
-}
-
-=head2 delete
-
-=cut
-
-sub delete : Chained('object') : PathPart('delete') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $rack = $c->stash->{'object'};
-    my $id   = $rack->id;
-    my $name = $rack->name;
-    $c->stash( default_backref => $c->uri_for('/rack/list') );
-
-    if ( lc $c->req->method eq 'post' ) {
-        if ( $c->model('ManocDB::Device')->search( rack => $id )->count ) {
-            $c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
-            $c->response->redirect( $c->uri_for_action( 'rack/view', [$id] ) );
-            $c->detach();
-        }
-
-        my $building = $rack->building->id;
-        $rack->delete;
-        $c->flash( message => 'Success!! Rack ' . $name . '  deleted.' );
-
-        $c->detach('/follow_backref');
-    }
-    else {
-        $c->stash( template => 'generic_delete.tt' );
     }
 }
+
 
 =head2 edit
 
@@ -188,30 +141,47 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my $item = $c->stash->{object};
     my $form = Manoc::Form::Rack->new( item => $item );
 
-    $c->stash( form => $form, template => 'rack/edit.tt' );
-
-    if ( $c->req->param('form-rack.discard') ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'rack/view', [ $c->stash->{object}->id ] ) );
-        $c->detach();
-    }
-
+    $c->stash( form => $form, template => 'rack/form.tt' );
     unless ( $form->process( params => $c->req->params ) ) {
-        $c->keep_flash( ['backref'] );
         return;
     }
 
-    $c->flash( message => 'Success! Rack ' . $c->req->param('name') . ' edited.' );
-    if ( my $backref = $c->check_backref($c) ) {
-        $c->response->redirect($backref);
-        $c->detach();
-    }
-
+    $c->flash( message => 'Rack modified ');
     $c->response->redirect( $c->uri_for_action( '/rack/view', [ $c->stash->{object}->id ] ) );
     $c->detach();
 }
 
 
+=head2 delete
+
+=cut
+
+sub delete : Chained('object') : PathPart('delete') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $rack = $c->stash->{'object'};
+    my $id   = $rack->id;
+    my $name = $rack->name;
+
+
+    if ( lc $c->req->method eq 'post' ) {
+        if ( $c->model('ManocDB::Device')->search( rack => $id )->count ) {
+            $c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
+            $c->response->redirect( $c->uri_for_action( 'rack/view', [$id] ) );
+            $c->detach();
+        }
+
+        $rack->delete;
+        $c->flash( message => 'Rack ' . $name . '  deleted.' );
+	$c->response->redirect( $c->uri_for('/rack/list') );
+        $c->detach();
+    }
+    else {
+        $c->stash( template => 'generic_delete.tt' );
+    }
+}
+
+ 
 
 sub prepare_json_object : Private {
     my ($self, $rack) = @_;
@@ -219,6 +189,10 @@ sub prepare_json_object : Private {
 	    id      => $rack->id,
 	    name    => $rack->name,
 	    building => $rack->building->id,
+	    building => {
+		id   => $rack->building->id,
+		name => $rack->building->name,
+	    },
 	    devices   => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
 	   };
 }
