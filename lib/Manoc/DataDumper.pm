@@ -153,7 +153,10 @@ sub _load_tables_loop {
             Manoc::DataDumper::Converter->get_converter_class( $version );
 
         if (defined($converter_class) ) {
-            $converter = $converter_class->new({ log => $self->log });
+            $converter = $converter_class->new({
+                log => $self->log,
+                schema => $self->schema,
+            });
             $self->log->info("Using converter $converter_class.");
         }
     }
@@ -203,16 +206,14 @@ sub _load_tables_loop {
 
             # converter callback
             $converter and
-                $converter->before_import_table($table, $self->schema,
-                                                $records);
+                $converter->before_import_table($table, $records);
 
             # load into db
             $self->_load_table( $source, $records, $force );
 
             # converter callback
             $converter and
-                $converter->after_import_table($table, $self->schema,
-                                               $records);
+                $converter->after_import_table($table, $records);
 
             #free memory
             undef @$records;
@@ -308,8 +309,8 @@ sub save {
     my $datadump = Manoc::DataDumper::Data->init(
         $self->filename,
         $self->version,
-        $self->config->{DataDumper} );
-    
+        $self->config->{DataDumper}
+    );
     my $path_to_tar  = $self->config->{DataDumper}->{path_to_tar} || undef;    
     my $source_names = $self->source_names;
     
@@ -318,8 +319,7 @@ sub save {
         next unless $source->isa('DBIx::Class::ResultSet');
 
         my $table = $source->result_source->name;
-        
-        $self->log->debug("Processing table $table");             
+        $self->log->debug("Processing table $table");
         $self->schema->storage->dbh_do(\&_dump_table, $self->log, $datadump, $source, $ROWS);
         $self->log->info("Table $table dumped");
     }

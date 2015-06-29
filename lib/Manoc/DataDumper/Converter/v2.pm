@@ -14,7 +14,7 @@ use Manoc::IpAddress;
 
 #Convert Ip addresses in zero-padded ip addresses
 
-sub upgrade_ipcolumn {
+sub _upgrade_ipcolumn {
   my ( $col_name, $data ) = @_;
   my ( $i, $ip );
   return 0 if ( !defined($data) );
@@ -26,126 +26,137 @@ sub upgrade_ipcolumn {
     $data->[$i]->{$col_name} = $ip;
   }
 }
-sub upgrade_devices {
+
+override 'upgrade_devices' => sub {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting devices...");
-    upgrade_ipcolumn("id",$data);
-}
+    _upgrade_ipcolumn("id",$data);
+    super();
+};
 
-sub upgrade_uplinks {
+override 'upgrade_uplinks' => sub {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting uplinks...");
-    upgrade_ipcolumn("device",$data);
-}
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
 sub upgrade_arp {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting arp entries...");
-    upgrade_ipcolumn("ipaddr",$data);
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
-sub upgrade_mat {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting mat entries...");
-  upgrade_ipcolumn("device",$data);
-}
+override 'upgrade_mat' => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting mat entries...");
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
 sub upgrade_ip_notes {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting ip_notes entries...");
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting ip_notes entries...");
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
 sub upgrade_win_hostname {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting win_hostname entries...");
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting win_hostname entries...");
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
 sub upgrade_win_logon {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting win_log entries...");
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting win_log entries...");
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
 sub upgrade_dhcp_reservation {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting dhcp_reservation entries...");
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting dhcp_reservation entries...");
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
 sub upgrade_dhcp_lease {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting dhcp_lease entries...");
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting dhcp_lease entries...");
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
 sub upgrade_ip_range {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting ip_range entries...");
-  upgrade_ipcolumn("network",$data);
-  upgrade_ipcolumn("netmask",$data);
-  upgrade_ipcolumn("from_addr",$data);
-  upgrade_ipcolumn("to_addr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting ip_range entries...");
+    _upgrade_ipcolumn("network",$data);
+    _upgrade_ipcolumn("netmask",$data);
+    _upgrade_ipcolumn("from_addr",$data);
+    _upgrade_ipcolumn("to_addr",$data);
 }
 
-sub upgrade_if_status {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting if_status entries...");    
-  upgrade_ipcolumn("device",$data);
-}
+override  upgrade_if_status => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting if_status entries...");    
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
-sub upgrade_if_notes {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting if_notes entries...");
-  upgrade_ipcolumn("device",$data);
-}
+override 'upgrade_if_notes' => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting if_notes entries...");
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
-sub upgrade_cdp_neigh {
-  my ( $self, $data ) = @_;
-  my $i;
-  $self->log->debug("Start converting cdp entries...");
-  upgrade_ipcolumn("from_device",$data);
+override 'upgrade_cdp_neigh' => sub {
+    my ( $self, $data ) = @_;
+    my $i;
+    $self->log->debug("Start converting cdp entries...");
+    _upgrade_ipcolumn("from_device",$data);
+    
+    for ( $i = 0; $i < scalar( @{$data} ); $i++ ) {
+	next if (!defined($data->[$i]->{"to_device"}) or 
+		     $data->[$i]->{"to_device"} ne 'no-ip');
+	$data->[$i]->{"to_device"} = "0.0.0.0";
+    }
+    _upgrade_ipcolumn("to_device",$data);
+    super();
+};
 
-  for ( $i = 0; $i < scalar( @{$data} ); $i++ ) {
-    next if (!defined($data->[$i]->{"to_device"}) or 
-	     $data->[$i]->{"to_device"} ne 'no-ip');
-    $data->[$i]->{"to_device"} = "0.0.0.0";
-  }
-  upgrade_ipcolumn("to_device",$data);
-}
+override upgrade_ssid_list => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting ssid entries...");
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
-sub upgrade_ssid_list {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting ssid entries...");
-  upgrade_ipcolumn("device",$data);
-}
+override 'upgrade_dot11_assoc' => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting  dot11_assoc entries...");
+    _upgrade_ipcolumn("device",$data);
+    _upgrade_ipcolumn("ipaddr",$data);
+    super();
+};
 
-sub upgrade_dot11_assoc {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting  dot11_assoc entries...");
-  upgrade_ipcolumn("device",$data);
-  upgrade_ipcolumn("ipaddr",$data);
-}
-
-sub upgrade_dot11client {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting dot11client entries...");    
-  upgrade_ipcolumn("device",$data);
-  upgrade_ipcolumn("ipaddr",$data);
-}
+override upgrade_dot11client => sub {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting dot11client entries...");    
+    _upgrade_ipcolumn("device",$data);
+    _upgrade_ipcolumn("ipaddr",$data);
+    super();
+};
 
 sub upgrade_deleted_devices {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting dot11client entries...");    
-  upgrade_ipcolumn("ipaddr",$data);
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting dot11client entries...");    
+    _upgrade_ipcolumn("ipaddr",$data);
 }
 
-sub upgrade_device_config {
-  my ( $self, $data ) = @_;
-  $self->log->debug("Start converting device configurations entries...");    
-  upgrade_ipcolumn("device",$data);
-}
+override 'upgrade_device_config' => sub  {
+    my ( $self, $data ) = @_;
+    $self->log->debug("Start converting device configurations entries...");    
+    _upgrade_ipcolumn("device",$data);
+    super();
+};
 
 
 no Moose;    # Clean up the namespace.
