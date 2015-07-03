@@ -29,6 +29,7 @@ use Catalyst qw/
     Session::Store::DBI
     Session::State::Cookie
     StackTrace
+    EnableMiddleware
     /;
 
 extends 'Catalyst';
@@ -62,6 +63,12 @@ __PACKAGE__->config(
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
+
+    # Protection against CSRF attacks
+    'Plugin::EnableMiddleware' => [qw/
+        Session
+        CSRFBlock
+    /],
 
     'Plugin::Authentication' => {
         default_realm => 'userdb',

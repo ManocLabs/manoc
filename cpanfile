@@ -33,6 +33,7 @@ requires 'YAML::Syck';
 requires 'Config::JFDI';
 requires 'SQL::Translator';
 requires 'Crypt::Eksblowfish::Bcrypt';
+requires 'Plack::Middleware::CSRFBlock';
 
 recommends 'Net::Pcap';
 recommends 'NetPacket';
