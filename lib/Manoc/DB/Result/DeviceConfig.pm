@@ -11,10 +11,9 @@ __PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 __PACKAGE__->table('device_config');
 __PACKAGE__->add_columns(
     'device' => {
-        data_type      => 'varchar',
+        data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
-        size           => 15
     },
     'config' => {
         data_type   => 'text',

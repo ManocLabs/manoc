@@ -2,10 +2,11 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::DeviceEdit;
+package Manoc::Form::Device;
 
 use strict;
 use warnings;
+use Manoc::Utils qw(check_addr);
 use HTML::FormHandler::Moose;
 
 extends 'HTML::FormHandler::Model::DBIC';
@@ -14,13 +15,22 @@ with 'Manoc::FormRenderTable';
 has '+name' => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
-#has_field 'id'     => ( type     =>   'Text',
-#			label    => 'Ip Address',
-#			disabled  => 1,
-#			 );
+has_field 'mng_address' => (
+    type     =>   'Text',
+    label    => 'IP Address',
+    required => 1,
+    apply    => [
+	'Str',
+	{
+	    check   => sub { check_addr( $_[0] ) },
+	    message => 'Invalid Ip Address'
+	},
+    ]
+);
 
 has_field 'name' => (
     type  => 'Text',
+    required => 1,
     apply => [
         'Str',
         {
@@ -45,10 +55,15 @@ has_field 'model' => (
 has_field 'rack' => (
     type         => 'Select',
     label        => 'Rack name',
-    empty_select => '---Choose a Rack---'
+    empty_select => '---Choose a Rack---',
+    required     => 1,
 );
 
-has_field 'level' => ( type => 'Text' );
+has_field 'level' => (
+    label    => 'Level',
+    type     => 'Text',
+    required => 1,
+);
 
 #Retrieved Info
 

@@ -7,8 +7,7 @@ use Moose;
 use namespace::autoclean;
 use Manoc::Utils qw(clean_string print_timestamp check_addr );
 use Text::Diff;
-use Manoc::Form::DeviceNew;
-use Manoc::Form::DeviceEdit;
+use Manoc::Form::Device;
 use Manoc::Report::NetwalkerReport;
 use Data::Dumper;
 
@@ -25,6 +24,16 @@ Manoc::Controller::Device - Catalyst Controller
 =head1 DESCRIPTION
 
 Catalyst Controller.
+
+=cut
+
+has 'device_form' => (
+    isa => 'Manoc::Form::Device',
+    is => 'rw',
+    lazy => 1,
+    default => sub { Manoc::Form::Device->new }
+);
+
 
 =head1 METHODS
 
@@ -57,8 +66,11 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
     my ( $self, $c, $id ) = @_;
     # $id = primary key
 
-    my $ipaddr =  Manoc::IpAddress->new($id);
-    $c->stash(object => $c->stash->{resultset}->find($ipaddr) ) ;
+    my $object = $c->stash->{resultset}->find($id);
+    if ( !defined($object)) {
+	$object = $c->stash->{resultset}->find({mng_address => $id});
+    }
+    $c->stash(object => $object);
 
     if ( !defined( $c->stash->{object} ) ) {
         $c->stash( error_msg => "Object $id not found!" );
@@ -150,7 +162,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my %if_last_mat;
 
     while ( $e = $it->next ) {
-      
       $if_last_mat{$e->interface} =
 	$e->get_column('lastseen') ? 
 	  print_timestamp( $e->get_column('lastseen') ) : 'never';
@@ -178,7 +189,6 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
             vlan         => $r->vlan        || '',
             last_mat     => $if_last_mat{ $r->interface },
             has_notes => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
-            updown_status_link => '',    #updown_status_link?device=$id&iface=".$r->interface,
         };
     }
 
@@ -250,7 +260,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 		 );
     
     # TODO why an hardcoded debug?
-    $ENV{DEBUG} = 1;
+    # $ENV{DEBUG} = 1;
     my $updater = Manoc::Netwalker::DeviceUpdater->new(
          entry        => $c->stash->{object},
          config       => \%config,
@@ -399,54 +409,22 @@ sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
 =cut
 
 sub create : Chained('base') : PathPart('create') : Args() {
-    my ( $self, $c, $rack_id ) = @_;
+    my ( $self, $c ) = @_;
 
-    my $item = $c->stash->{resultset}->new_result( {} );
-    $c->stash( def_rack => $rack_id ) if ($rack_id);
-    $c->stash( default_backref => $c->uri_for_action('/device/list') );
-    my $form = Manoc::Form::DeviceNew->new( item => $item );
+    my $rack = $c->request->query_parameters->{rack};
+    my $obj_params = {};
+    $rack and $obj_params->{rack} = $rack;
 
-    #prepare the selects input
-    my @buildings = $c->model('ManocDB::Building')->search(
-        {},
-        {
-            order_by => 'me.id',
-            prefetch => 'racks',
-            join     => 'racks',
-        }
+    $c->stash(
+	object => $c->stash->{resultset}->new_result( $obj_params ),
+	default_backref => $c->uri_for_action('/device/list'),
+	new_object => 1,
+	template => 'device/create.tt',
     );
-    my @racks = $c->model('ManocDB::Rack')->search(
-        {},
-        {
-            join     => 'building',
-            prefetch => 'building'
-        }
-    );
-
-    $c->stash( form      => $form );
-    $c->stash( template  => 'device/create.tt' );
-    $c->stash( buildings => \@buildings );
-    $c->stash( racks     => \@racks );
-
-    if ( $c->req->param('form-device.discard') ) {
-        $c->detach('/follow_backref');
-    }
-    my $param = $c->req->params;
-    if ( defined( $param->{'building'} ) ) {
-        delete $param->{'building'};
-    }
-
-    # the "process" call has all the saving logic,
-    #   if it returns False, then a validation error happened
-    unless ( $form->process( params => $param ) ) {
-        $c->keep_flash('backref');
-        return;
-    }
-    $c->flash( message => 'Success! Device created.' );
-    $c->keep_flash('backref');
-    $c->response->redirect( $c->uri_for_action( '/device/edit', [ $c->req->param('form-device.id') ] ) );
-    $c->detach();
+    $c or die;
+    return $self->process_form($c);
 }
+
 
 =head2 edit
 
@@ -454,28 +432,51 @@ sub create : Chained('base') : PathPart('create') : Args() {
 
 sub edit : Chained('object') : PathPart('edit') : Args(0) {
     my ( $self, $c ) = @_;
+    $c->stash(template => 'create/form.tt');
+    return $self->process_form($c);
+}
 
-    my $item = $c->stash->{object};
-    my $id   = $item->id->address;
-    my $form = Manoc::Form::DeviceEdit->new( item => $item );
+=head2 form
 
-    $c->keep_flash('backref');
+Used by add and edit
 
-    $c->stash( default_backref => $c->uri_for_action( 'device/view', [$id] ) );
+=cut
 
-    #prepare the selects input
+sub process_form {
+    my ( $self, $c ) = @_;
+    $c or die "@_";
+    my $action = $c->uri_for($c->action, $c->req->captures);
+    $c->stash(
+	form => $self->device_form,
+	action => $action,
+    );
 
     if ( $c->req->param('form-device.discard') ) {
         $c->detach('/follow_backref');
     }
 
-    $c->stash( form => $form, template => 'device/edit.tt' );
-
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
-    return unless $form->process( params => $c->req->params, );
-    $c->flash( message => 'Success! Device edited.' );
-    $c->detach('/follow_backref');
+    my $process = $self->device_form->process(params => $c->req->params,
+				       item => $c->stash->{object} );
+
+    if (! $process) {
+        $c->keep_flash('backref');
+	$c->detach();
+    }
+    
+    $c->flash( message => 
+	     $c->stash->{new_object} ? 
+		 'Device created.' :
+		 'Device edited.'
+		 );
+
+    if ( my $backref = $c->check_backref($c) ) {
+        $c->response->redirect($backref);
+        $c->detach();
+    }
+    $c->response->redirect( $c->uri_for_action( '/device/list' ) );
+    $c->detach();
 }
 
 =head2 delete
@@ -544,99 +545,6 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
     else {
         $c->stash( template => 'generic_delete.tt' );
-    }
-}
-
-=head2 change_ip
-
-=cut
-
-sub change_ip : Chained('object') : PathPart('change_ip') : Args(0) {
-
-    #  my ($self, $c) = @_;
-
-    #N.B. ho provato con FH ma da' errore nel momento in cui fa l'update (da aggiornare il modello?)
-    #   my $item = $c->stash->{'object'};
-    #   my $id   = $item->id;
-    #   $c->log->debug(Dumper($item));
-    #   my $form = Manoc::Form::Change_ip->new(item => $item);
-
-    #   $c->stash( form => $form, template => 'device/change_ip.tt' );
-
-    #   # the "process" call has all the saving logic,
-    #   #   if it returns False, then a validation error happened
-    #   return unless $form->process( params => $c->req->params, );
-
-    #   $c->flash(message => 'Success! The IP of the device is changed.');
-
-    #   if(my $backref = $c->check_backref($c) ){
-    #       $c->response->redirect($backref);
-    #       $c->detach();
-    #   }
-    #   $c->response->redirect($c->uri_for_action
-    # 			 ('/device/view', [$c->req->param('id')]));
-    #   $c->detach();
-    # }
-    my ( $self, $c ) = @_;
-    my $error = {};
-    my $old_ip = $c->stash->{'object'}->id->address || $c->req->param('id');
-    $c->stash( template => 'device/change_ip.tt' );
-
-    my $message;
-    if ( $c->req->param('submit') ) {
-        my $done;
-        my $new_ip = $c->req->param('new_ip');
-        ( $done, $message ) = $self->process_change_ip( $c, $old_ip, $new_ip );
-        if ($done) {
-            $c->flash( message => 'Success! Device edit.' );
-
-            if ( my $backref = $c->check_backref($c) ) {
-                $c->response->redirect($backref);
-                $c->detach();
-            }
-            $c->response->redirect( $c->uri_for_action( 'device/view', [$new_ip] ) );
-            $c->detach();
-        }
-        else {
-            $error->{ip} = $message;
-            $c->stash( error  => $error );
-            $c->stash( new_ip => $c->req->param('new_ip') );
-        }
-    }
-    elsif ( $c->req->param('discard') ) {
-        if ( my $backref = $c->check_backref($c) ) {
-            $c->response->redirect($backref);
-            $c->detach();
-        }
-        $c->response->redirect( $c->uri_for_action( '/device/view', [$old_ip] ) );
-        $c->detach();
-    }
-}
-
-sub process_change_ip : Private {
-    my ( $self, $c, $id, $new_id ) = @_;
-    my $device = $c->stash->{'object'};
-    my $ip_obj = Manoc::IpAddress->new($new_id);
-    my $new_ip = $c->stash->{'resultset'}->find($ip_obj);
-
-    if ($new_ip) {
-        return ( 0, "The ip is already in use. Try again with another one!" );
-    }
-    if ( check_addr($new_id) ) {
-        $c->model('ManocDB')->schema->txn_do(
-            sub {
-                $device->update( { id => $ip_obj } );
-            }
-        );
-        if ($@) {
-            return ( 0, $@ );
-        }
-        else {
-            return ( 1, "" );
-        }
-    }
-    else {
-        return ( 0, 'Bad ip format' );
     }
 }
 

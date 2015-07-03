@@ -69,7 +69,7 @@ sub run {
         show_warnings  => $self->show_warnings,
         add_drop_table => $self->add_drop_table,
         validate       => $self->validate,
-        parser_args    => { 'DBIx::Schema' => 'Manoc::DB', },
+        parser_args    => { dbic_schema => 'Manoc::DB', },
     );
 
     $translator->parser('SQL::Translator::Parser::DBIx::Class');

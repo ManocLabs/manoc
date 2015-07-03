@@ -34,6 +34,7 @@ has 'schema' => (
     required => 1
 );
 
+# a set of all mng_address knwon to Manoc
 # used to to recognise neighbors and uplinks
 has 'device_set' => (
     is       => 'ro',
@@ -84,7 +85,8 @@ has 'native_vlan' => (
 
 sub _build_report {
     my $self = shift;
-    return Manoc::Netwalker::DeviceReport->new( host => $self->entry->id->address );
+    my $device_address = $self->entry->mng_address->address;
+    return Manoc::Netwalker::DeviceReport->new( host => $device_address );
 }
 
 #----------------------------------------------------------------------#
@@ -95,7 +97,7 @@ sub _build_source {
     my $entry = $self->entry;
 
     # get device community and version or use default
-    my $host           = $entry->id->address;
+    my $host           = $entry->mng_address->address;
     my $comm           = $entry->snmp_com() || $self->config->{snmp_community};
     my $version        = $entry->snmp_ver() || $self->config->{snmp_version};
     my $mat_force_vlan = $self->config->{mat_force_vlan} || '';
@@ -108,7 +110,7 @@ sub _build_source {
         ) or return undef;
 
     unless($source->connect){
-        my $msg = "Could not connect to ".$entry->id->address;
+        my $msg = "Could not connect to $host";
         $self->log->error($msg);
         $self->report->add_error($msg);
         return undef;
@@ -131,9 +133,9 @@ sub _build_native_vlan {
 sub _build_device_set {
     my $self = shift;
 
-    my @device_ids = $self->schema->resultset('Device')->get_column('id')->all;
-    my %device_set = map { Manoc::Utils::unpadded_ipaddr($_) => 1 } @device_ids;
-    return \%device_set;
+    my @addresses = $self->schema->resultset('Device')->get_column('mng_address')->all;
+    my %addr_set = map { Manoc::Utils::unpadded_ipaddr($_) => 1 } @addresses;
+    return \%addr_set;
 }
 
 #----------------------------------------------------------------------#
@@ -179,7 +181,7 @@ sub update_all_info {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing full update for device ", $self->entry->id->address );
+    $self->log->info( "Performing full update for device ", $self->mng_address->address );
 
     $self->update_device_entry;
     $self->update_cdp_neighbors;
@@ -199,7 +201,7 @@ sub fast_update {
 
     $self->source or return undef;
 
-    $self->log->info( "Performing fast update for device ", $self->entry->id->address );
+    $self->log->info( "Performing fast update for device ", $self->entry->mng_address->address );
 
     $self->update_cdp_neighbors;
     $self->entry->get_mat() and $self->update_mat;

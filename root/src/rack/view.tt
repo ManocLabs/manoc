@@ -38,8 +38,7 @@
     <a href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% ui_icon('pencil') %] Edit</a>
     &nbsp;<a href="[%c.uri_for_action('rack/delete',[object.id]) %]">
       [% ui_icon('closethick') %] Delete</a>
-    &nbsp;<a href="[% c.uri_for_action('device/create', object.id, {backref
-  =>c.req.uri}) %]">[% ui_icon('plusthick') %] Add Device</a>
+    &nbsp;<a href="[% c.uri_for_action('device/create', { rack => object.id}  ) %]">[% ui_icon('plusthick') %] Add Device</a>
   </div>
 </p>
 </div>

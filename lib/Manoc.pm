@@ -176,7 +176,7 @@ after setup_finalize => sub {
 
     #Additional acl for admin privileges
     my @add_acl =
-        qw{ device/change_ip device/uplinks device/refresh vlanrange/split vlanrange/merge iprange/split
+        qw{ device/uplinks device/refresh vlanrange/split vlanrange/merge iprange/split
         iprange/merge user/switch_status user/set_roles vlan/merge_name
         interface/edit_notes interface/delete_notes ip/edit ip/delete
     };
