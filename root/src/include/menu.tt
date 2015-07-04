@@ -2,37 +2,37 @@
   menu_sections = [
 		{
 		     name = 'Asset',
-		     path = c.uri_for('/device'),
+		     path =  c.uri_for_action('/building/list'),
 		     subsections = [
   	       	     {
 			name = 'Device', 
-		        path = c.uri_for('/device/list'),
+		        path = c.uri_for_action('/device/list'),
 	             },
 	             {
 		         name = 'Building',
-		         path = c.uri_for('/building/list'),
+		         path = c.uri_for_action('/building/list'),
 	  	     },
 		     {
 		         name = 'Rack',
-		         path = c.uri_for('/rack/list'),
+		         path = c.uri_for_action('/rack/list'),
 		     },		     
 		     ]
 		},
 		{
 		     name = 'Network',
-		     path = c.uri_for('/vlanrange'),
+		     path = c.uri_for_action('/vlanrange/list'),
 		     subsections = [
   	       		 {
 	        	     name = 'VLAN', 
-		     	     path = c.uri_for('/vlanrange/list'),
+		     	     path = c.uri_for_action('/vlanrange/list'),
 			},
 			{
 			    name = 'VTP',
-		     	    path = c.uri_for('/vlan/list'),
+		     	    path = c.uri_for_action('/vlan/list'),
 			},
 			{
 				name = 'Address Plan',
-				path = c.uri_for('/iprange/list'),
+				path = c.uri_for_action('/iprange/list'),
 			},
 			{
 				name = 'SSid',
@@ -47,11 +47,11 @@
 		     subsections = [
                         {
 			   name = "Queries",
-			   path = c.uri_for('/query'),
+			   path = "#",
 			}
 	                {
 		           name = 'Report Archive',
-		           path = c.uri_for('/reportarchive'),
+		           path = c.uri_for_action('/reportarchive/list'),
 		        },
 			{
 			    path=c.uri_for_action('/query/statistics'),
@@ -61,21 +61,21 @@
 		},
 		{
 		     name = 'Config',
-     		     path = c.uri_for('/user/list'),
+     		     path = c.uri_for_action('/user/list'),
 		     subsections = [		     
   	       	     {
 			name = 'Users', 
-		     	path = c.uri_for('/user/list'),
-	       	      },
-	     	      {
-		     name = 'Management Urls',
-		     path = c.uri_for('/mngurlformat'),
+		     	path = c.uri_for_action('/user/list'),
+	       	     },
+	     	     {
+		        name = 'Management Urls',
+		        path = c.uri_for_action('/mngurlformat/list'),
 		     },
 		     {
 			name = 'Credentials',
 		     	path = '#',
-			}	     
-			]
+		     }		
+		     ]
  		 }
 	]
 -%]
