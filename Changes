@@ -1,0 +1,58 @@
+2.0200 Not Released
+
+  [ UI ]
+  
+  - restyled UI
+  - controller/device: replaced popups with ajax dialogs
+  - controller/device: optional loading of SNMP::Info
+  - views added JSON view and JSONView Controller Role
+  - cleaned Manoc.pm configuration
+  - protection against CSRF
+  
+  [ DB ]
+  
+  - changed device primary key from ip address to integer
+  - updated users table with support for bcrypt password
+  - changed schema numbering
+
+  [ OTHER ]
+  
+  - Manoc requires Perl 5.10
+  - updated to support latest CPAN packages, including Moose and SNMPInfo
+  - new datadumper implementation
+
+2.0101 2015-04-29
+
+  [ NETWALKER ]
+  - Support for SNMP::Info 3.37
+  - Bugfix to neighborhood discovery
+
+2.0100 2013-06-18 Woodpecker Release
+
+  [ UI ]
+
+  - restyled device creation form, close popup window after
+    actions or on discard button
+  - introduced natural sorting in tables
+  - updated for new versions of HTML::FormHanlder and DataTable
+    (table plug-in for JQuery) better performance in loading JS
+  - (moved links at end of page) implemented search plugin system to
+    add custom searches in search controller added new report to
+  - discover new devices connetcted to the net
+
+  [ DB ]
+
+  - changed the internal representation of all IP addresses: now IP
+   are 0 padded in order to delete ANY functional dependences with the
+   backend (MySQL)
+
+  [ OTHER ]
+
+  - Improved performance of DB dumper script
+
+  - Added support in manoc_backup script to ignore changes in specific
+    lines
+
+2.00 2011-19-02
+
+  - Initial release of Manoc 2
