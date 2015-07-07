@@ -5,10 +5,11 @@
 package Manoc::Controller::Building;
 use Moose;
 use namespace::autoclean;
+
 use Manoc::Form::Building;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
+with "Manoc::ControllerRole::CommonCRUD";
 with "Manoc::ControllerRole::JSONView";
 
 =head1 NAME
@@ -23,155 +24,45 @@ Catalyst Controller.
 
 =cut
 
-=head2 index
+__PACKAGE__->config(
+    # define PathPart
+    action => {
+        setup => {
+            PathPart => 'building',
+        }
+    },
+    class      => 'ManocDB::Building',
 
-=cut
+    create_page_title  => 'New building',
+    edit_page_title    => 'Edit building',
+    list_page_title    => 'Buildings',
+);
 
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->response->redirect($c->uri_for('/building/list'));
-    $c->detach();
-}
-
-=head2 base
-
-=cut
-
-sub base : Chained('/') : PathPart('building') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( resultset => $c->model('ManocDB::Building') );
-}
-
-=head2 object
-
-=cut
-
-sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
-    my ( $self, $c, $id ) = @_;
-
-    $c->stash( object => $c->stash->{resultset}->find($id) );
-
-    if ( !$c->stash->{object} ) {
-        $c->stash( error_msg => "Object $id not found!" );
-        $c->detach('/error/index');
-    }
-}
-
-=head2 list
-
-=cut
-
-sub fetch_list : Private {
+sub get_object_list {
    my ( $self, $c ) = @_;
-   
-   my $build_schema = $c->stash->{resultset};
-   $c->stash('object_list' => [ $build_schema->search({}, 
-                                                      {prefetch => 'racks'} ) ]
-         );
-   
+
+   my $rs = $c->stash->{resultset};
+   return  [ $rs->search({}, {prefetch => 'racks'} ) ];
 }
 
-sub list : Chained('base') : PathPart('list') : Args(0) {
+sub get_form {
     my ( $self, $c ) = @_;
-
-    $c->forward('fetch_list');
-    $c->stash( template       => 'building/list.tt' );
+    return Manoc::Form::Building->new();
 }
 
-
-=head2 view
-
-=cut
-
-sub view : Chained('object') : PathPart('view') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->stash( template => 'building/view.tt' );
-}
-
-=head2 edit
-
-=cut
-
-sub edit : Chained('object') : PathPart('edit') : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash(title => 'Edit building');
-    $c->forward('form');
-}
-
-
-=head2 create
-
-=cut
-
-sub create : Chained('base') : PathPart('create') : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash(title => 'New building');
-    $c->forward('form');
-}
-
-=head2 form
-
-Handle create and edit resources
-
-=cut
-
-sub form : Private {
-    my ( $self, $c ) = @_;
-    my $item = $c->stash->{object} ||
-        $c->stash->{resultset}->new_result( {} );
-
-    my $form = Manoc::Form::Building->new( item => $item );
-    $c->stash(
-        form => $form,
-        template => 'building/form.tt'
-    );
-
-    # the "process" call has all the saving logic,
-    #   if it returns False, then a validation error happened
-    my $success = $form->process( params => $c->req->params );
-    $success or return;
-
-    $c->stash(message => "Building updated.");
-    if ($c->stash->{is_xhr}) {
-        $c->stash(no_wrapper => 1);
-        return;
-    }
-    $c->response->redirect($c->uri_for_action( 'building/list') );
-    $c->detach();
-}
-
-=head2 delete
-
-=cut
-
-sub delete : Chained('object') : PathPart('delete') : Args(0) {
+sub delete_object {
     my ( $self, $c ) = @_;
     my $building = $c->stash->{'object'};
-    my $id       = $building->id;
-    my $name     = $building->name;
 
+    if ( $building->racks->count ) {
+        $c->flash( error_msg => 'Building is not empty and cannot be deleted.' );
+        return undef;
+    }
 
-    if ( lc $c->req->method eq 'post' ) {
-        if ( $c->model('ManocDB::Rack')->search( { building => $id } )->count ) {
-            $c->flash( error_msg => 'Building is not empty. Cannot be deleted.' );
-            $c->response->redirect( $c->uri_for_action( 'building/view', [$id] ) );
-            $c->detach();
-        }
-        if ( $building->delete ) {
-            $c->flash( message => $name . ' deleted.' );
-        } else {
-            $c->flash( error_msg => 'Error deleting builind' );
-        }
-        $c->response->redirect( $c->uri_for_action('building/list') );
-        $c->detach()
-    }
-    else {
-        $c->stash( template => 'generic_delete.tt' );
-    }
+    return  $building->delete;
 }
 
-sub prepare_json_object : Private {
+sub prepare_json_object {
     my ($self, $building) = @_;
     return {
         id      => $building->id,
