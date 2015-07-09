@@ -84,7 +84,7 @@
   <td>
   [% IF backup_date %]
        [% backup_date %] 
-	<a href="[% c.uri_for_action('device/show_run', [object.id.address]) %]">
+	<a href="[% c.uri_for_action('device/show_run', [object.id]) %]">
 	  View</a>
   [% ELSE %]
 	Backup not found
@@ -120,11 +120,11 @@
 <div class="buttons">	
   <a href="[% c.uri_for_action('/device/edit',[object.id]) %]">[%
   ui_icon('pencil') %]Edit</a>
-  &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id.address]) %]">
+  &nbsp;<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
   [% ui_icon('closethick') %]    Delete</a>
-  &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id.address]) %]">
+  &nbsp;<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
 [% ui_icon('gear') %] Set Uplink</a>
-  &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id.address]) %]" id="confirm-button"> 
+  &nbsp;<a href="[% c.uri_for_action('/device/refresh', [object.id]) %]" id="confirm-button"> 
         [% ui_icon('arrowrefresh-1-w') %] Refresh Info</a>
 </div>
 
