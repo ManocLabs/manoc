@@ -1,18 +1,17 @@
 [% META 
-   title='List'
-   subsection='Device'
-   section='Asset'
    use_table=1
 -%]
+[%
+page.title = 'Devices'
+page.subsection = 'Device'
+page.section = 'Asset'
+%]
+<div id="device_create">
+  <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
 
-<div>
-<div class="buttons create_btn">
-    <a href="[% c.uri_for_action('/device/create') %]" >
-             [% ui_icon('circle-plus') %] Create Device</a>
- [% add_css_create_btn %]
- </div>
- [% init_table('devices') %]
- <table class="display" id="devices">
+[% init_table('device_list', { toolbar="device_create" }) %]
+ <table id="device_list">
        <thead>
 	 <tr>
    	   <th>IP Address</th>
