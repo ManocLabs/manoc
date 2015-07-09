@@ -1,14 +1,14 @@
 [% META
-   section='Asset'
-   subsection='Building'
-   title='Buildings'
-   use_table=1
+use_table=1
 -%]
-
+[%
+page.section='Asset'
+page.subsection='Building'
+page.title='Buildings'
+%]
 <div id="building_create">
 <a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-
 
 [% init_table('building_list',{ columns=[30,50,20], toolbar="building_create" } ) %]
  <table id="building_list">

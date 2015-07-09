@@ -5,7 +5,7 @@
 -%]
 [% PROCESS 'bootstrap.tt' -%]
 [% PROCESS 'menu.tt'      -%]
-[% PROCESS 'datatable.tt' -%]
+[% PROCESS 'datatable.tt' IF template.use_table -%]
 [% PROCESS 'macros.tt'    -%]
 [%-
    link_css.push(c.uri_for('/static/css/style.css'))

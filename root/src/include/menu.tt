@@ -105,7 +105,7 @@
 	    </li>	    
 [% END -%]
           </ul>
-[% UNLESS template.disable_search %]
+[% UNLESS page.disable_search %]
           <form action="[% c.uri_for('/search') %]" method="get" class="navbar-form navbar-right" >
             <input name="q" type="text" class="form-control" placeholder="Search...">
           </form>
@@ -117,7 +117,7 @@
 [% MACRO sidebar BLOCK -%]
 <ul class="nav nav-sidebar">
 [% FOREACH s IN menu_sections %]
-  [% IF s.name == template.section -%]
+  [% IF s.name == page.section -%]
     [% FOREACH i IN s.subsections %]
   <li><a href="[% i.path %]">[% i.name %]</a></li>
     [% END -%]

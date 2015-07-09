@@ -1,8 +1,9 @@
 [% META
-   section = 'About'
    layout = 'onecol'
-%]
-
+-%]
+[%
+page.section = 'About'
+-%]
 <div>
 <img class="center-block" src="[% c.uri_for('/static/images/manoc-logo.jpg') %]">
 <p class="text-center" id="fir">One Query to know them all,</p>

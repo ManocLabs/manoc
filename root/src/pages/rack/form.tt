@@ -1,5 +1,5 @@
-[% META
-   subsection='Rack'
-   section='Asset' 
+[%
+page.subsection = 'Rack'
+page.section = 'Asset' 
 -%]
 [% form.render %]

@@ -6,6 +6,12 @@
    use_row_group = 1
 -%]
 
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#general" role="tab" data-toggle="tab" aria-controls="general">Building info</a></li>
+    <li role="presentation"><a href="#racks" role="tab" data-toggle="tab" aria-controls="racks">Racks</a></li>
+  </ul>
+
 <div id="tabs">	 
   <ul>
     <li><a href="#tabs-1">General</a></li>

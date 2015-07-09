@@ -1,63 +1,43 @@
-[% META
-   section='Asset'
-   subsection='Building'  
-   title='View building'
-   use_table=1
+[%
+page.section = 'Asset'
+page.subsection = 'Building'
+page.title = 'Building ' _ object.name
 -%]
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#general" role="tab" data-toggle="tab" aria-controls="general">Building info</a></li>
-    <li role="presentation"><a href="#racks" role="tab" data-toggle="tab" aria-controls="racks">Racks</a></li>
-  </ul>
-
-  <!-- Tab panes -->
-  <div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="general">
-    <table class="table">
-      <tr>
-	<td>Name:</td><td>[% object.name | html %]</td>
-      </tr>
-      <tr>
-	<td>Description:</td><td>[% object.description | html %] </td>
-      <tr>
-	<td>Notes:</td><td>[% object.notes | html%]</td>
-      </tr>
-    </table>
-    <p>
-      <div>	
-	<a class="btn btn-primary" href=[%c.uri_for_action('building/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
-	&nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('building/delete', [object.id]) %]>
-	[% ui_icon('closethick') %]  Delete</a>
-	&nbsp;<a class="btn btn-default" href="[% c.uri_for('/rack/create', { building => object.id}) %]">
-	[% bootstrap_icon('plus') %] Add Rack</a>
-      </div>
-    </p>
-  </div>
-  
-  <div role="tabpanel" class="tab-pane"  id="racks">
-    [% FOREACH r IN object.racks %]
-    [% IF loop.first %]
-    [% init_table('rack_list') %]
-    <table class="display" id="rack_list">
-      <thead>  
-        <tr>
- 	  <th>Floor</th>
- 	  <th>Racks</th>
-        </tr>
-      </thead>  
-      <tbody>
-	[% END %]
-        <tr>
- 	  <td>[% r.floor | html %]</td>
- 	  <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]>[% r.name %]</a></td>
-        </tr>
-	[% IF loop.last %]
-      </tbody>
-    </table>
-    [% END %]
-    [% END %]
-  </div>
+[% page.toolbar = BLOCK %]
+  <a class="btn btn-primary" href=[%c.uri_for_action('building/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+  <a class="btn btn-danger" href=[% c.uri_for_action('building/delete', [object.id]) %]>
+    [% bootstrap_icon('trash') %] Delete</a>
+  <a class="btn btn-default" href="[% c.uri_for('/rack/create', { building => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add Rack</a>
+[% END %]
+<div class="row">
+<div class="panel panel-default">
+  <div class="panel-body">
+<dl class="dl-horizontal">
+  <dt>Description:</dt><dd>[% object.description | html %]</dd>
+  <dt>Notes:</dt><dd>[% object.notes | html%]</dd>
+</dl>
+</div>
+</div>
 </div>
 
-
+<div class="row">
+[% IF object.racks -%]
+  <table class="table table-condensed" id="rack_list">
+    <thead>  
+      <tr>
+ 	<th class="col-md-2">Floor</th>
+ 	<th>Racks</th>
+      </tr>
+    </thead>  
+    <tbody>
+[% FOREACH r IN object.racks -%]
+      <tr>
+ 	<td>[% r.floor | html %]</td>
+ 	<td>[% print_rack(r) %]</td>
+      </tr>
+[% END -%]
+    </tbody>
+  </table>
+  [% END %]
 </div>

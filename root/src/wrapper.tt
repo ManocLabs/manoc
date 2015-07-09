@@ -5,6 +5,7 @@
         layout = template.layout || 'standard';
         wrapper = "layouts/${layout}.tt";
         debug("Applying wrapper $wrapper to $template.name");
+	title = title || page.title || template.title;
         content WRAPPER $wrapper;
     END;
 -%]

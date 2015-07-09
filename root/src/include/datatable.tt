@@ -1,9 +1,4 @@
-[% IF template.use_row_group -%]
-   [% link_css.push(c.uri_for('/static/external/datatable/rowGrouping.css') ) -%]
-   [% link_js.push(c.uri_for('/static/external/datatable/jquery.dataTables.rowGrouping.js')) -%]
-[% END -%]
-[% IF template.use_table -%]
-  [%  link_css.push(
+[% link_css.push(
                c.uri_for('/static/external/datatable-bs/css/dataTables.bootstrap.css'),
              )
   -%]
@@ -12,13 +7,8 @@
                c.uri_for('/static/external/datatable-bs/js/dataTables.bootstrap.js'),
              ) 
   -%]
-[% END -%]
-[% IF template.use_exp_table -%]
-  [% link_js.push(c.uri_for('/static/js/jExpand.js')) -%]
-  [% link_css.push( c.uri_for('/static/css/jExpand.css')) -%]
-[%  END -%]
 [%# Init Table -%]
-[%MACRO init_table(id, options) BLOCK -%]
+[% MACRO init_table(id, options) BLOCK -%]
 [% capture = BLOCK -%]
 $(function() {
     var page_rows=25;
@@ -50,28 +40,6 @@ $(function() {
    var dest=$("#[% id %]_wrapper div.toolbar").first();
    origin.appendTo(dest);
 [% END -%]
-});
-[% END -%]
-[% js_scripts.push(capture) -%]
-[% END -%]
-[%MACRO init_row_group_table(id,columns, options) BLOCK -%]
-[% capture = BLOCK -%]
-$(function() { 
-	  if ( $("#[% id  %]").dataTable ) {
-	   
- 	     /* inizializzazione della tabella */
-	     $("#[% id  %]").dataTable( {
-	       //[% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
-	       //pagination button (two_button, full_numbers)
- 	       "bLengthChange": false,
-	       //to disable sorting
-	       //"bSort": true,
-		   //to disable pagination
-	       "bPaginate": false
-	       }).rowGrouping({ bExpandableGrouping: true,
-	         				asExpandedGroups: ["Active"],
-						  });
-		}
 });
 [% END -%]
 [% js_scripts.push(capture) -%]

@@ -1,78 +1,45 @@
-[% META 
-   title='View'
-   subsection='Rack'
-   section='Asset'
-   use_table=1
+[%
+page.section = 'Asset'
+page.subsection = 'Rack'
+page.title = 'Rack ' _ object.name
 -%]
+[% page.toolbar = BLOCK -%]
+  <a class="btn btn-primary" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+  <a class="btn btn-danger" href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
+  <a class="btn  btn-default" href="[% c.uri_for_action('device/create', { rack => object.id}) %]">[% bootstrap_icon('plus') %] Add Device</a>
+[% END -%]
 
-	<div id="tabs">
-			<ul>
-				<li><a href="#tabs-1">Info</a></li>
-				<li><a href="#tabs-2">Devices</a></li>
-			</ul>
-
-		
-
-<div id="tabs-1">
-<table id="info">
-<tr>
-  <td>Name:</td><td>[%object.name%]</td>
-</tr>
-<tr>
-  <td>Building:</td>
-  <td><a href="[% c.uri_for_action('/building/view',[object.building.id]) %]">[% object.building.name %]</a> 
-               [% object.building.description | html %]
-  </td>
-<tr>
-  <td>Floor:</td><td>[%object.floor%]</td>
-</tr>
-</tr>
-<tr>
-  <td>Notes:</td><td>[% object.notes | html %]</td>
-</tr>
-</table>
-[% add_css_tableinfo -%]
-
-<p>
-  <div class="buttons">	
-    <a href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% ui_icon('pencil') %] Edit</a>
-    &nbsp;<a href="[%c.uri_for_action('rack/delete',[object.id]) %]">
-      [% ui_icon('closethick') %] Delete</a>
-    &nbsp;<a href="[% c.uri_for_action('device/create', { rack => object.id}  ) %]">[% ui_icon('plusthick') %] Add Device</a>
+<div class="row">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+	<dt>Building</dt><dd>[% print_building(object.building) %]</dd>
+	<dt>Floor</dt><dd>[% object.floor %]</dd>
+	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
+      </dl>
+    </div>
   </div>
-</p>
-</div>
-
-   <div id="tabs-2">	
-[% FOREACH d IN object.devices %]
-   [% IF loop.first %]
-   [% init_table('devices') %]
-    <table class="display" id="devices">
-      <thead>  
-         <tr>
- 	 <th>Level</th>
- 	 <th>Name</th>
- 	 <th>Address</th>
-         </tr>
-      </thead>  
-      <tbody>
-  [% END %]
-         <tr>
- 	 <td>[% d.level %]</td>
- 	 <td>[% d.name %]</td>
- 	 <td>[% print_device(d) %]</td>
-         </tr>
-  [% IF loop.last %]
-      </tbody>
-    </table>
-  [% END %]
-[% END %]
-        </div>
-
-
-
-  
-
 </div>
 
 
+
+<div class="row">
+[% IF object.devices -%]
+  <table class="table table-condensed" id="device_list">
+    <thead>  
+      <tr>
+ 	<th class="col-md-2">Level</th>
+ 	<th>Device</th>
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH d IN object.devices -%]
+      <tr>
+	<td>[% d.level %]</td>
+	<td>[% print_device(d) %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>

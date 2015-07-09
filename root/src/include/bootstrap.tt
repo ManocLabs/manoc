@@ -15,6 +15,6 @@
 [%# ----------------------------------------------------------------- -%]
 [% MACRO bootstrap_pagetitle(title) BLOCK -%]
 [% IF title -%]
-<h1 class="page-header">[% template.title %]</h1>
+<h1 class="page-header">[% title %]</h1>
 [% END -%]
 [%- END -%]

@@ -1,15 +1,15 @@
 [% META 
-   title='Racks'
-   subsection='Rack'
-   section='Asset'	
    use_table=1
 -%]
-
+[%
+page.title='Racks'
+page.subsection='Rack'
+page.section='Asset'	
+-%]
+[% init_table('rack_list', { toolbar="rack_create" })%] 
 <div id="rack_create">
      <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-
-[% init_table('rack_list', { toolbar="rack_create" })%] 
  <table id="rack_list">
        <thead>  
 	 <tr>
