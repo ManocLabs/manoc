@@ -14,7 +14,11 @@
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO bootstrap_pagetitle(title) BLOCK -%]
-[% IF title -%]
 <h1 class="page-header">[% title %]</h1>
-[% END -%]
+[%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_nav_tab(name, label, active) BLOCK -%]
+<li role="presentation" [% IF active %]class="active"[% END %]>
+<a href="#[% name %]" aria-controls="[% name %]" role="tab" data-toggle="tab">[% label %]</a>
+</li>
 [%- END -%]
