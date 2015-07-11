@@ -5,7 +5,7 @@
 package Manoc::Controller::Ip;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int check_addr);
+use Manoc::Utils qw(clean_string int2ip ip2int check_addr);
 use Manoc::Form::Ip;
 use Manoc::IpAddress;
 use Data::Dumper;
@@ -81,8 +81,8 @@ sub _get_ipinfo : Private {
     my @arp_results = map +{
         macaddr   => $_->macaddr,
         vlan      => $_->vlan,
-        firstseen => print_timestamp( $_->firstseen ),
-        lastseen  => print_timestamp( $_->lastseen )
+        firstseen => $_->firstseen,
+        lastseen  => $_->lastseen
     }, @r;
     $c->stash( arp_results => \@arp_results );
 

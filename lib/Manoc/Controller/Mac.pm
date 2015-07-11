@@ -5,7 +5,7 @@
 package Manoc::Controller::Mac;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(print_timestamp clean_string int2ip ip2int);
+use Manoc::Utils qw(clean_string int2ip ip2int);
 use Manoc::IpAddress;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -90,8 +90,8 @@ sub _get_arp : Private {
     my @arp_results = map +{
         ipaddr    => $_->ipaddr,
         vlan      => $_->vlan,
-        firstseen => print_timestamp( $_->firstseen ),
-        lastseen  => print_timestamp( $_->lastseen )
+        firstseen =>  $_->firstseen,
+        lastseen  =>  $_->lastseen
     }, @r;
 
     $c->stash( arp_results => \@arp_results );
@@ -116,10 +116,8 @@ sub _get_mat : Private {
         device      => $_->device_entry,
         iface       => $_->interface,
         vlan        => $_->vlan,
-        firstseen_i => $_->firstseen,
-        lastseen_i  => $_->lastseen,
-        firstseen   => print_timestamp( $_->firstseen ),
-        lastseen    => print_timestamp( $_->lastseen )
+        firstseen   => $_->firstseen,
+        lastseen    => $_->lastseen,
     }, @r;
 
     @r = $c->stash->{'resultset'}->{'mat_archive'}->search( 
@@ -132,8 +130,8 @@ sub _get_mat : Private {
         vlan             => $_->vlan,
         firstseen_i      => $_->firstseen,
         lastseen_i       => $_->lastseen,
-        firstseen        => print_timestamp( $_->firstseen ),
-        lastseen         => print_timestamp( $_->lastseen )
+        firstseen        => $_->firstseen,
+        lastseen         => $_->lastseen
     }, @r;
 
     my @mat_results = sort {
@@ -162,8 +160,8 @@ sub _get_dot11 : Private {
         ssid      => $_->ssid,
         ipaddr    => $_->ipaddr,
         vlan      => $_->vlan,
-        firstseen => print_timestamp( $_->firstseen ),
-        lastseen  => print_timestamp( $_->lastseen )
+        firstseen => $_->firstseen,
+        lastseen  => $_->lastseen 
     }, @r;
 
     $c->stash( dot11_results => \@dot11_results );
@@ -191,8 +189,8 @@ sub _get_dhcpinfo : Private {
     my @leases = map +{
         ipaddr   => $_->ipaddr,
         server   => $_->server,
-        start    => print_timestamp( $_->start ),
-        end      => print_timestamp( $_->end ),
+        start    => $_->start,
+        end      => $_->end,
         hostname => $_->hostname,
         status   => $_->status
     }, @r;

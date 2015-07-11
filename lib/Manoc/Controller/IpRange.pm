@@ -8,7 +8,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Manoc::IpAddress;
 use Manoc::Utils qw/netmask_prefix2range int2ip ip2int padded_ipaddr
-    print_timestamp prefix2wildcard netmask2prefix
+    prefix2wildcard netmask2prefix
     check_addr /;
 use POSIX qw/ceil/;
 BEGIN { extends 'Catalyst::Controller'; }

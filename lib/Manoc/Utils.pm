@@ -10,7 +10,7 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
-    clean_string print_timestamp
+    clean_string
     ip2int int2ip str2seconds
     netmask_prefix2range netmask2prefix
     padded_ipaddr
@@ -102,13 +102,6 @@ sub check_ipv6_addr {
 #           D a t e   &   t i m e   F u n c t i o n s                  #
 #                                                                      #
 ########################################################################
-
-sub print_timestamp {
-    my $timestamp = shift @_;
-    defined($timestamp) || croak "Missing timestamp";
-    my @timestamp = localtime($timestamp);
-    return strftime( "%d/%m/%Y %H:%M:%S", @timestamp );
-}
 
 sub str2seconds {
     my ($str) = @_;
