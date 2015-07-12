@@ -60,8 +60,8 @@
 [%# ----------------------------------------------------------------- -%]
 [%#                          Vlan                                     -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_vlan(id,name) BLOCK -%]
-<a href=[% c.uri_for_action('/vlan/view', [id]) %]> [% name | html %] </a>
+[% MACRO print_vlan(vlan) BLOCK -%]
+<a href="[% c.uri_for_action('/vlan/view', [vlan.id]) %]> [% vlan.name | html %] </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Hostname                                  -%]

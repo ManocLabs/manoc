@@ -10,11 +10,11 @@
 [% END -%]
 [% IF c.flash.error_msg -%]
 <div class="alert alert-warning" role="alert">
-[% c.flash.error_msg | html %]<
+[% c.flash.error_msg | html %]
 </div>
 [% END -%]
 [% IF error_msg -%]
 <div class="alert alert-warning" role="alert">
-[% error_msg | html %]<
+[% error_msg | html %]
 </div>
 [% END -%]
