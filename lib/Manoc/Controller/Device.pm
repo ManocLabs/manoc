@@ -5,11 +5,15 @@
 package Manoc::Controller::Device;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(clean_string print_timestamp check_addr );
+
+
+BEGIN { extends 'Catalyst::Controller'; }
+with "Manoc::ControllerRole::CommonCRUD";
+with "Manoc::ControllerRole::JSONView";
+
 use Text::Diff;
 use Manoc::Form::Device;
 use Manoc::Report::NetwalkerReport;
-use Data::Dumper;
 
 # moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
 # where we need it
@@ -34,48 +38,28 @@ has 'device_form' => (
     default => sub { Manoc::Form::Device->new }
 );
 
+__PACKAGE__->config(
+    # define PathPart
+    action => {
+        setup => {
+            PathPart => 'device',
+        }
+    },
+    class      => 'ManocDB::Device',
+);
 
 =head1 METHODS
 
 =cut
 
-=head2 index
-
-=cut
-
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->response->redirect($c->uri_for_action('/device/list'));
-    $c->detach();
-}
-
-=head2 base
-
-=cut
-
-sub base : Chained('/') : PathPart('device') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( resultset => $c->model('ManocDB::Device') );
-}
-
-=head2 object
-
-=cut
-
-sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
+sub get_object {
     my ( $self, $c, $id ) = @_;
-    # $id = primary key
 
     my $object = $c->stash->{resultset}->find($id);
     if ( !defined($object)) {
 	$object = $c->stash->{resultset}->find({mng_address => $id});
     }
-    $c->stash(object => $object);
-
-    if ( !defined( $c->stash->{object} ) ) {
-        $c->stash( error_msg => "Object $id not found!" );
-        $c->detach('/error/index');
-    }
+    return $object;
 }
 
 
@@ -83,7 +67,7 @@ sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
 
 =cut
 
-sub view : Chained('object') : PathPart('view') : Args(0) {
+sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
     my $device = $c->stash->{'object'};
     my $id     = $device->id;
@@ -91,60 +75,25 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     my %tmpl_param;
     my @iface_info;
 
-    $tmpl_param{name}     = $device->name;
-    $tmpl_param{boottime} = (
-        $device->boottime ? print_timestamp( $device->boottime ) :
-            'n/a'
-    );
-    $tmpl_param{last_visited} = (
-        $device->last_visited ? print_timestamp( $device->last_visited ) :
-            'Never visited'
-    );
-
-    $tmpl_param{backup_date} =
-        $device->config ? print_timestamp( $device->config->config_date ) : undef;
-    $tmpl_param{backup_enabled} = $device->backup_enabled ? "Enabled" : "Not enabled";
-    $tmpl_param{serial}         = $device->serial;
-    
-    $tmpl_param{dot11_enabled} = $device->get_dot11 ? "Enabled" : "Not enabled";
-    $tmpl_param{arp_enabled}   = $device->get_arp   ? "Enabled" : "Not enabled";
-    $tmpl_param{mat_enabled}   = $device->get_mat   ? "Enabled" : "Not enabled";
     $tmpl_param{uplinks} = join( ", ", map { $_->interface } $device->uplinks->all() );
 
     # CPD
-    my @neighs = $c->model('ManocDB::CDPNeigh')->search(
-                 { from_device => $id },
-                 {
-                     '+columns' => [ { 'devname' => 'dev.name' } ],
-                     order_by   => 'last_seen DESC, from_interface',
-                     from  => [
-                               { 'me' => 'cdp_neigh' },  
-                               [
-                                { 
-                                    'dev'       => 'devices',
-                                    -join_type  => 'LEFT',
-                                },
-                                { 
-                                    'me.to_device' => 'dev.id'}
-                                ]
-                               ]});
+    my@neighs = $device->neighs( {}, { prefetch=>'to_device_info' } );
   
     my @cdp_links;
-    my $time_group = $c->config->{Device}->{cdp_age} || 3600 * 12; #12 hours
+    my $time_limit = $c->config->{Device}->{cdp_age} || 3600 * 12; #12 hours
     foreach my $n (@neighs){
-      my $neigh_addr = $n->to_device; 
-      $neigh_addr = $n->to_device->address if(ref $neigh_addr);
-     push ( @cdp_links, {  
-              group        => time - $n->last_seen < $time_group ? "Active" : "History",
-			  local_iface  => $n->from_interface,
-			  neigh_address=> $neigh_addr,
-			  device_name  => $n->get_column('devname'),
-			  device_id    => $n->remote_id,
-			  descr        => $n->remote_type,
-			  date         => print_timestamp( $n->last_seen ),
-			 });
-   }
-
+	push ( @cdp_links, {  
+	    expired      => time - $n->last_seen > $time_limit,
+	    local_iface  => $n->from_interface,
+	    to_device    => $n->to_device,
+	    to_device_info => $n->to_device_info,
+	    remote_id    => $n->remote_id,
+	    remote_type  => $n->remote_type,
+	    date         => $n->last_seen,
+	});
+    }
+    
     #------------------------------------------------------------
     # Interfaces info
     #------------------------------------------------------------
@@ -155,16 +104,13 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
     # prefetch interfaces last activity
     my ($e, $it);
 
-    
     $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
 
 
     my %if_last_mat;
 
     while ( $e = $it->next ) {
-      $if_last_mat{$e->interface} =
-	$e->get_column('lastseen') ? 
-	  print_timestamp( $e->get_column('lastseen') ) : 'never';
+      $if_last_mat{$e->interface} = $e->get_column('lastseen');
     }
 
     # fetch ifstatus and build result array
@@ -174,8 +120,8 @@ sub view : Chained('object') : PathPart('view') : Args(0) {
         my $lc_if = lc( $r->interface );
 
         push @iface_info, {
-            controller   => $controller,                                  # for sorting
-            port         => $port,                                        # for sorting
+            controller   => $controller,      # for sorting
+            port         => $port,            # for sorting
             interface    => $r->interface,
             speed        => $r->speed || 'n/a',
             up           => $r->up || 'n/a',
@@ -250,17 +196,15 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     }
 
     my %config = (
-		  snmp_community => $c->config->{Credentials}->{snmp_community}
-		  || 'public',
-		  snmp_version   => $c->config->{Netwalker}->{snmp_version} || 2,
-		  default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
-		  iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
-		  ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
-		  || 1,
-		 );
+	snmp_community => $c->config->{Credentials}->{snmp_community}
+	    || 'public',
+	snmp_version   => $c->config->{Netwalker}->{snmp_version} || 2,
+	default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
+	iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
+	ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
+	    || 1,
+    );
     
-    # TODO why an hardcoded debug?
-    # $ENV{DEBUG} = 1;
     my $updater = Manoc::Netwalker::DeviceUpdater->new(
          entry        => $c->stash->{object},
          config       => \%config,
@@ -273,7 +217,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 	my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
 	$c->flash( error_msg => $err_msg );
 	$c->response->redirect(
-			       $c->uri_for_action( '/device/view', [$device_id] ) );
+	    $c->uri_for_action( '/device/view', [$device_id] ) );
 	$c->detach();
     }
     
@@ -303,45 +247,41 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     $report->visited( $worker_report->visited );
     
     my $new_report = $c->model('ManocDB::ReportArchive')->create(
-								 {
-								  'timestamp' => time,
-								  'name'      => 'Netwalker',
-								  'type'      => 'NetwalkerReport',
-								  's_class'   => $report,
-								 }
-								);
+	{
+	    'timestamp' => time,
+	    'name'      => 'Netwalker',
+	    'type'      => 'NetwalkerReport',
+	    's_class'   => $report,
+	}
+    );
     
     my $report_url =
       $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
     
     my $msg = "Success! Device infomations are now up to date!"
-      . " See the <a href=\"$report_url\">report</a> for details.";
+	. " See the <a href=\"$report_url\">report</a> for details.";
     
     $c->flash( message => $msg);
     $c->response->redirect(
 			   $c->uri_for_action( '/device/view', [$device_id] ) );
-    $c->detach();
 }
 
 =head2 list
 
 =cut
 
-sub list : Chained('base') : PathPart('list') : Args(0) {
+sub get_object_list {
     my ( $self, $c ) = @_;
 
-    my $device_schema = $c->stash->{resultset};
-
-    my @device_table = $device_schema->search(
-        undef,
+    my $rs = $c->stash->{resultset};
+    my @devices = $rs->search(
+        {},
         {
             join     => [ { rack   => 'building' }, 'mng_url_format' ],
             prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
         }
     );
-    $c->stash( device_table => \@device_table );
-    $c->stash( template     => 'device/list.tt' );
-
+    return \@devices;
 }
 
 =head2 show_run
@@ -350,36 +290,14 @@ Show running configuration
 
 =cut
 
-sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
+sub show_config : Chained('object') : PathPart('config') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $device_schema = $c->stash->{resultset};
-    my $device_id     = $c->stash->{object}->id;
+    my $device = $c->stash->{object};
+    my $config = $device->config;
 
-    my (
-        $dev_config, $curr_config,     $curr_date, $prev_config,
-        $prev_date,  $has_prev_config, $template,  %tmpl_param
-    );
-
-    #Retrieve device configuration from DB
-    $dev_config = $c->model('ManocDB::DeviceConfig')->find( {device => $device_id} );
-    if ( !$dev_config ) {
-        $c->stash( error_msg => "Device backup not found!" );
-        $c->detach('/error/index');
-    }
-
-    #Set configuration parameters
-    $prev_config = $dev_config->prev_config;
-    if ( defined($prev_config) ) {
-        $has_prev_config = 1;
-        $prev_date       = print_timestamp( $dev_config->prev_config_date );
-    }
-    else {
-        $has_prev_config = 0;
-        $prev_date       = "";
-    }
-    $curr_config = $dev_config->config;
-    $curr_date   = print_timestamp( $dev_config->config_date );
+    my $prev_config = $config->prev_config;
+    my $curr_config = $config->config;
 
     #Get diff and modify diff string
     my $diff = diff( \$prev_config, \$curr_config );
@@ -391,16 +309,12 @@ sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
     $diff =~ s/^\+(.*)$/<font color=green> $1<\/font>/mg;
     $diff =~ s/^\-(.*)$/<font color=red> $1<\/font>/mg;
 
-    $tmpl_param{prev_config}      = $prev_config;
-    $tmpl_param{prev_config_date} = $prev_date;
-    $tmpl_param{has_prev_config}  = $has_prev_config;
-    $tmpl_param{curr_config}      = $curr_config;
-    $tmpl_param{curr_config_date} = $curr_date;
-    $tmpl_param{diff}             = $diff;
-
     #Prepare template
-    $c->stash(%tmpl_param);
-    $c->stash( template => 'device/show_run.tt' );
+    $c->stash(
+	config => $config,
+	diff   => $diff,
+    );
+    $c->stash( template => 'device/config.tt' );
 
 }
 
@@ -408,97 +322,41 @@ sub show_run : Chained('object') : PathPart('show_run') : Args(0) {
 
 =cut
 
-sub create : Chained('base') : PathPart('create') : Args() {
-    my ( $self, $c ) = @_;
 
-    my $rack = $c->request->query_parameters->{rack};
-    my $obj_params = {};
-    $rack and $obj_params->{rack} = $rack;
+before 'create' => sub {
+    my ( $self, $c) = @_;
 
-    $c->stash(
-	object => $c->stash->{resultset}->new_result( $obj_params ),
-	default_backref => $c->uri_for_action('/device/list'),
-	new_object => 1,
-	template => 'device/create.tt',
-    );
-    $c or die;
-    return $self->process_form($c);
-}
+    my $rack_id = $c->req->query_parameters->{'rack'};
+    $c->log->debug("new device in $rack_id");
+    $c->stash(form_defaults => { rack => $rack_id });
+};
 
-
-=head2 edit
+=head2 get_form
 
 =cut
 
-sub edit : Chained('object') : PathPart('edit') : Args(0) {
+sub get_form {
     my ( $self, $c ) = @_;
-    $c->stash(template => 'device/form.tt');
-    return $self->process_form($c);
-}
-
-=head2 form
-
-Used by add and edit
-
-=cut
-
-sub process_form {
-    my ( $self, $c ) = @_;
-    $c or die "@_";
-    my $action = $c->uri_for($c->action, $c->req->captures);
-    $c->stash(
-	form => $self->device_form,
-	action => $action,
-    );
-
-    if ( $c->req->param('form-device.discard') ) {
-        $c->detach('/follow_backref');
-    }
-
-    # the "process" call has all the saving logic,
-    #   if it returns False, then a validation error happened
-    my $process = $self->device_form->process(params => $c->req->params,
-				       item => $c->stash->{object} );
-
-    if (! $process) {
-        $c->keep_flash('backref');
-	$c->detach();
-    }
-    
-    $c->flash( message => 
-	     $c->stash->{new_object} ? 
-		 'Device created.' :
-		 'Device edited.'
-		 );
-
-    if ( my $backref = $c->check_backref($c) ) {
-        $c->response->redirect($backref);
-        $c->detach();
-    }
-    $c->response->redirect( $c->uri_for_action( '/device/list' ) );
-    $c->detach();
+    return Manoc::Form::Device->new();
 }
 
 =head2 delete
 
 =cut
 
-sub delete : Chained('object') : PathPart('delete') : Args(0) {
+sub delete_object {
     my ( $self, $c ) = @_;
     my $device = $c->stash->{'object'};
     my $id     = $device->id;
     my ( $e, $it );
 
-    $c->stash( default_backref => $c->uri_for_action('device/list') );
-    if ( lc $c->req->method eq 'post' ) {
-        $c->model('ManocDB')->schema->txn_do(
-            sub {
-
-                # transaction....
-                # 1) create a new deletedevice d2
-                # 2) move mat for $device to archivedmat for d2
-                # 3) $device->delete
-                my $del_device = $c->model('ManocDB::DeletedDevice')->create(
+    # transaction....
+    # 1) create a new deletedevice d2
+    # 2) move mat for $device to archivedmat for d2
+    # 3) $device->delete
+    $c->model('ManocDB')->schema->txn_do(
+	sub {
+	    my $del_device = $c->model('ManocDB::DeletedDevice')->create(
                     {
                         ipaddr    => $id,
                         name      => $device->name,
@@ -507,10 +365,9 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
                         timestamp => time()
                     }
                 );
-
-                $it = $c->model('ManocDB::Mat')->search(
-                    { device => $id, },
-                    {
+	    $it = $c->model('ManocDB::Mat')->search(
+		{ device => $id, },
+		{
                         select => [
                             'macaddr', 'vlan',
                             { 'min' => 'firstseen' }, { 'max' => 'lastseen' },
@@ -518,34 +375,27 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
                         group_by => [qw(macaddr vlan)],
                         as       => [ 'macaddr', 'vlan', 'min_firstseen', 'max_lastseen' ]
                     }
-                );
+	    );
 
-                while ( $e = $it->next ) {
-                    $del_device->add_to_mat_assocs(
-                        {
-                            macaddr   => $e->macaddr,
-                            firstseen => $e->get_column('min_firstseen'),
-                            lastseen  => $e->get_column('max_lastseen'),
-                            vlan      => $e->vlan
-                        }
-                    );
-                }
-                $device->delete;
-            }
-        );
-        if ($@) {
-            $c->flash( error_msg => 'Commit error: ' . $@ );
-            $c->detach('/error/index');
-        }
+	    while ( $e = $it->next ) {
+		$del_device->add_to_mat_assocs(
+		    {
+			macaddr   => $e->macaddr,
+			firstseen => $e->get_column('min_firstseen'),
+			lastseen  => $e->get_column('max_lastseen'),
+			vlan      => $e->vlan
+		    }
+		);
+	    }
+	    $device->delete;
+	}
+    );
 
-        $c->flash( message => 'Success!! Device ' . $id->address . ' successful deleted.' );
-
-        $c->detach('/follow_backref');
-
+    if ($@) {
+	$c->flash( error_msg => 'Error deleting device: ' . $@ );
+	return undef;
     }
-    else {
-        $c->stash( template => 'generic_delete.tt' );
-    }
+    return 1;
 }
 
 =head2 uplinks
@@ -618,9 +468,23 @@ sub process_uplinks : Private {
     return ( 1, 'Done. Uplinks setted.' );
 }
 
+
+=head2 prepare_json_object
+
+=cut
+
+sub prepare_json_object  {
+    my ($self, $device) = @_;
+    return {
+	id   => $device->id,
+	name => $device->name,
+	rack => $device->rack->id,
+    };
+};
+
 =head1 AUTHOR
 
-Rigo
+Manoc Team
 
 =head1 LICENSE
 

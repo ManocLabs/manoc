@@ -26,7 +26,7 @@ page.section = 'Asset'
          </tr>
        </thead>  
        <tbody>
-[% FOREACH d IN device_table %]
+[% FOREACH d IN object_list %]
          <tr>
  	   <td>[% print_device(d) %]</td>
    	   <td>[% d.name | html %]</td>
