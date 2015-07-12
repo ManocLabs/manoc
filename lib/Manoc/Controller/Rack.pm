@@ -100,7 +100,7 @@ sub delete_object {
 
 =cut
 
-sub prepare_json_object : Private {
+sub prepare_json_object  {
     my ($self, $rack) = @_;
     return {
 	    id      => $rack->id,

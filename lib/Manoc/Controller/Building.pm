@@ -32,10 +32,6 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::Building',
-
-    create_page_title  => 'New building',
-    edit_page_title    => 'Edit building',
-    list_page_title    => 'Buildings',
 );
 
 sub get_object_list {
