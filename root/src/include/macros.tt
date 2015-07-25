@@ -4,7 +4,7 @@
 [% MACRO print_device(device) BLOCK -%]
 <a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.name|html%]</a>
 [% IF device.get_mng_url -%]
-<a href="[%device.get_mng_url%]">[% boostrap_icon('share') %]</a>
+<a href="[%device.get_mng_url%]"><span class="sr-only">Open</span>[% bootstrap_icon('share') %]</a>
 [% END-%]
 [% END-%]
 [%# ----------------------------------------------------------------- -%]
@@ -61,7 +61,7 @@
 [%#                          Vlan                                     -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vlan(vlan) BLOCK -%]
-<a href="[% c.uri_for_action('/vlan/view', [vlan.id]) %]> [% vlan.name | html %] </a>
+<a href="[% c.uri_for_action('/vlan/view', [vlan.id]) %]"> [% vlan.name | html %] </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Hostname                                  -%]
