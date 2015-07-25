@@ -6,13 +6,13 @@ package Manoc::Controller::Device;
 use Moose;
 use namespace::autoclean;
 
-
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
 with "Manoc::ControllerRole::JSONView";
 
 use Text::Diff;
 use Manoc::Form::Device;
+use Manoc::Form::Uplink;
 use Manoc::Report::NetwalkerReport;
 
 # moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
@@ -406,67 +406,27 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $device = $c->stash->{'object'};
+    my $form = Manoc::Form::Uplink->new(device => $device);
 
-    if ( $c->req->param('discard') ) {
-        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id->address ] ) );
+    if ($device->ifstatus->count() == 0) {
+        $c->flash(error_msg => 'No known interfaces on this device');
+        $c->uri_for_action( 'device/view', [ $device->id ] );
         $c->detach();
     }
-    my $message;
-    if ( $c->req->param('submit') ) {
-        my $done;
-        ( $done, $message ) = $self->process_uplinks( $c, $device );
-        $done and $c->flash( message => $message );
-
-        if ( my $backref = $c->check_backref($c) ) {
-            $c->response->redirect($backref);
-            $c->detach();
-        }
-        $done and
-            $c->response->redirect( $c->uri_for_action( '/device/view', [ $device->id->address ] ) );
-        $c->detach();
-    }
-
-    my %uplinks = map { $_->interface => 1 } $device->uplinks->all;
-    my @iface_list;
-    my $rs = $device->ifstatus;
-    while ( my $r = $rs->next() ) {
-        my ( $controller, $port ) = split /[.\/]/, $r->interface;
-        my $lc_if = lc( $r->interface );
-
-        push @iface_list, {
-            controller  => $controller,                 # for sorting
-            port        => $port,                       # for sorting
-            interface   => $r->interface,
-            description => $r->description || '',
-            checked     => $uplinks{ $r->interface },
-        };
-    }
-    @iface_list =
-        sort { ( $a->{controller} cmp $b->{controller} ) || ( $a->{port} <=> $b->{port} ) }
-        @iface_list;
     $c->stash(
-        template   => 'device/uplinks.tt',
-        iface_list => \@iface_list
+        form   => $form,
+        action => $c->uri_for($c->action, $c->req->captures),
+    );
+    return unless $form->process(
+        params =>  $c->req->parameters,
     );
 
-}
-
-sub process_uplinks : Private {
-    my ( $self, $c ) = @_;
-    my @uplinks = $c->req->param('uplinks');
-
-    #return (1, 'Done') unless @uplinks ;
-
-    $c->model('ManocDB')->schema->txn_do(
-        sub {
-            $c->stash->{'object'}->uplinks()->delete();
-            foreach (@uplinks) {
-                $c->stash->{'object'}->add_to_uplinks( { interface => $_ } );
-            }
-        }
+    $c->response->redirect(
+	$c->uri_for_action( 'device/view', [ $device->id ] )
     );
-    return ( 1, 'Done. Uplinks setted.' );
+    $c->detach();
 }
+
 
 
 =head2 prepare_json_object
@@ -496,3 +456,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

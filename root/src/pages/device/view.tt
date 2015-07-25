@@ -35,12 +35,12 @@ page.subsection = 'Device'
 	<dd>[% object.serial | html %]</dd>
 	<dt>OS:</dt>
 	<dd>[% object.os | html %] [% object.os_ver | html %]</dd>
-	<dt>VTP domain:</dt>
+	<dt>VTP domain</dt>
 	<dd>[% object.vtp_domain | html %]</dd>
-	<dt>Up from:</dt><dd>[% object.boottime | html %]</dd>
-	<dt>Backup status:</dt>
+	<dt>Up from:</dt><dd>[% date.format(object.boottime) | html %]</dd>
+	<dt>Backup status</dt>
 	<dd>[% object.backup_enabled | html %]</dd>
-	<dt>Last backup:</dt>
+	<dt>Last backup</dt>
 	<dd>
 	  [% IF backup_date %][% backup_date %]
 	  <a href="[% c.uri_for_action('device/show_config', [object.id]) %]">View</a>
@@ -48,14 +48,15 @@ page.subsection = 'Device'
 	  Backup not found
 	  [% END %]
 	</dd>
-	<dt>Fetch ARP table:</dt><dd>[% arp_enabled %]</dd>
+	<dt>Fetch ARP table</dt>
+	<dd>[% arp_enabled %]</dd>
 	[% IF object.vlan_arpinfo %]
-	<dt>ARP table to vlan:</dt>
+	<dt>ARP table vlan</dt>
 	<dd>[% print_vlan(object.vlan_arpinfo) %]</dd>
 	[% END %]
-	<dt>Fetch mac-address-table:</dt>
+	<dt>Fetch mac-address-table</dt>
 	<dd>[% mat_enabled %]</dd>
-	<dt>Fetch Dot11 info:</dt>
+	<dt>Fetch Dot11 info</dt>
 	<dd> [% dot11_enabled %]</dd>
 	<dt>Uplinks:</dt><dd>[% uplinks %]</dd>
 	<dt>Notes:</dt><dd>[% object.notes | html %]</dd>
@@ -162,7 +163,7 @@ page.subsection = 'Device'
 	    [% print_short_iface(object.id,if.interface) %]
 	  </td>
 	  <td>[% if.up_admin %]</td>
-	  <td>[% if.last_mat %]</td>
+	  <td>[% date.format(if.last_mat) %]</td>
 	  <td>[% if.vlan || "-" %]</td>
 	  <td>[% if.description | html %]</td>
 	</tr>
