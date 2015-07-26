@@ -8,7 +8,9 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-requires 'get_form';
+with 'Manoc::ControllerRole::ResultSet';
+with 'Manoc::ControllerRole::ObjectForm';
+
 
 =head1 NAME
 
@@ -47,8 +49,6 @@ Catalyst controller role for Manoc common CRUD implementation.
 
 =cut
 
-has 'class' => ( is => 'ro', isa => 'Str', writer => '_set_class' );
-
 has 'create_page_title' => ( is => 'rw', isa => 'Str' );
 has 'view_page_title' => ( is => 'rw', isa => 'Str' );
 has 'edit_page_title'   => ( is => 'rw', isa => 'Str' );
@@ -59,19 +59,23 @@ has 'create_page_template' =>  (
      is => 'rw',
      isa => 'Str'
 );
+
 has 'view_page_template' =>  (
      is => 'rw',
      isa => 'Str'
 );
+
 has 'edit_page_template'   =>  (
     is => 'rw',
     isa => 'Str'
 );
+
 has 'delete_page_template' =>  (
     is => 'rw',
     isa => 'Str',
     default => 'generic_delete.tt'
 );
+
 has 'list_page_template'   =>  (
     is => 'rw',
     isa => 'Str'
@@ -90,26 +94,6 @@ has 'object_deleted_message' => (
 );
 
 =head1 ACTIONS
-
-=head2 setup
-
-=cut
-
-sub setup :
-    Chained('/') : CaptureArgs(0) :
-    PathPart('specify.in.subclass.config') {}
-
-=head2 base
-
-Add a resultset to the stash. Chained to setup.
-
-=cut
-
-sub base : Chained('setup') : PathPart('') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-
-    $c->stash( resultset => $self->get_resultset($c) );
-}
 
 =head2 create
 
@@ -130,7 +114,6 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
 }
 
 =head2 object_list
-sc
 Load the list of objects from the resultset into the stash. Chained to base.
 This is the point for chaining all actions using the list of object
 
@@ -144,7 +127,7 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
 
 =head2 list
 
-Disp
+Display a list of items.
 
 =cut
 
@@ -154,26 +137,6 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
         title    => $self->list_page_title,
         template => $self->list_page_template
     );
-}
-
-
-=head2 object
-
-This action is the chain root for all the actions which operate on a single identifer,
-e.g. view, edit, delete.
-
-=cut
-
-sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
-    my ( $self, $c, $id ) = @_;
-
-    $c->stash(
-        object => $self->get_object($c, $id),
-        object_pk => $id
-    );
-    if ( !$c->stash->{object} ) {
-        $c->detach('/error/http_404');
-    }
 }
 
 
@@ -205,7 +168,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( lc $c->req->method eq 'post' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $c->namespace . "/" . $c->uri_for_action('list') );
+            $c->res->redirect( $c->uri_for_action($c->namespace . "/list") );
             $c->detach();
         } else {
             my $action = $c->namespace . "/view";
@@ -220,73 +183,8 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     );
 }
 
-=head2 form
-
-Handle creation and editing of resources.
-Form defaults can be injected by form_defaults in stash.
-
-=cut
-
-sub form : Private {
-    my ( $self, $c ) = @_;
-
-    my $item = $c->stash->{object};
-    my $form = $self->get_form($c);
-
-    $c->stash(
-        form   => $form,
-        action => $c->uri_for($c->action, $c->req->captures),
-    );
-    unless ( $c->stash->{template} ) {
-        $c->stash(template =>  $c->namespace . "/form.tt" );
-    }
-
-    # the "process" call has all the saving logic,
-    #   if it returns False, then a validation error happened
-    
-    my %process_params;
-    $process_params{item}   =  $c->stash->{object};
-    $process_params{params} =  $c->req->parameters;
-    if ( $c->stash->{form_defaults} ) {
-        $process_params{defaults} = $c->stash->{form_defaults};
-        $process_params{use_defaults_over_obj} = 1;
-    }
-    return unless $form->process( %process_params );
-
-    $c->stash(message => $self->object_updated_message );
-    if ($c->stash->{is_xhr}) {
-        $c->stash(no_wrapper => 1);
-        $c->stash(template   => 'dialog/message.tt');
-        return;
-    }
-
-    $c->res->redirect( $c->uri_for($self->action_for('list')) );
-    $c->detach();
-}
 
 =head1 METHODS
-
-=head2 get_resultset
-
-It returns a resultset of the controller's class.  Used by base.
-
-=cut
-
-sub get_resultset {
-    my ( $self, $c ) = @_;
-
-    return $c->model( $c->stash->{class} || $self->class );
-}
-
-=head2 get_object
-
-=cut
-
-sub get_object {
-    my ( $self, $c, $pk ) = @_;
-    return $c->stash->{resultset}->find($pk);
-}
-
 
 =head2 get_object_list
 
