@@ -1,117 +1,98 @@
-[% META
+[%
    section='Asset'
    subsection='Device'
    title='Interface View'
+-%]
+[% META
    use_table=1
 -%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 
-<div id="tabs">	
-  <ul>
-     <li><a href="#tabs-1">Interface info</a></li>
-     <li><a href="#tabs-2">Mac Address History</a></li>
- </ul>
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  [% bootstrap_nav_tab("info", "Interface info", 1) -%]
+  [% bootstrap_nav_tab("history", "Mac Address History", 0) -%]
+</ul>
 
-<div id="tabs-1">
-<table id="info">
-<tr>
-  <td>Interface:</td><td>[% object.interface | html %] </td>
-</tr>
-<tr>
-  <td>Switch:</td><td>[% device.name | html %]
-   ([% print_device(device) %])</td>
-</tr>
-<tr>
-  <td>Switch Model:</td><td>[% device.model | html %]</td>
-</tr>
-<tr>
-  <td>Switch Location:</td>
-  <td>Building [% device.rack.building.name %] ( [%
-  device.rack.building.description | html  %] ), Rack [% device.rack.name %]</td>
-<tr>
-  <td>Description:</td><td>[% object.description | html  %] </td>
-</tr>
-<tr>
-  <td>Status (admin):</td>
-  <td>
-    [% object.up | html %] ([% object.up_admin %])	
-  </td>
-</tr>
-<tr>
-  <td>Duplex (admin):</td>
-  <td>
-	[% object.duplex | html %]([% object.duplex_admin %])
-  </td>
-</tr>
-<tr>
-  <td>Vlan:</td>
-  <td>
-      [% object.vlan | html %]
-  </td>
-</tr>
-<tr>
-  <td>STP Status</td>
-  <td> [% object.stp_state | html %] </td>
-</tr>
-<tr>
-  <td>Portsecurity:</td>
-  <td>
-    [% IF object.cps_enable %]
-	[% object.cps_status | html %] -
-        [% object.cps_count | html %] violations
-    [% ELSE %]
-    Disabled
-    [% END %]
-  </td>
-</tr>
-<tr> 
-  <td>Notes: </td>
-  <td>[% notes | html %]</td>
-</tr>
-</table>
-[% add_css_tableinfo %]
-<div class="buttons">	
-[% IF notes=='' %]
-   <a href="[% c.uri_for_action
-   ('interface/edit_notes', [object.device, object.interface])%]">
-   [% ui_icon('plusthick') %] Add a Note</a>
-[% ELSE %]
-<a href="[% c.uri_for_action
-   ('interface/edit_notes', [object.device, object.interface])%]">Edit Note</a>
-<a href="[% c.uri_for_action
-   ('interface/delete_notes', [object.device, object.interface])%]">Delete Note </a> 
-[% END %]
-</div>
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="info">
+    <div class="row">
+      <dl class="dl-horizontal">
+        <dt>Interface:</dt>
+	<dd>[% object.interface | html %] </dd>
 
-</div>  <!-- end tabs-1 -->
+	<dt>Switch:</dt>
+	<dd>[% print_device(device) %]</dd>
 
-<div id="tabs-2">
+	<dt>Switch Model:</dt>
+	<dd>[% device.model | html %]</dd>
 
-[% FOREACH m IN mat_results %]
-   [% IF loop.first %]
-     [% init_table('mat',undef, {sortby=>3,order=>'desc'}) %]
-        <table class="display"  id="mat">
-      <thead>  
-         <tr>
- 	 <th>Mac Address</th>
- 	 <th>Vlan</th>
- 	 <th>From</th>
-	 <th>To</th>
-         </tr>
-      </thead>  
-      <tbody>
-  [% END %]
-         <tr>
- 	 <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
- 	 <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
- 	 <td> [% m.firstseen | html %]</td>
-	 <td> [% m.lastseen  | html %]</td>
-         </tr>
-  [% IF loop.last %]
-      </tbody>
-    </table>
-  [% END %]
-[% END %]
+	<dt>Switch Location:</dt>
+	<dd>Rack [% print_rack(device.rack) %] - Building [% print_building(device.rack.building) %]</dd>
 
-</div> <!-- end tabs-2 -->
+	<dt>Description:</dt>
+	<dd>[% object.description | html  %] </dd>
 
-<div> <!-- end tabs -->
+	<dt>Status (admin):</dt>
+	<dd>[% object.up | html %] ([% object.up_admin %])</dd>
+
+	<dt>Duplex (admin):</dt>
+	<dd>
+	  [% object.duplex | html %]([% object.duplex_admin %])
+	</dd>
+	
+	<dt>Vlan:</dt>
+	<dd>
+	  [% object.vlan | html %]
+	</dd>
+	
+	<dt>STP Status</dt>
+	<dd> [% object.stp_state | html %] </dd>
+	
+	<dt>Portsecurity:</dt>
+	<dd>
+	  [% IF object.cps_enable %]
+	  [% object.cps_status | html %] -
+          [% object.cps_count | html %] violations
+	  [% ELSE %]
+	  Disabled
+	  [% END %]
+	</dd>
+
+	<dt>Notes: </dt>
+	<dd>[% notes | html %]
+	  <a href="[% c.uri_for_action('interface/edit_notes', [object.device, object.interface])%]">
+	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span>	</a>
+	  [% IF notes != '' -%]
+	  <a href="[% c.uri_for_action('interface/delete_notes', [object.device, object.interface])%]">
+	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Note</span></a> 
+	  [% END -%]
+      </dl>
+    </div><!-- row -->
+  </div>  <!-- end tab -->
+
+  <div role="tabpanel" class="tab-pane" id="history">
+    <div class="row">
+      <table class="table">
+	<thead>  
+          <tr>
+ 	    <th>Mac Address</th>
+ 	    <th>Vlan</th>
+ 	    <th>From</th>
+	    <th>To</th>
+          </tr>
+	</thead>  
+	<tbody>	  
+	  [% FOREACH m IN mat_history %]
+	  <tr>
+	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
+	    <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
+	    <td> [% date.format(m.firstseen) %]</td>
+	    <td> [% date.format(m.lastseen) %]</td>
+	  </tr>
+	  [% END %]
+	</tbody>
+      </table>
+    </div> <!-- end row -->
+  </div> <!-- end tab -->  
+</div> <!-- end tab content -->

@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -22,16 +22,6 @@ Catalyst Controller.
 
 =cut
 
-=head2 index
-
-=cut
-
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Manoc::Controller::Interface in Interface.');
-}
-
 sub base : Chained('/') : PathPart('interface') : CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->stash( resultset => $c->model('ManocDB::IfStatus') );
@@ -41,122 +31,92 @@ sub base : Chained('/') : PathPart('interface') : CaptureArgs(0) {
 
 =cut
 
-sub object : Chained('base') : PathPart('id') : CaptureArgs(2) {
-    my ( $self, $c, $id, $iface ) = @_;
-    my $object = $c->stash(
-        object => $c->stash->{resultset}->find(
-            {
-                device    => $id,
-                interface => $iface,
-            },
-        ),
-	device_id => $id,
-	interface_name => $iface,
-    );
+sub object : Chained('base') : PathPart('') : CaptureArgs(2) {
+    my ( $self, $c, $device_id, $iface ) = @_;
+
+    my $object_pk = {
+	device    => $device_id,
+	interface => $iface,
+    };
+
+    $c->stash(object => $c->stash->{resultset}->find($object_pk));
     if ( !$c->stash->{object} ) {
-        $c->stash( error_msg => "Object not found!" );
-        $c->detach('/error/index');
+        $c->detach('/error/http_404');
     }
+
+    $c->stash(object_pk => $object_pk);
 }
 
 =head2 view
 
 =cut
 
-sub view : Chained('object') : PathPart('view') : Args(0) {
+sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
     my $object = $c->stash->{'object'};
-    my $device = $object->device_info;
-    $c->stash( device => $device );
-
-    my $note = $c->model('ManocDB::IfNotes')->search(
-        {
-            device    => $device->id,
-            interface => $object->interface,
-        }
-    )->first;
-
+    my $object_pk = $c->stash->{object_pk};
+    
+    my $note = $c->model('ManocDB::IfNotes')->find($object_pk);
     $c->stash( notes => defined($note) ? $note->notes : '' );
 
     #MAT related results
-    my @mat_rs = $c->model('ManocDB::Mat')->search(
-        {
-            device    => $device->id,
-            interface => $object->interface,
-        },
+    my @mat_rs = $c->model('ManocDB::Mat')->search($object_pk,
         { order_by => 'lastseen DESC, firstseen DESC', }
     );
     my @mat_results = map +{
         macaddr   => $_->macaddr,
         vlan      => $_->vlan,
-        firstseen => print_timestamp( $_->firstseen ),
-        lastseen  => print_timestamp( $_->lastseen )
+        firstseen => $_->firstseen,
+        lastseen  => $_->lastseen
     }, @mat_rs;
 
-    $c->stash( mat_results => \@mat_results );
-    $c->stash( template    => 'interface/view.tt' );
+    $c->stash(mat_history => \@mat_results);
 }
 
 =head2 edit_notes
 
 =cut
 
-sub edit_notes : Chained('object') PathPart('edit_notes') Args(0) {
+sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
     my ( $self, $c ) = @_;
-    my $iface        = $c->stash->{'object'};
-    my $device_id    = $c->stash->{'device_id'};
-  
-    $c->stash( default_backref =>
-      $c->uri_for_action( 'interface/view', [ $device_id, $iface->interface ] )
-);
 
-    my $item = $c->model('ManocDB::IfNotes')->find(
-	{
-	    device    => $device_id,
-	    interface => $iface->interface,
-	});
-    $item or $item = $c->model('ManocDB::IfNotes')->new_result( {} );
-    my $form = Manoc::Form::IfNotes->new(
-	device    => $device_id,
-	interface => $iface->interface,
-    );
-    $c->log->info("ITEM $device_id " .$item->interface);
-    if ( $c->req->param('discard') ) {
-        $c->detach('/follow_backref');
-    }
-    
-    $c->stash(
-	form => $form,
-	template => 'interface/edit_notes.tt'
-    );
-    
+    my $object_pk = $c->stash->{object_pk};
+
+    my $ifnotes = $c->model('ManocDB::IfNotes')->find($object_pk);
+    $ifnotes or $ifnotes = $c->model('ManocDB::IfNotes')->new_result( {});
+
+    my $form = Manoc::Form::IfNotes->new( %$object_pk );
+    $c->stash(form => $form);
     return unless $form->process(
 	params => $c->req->params,
-	item => $item );
+	item   => $ifnotes );
 
-    $c->flash( message => 'Success! Note edit.' );
-    $c->detach('/follow_backref');
+    my $dest_url = $c->uri_for_action( 'interface/view',
+				       [ @$object_pk{'device', 'interface'} ]
+				   );
+    $c->res->redirect($dest_url);
 }
 
 =head2 delete_notes
 
 =cut
 
-sub delete_notes : Chained('object') PathPart('delete_notes') Args(0) {
+sub delete_notes : Chained('object') : PathPart('delete_notes') : Args(0) {
     my ( $self, $c ) = @_;
-    my $iface = $c->stash->{'object'};
+    my $object_pk = $c->stash->{object_pk};
 
-    $c->stash( default_backref =>
-            $c->uri_for_action( 'interface/view', [ $iface->device, $iface->interface ] ) );
-    my $item = $c->model('ManocDB::IfNotes')->search(
-        {
-            device    => $iface->device,
-            interface => $iface->interface
-        }
+    my $dest_url = $c->uri_for_action(
+        'interface/view',
+        [ @$object_pk{'device', 'interface'} ]
     );
-    if ( lc $c->req->method eq 'post' ) {
-        $item and $item->delete;
-        $c->flash->{message} = 'Success!! Note successful deleted.';
+
+    my $item = $c->model('ManocDB::IfNotes')->find($object_pk);
+    if (!$item) {
+        $c->detach('/error/http_404');
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $item->delete;
         $c->detach('/follow_backref');
     }
     else {
@@ -166,7 +126,7 @@ sub delete_notes : Chained('object') PathPart('delete_notes') Args(0) {
 
 =head1 AUTHOR
 
-Rigo
+The Manoc Team
 
 =head1 LICENSE
 
@@ -178,3 +138,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
