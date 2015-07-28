@@ -14,7 +14,6 @@ page.section = 'Asset'
  <table id="device_list">
        <thead>
 	 <tr>
-   	   <th>IP Address</th>
  	   <th>Name</th>
 	   <th>Building</th>
 	   <th>Rack</th>
@@ -29,9 +28,8 @@ page.section = 'Asset'
 [% FOREACH d IN object_list %]
          <tr>
  	   <td>[% print_device(d) %]</td>
-   	   <td>[% d.name | html %]</td>
-	   <td><a href="[%c.uri_for_action('/building/view',[d.rack.building.id])%]">[% d.rack.building.name %]</a></td>
-	   <td><a href="[%c.uri_for_action('/rack/view', [d.rack.id])%]"> [% d.rack.name | html %]</a></td>
+	   <td>[% print_building(d.rack.building) %]</td>
+	   <td>[% print_rack(d.rack) %]</td>
 	   <td>[% d.rack.floor | html %]</td>
 	   <td>[% d.vendor | html %]</td>
            <td>[% d.os_ver | html %]</td>

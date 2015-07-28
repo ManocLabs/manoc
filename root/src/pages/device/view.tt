@@ -23,43 +23,54 @@ page.subsection = 'Device'
     <div class="row">
       <dl class="dl-horizontal">
 	<dt>Name</dt><dd>[% object.name %]</dd>
-	<dt>Ip Address</dt><dd>[% object.mng_address %]</dd>
-	<dt>Building:</dt>
+
+	<dt>Management Address</dt>
+	<dd><a href="[% object.get_mng_url %]">[% object.mng_address.address %]</a></dd>
+
+	<dt>Building</dt>
 	<dd>[% print_building(object.rack.building) %]</dd>
-	<dt>Rack:</dt>
-	<dd>[% print_rack(object.rack.id) %]</dd>
+
+	<dt>Rack</dt>
+	<dd>[% print_rack(object.rack) %]</dd>
+
 	<dt>Last Visited</dt><dd>[% date.format(object.last_visited) %]</dd>
+
 	<dt>Model</dt>
 	<dd>[% object.vendor | html %] [% object.model  | html %]</dd>
+
 	<dt>Serial</dt>
 	<dd>[% object.serial | html %]</dd>
-	<dt>OS:</dt>
+
+	<dt>OS</dt>
 	<dd>[% object.os | html %] [% object.os_ver | html %]</dd>
+
 	<dt>VTP domain</dt>
 	<dd>[% object.vtp_domain | html %]</dd>
-	<dt>Up from:</dt><dd>[% date.format(object.boottime) | html %]</dd>
-	<dt>Backup status</dt>
-	<dd>[% object.backup_enabled | html %]</dd>
+
+	<dt>Up from</dt><dd>[% date.format(object.boottime) | html %]</dd>
+
+	<dt>Backup</dt>
+	<dd>[% object.backup_enabled ? 'Yes' : 'No' %]</dd>
 	<dt>Last backup</dt>
 	<dd>
 	  [% IF backup_date %][% backup_date %]
 	  <a href="[% c.uri_for_action('device/show_config', [object.id]) %]">View</a>
 	  [% ELSE %]
-	  Backup not found
+	  No backup found
 	  [% END %]
 	</dd>
 	<dt>Fetch ARP table</dt>
-	<dd>[% arp_enabled %]</dd>
+	<dd>[% arp_enabled  ? 'Yes' : 'No' %]</dd>
 	[% IF object.vlan_arpinfo %]
 	<dt>ARP table vlan</dt>
 	<dd>[% print_vlan(object.vlan_arpinfo) %]</dd>
 	[% END %]
-	<dt>Fetch mac-address-table</dt>
-	<dd>[% mat_enabled %]</dd>
-	<dt>Fetch Dot11 info</dt>
-	<dd> [% dot11_enabled %]</dd>
-	<dt>Uplinks:</dt><dd>[% uplinks %]</dd>
-	<dt>Notes:</dt><dd>[% object.notes | html %]</dd>
+	<dt>Fetch MAT</dt>
+	<dd>[% mat_enabled  ? 'Yes' : 'No'%]</dd>
+	<dt>Fetch Dot11</dt>
+	<dd>[% dot11_enabled ? 'Yes' : 'No'  %]</dd>
+	<dt>Uplinks</dt><dd>[% uplinks %]</dd>
+	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- row -->
     
@@ -171,7 +182,6 @@ page.subsection = 'Device'
       </tbody>
     </table>
   </div> <!-- ifactivity  -->
-
 
   <div role="tabpanel" class="tab-pane" id="ifunused">
     <table class="table">
