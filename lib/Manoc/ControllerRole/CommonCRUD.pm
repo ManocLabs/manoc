@@ -165,7 +165,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
 sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
 
-    if ( lc $c->req->method eq 'post' ) {
+    if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
             $c->res->redirect( $c->uri_for_action($c->namespace . "/list") );
