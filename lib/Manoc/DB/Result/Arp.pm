@@ -68,4 +68,3 @@ sub sqlt_deploy_hook {
 }
 
 1;
-

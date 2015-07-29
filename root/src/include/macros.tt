@@ -26,23 +26,11 @@
 [%# ----------------------------------------------------------------- -%]
 [%#                           Interface                               -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_short_iface(device,iface) BLOCK %]
-   [% IF device and device.isa("Manoc::IpAddress") -%]
-       <a href="[% c.uri_for_action('interface/view', 
-        [device.address , iface]) %]"> [% iface | html %]</a>
-   [% ELSE-%]
-   <a href="[% c.uri_for_action('interface/view',[device, iface]) %]">
-	     [% iface | html %]</a>
-   [% END -%]
-[% END -%]
-[% MACRO print_iface(device,iface) BLOCK -%]
-   [% IF device and device.id.isa("Manoc::IpAddress") -%]
-      <a href="[% c.uri_for_action('interface/view', 
-	[device.id.address , iface]) %]">[% device.id.address %]/[% iface | html %]</a>
-    [% ELSE-%]
-       <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
-	     [% device | html %]/[% iface | html %]</a>
-    [% END -%]
+[% MACRO print_iface(device, iface, options) BLOCK -%]
+ <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
+ [%- IF options.show_device %][% device | html %]/[% END -%]
+ [% iface | html -%]
+  </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                          Building                                 -%]
@@ -56,18 +44,19 @@
 [% MACRO print_rack(rack) BLOCK -%]
 <a href=[% c.uri_for_action('/rack/view', [ rack.id ]) %]>[% rack.name | html %] </a>
 [% END -%]
-
 [%# ----------------------------------------------------------------- -%]
 [%#                          Vlan                                     -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vlan(vlan) BLOCK -%]
-<a href="[% c.uri_for_action('/vlan/view', [vlan.id]) %]"> [% vlan.name | html %] </a>
+[% id = vlan.isa("HASH") ? vlan.id : vlan -%]
+[% name = vlan.isa("HASH") ? vlan.name : vlan -%]
+<a href="[% c.uri_for_action('/vlan/view', [id]) %]"> [% name | html %] </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Hostname                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_host(id,name) BLOCK -%]
- [% IF id and id.isa("Manoc::IpAddress") -%]
+[% IF id and id.isa("Manoc::IpAddress") -%]
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id.address]) %]>[% id.address | html %]</a>
  [% ELSE-%]
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
@@ -76,8 +65,10 @@
 [%# ----------------------------------------------------------------- -%]
 [%#                             IpRange                               -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_iprange(name, desc) BLOCK -%]
-<a href=[% c.uri_for_action('/iprange/view', [name]) %]>[%name | html %]</a> ([% desc | html %])
+[% MACRO print_iprange(range) BLOCK -%]
+<a href=[% c.uri_for_action('/iprange/view', [range.name]) %]>
+[%range.name | html %]
+</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                            VlanRange                              -%]
@@ -89,7 +80,7 @@
 [%#                           IpCalc                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ipcalc(range, prefix) BLOCK -%]
- [% IF range and range.isa("Manoc::IpAddress") -%]
+   [% IF range and range.isa("Manoc::IpAddress") -%]
     <a href=[% c.uri_for_action('/iprange/view_iprange',
     [range.address,prefix]) %]>
     [%range.address | html %]/[% prefix | html %]</a> 

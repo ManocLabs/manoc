@@ -1,96 +1,75 @@
-[% META 
-   title='Ip Address View'
-   use_table=1
+[%
+title='IP Address ' _ id.address
 -%]
+[% META
+layout='onecol'
+use_table=1
+-%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 
-<div id="tabs">	
-  <ul>
-     <li><a href="#tabs-1">Info</a></li>
-     <li><a href="#tabs-2">Mac Address Association</a></li>
-     <li><a href="#tabs-3">Subnet</a></li>
-     <li><a href="#tabs-4">AD Hostname</a></li>
-     <li><a href="#tabs-5">AD Logons</a></li>
-     <li><a href="#tabs-6">DHCP Lease</a></li>
-     <li><a href="#tabs-7">DHCP Reservation</a></li>
- </ul>
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+[% bootstrap_nav_tab("info", "Info", 1) -%]
+[% bootstrap_nav_tab("mac", "Mac Address Association") -%]
+[% bootstrap_nav_tab("subnet", "Subnet") -%]
+[% bootstrap_nav_tab("adhost", "AD Hostname") -%]
+[% bootstrap_nav_tab("adlogons", "AD Logons") -%]
+[% bootstrap_nav_tab("dhcplease", "DHCP Lease") -%]
+[% bootstrap_nav_tab("dhcpres", "DHCP Reservation") -%]
+</ul>
 
-   <div id="tabs-1">	
-     <table id="info">
-         <tr>
-  	  <td>Ip: </td>
-  	  <td>[% id.address %] 
-      [%IF last_subnet -%] [%END -%]
-      </td>
- 	 </tr>
-   <tr>
-    [%IF last_subnet -%]
-    <tr>
-      <td>Subnet: </td>
-      <td><a href="[% c.uri_for_action('iprange/view',[last_subnet.name]) %]"> 
-          [% last_subnet.name %]</a> 
-      </td>
-    </tr>
-   [%END -%] 
-    [%IF last_vlan -%]
-    <tr>
-      <td>Vlan: </td>
-      <td><a href="[% c.uri_for_action('vlan/view',[last_vlan.id]) %]"> 
-          [% last_vlan.id %]</a> 
-      </td>
-    </tr>
-   [%END -%] 
-    <td>Description: </td>
-  	 <td>[% info.description %]</td>
- 	 </tr>
-   [%IF last_host -%]
-    <tr>
-      <td>Last hostname: </td>
-      <td>[% last_host.name %] ( [%last_host.lastseen%] )</td>
-    </tr>
-   [%END -%]
-   [%IF last_logon -%]
-    <tr>
-      <td>Last logon: </td>
-      <td>[% last_logon.user %] ( [%last_logon.lastseen%] ) </td>
-    </tr>
-   [%END -%]
-   <tr>
-  	  <td>Assigned to: </td>
-  	  <td>[% info.assigned_to %]</td>
- 	 </tr>
-	  <td>Phone: </td>
-  	  <td>[% info.phone %]</td>
- 	 </tr>
-	  <td>Email: </td>
-  	  <td>[% info.email %]</td>
- 	 </tr>
-	  <td>Notes: </td>
-  	  <td>[% info.notes %]</td>
- 	 </tr>
-    </table>
-    [% add_css_tableinfo %]
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="info">
+    <div class="row">
+      <dl class="dl-horizontal">
+  	<dt>IP Address</dt>	
+  	<dd>[% ipaddress.address %]</dd>
+	[%IF subnets.size -%]
+	<dt>Subnet</dt>
+	<dd>[% print_iprange(subnets.0) %]</dd>
+	<dt>Vlan</dt>
+	<dd>[% print_vlan(subnets.0.vlan_id) %]</dd>
+	[%END -%] 
+	[%IF hostnames.size -%]
+	<dt>Last hostname</dt>
+	<dd>[% hostnames.0.name %]
+	   [% IF hostnames.0.lastseen %]([% date.format(hostnames.0.lastseen) %])[% END %]
+	</dd>
+	[%END -%]
+	[%IF logons.size -%]
+	<dt>Last logon: </dt>
+	<dd>[% logons.0.user %] ([% date.format(logons.0.lastseen) %]) </dd>
+	[%END -%]
 
-   <p>
-     <div class="buttons">	
-      [%IF info -%]
-       <a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
-         ui_icon('pencil') %] Edit Infos </a>
-	     &nbsp;<a href=[% c.uri_for_action('ip/delete', [id.address ]) %]>
-	     [% ui_icon('closethick') %]  Delete Infos </a>
-      [%ELSE  -%]
-      <a href=[%c.uri_for_action('ip/edit', [ id.address ]) %]> [%
-         ui_icon('pencil') %] Add Infos </a>
-    [%END -%]
-     </div>
-    </p>
-   </div>
- 
-<div id="tabs-2">
-[% FOREACH r IN arp_results %]
-   [% IF loop.first %]
-      [% init_table('arp_res', undef, {sortby => 3, order => 'desc'}) %]
+	<dt>Description</dt>
+  	<dd>[% object.description %]</dd>
 
-    <table class="display" id="arp_res">
+  	<dt>Assigned to</dt>	
+	<dd>[% object.assigned_to %]</dd>
+
+	<dt>Phone</dt>
+	<dd>[% object.phone %]</dd>
+
+	<dt>Email</dt>
+  	<dd>[% object.email %]</dd>
+ 	
+	<dt>Notes</dt>
+  	<dd>[% object.notes %]</dd>
+      </dl>
+    </div><!-- row -->
+    <div class="row">
+      <a class="btn btn-default" href="[% c.uri_for_action('ip/edit', [ ipaddress.address ])%]">
+	[% bootstrap_icon('pencil') %] Edit Info</a>
+      [% IF info != '' -%]
+      <a class="btn btn-default href="[% c.uri_for_action('ip/delete', [ ipaddress.address ])%]">
+	[% bootstrap_icon('trash') %]Delete info</a>
+      [% END -%]
+    </div>
+  </div><!-- tab -->
+
+  <div role="tabpanel" class="tab-pane" id="mac">
+    [% IF arp_results.size %]
+    <table class="table">
       <thead>  
          <tr>
  	 <th>Mac Address</th>
@@ -100,182 +79,143 @@
          </tr>
       </thead>  
       <tbody>
-  [% END %]
-         <tr>
- 	 <td> <a href="[% c.uri_for('/mac',r.macaddr) %]">[% r.macaddr %]</a></td>
- 	 <td> <a href="[% c.uri_for_action('vlan/view',[r.vlan]) %]">[% r.vlan %]</a></td>
- 	 <td> [% r.firstseen %]</td>
-	 <td> [% r.lastseen  %]</td>
-         </tr>
-  [% IF loop.last %]
+	[% FOREACH r IN arp_results %]
+        <tr>
+ 	  <td> <a href="[% c.uri_for_action('mac/view',r.macaddr) %]">[% r.macaddr %]</a></td>
+ 	  <td> <a href="[% c.uri_for_action('vlan/view',[r.vlan]) %]">[% r.vlan %]</a></td>
+ 	  <td> [% date.format(r.firstseen) %]</td>
+	  <td> [% date.format(r.lastseen)  %]</td>
+        </tr>
+	[% END %]
       </tbody>
     </table>
   [% END %]
-[% END %]
+  </div>
 
-
-</div>
-
-  <div id="tabs-3">	
- 
-    [% FOREACH s IN subnet %]
-      [% IF loop.first %]
-      [% init_table('subnet', undef, {sortby => 1, order => 'asc'}) %]
-       <table class="display" id="subnet">
-         <thead>  
-         	<tr>
- 	 	 <th>Subnet Name</th>
- 	 	<th>From</th>
- 	 	<th>To</th>
-           </tr>
-           </thead>  
-         <tbody>
-      [% END %]
-            <tr>
- 	 <td><a href="[% c.uri_for_action('iprange/view',[s.subnet_name]) %]"> 
-              [% s.subnet_name %]</a></td>
-  	 <td> [% s.from_addr %]</td>
- 	 <td> [% s.to_addr %] </td>
-	</tr>
-      [% IF loop.last %]
-      </tbody>
-    </table>
-     [% END %]
-    [% END %]
-
-   </div>
-
-   <div id="tabs-4">	
-   [% FOREACH h IN hostnames %]
-      [% IF loop.first %]
-       [% init_table('hostname',undef, {sortby=>2,order=>'desc'}) %]
-       <table class="display" id="hostname">
-         <thead>  
-         	<tr>
- 	 	 <th>Name</th>
- 	 	<th>From</th>
- 	 	<th>To</th>
-           </tr>
-           </thead>  
-         <tbody>
-      [% END %]
-            <tr>
- 	 <td>[% h.name %]</td>
-  	 <td> [% h.firstseen %]</td>
- 	 <td> [% h.lastseen %]  </td>
-	</tr>
-      [% IF loop.last %]
-      </tbody>
-    </table>
-     [% END %]
-    [% END %]
-
-
-   </div>
-
-   <div id="tabs-5">	
-[% FOREACH h IN logons %]
-      [% IF loop.first %]
-       [% init_table('logons',undef, {sortby=>2,order=>'desc'}) %]
-       <table class="display" id="logons">
-         <thead>  
-         	<tr>
- 	 	 <th>Name</th>
- 	 	<th>From</th>
- 	 	<th>To</th>
-           </tr>
-           </thead>  
-         <tbody>
-      [% END %]
-            <tr>
- 	 <td>[% h.user %]</td>
-  	 <td> [% h.firstseen %]</td>
- 	 <td> [% h.lastseen %]  </td>
-	</tr>
-      [% IF loop.last %]
-      </tbody>
-    </table>
-     [% END %]
-    [% END %]
-
-   </div>
-
-
-
-<div id="tabs-6">
-[% IF (leases.0) %]
-[% FOREACH r IN leases %]
-   [% IF loop.first %]
-   [% init_table('leases') %]
-    <table class="display" id="leases">
+  <div role="subnet" class="tab-pane" id="subnet">
+    [% IF subnets.size %]
+    <table class="table" id="subnet">
       <thead>  
-         <tr>
- 	 <th>Server</th>
- 	 <th>Mac Address</th>
- 	 <th>From</th>
- 	 <th>To</th>
- 	 <th>Status</th>
- 	 <th>Hostname</th>
-         </tr>
+        <tr>
+ 	  <th>Subnet</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+        </tr>
       </thead>  
       <tbody>
-   [% END %]
-         <tr>
- 	 <td>[% r.server -%]</td>
- 	 <td>[% print_mac(r.macaddr) %]</td>
-	 <td>[% r.start %]</td>
- 	 <td>[% r.end %] </td>
- 	 <td>[% r.status %] </td>
- 	 <td>[% r.hostname %] </td>
+	[% FOREACH s IN subnets %]
+        <tr>
+ 	  <td>[% print_iprange(s) %]</td>
+  	  <td>[% s.from_addr.address %]</td>
+ 	  <td>[% s.to_addr.address %]</td>
 	</tr>
-  [% IF loop.last %]
+	[% END %]
       </tbody>
     </table>
-  [% END %]
- [% END %]
-
-[% ELSE %]
-      [% PROCESS  'message_box.tt' msg='There are no DHCP leases for this MAC' %]
-[% END %] 
-
-</div>     <!-- end tabs-6 -->
-
-<div id="tabs-7">
-[% IF (reservations.0) %]
-[% FOREACH r IN reservations %]
-   [% IF loop.first %]
-    [% init_table('res') %]
-    <table class="display" id="res">
-      <thead>  
-         <tr>
- 	 <th>Server</th>
- 	 <th>Mac Address</th>
- 	 <th>Name</th>
- 	 <th>Hostname</th>
-         </tr>
-      </thead>  
-      <tbody>
-   [% END %]
-         <tr>
- 	 <td>[% r.server %]</td>
- 	 <td>[% print_mac(r.macaddr) %]</td>
-	 <td>[% r.name %]</td>
- 	 <td>[% r.hostname %] </td>
-	</tr>
-  [% IF loop.last %]
-      </tbody>
-    </table>
-  [% END %]
- [% END %]
-
-[% ELSE %]
-      [% PROCESS  'message_box.tt' msg='There are no DHCP reservations for this MAC' %]
-[% END %] 
-
-</div> <!-- end tabs-7 -->
-
-
+    [% END %]
+  </div>
   
+  <div role="tabpanel" class="tab-pane" id="adhost">
+    [% IF hostnames.size %]
+       <table class="table" id="hostname">
+         <thead>  
+         	<tr>
+ 	 	 <th>Name</th>
+ 	 	<th>From</th>
+ 	 	<th>To</th>
+           </tr>
+           </thead>  
+         <tbody>
+          [% FOREACH h IN hostnames %]
+            <tr>
+ 	      <td>[% h.name %]</td>
+  	      <td>[% date.format(h.firstseen) %]</td>
+ 	      <td>[% date.format(h.lastseen) %]</td>
+	    </tr>
+	    [% END %]
+	 </tbody>
+       </table>
+    [% END %]
+  </div><!-- end of tab -->
+
+  <div role="tabpanel" class="tab-pane" id="adlogons">
+    [% IF logons.size %]
+    <table class="table" id="logons">
+      <thead>  
+        <tr>
+ 	  <th>Name</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+        </tr>
+      </thead>  
+      <tbody>
+        [% FOREACH h IN logons %]
+        <tr>
+ 	  <td>[% h.user %]</td>
+	  <td>[% date.format(h.firstseen) %]</td>	
+ 	  <td>[% date.format(h.lastseen) %]</td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div><!-- end of tab -->
+
+  <div role="tabpanel" class="tab-pane" id="dhcplease">
+    [% IF leases.size %]
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Server</th>
+ 	  <th>Mac Address</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+ 	  <th>Status</th>
+ 	  <th>Hostname</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN leases %]
+         <tr>
+ 	   <td>[% r.server -%]</td>
+ 	   <td>[% print_mac(r.macaddr) %]</td>
+	   <td>[% date.format(r.start) %]</td>
+ 	   <td>[% date.format(r.end) %] </td>
+ 	   <td>[% r.status %] </td>
+ 	   <td>[% r.hostname %] </td>
+	 </tr>
+	 [% END %]
+      </tbody>
+    </table>
+[% END %] 
+  </div><!-- end tab dhcpleases -->
+
+  <div role="tabpanel" class="tab-pane" id="dhcpres">
+    [% IF reservations.0 %]
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Server</th>
+ 	  <th>Mac Address</th>
+ 	  <th>Name</th>
+ 	  <th>Hostname</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN reservations %]
+        <tr>
+ 	  <td>[% r.server %]</td>
+ 	  <td>[% print_mac(r.macaddr) %]</td>
+	  <td>[% r.name %]</td>
+ 	  <td>[% r.hostname %] </td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div>
+</div><!-- end of tab -->
+
 
   
 </div><!-- end tabs -->

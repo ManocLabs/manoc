@@ -5,8 +5,7 @@
 package Manoc::Controller::Mac;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(clean_string int2ip ip2int);
-use Manoc::IpAddress;
+
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -20,189 +19,73 @@ Catalyst Controller.
 
 =head1 METHODS
 
-=cut
-
-=head2 index
+=head2 view
 
 =cut
 
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( error_msg => "Missing Mac Address Parameter!" );
-    $c->detach('/error/index');
-}
+sub view : Chained('/') : PathPart('mac') : Args(1) {
+    my ( $self, $c, $macaddr ) = @_;
 
-=head2 base
-
-=cut
-
-sub base : Chained('/') PathPart('mac') Args(1) {
-    my ( $self, $c, $id ) = @_;
-
-    if ( !defined($id) and $id eq '' ) {
-        $c->stash( error_msg => "Object not found!" );
-        $c->detach('/error/index');
-    }
-
-    $c->stash( id => $id );
     $c->stash(
-        resultset => {
-            mat         => $c->model('ManocDB::Mat'),
-            mat_archive => $c->model('ManocDB::MatArchive'),
-            arp         => $c->model('ManocDB::Arp'),
-            dot11       => $c->model('ManocDB::Dot11Assoc'),
-        }
+	macaddr => $macaddr,
+
+	mat_results  => [
+	    $c->model('ManocDB::MatArchive')->search( 
+		{
+		    macaddr  => $macaddr
+		},
+		{
+		    prefetch => [ 'device', ],
+		}
+	    ),
+	    $c->model('ManocDB::Mat')->search(
+		{
+		    macaddr => $macaddr
+		},
+		{
+		    prefetch => { 'device_entry' => ['mng_url_format'] }
+		}
+	    ) ],
+	
+	arp_results => [
+	    $c->model('ManocDB::Arp')->search(
+		{
+		    macaddr => $macaddr,
+		},
+		{
+		    order_by => 'lastseen DESC, firstseen DESC'
+		}
+	    ) ],
+
+	dot11_results => [
+	    $c->model('ManocDB::Dot11Assoc')->search(
+		{
+		    macaddr => $macaddr
+		},
+		{
+		    order_by => 'lastseen DESC, firstseen DESC'
+		}
+	    )
+	],
+
+	reservations => [
+	    $c->model('ManocDB::DHCPReservation')->search( { macaddr => $macaddr } )
+	],
+
+	leases => [
+	    $c->model('ManocDB::DHCPLease')->search( { macaddr => $macaddr } )
+	],
+
     );
 
     #vendor info
-    my $vendor = 'UNKNOWN';
-    my $oui = $c->model('ManocDB::Oui')->find( substr( $id, 0, 8 ) );
-    defined($oui) and $vendor = $oui->vendor;
-    $c->stash( vendor => $vendor );
-
-    #template
-    $c->stash( template => 'macaddr.tt' );
-
-    my $n_res = $self->_get_arp($c);
-    $n_res += $self->_get_mat($c);
-    $n_res += $self->_get_dot11($c);
-
-    $self->_get_dhcpinfo($c);
-
-    unless ($n_res) {
-        $c->stash( message => 'Sorry, Mac Address not found!' );
-    }
-    $c->stash(macaddr => $id);
-
-}
-
-=head2 get_arp
-
-=cut
-
-sub _get_arp : Private {
-    my ( $self, $c ) = @_;
-
-    my @r = $c->stash->{'resultset'}->{'arp'}->search(
-        {macaddr => $c->stash->{'id'}},
-        { order_by => ['lastseen DESC, firstseen DESC'] }
-    );
-    my @arp_results = map +{
-        ipaddr    => $_->ipaddr,
-        vlan      => $_->vlan,
-        firstseen =>  $_->firstseen,
-        lastseen  =>  $_->lastseen
-    }, @r;
-
-    $c->stash( arp_results => \@arp_results );
-    return scalar(@arp_results);
-}
-
-=head2 get_mat
-
-=cut
-
-sub _get_mat : Private {
-    my ( $self, $c ) = @_;
-
-    my @r = $c->stash->{'resultset'}->{'mat'}->search(
-        {macaddr => $c->stash->{id}},
-        {
-            #join => [ { 'device_entry' => 'mng_url_format' }, 'device_entry', ],
-            prefetch => { 'device_entry' => ['mng_url_format'] }, 
-        }
-    );
-    my @mat_entries = map +{
-        device      => $_->device_entry,
-        iface       => $_->interface,
-        vlan        => $_->vlan,
-        firstseen   => $_->firstseen,
-        lastseen    => $_->lastseen,
-    }, @r;
-
-    @r = $c->stash->{'resultset'}->{'mat_archive'}->search( 
-							   { macaddr  => $c->stash->{'id'} }, 
-							   { prefetch => [ 'device', ]}, 
-							  );
-    my @mat_archive_entries = map +{
-        arch_device_ip   => $_->device->ipaddr->address,
-        arch_device_name => $_->device->name,
-        vlan             => $_->vlan,
-        firstseen_i      => $_->firstseen,
-        lastseen_i       => $_->lastseen,
-        firstseen        => $_->firstseen,
-        lastseen         => $_->lastseen
-    }, @r;
-
-    my @mat_results = sort {
-        $b->{lastseen_i} <=> $a->{lastseen_i} ||
-            $b->{firstseen_i} <=> $a->{firstseen_i}
-    } ( @mat_entries, @mat_archive_entries );
-
-    $c->stash( mat_results => \@mat_results );
-    return scalar(@mat_results);
-
-}
-
-=head _get_dot11
-
-=cut
-
-sub _get_dot11 : Private {
-    my ( $self, $c ) = @_;
-
-    my @r = $c->stash->{'resultset'}->{'dot11'}->search(
-        {macaddr => $c->stash->{id}},
-        { order_by => ['lastseen DESC, firstseen DESC'] }
-    );
-    my @dot11_results = map +{
-        device    => $_->device,
-        ssid      => $_->ssid,
-        ipaddr    => $_->ipaddr,
-        vlan      => $_->vlan,
-        firstseen => $_->firstseen,
-        lastseen  => $_->lastseen 
-    }, @r;
-
-    $c->stash( dot11_results => \@dot11_results );
-    return scalar(@dot11_results);
-}
-
-=head _get_dhcpinfo
-
-=cut
-
-sub _get_dhcpinfo : Private {
-    my ( $self, $c ) = @_;
-    my @r;
-
-    @r = $c->model('ManocDB::DHCPReservation')->search( { macaddr => $c->stash->{id} } );
-    my @reservations = map +{
-        ipaddr   => $_->ipaddr,
-        name     => $_->name,
-        hostname => $_->hostname,
-        server   => $_->server,
-    }, @r;
-
-    @r = $c->model('ManocDB::DHCPLease')->search( { macaddr => $c->stash->{id} } );
-
-    my @leases = map +{
-        ipaddr   => $_->ipaddr,
-        server   => $_->server,
-        start    => $_->start,
-        end      => $_->end,
-        hostname => $_->hostname,
-        status   => $_->status
-    }, @r;
-    $c->stash(
-        leases       => \@leases,
-        reservations => \@reservations,
-    );
+    my $oui = $c->model('ManocDB::Oui')->find( substr( $macaddr, 0, 8 ) );
+    $c->stash( vendor => $oui ? $oui->vendor : 'UNKNOWN' );
 }
 
 =head1 AUTHOR
 
-Rigo
+The Manoc Team
 
 =head1 LICENSE
 
