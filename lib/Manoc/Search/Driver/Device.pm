@@ -21,7 +21,7 @@ sub search_device {
         my $item = Manoc::Search::Item::Device->new(
             {
                 device => $e,
-                match  => $e->id->address,
+                match  => $e->mng_address->address,
             }
         );
         $result->add_item($item);
@@ -47,7 +47,7 @@ sub search_ipaddr {
         my $item = Manoc::Search::Item::Device->new(
             {
                 device => $e,
-                match  => $e->id->address,
+                match  => $e->mng_address->address,
             }
         );
         $result->add_item($item);
@@ -87,7 +87,7 @@ sub search_note {
     my $item = Manoc::Search::Item::Device->new(
 						{
 						 device => $e,
-						 match  => $e->id->address,
+						 match  => $e->mng_address->address,
 						 notes  => $e->notes,
 						}
 					       );
