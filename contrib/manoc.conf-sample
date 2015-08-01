@@ -1,7 +1,6 @@
 name Manoc
 
 <ArpSniffer>
-
 	# a list of vlan to ignore
 	vlan_filter 2
 	vlan_filter 4
@@ -13,16 +12,13 @@ name Manoc
 	
 	# native vlan
     	vlan 1
-
 </ArpSniffer>
-
 
 <"Model::ManocDB">  
 	connect_info DBI:mysql:database=manoc;host=localhost
 	connect_info manoc
 	connect_info manoc
 </"Model::ManocDB"> 
-
 
 <Netwalker>
 	ifstatus_interval	3600
@@ -53,8 +49,3 @@ name Manoc
 <Log>
 	directory /var/log/manoc
 </Log>
-
-<DataDumper>
-	path_to_tar
-</DataDumper>
-
