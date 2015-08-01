@@ -47,9 +47,13 @@ on 'develop' => sub {
 };
 
 feature 'sqlite', 'SQLite support' => sub {
-   recommends 'DBD::SQLite';
+   requires 'DBD::SQLite';
 };
 
 feature 'mysql', 'MySQL support' => sub {
-   recommends 'DBD::mysql';
+   requires 'DBD::mysql';
 };
+
+feature 'postgres', 'PostgreSQL support' => sub {
+   requires 'DBD::Pg';
+}
