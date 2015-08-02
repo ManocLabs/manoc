@@ -1,4 +1,5 @@
 package Manoc;
+
 use Moose;
 use namespace::autoclean;
 
@@ -53,7 +54,7 @@ __PACKAGE__->plugin_registry({});
 # with an external configuration file acting as an override for
 # local deployment.
 
-my $dsn = $ENV{MANOC_DSN} ||= 'dbi:SQLite:manoc.db';
+my $dsn = 
 
 __PACKAGE__->config(
     name         => 'Manoc',
@@ -65,10 +66,10 @@ __PACKAGE__->config(
 
     'Model::ManocDB' => {
 	connect_info => [
-	    $dsn,
-	    '',
-	    '',
-	    { AutoCommit => 1 },
+	    $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
+	    $ENV{MANOC_DB_USERNAME},
+	    $ENV{MANOC_DB_PASSWORD},
+	    { AutoCommit => 1 }
 	],
     },
 
