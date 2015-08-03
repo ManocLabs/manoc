@@ -66,7 +66,8 @@ __PACKAGE__->config(
 	    $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
 	    $ENV{MANOC_DB_USERNAME},
 	    $ENV{MANOC_DB_PASSWORD},
-	    { AutoCommit => 1 }
+	    { AutoCommit => 1 },
+            { quote_names => 1 },
 	],
     },
 
