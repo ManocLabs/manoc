@@ -36,6 +36,8 @@ requires 'SQL::Translator';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Plack::Middleware::CSRFBlock';
 requires 'Plack::Middleware::Session';
+requires 'Plack::Middleware::ReverseProxy';
+
 
 recommends 'Net::Pcap';
 recommends 'NetPacket';
