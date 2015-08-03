@@ -30,7 +30,6 @@ use Catalyst qw/
     Session::Store::DBI
     Session::State::Cookie
     StackTrace
-    EnableMiddleware
     /;
 
 extends 'Catalyst';
@@ -54,8 +53,6 @@ __PACKAGE__->plugin_registry({});
 # with an external configuration file acting as an override for
 # local deployment.
 
-my $dsn = 
-
 __PACKAGE__->config(
     name         => 'Manoc',
 
@@ -75,12 +72,6 @@ __PACKAGE__->config(
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
-
-    # Protection against CSRF attacks
-    'Plugin::EnableMiddleware' => [qw/
-        Session
-        CSRFBlock
-    /],
 
     'Plugin::Authentication' => {
         default_realm => 'userdb',
@@ -125,6 +116,14 @@ __PACKAGE__->config(
         dbi_expires_field => 'expires',
     }
 );
+
+# use Plack middleware for CSRF protection
+__PACKAGE__->config(
+    psgi_middleware => [
+        Session => { store => 'File' },
+        'CSRFBlock'
+    ]) unless ( $ENV{MANOC_NO_CSRFBLOCK} );
+
 
 ########################################################################
 

@@ -11,7 +11,6 @@ requires 'DBIx::Class::EncodedColumn';
 requires 'Catalyst::Runtime', '5.90077';
 requires 'Catalyst::Authentication::Credential::HTTP';
 requires 'Catalyst::Plugin::ConfigLoader';
-requires 'Catalyst::Plugin::EnableMiddleware';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Plugin::StackTrace';
