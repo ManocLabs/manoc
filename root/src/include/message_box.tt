@@ -1,5 +1,20 @@
-<div class="ui-state-highlight ui-corner-all"> 
-     <p> <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;" ></span>
-		<strong>[% msg | html %]</strong> 
-     </p>   	
+[% IF c.flash.message -%]
+<div class="alert alert-success" role="alert">
+[% c.flash.message | html %]
 </div>
+[% END -%]
+[% IF message -%]
+<div class="alert alert-success" role="alert">
+[% message | html %]
+</div>
+[% END -%]
+[% IF c.flash.error_msg -%]
+<div class="alert alert-warning" role="alert">
+[% c.flash.error_msg | html %]
+</div>
+[% END -%]
+[% IF error_msg -%]
+<div class="alert alert-warning" role="alert">
+[% error_msg | html %]
+</div>
+[% END -%]

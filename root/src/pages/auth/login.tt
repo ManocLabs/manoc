@@ -1,0 +1,9 @@
+[% META
+   layout = 'onecol'
+%]
+[%
+   page.title = 'Login'
+   page.disable_search = 1
+%]
+[% form.render %]
+

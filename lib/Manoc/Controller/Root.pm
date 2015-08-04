@@ -60,7 +60,6 @@ sub auto : Private {
       delete $c->req->params->{'format'};
   }
 
-
   ## redirect to login if needed ##
   my $skip_login_redirect;
   if ( $c->stash->{is_xhr} ||
@@ -84,15 +83,15 @@ sub auto : Private {
 
 =head2 default
 
-Standard 404 error page
+Standard 404 error page for Manoc
 
 =cut
 
 sub default : Path {
     my ( $self, $c ) = @_;
     my $url = $c->request->uri;
-    $c->response->body("Page not found $url");
-    $c->response->status(404);
+
+    $c->detach('error/http_404');
 }
 
 =head2 message

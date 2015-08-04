@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -10,30 +10,31 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-Manoc::Controller::Error - Catalyst Controller
+Manoc::Controller::Error
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst Controller for showing error pages
 
 =head1 METHODS
 
 =cut
 
-=head2 index
+=head2 http_404
+
+Error page for HTTP 404.
 
 =cut
 
-sub index : Path('error') : Args(0) {
+sub http_404 : Private {
     my ( $self, $c ) = @_;
-
-    $c->response->status(404);
     $c->stash( template => 'error_404.tt' );
+    $c->response->status(404);
 }
 
 =head1 AUTHOR
 
-Rigo
+The Manoc Team
 
 =head1 LICENSE
 
@@ -45,3 +46,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

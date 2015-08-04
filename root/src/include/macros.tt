@@ -1,58 +1,14 @@
-[% MACRO manoc_radiobox BLOCK -%]
-[%# parameter options (array of [value, label] pairs) -%]
-[%# parameter name                                    -%]
-[%# parameter default                                 -%]
-  [% FOREACH o IN options -%]
-    <label><input type="radio" name=[% name | html %] value=[% o.0 %] 
-  	    [% 'checked="checked"' IF default == o.0 %] />[% o.1 %]</label>
-  [% END -%]
-[% END -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO icon(command) BLOCK -%]
-<img class="shortcut" border="0" src="[% c.uri_for('/static/images/' _ command
-_ '.gif') %]" alt="[%command|html%]" title="[%command|html%]"/>
-[%- END -%]
-[%# ----------------------------------------------------------------- -%]
-[% MACRO ui_icon(image) BLOCK -%]
-<span style="float:left" class="ui-icon
- ui-icon-[%image%]"></span>
-[%- END -%]
-[%# ----------------------------------------------------------------- -%]
-[%# Device -%]
+[%#                            Device                                 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_device(device) BLOCK -%]
-  [% IF device -%]
-    <a href="[% c.uri_for_action('device/view',[device.id])%]">
-       [%device.mng_address.address|html%]</a>
-  [% END-%]
-  [% IF device.get_mng_url -%]
-    <a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
-       c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
-  [% END-%]
+<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.name|html%]</a>
+[% IF device.get_mng_url -%]
+<a href="[%device.get_mng_url%]"><span class="sr-only">Open</span>[% bootstrap_icon('share') %]</a>
 [% END-%]
-
-[% MACRO print_device_with_name(device) BLOCK-%]
-<a href="[% c.uri_for_action('device/view',[device.id.address]) %]">[%device.id.address%]</a>
-([%device.name%])
-  [% IF device.get_mng_url -%]
-<a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
-c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
-  [% END-%]
-[% END-%]
-
-[%# ----------------------------------------------------------------- -%]
-[%# Device Long Format-%]
-[%# ----------------------------------------------------------------- -%]
-[% MACRO print_device_long(device) BLOCK -%]
-<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.id|html%]</a>
-  [% IF device.get_mng_url -%]
-<a href="[%device.get_mng_url%]"><img class="shortcut" border="0" src="[%
-c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
-  [% END-%]
-[% IF device.notes-%] ( [% device.notes | html -%] ) [% END-%]
 [% END-%]
 [%# ----------------------------------------------------------------- -%]
-[%# IP address -%]
+[%#                           IP address                              -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ip(ip) BLOCK %]
    [% IF ip and ip.isa("Manoc::IpAddress") -%]
@@ -62,7 +18,7 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
    [% END-%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# MAC address -%]
+[%#                            MAC address                            -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_mac(mac) BLOCK -%]
 <a href=[% c.uri_for('/mac', mac) %]> [% mac | html %] </a>
@@ -70,63 +26,61 @@ c.uri_for('/static/images/set.png') %]" alt="mng url" /></a>
 [%# ----------------------------------------------------------------- -%]
 [%#                           Interface                               -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_short_iface(device,iface) BLOCK %]
-   [% IF device and device.isa("Manoc::IpAddress") -%]
-       <a href="[% c.uri_for_action('interface/view', 
-        [device.address , iface]) %]"> [% iface | html %]</a>
-   [% ELSE-%]
-   <a href="[% c.uri_for_action('interface/view',[device, iface]) %]">
-	     [% iface | html %]</a>
-   [% END -%]
-[% END -%]
-[% MACRO print_iface(device,iface) BLOCK -%]
-   [% IF device and device.id.isa("Manoc::IpAddress") -%]
-      <a href="[% c.uri_for_action('interface/view', 
-	[device.id.address , iface]) %]">[% device.id.address %]/[% iface | html %]</a>
-    [% ELSE-%]
-       <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
-	     [% device | html %]/[% iface | html %]</a>
-    [% END -%]
+[% MACRO print_iface(device, iface, options) BLOCK -%]
+ <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
+ [%- IF options.show_device %][% device | html %]/[% END -%]
+ [% iface | html -%]
+  </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# Rack -%]
+[%#                          Building                                 -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_rack(id,name) BLOCK -%]
-<a href=[% c.uri_for_action('/rack/view', id) %]> [% name | html %] </a>
+[% MACRO print_building(building) BLOCK -%]
+<a href=[% c.uri_for_action('/building/view', [ building.id ]) %]>[% building.name | html %]</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# Vlan -%]
+[%#                           Rack                                    -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_vlan(id,name) BLOCK -%]
-<a href=[% c.uri_for_action('/vlan/view', [id]) %]> [% name | html %] </a>
+[% MACRO print_rack(rack) BLOCK -%]
+<a href=[% c.uri_for_action('/rack/view', [ rack.id ]) %]>[% rack.name | html %] </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# Hostname -%]
+[%#                          Vlan                                     -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_vlan(vlan) BLOCK -%]
+[% id = vlan.isa("HASH") ? vlan.id : vlan -%]
+[% name = vlan.isa("HASH") ? vlan.name : vlan -%]
+<a href="[% c.uri_for_action('/vlan/view', [id]) %]"> [% name | html %] </a>
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                         Hostname                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_host(id,name) BLOCK -%]
- [% IF id and id.isa("Manoc::IpAddress") -%]
+[% IF id and id.isa("Manoc::IpAddress") -%]
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id.address]) %]>[% id.address | html %]</a>
  [% ELSE-%]
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
  [% END -%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# IpRange -%]
+[%#                             IpRange                               -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_iprange(name, desc) BLOCK -%]
-<a href=[% c.uri_for_action('/iprange/view', [name]) %]>[%name | html %]</a> ([% desc | html %])
+[% MACRO print_iprange(range) BLOCK -%]
+<a href=[% c.uri_for_action('/iprange/view', [range.name]) %]>
+[%range.name | html %]
+</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# VlanRange -%]
+[%#                            VlanRange                              -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vlanrange(name) BLOCK -%]
 <a href=[% c.uri_for('/vlanrange/list') %]>[% name | html %]</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%# IpCalc -%]
+[%#                           IpCalc                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ipcalc(range, prefix) BLOCK -%]
- [% IF range and range.isa("Manoc::IpAddress") -%]
+   [% IF range and range.isa("Manoc::IpAddress") -%]
     <a href=[% c.uri_for_action('/iprange/view_iprange',
     [range.address,prefix]) %]>
     [%range.address | html %]/[% prefix | html %]</a> 

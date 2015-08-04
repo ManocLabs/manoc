@@ -19,7 +19,6 @@ use Catalyst::Runtime 5.90;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
     Authentication
@@ -57,8 +56,8 @@ __PACKAGE__->config(
     name         => 'Manoc',
 
     # Views setup
-    default_view => 'WebPage',
- 
+    default_view => 'TT',
+
     use_request_uri_for_path => 1,
 
     'Model::ManocDB' => {

@@ -1,0 +1,31 @@
+[% META
+use_table=1
+-%]
+[%
+page.section='Asset'
+page.subsection='Building'
+page.title='Buildings'
+%]
+<div id="building_create">
+<a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+
+[% init_table('building_list',{ columns=[30,50,20], toolbar="building_create" } ) %]
+ <table id="building_list">
+   <thead>  
+     <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Nr. of racks</th>
+     </tr>
+   </thead>  
+   <tbody>
+[% FOREACH b IN object_list %]
+         <tr>
+ 	 <td><a href=[% c.uri_for_action('/building/view', [b.id]) %]>[% b.name | html %]</a></td>
+ 	 <td>[% b.description | html %]</td>
+ 	 <td>[% IF b.racks.isa('HASH') %]1[% ELSE %][% b.racks.size %][% END %]</td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

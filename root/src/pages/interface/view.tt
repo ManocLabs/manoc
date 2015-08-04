@@ -1,0 +1,98 @@
+[%
+   section='Asset'
+   subsection='Device'
+   title='Interface View'
+-%]
+[% META
+   use_table=1
+-%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  [% bootstrap_nav_tab("info", "Interface info", 1) -%]
+  [% bootstrap_nav_tab("history", "Mac Address History", 0) -%]
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="info">
+    <div class="row">
+      <dl class="dl-horizontal">
+        <dt>Interface:</dt>
+	<dd>[% object.interface | html %] </dd>
+
+	<dt>Switch:</dt>
+	<dd>[% print_device(device) %]</dd>
+
+	<dt>Switch Model:</dt>
+	<dd>[% device.model | html %]</dd>
+
+	<dt>Switch Location:</dt>
+	<dd>Rack [% print_rack(device.rack) %] - Building [% print_building(device.rack.building) %]</dd>
+
+	<dt>Description:</dt>
+	<dd>[% object.description | html  %] </dd>
+
+	<dt>Status (admin):</dt>
+	<dd>[% object.up | html %] ([% object.up_admin %])</dd>
+
+	<dt>Duplex (admin):</dt>
+	<dd>
+	  [% object.duplex | html %]([% object.duplex_admin %])
+	</dd>
+	
+	<dt>Vlan:</dt>
+	<dd>
+	  [% object.vlan | html %]
+	</dd>
+	
+	<dt>STP Status</dt>
+	<dd> [% object.stp_state | html %] </dd>
+	
+	<dt>Portsecurity:</dt>
+	<dd>
+	  [% IF object.cps_enable %]
+	  [% object.cps_status | html %] -
+          [% object.cps_count | html %] violations
+	  [% ELSE %]
+	  Disabled
+	  [% END %]
+	</dd>
+
+	<dt>Notes: </dt>
+	<dd>[% notes | html %]
+	  <a href="[% c.uri_for_action('interface/edit_notes', [object.device, object.interface])%]">
+	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span>	</a>
+	  [% IF notes != '' -%]
+	  <a href="[% c.uri_for_action('interface/delete_notes', [object.device, object.interface])%]">
+	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Note</span></a> 
+	  [% END -%]
+      </dl>
+    </div><!-- row -->
+  </div>  <!-- end tab -->
+
+  <div role="tabpanel" class="tab-pane" id="history">
+    <div class="row">
+      <table class="table">
+	<thead>  
+          <tr>
+ 	    <th>Mac Address</th>
+ 	    <th>Vlan</th>
+ 	    <th>From</th>
+	    <th>To</th>
+          </tr>
+	</thead>  
+	<tbody>	  
+	  [% FOREACH m IN mat_history %]
+	  <tr>
+	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
+	    <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
+	    <td> [% date.format(m.firstseen) %]</td>
+	    <td> [% date.format(m.lastseen) %]</td>
+	  </tr>
+	  [% END %]
+	</tbody>
+      </table>
+    </div> <!-- end row -->
+  </div> <!-- end tab -->  
+</div> <!-- end tab content -->

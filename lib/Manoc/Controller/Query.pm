@@ -9,7 +9,7 @@ use Manoc::Utils;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-use Manoc::Utils qw(print_timestamp str2seconds);
+use Manoc::Utils qw(str2seconds);
 
 =head1 NAME
 
@@ -289,7 +289,7 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
         from_iface  => $_->from_interface,
         to_device   => $_->to_device->address,
         to_iface    => $_->to_interface,
-        date        => Manoc::Utils::print_timestamp( $_->last_seen )
+        date        => $_->last_seen
     }, @results;
 
     $c->stash(
@@ -439,7 +439,7 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
             macaddr      => $_->macaddr,
             device       => $_->device_entry,
             iface        => $_->interface,
-            from         => Manoc::Utils::print_timestamp($_->firstseen),
+            from         => $_->firstseen,
         }, @results;
 
         $c->stash( new_devs => \@new_devices );

@@ -1,0 +1,45 @@
+[%
+page.section = 'Asset'
+page.subsection = 'Rack'
+page.title = 'Rack ' _ object.name
+-%]
+[% page.toolbar = BLOCK -%]
+  <a class="btn btn-primary" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+  <a class="btn btn-danger" href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
+  <a class="btn  btn-default" href="[% c.uri_for_action('device/create', { rack => object.id}) %]">[% bootstrap_icon('plus') %] Add Device</a>
+[% END -%]
+
+<div class="row">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+	<dt>Building</dt><dd>[% print_building(object.building) %]</dd>
+	<dt>Floor</dt><dd>[% object.floor %]</dd>
+	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="row">
+[% IF object.devices -%]
+  <table class="table table-condensed" id="device_list">
+    <thead>  
+      <tr>
+ 	<th class="col-md-2">Level</th>
+ 	<th>Device</th>
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH d IN object.devices -%]
+      <tr>
+	<td>[% d.level %]</td>
+	<td>[% print_device(d) %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>

@@ -1,0 +1,147 @@
+[% META
+   section="Search"
+   title="Manoc search"
+   layout="onecol"
+   disable_search=1
+-%]
+<form method="get"  enctype="multipart/form-data">
+<table align="center" >
+[% FOREACH plugin IN plugins %]	
+ [% PROCESS $plugin -%] 
+[%END -%]
+<tr>
+<td  class="search_cen" align="center">
+<input type="text" name="q" value="[% q | html %]" size="50"/>
+</td>
+</tr>
+
+<tr>
+  <td colspan="2">
+  <input type="checkbox" name="advanced" id="advanced"
+  	 [% "checked=\"checked\"" IF advanced %]><label for="check">Advanced</label>
+  </td>
+</tr>
+<tr class="advanced-search">
+<td class="search_cen"> Type: 
+[% manoc_radiobox(options=search_types,name='type', default=default_type) %]
+</tr>
+<tr class="advanced-search">
+<td class="search_cen" >Limit:
+<input type="text" name="limit" value="[% limit %]"/>  
+(Default is [% default_limit OR 'no limits' %])
+</td>
+</tr>
+                 
+<tr>
+<td class="buttons" align="center">
+<input value="Search" type="submit" />
+</td>
+</tr>
+</table>
+</form>
+
+[% MACRO item_building(item) BLOCK -%]
+<label id="search-cat">Building</label> <a href="[% c.uri_for_action('building/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
+[% END -%]
+[% MACRO item_rack(item) BLOCK -%]
+<label id="search-cat">Rack:</label>  <a href="[% c.uri_for_action('rack/view', [item.id]) %]">[% item.name %]</a> [% item.description %]
+[%  END -%]
+[% MACRO item_device(item) BLOCK -%]
+<label id="search-cat">Device:</label> [% item.name %] [% print_device_long(item) -%]
+[% END -%]
+[% MACRO item_ipaddr(item) BLOCK -%]
+<label id="search-cat">IP:</label> [% print_ip(item.addr) %] 
+[% END -%]
+[% MACRO item_macaddr(item) BLOCK -%]
+<label id="search-cat">MAC:</label>  [% print_mac(item.addr) %]
+[% END -%]
+[% MACRO item_iface(item) BLOCK -%]
+<label id="search-cat">Interface:</label>  [% print_short_iface(item.device.id, item.interface) %] on
+[% print_device_with_name(item.device) %]
+[% END -%]
+[% MACRO item_generic_group(item) BLOCK -%]
+ [% IF item and item.isa("Manoc::IpAddress") -%]
+     [% item.match.address %] 
+   [% ELSE-%]
+     [% item.match %]
+   [% END-%]
+[% END -%]
+[% MACRO item_vlan(item) BLOCK -%]
+<label id="search-cat">Vlan:</label>  [% print_vlan(item.id, item.name) %](
+[%item.id%] )
+[% END -%]
+[% MACRO item_ipnote(item) BLOCK -%]
+<label id="search-cat">IpNote:</label>  [% print_note(item.ipaddr, item.notes) %] 
+[% END -%]
+[% MACRO item_hostname(item) BLOCK -%]
+<label id="search-cat">Hostname:</label>  [% print_host(item.ipaddr, item.name) %] 
+[% END -%]
+[% MACRO item_iprange(item) BLOCK -%]
+<label id="search-cat">Subnet:</label>  [% print_iprange(item.name, item.iprange) %] 
+[% END -%]
+[% MACRO item_ipcalc(item) BLOCK -%]
+<label id="search-cat">Ipcalc:</label>  [% print_ipcalc(item.iprange, item.prefix) %] 
+[% END -%]
+[% MACRO item_vlanrange(item) BLOCK -%]
+<label id="search-cat">VlanRange:</label>  [% print_vlanrange(item.name) %] 
+[% END -%]
+[% MACRO item_logon(item) BLOCK -%]
+<label id="search-cat">Logon:</label>  [% item.match %]
+[% END -%]
+[% MACRO item_plugin(item) BLOCK -%]
+[% render = item.item_type %]
+<label id="search-cat">[% item.item_type %]:</label> [% $render(item) %]
+[% END -%]
+
+[% MACRO item_generic(item) BLOCK %]
+  [% SWITCH item.item_type -%]
+     [%  CASE 'building'  %][% item_building(item)      -%]
+     [%  CASE 'rack'      %][% item_rack(item)          -%]
+     [%  CASE 'device'    %][% item_device(item)        -%]
+     [%  CASE 'ipaddr'    %][% item_ipaddr(item)        -%]
+     [%  CASE 'macaddr'   %][% item_macaddr(item)       -%]
+     [%  CASE 'iface'     %][% item_iface(item)         -%]
+     [%  CASE 'vlan'      %][% item_vlan(item)          -%]
+     [%  CASE 'hostname'  %][% item_hostname(item)      -%]
+     [%  CASE 'iprange'   %][% item_iprange(item)       -%]
+     [%  CASE 'ipcalc'    %][% item_ipcalc(item)        -%]
+     [%  CASE 'logon'     %][% item_logon(item)         -%]
+     [%  CASE 'vlanrange' %][% item_vlanrange(item)     -%]
+     [%  CASE 'group'     %][% item_generic_group(item) -%]
+     [%  CASE             %][% item_plugin(item) -%]
+     [% END -%]
+   [% IF item.text -%]<span class="result-text">[% item.text -%]</span>[% END -%]
+[% END -%]
+
+[% FOREACH item IN result.items -%]
+  [% '<ul class="results">' IF loop.first %]
+  <li>
+  [% IF item.item_type == 'group' && item.items.size == 1 %]
+    [% item_generic(item.items.0) %]
+  [% ELSE %]
+    [% item_generic(item) %] 
+      [% IF item.items %]
+	<ul>
+	[% FOREACH subitem IN item.items -%]		
+	<li>[% item_generic(subitem) %]</li>
+	[% END -%]
+        </ul>
+     [% END -%]
+  [% END %]
+  </li>
+  [% '</ul>' IF loop.last %]
+[% END %]
+
+[% fragment = BLOCK -%]
+$("#advanced").click(function() {
+   var opacity = $("#advanced").is(':checked') ? "1" : "0";
+   $("tr.advanced-search").stop(true, true).animate({
+    				       height:"toggle",
+				       opacity:"toggle"
+				       }, 1000);
+        });
+$(function() { if(!$("#advanced").is(':checked')) { $("tr.advanced-search").hide() }  });	
+[% END %]
+
+[% js_scripts.push(fragment) %]
+

@@ -64,14 +64,12 @@ __PACKAGE__->inflate_column(
     }
 );
 
-# TODO is_foreign_key_constraint doesn't work!!
-#__PACKAGE__->might_have(to_device_info => 'Manoc::DB::Result::Device',
-#			{ 'foreign.id' => 'self.to_device' },
-#			{
-#			    cascade_delete => 0,
-#			    is_foreign_key_constraint => 0,
-#			}
-#			);
+__PACKAGE__->belongs_to(
+    to_device_info => 'Manoc::DB::Result::Device',
+    { 'foreign.mng_address' => 'self.to_device' },
+    { join_type => 'left' },
+);
+
 
 =head1 NAME
 
