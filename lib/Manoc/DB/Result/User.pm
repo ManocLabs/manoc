@@ -23,7 +23,7 @@ __PACKAGE__->add_columns(
         is_nullable => 0
     },
     password => {
-        data_type           => 'CHAR',
+        data_type           => 'varchar',
         size                => 255,
         encode_column       => 1,
 	encode_class        => 'Crypt::Eksblowfish::Bcrypt',
