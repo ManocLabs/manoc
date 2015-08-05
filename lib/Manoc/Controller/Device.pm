@@ -31,13 +31,6 @@ Catalyst Controller.
 
 =cut
 
-has 'device_form' => (
-    isa => 'Manoc::Form::Device',
-    is => 'rw',
-    lazy => 1,
-    default => sub { Manoc::Form::Device->new }
-);
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -48,19 +41,7 @@ __PACKAGE__->config(
     class      => 'ManocDB::Device',
 );
 
-=head1 METHODS
-
-=cut
-
-sub get_object {
-    my ( $self, $c, $id ) = @_;
-
-    my $object = $c->stash->{resultset}->find($id);
-    if ( !defined($object)) {
-	$object = $c->stash->{resultset}->find({mng_address => $id});
-    }
-    return $object;
-}
+=head1 ACTIONS
 
 
 =head2 view
@@ -266,7 +247,38 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 			   $c->uri_for_action( '/device/view', [$device_id] ) );
 }
 
-=head2 list
+
+=head2 uplinks
+
+=cut
+
+sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $device = $c->stash->{'object'};
+    my $form = Manoc::Form::Uplink->new(device => $device);
+
+    if ($device->ifstatus->count() == 0) {
+        $c->flash(error_msg => 'No known interfaces on this device');
+        $c->uri_for_action( 'device/view', [ $device->id ] );
+        $c->detach();
+    }
+    $c->stash(
+        form   => $form,
+        action => $c->uri_for($c->action, $c->req->captures),
+    );
+    return unless $form->process(
+        params =>  $c->req->parameters,
+    );
+
+    $c->response->redirect(
+	$c->uri_for_action( 'device/view', [ $device->id ] )
+    );
+    $c->detach();
+}
+
+
+=head2 get_object_list
 
 =cut
 
@@ -318,6 +330,7 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
 
 }
 
+
 =head2 create
 
 =cut
@@ -331,6 +344,20 @@ before 'create' => sub {
     $c->stash(form_defaults => { rack => $rack_id });
 };
 
+=head1 METHODS
+
+=cut
+
+sub get_object {
+    my ( $self, $c, $id ) = @_;
+
+    my $object = $c->stash->{resultset}->find($id);
+    if ( !defined($object)) {
+	$object = $c->stash->{resultset}->find({mng_address => $id});
+    }
+    return $object;
+}
+
 =head2 get_form
 
 =cut
@@ -340,7 +367,7 @@ sub get_form {
     return Manoc::Form::Device->new();
 }
 
-=head2 delete
+=head2 delete_object
 
 =cut
 
@@ -397,36 +424,6 @@ sub delete_object {
     }
     return 1;
 }
-
-=head2 uplinks
-
-=cut
-
-sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $device = $c->stash->{'object'};
-    my $form = Manoc::Form::Uplink->new(device => $device);
-
-    if ($device->ifstatus->count() == 0) {
-        $c->flash(error_msg => 'No known interfaces on this device');
-        $c->uri_for_action( 'device/view', [ $device->id ] );
-        $c->detach();
-    }
-    $c->stash(
-        form   => $form,
-        action => $c->uri_for($c->action, $c->req->captures),
-    );
-    return unless $form->process(
-        params =>  $c->req->parameters,
-    );
-
-    $c->response->redirect(
-	$c->uri_for_action( 'device/view', [ $device->id ] )
-    );
-    $c->detach();
-}
-
 
 
 =head2 prepare_json_object
