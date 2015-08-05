@@ -168,11 +168,11 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $c->uri_for_action($c->namespace . "/list") );
+            $c->res->redirect( $self->get_delete_failure_url($c) );
             $c->detach();
         } else {
-            my $action = $c->namespace . "/view";
-            $c->res->redirect( $c->uri_for_action( $action,[ $c->stash->{object_pk} ] ));
+            $c->res->redirect( $self->get_delete_success_url($c) );
+            $c->detach();
         }
     }
 
@@ -205,6 +205,19 @@ sub delete_object {
     my ( $self, $c ) = @_;
 
     return $c->stash->{object}->delete;
+}
+
+sub get_delete_failure_url {
+    my ( $self, $c ) = @_;
+    
+    my $action = $c->namespace . "/view";
+    return $c->uri_for_action( $action,[ $c->stash->{object_pk} ] );
+}
+
+sub get_delete_success_url {
+    my ( $self, $c ) = @_;
+
+    return $c->uri_for_action($c->namespace . "/list");
 }
 
 1;
