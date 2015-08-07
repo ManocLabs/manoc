@@ -1,50 +1,6 @@
-[% META
+[% 
    section='Network'
    subsection='VLAN'
-   title='Merge ranges'  
-   -%]
-[% UNLESS neighs.0 %]
-[% PROCESS  'message_box.tt' msg='This VlanRange doesn\'t have neighbor ranges' %]
-[% END %]
-[% IF neighs.0 %]
-<form name="form1" method="POST">
-    <input type=hidden name="id" value="[% object.id %]"> 
-    <table class="ui-widget-content ui-corner-all manoc-form">
-       <tr>
-            <td><label>Range to merge:</label></td>
-	    <td colspan="2">[% object.name | html %] [ [% object.start | html %] - [% object.end | html %] ]</td>
-       </tr>
-        <tr>
-            <td><label>Merged vlan range name</label></td>
-            <td colspan=2><input type="text" value="[% new_name | html %]"
-	        name="new_name"></input></td>
-	    <td>
-	       [% IF error.name %]
-	    	<span class="error" id="error">[% error.name | html %] </span>
-	       [%END%]
-	    </td>
-        </tr>
-       <tr>
-            <td colspan="3"><label>Merge with:</label>
-       </tr>
-	[% FOREACH n IN neighs %]
-            <tr>
-                <td><input type=radio name=sel_vlan_range_id value="[% n.id %]" 
-		[% IF sel_vlan_range_id == n.id %] checked [% END %]>
-		<a href="[% c.uri_for('/vlanrange/list') %]">[% n.name | html %] </a></td>
-                <td align=center>[% n.start | html %]</td>
-                <td align=center>[% n.end | html %]</td>
-            </tr>
-	[% END %]
-        <tr>
-            <td colspan="3" class="buttons-form">
-	    <div class="buttons"> 
-	    <input type="submit" name="submit" value="Submit"> 
-            <input type="submit" name="discard" value="Discard"> 
-            </div> 
-            </td>
-        </tr>
-    </table>
-</form>
-
-[% END %]
+   title='Merge VLAN range'  
+-%]
+[% form.render %]
