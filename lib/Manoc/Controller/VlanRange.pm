@@ -48,7 +48,6 @@ Catalyst Controller.
 sub split : Chained('object') : PathPart('split') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $device = $c->stash->{'object'};
     my $form = Manoc::Form::VlanRange::Split->new();
 
     $c->stash(
@@ -69,7 +68,6 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
 sub merge : Chained('object') : PathPart('merge') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $device = $c->stash->{'object'};
     my $form = Manoc::Form::VlanRange::Merge->new();
 
     $c->stash(
