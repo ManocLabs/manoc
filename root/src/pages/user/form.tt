@@ -1,10 +1,6 @@
-[% META
+[% 
    title='Edit'
    subsection='Users'
    section='Config'
- -%]
-
-<div class="buttons">
+-%]
 [% form.render %]
-</div>
-

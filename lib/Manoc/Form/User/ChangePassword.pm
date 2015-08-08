@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::User;
+package Manoc::Form::User::ChangePassword;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
@@ -12,19 +12,12 @@ with 'Manoc::Form::Base::SaveButton';
 has '+name' => ( default => 'form-user' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'username' => (
-    type     => 'Text',
-    label    => 'Username',
-    required => 1,
-    apply    => [
-        'Str',
-        {
-            check => sub { $_[0] =~ /^\w[\w-]*$/ },
-            message => 'Invalid Username'
-        },
-    ]
+has_field 'old_password' => (
+    type      => 'Password',
+    label     => 'Old password',
+    required  => 1,
 );
-
+    
 has_field 'password' => (
     type      => 'Password',
     label     => 'Password',
@@ -37,27 +30,13 @@ has_field 'password2' => (
     label    => 'Confirm Password',
 );
 
-has_field 'email' => (
-    label => 'Email',
-    type  => 'Email',
-);
+sub validate_model {
+    my $self = shift;
+    my $item = $self->item;
 
-has_field 'fullname' => (
-    type     => 'Text',
-    required => 1,
-);
-
-has_field 'roles' => (
-    type         => 'Multiple',
-    label        => 'Roles',
-    label_column => 'role',
-);
-
-has_field 'active' => (
-    label => 'Active',
-    type  => 'Boolean',
-);
-
+    $item->check_password($self->field('old_password')->value)
+        or $self->field('old_password')->add_error("Old password not valid");
+}
 
 1;
 # Local Variables:

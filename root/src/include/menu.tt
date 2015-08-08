@@ -71,10 +71,6 @@
 		        name = 'Management Urls',
 		        path = c.uri_for_action('/mngurlformat/list'),
 		     },
-		     {
-			name = 'Credentials',
-		     	path = '#',
-		     }		
 		     ]
  		 }
 	]
@@ -100,6 +96,7 @@
             <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% bootstrap_icon("user") %]</a>
                 <ul class="dropdown-menu">
 		    <li class="dropdown-header">User: [% c.user.username %]</li>
+		    <li><a href="[% c.uri_for('/user/change_password') %]">Change password</a></li>
 	            <li><a href="[% c.uri_for('/auth/logout') %]">Logout</a></li>
 		</ul>
 	    </li>	    
