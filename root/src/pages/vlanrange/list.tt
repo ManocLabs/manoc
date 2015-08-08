@@ -32,7 +32,7 @@ page.section= 'Network'
 	<a href="[% c.uri_for_action('vlanrange/edit',[range.id])%]">[% bootstrap_icon('pencil') %]</a>
 	<a href="[% c.uri_for_action('vlanrange/split',[range.id])%]">[% bootstrap_icon('resize-full') %]</a>
 	<a href="[% c.uri_for_action('vlanrange/merge',[range.id])%]">[% bootstrap_icon('resize-small') %]</a>
-	<a href="[% c.uri_for_action('vlanrange/delete',[range.id])%]">[% bootstrap_icon('remove') %]</a>
+	<a href="[% c.uri_for_action('vlanrange/delete',[range.id])%]">[% bootstrap_icon('trash') %]</a>
       </td>
     </tr>
   </tbody>
@@ -45,7 +45,7 @@ page.section= 'Network'
       <td>[% vlan.description | truncate(40) | html %]</td>
       <td>
 	<a href="[% c.uri_for_action('vlan/edit',[vlan.id],{backref=>c.req.uri})%]">[% bootstrap_icon('plus') %]</a>
-	<a href="[% c.uri_for_action('vlan/delete',[vlan.id],{backref=>c.req.uri})%]">[% bootstrap_icon('remove')%]</a>
+	<a href="[% c.uri_for_action('vlan/delete',[vlan.id],{backref=>c.req.uri})%]">[% bootstrap_icon('trash')%]</a>
       </td>
     </tr>   <!-- end of specific vlans--> 
     [% END -%] 

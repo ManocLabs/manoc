@@ -140,7 +140,7 @@ sub get_object_list {
 }
 
 
-=head2 prepare_json_object
+=head2 get_delete_failure_url
 
 =cut
 
