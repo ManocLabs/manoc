@@ -10,7 +10,8 @@ has_field 'save' => (
     widget => 'ButtonTag',
     element_attr => { class => ['btn', 'btn-primary'] },
     widget_wrapper => 'None',
-    value => "Save"
+    value => "Save",
+    order => 1000,
 );
 
 1;
