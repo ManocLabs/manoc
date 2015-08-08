@@ -30,6 +30,8 @@ has_field 'password2' => (
     label    => 'Confirm Password',
 );
 
+has '+success_message' => ( default => 'Password updated.' );
+
 sub validate_model {
     my $self = shift;
     my $item = $self->item;

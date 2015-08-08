@@ -56,8 +56,6 @@ sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
         item   =>  $c->stash->{object},
         params =>  $c->req->parameters,
     );
-
-    $c->flash( message => 'Password updated.' );
     $c->detach();
 }
 
