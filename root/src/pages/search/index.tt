@@ -1,8 +1,8 @@
 [% 
-   section="Search"
-   title="Manoc search"
-   disable_search=1
--%]
+   page.section="Search"
+   page.title="Manoc search"
+   page.disable_search=1
+ -%]	
 [% META 
 layout="onecol"
 -%]
