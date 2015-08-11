@@ -12,6 +12,17 @@ extends 'Manoc::Form::Base';
 has '+name' => ( default => 'form-vlanrange' );
 has '+html_prefix' => ( default => 1 );
 
+sub build_form_element_class { ['form-horizontal'] }
+
+sub build_form_tags {
+    {
+        'layout_classes' => {
+            element_wrapper_class => [ 'col-sm-10' ],
+            label_class           => [ 'col-sm-2' ],
+        }
+    }
+}
+
 has_field 'name' => (
     label    => 'Name',
     type     => 'Text',
@@ -22,26 +33,26 @@ has_field 'name' => (
             check => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
-    ]
+    ],
 );
 
 has_field 'start' => (
-    label => 'From VLAN ID',
-    type => 'PosInteger',
+    label => 'From VLAN',
+    type => 'Integer',
     apply => [ 'VlanID' ],
-    required => 1
+    required => 1,
 );
 
 has_field 'end' => (
-    label => 'To VLAN ID',
-    type => 'PosInteger',
+    label => 'To VLAN',
+    type => 'Integer',
     apply => [ 'VlanID' ],
-    required => 1
+    required => 1,
 );
 
 has_field 'description' => (
     label => 'Description',
-    type => 'TextArea'
+    type  => 'TextArea',
 );
 
 has_field 'save' => (
@@ -51,6 +62,7 @@ has_field 'save' => (
     widget_wrapper => 'None',
     value => "Save"
 );
+
 
 sub validate {
     my $self = shift;
@@ -73,13 +85,12 @@ sub validate_model {
     $overlap = $overlap->search( id => { '<>' => $self->item->id } )
         if $item->in_storage;
     $overlap->count() > 0
-        and self->add_form_error('Overlaps with existing range');
+        and $self->add_form_error('Overlaps with existing range');
 
     # check for vlans outside boundaries
     if ($item->in_storage) {
         $item->vlans->search( { id => { '<' => $start } } )->count() > 0
             and $self->field('start')->add_error('There are associated vlans which will be below the lower end of the range');
-
         $item->vlans->search( { id => { '>' => $end } } )->count() > 0
             and $self->field('end')->add_error('There are associated vlans which will be above the upper end of the range');
     }
