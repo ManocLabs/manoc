@@ -1,0 +1,14 @@
+[%
+  page.title='Management URL Format'
+  page.subsection='Management URL Format' 
+  page.section='Config'
+-%]
+
+<div class="row">
+<p>Use <tt>%h</tt> as a placeholder for device address</p>
+</div>
+
+<div class="row">
+[% form.render %]
+</div>
+
