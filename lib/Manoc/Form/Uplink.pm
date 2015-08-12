@@ -6,7 +6,7 @@ package Manoc::Form::Uplink;
 
 use strict;
 use warnings;
-use Manoc::Utils qw(check_addr);
+
 use HTML::FormHandler::Moose;
 
 extends 'HTML::FormHandler';

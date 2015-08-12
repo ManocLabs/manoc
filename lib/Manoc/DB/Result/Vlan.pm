@@ -6,9 +6,8 @@ package Manoc::DB::Result::Vlan;
 use strict;
 use warnings;
 
-use base qw(DBIx::Class);
+use parent 'DBIx::Class::Core';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
 __PACKAGE__->table('vlan');
 
 __PACKAGE__->add_columns(

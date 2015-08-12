@@ -6,8 +6,8 @@ package Manoc::Search::Driver::IpRange;
 use Moose;
 use Manoc::Search::Item::IpRange;
 use Manoc::Search::Item::IpCalc;
-use Manoc::IpAddress;
-use Manoc::Utils qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr);
+use Manoc::IPAddress::IPv4;
+use Manoc::Utils::IPAddress qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr);
 
 extends 'Manoc::Search::Driver';
 
@@ -23,10 +23,10 @@ sub search_subnet {
     return unless ( check_addr($subnet) );
     $prefix = '24' unless ( defined($prefix) );
 
-    my ( $from_addr, $to_addr ) = Manoc::Utils::netmask_prefix2range( $subnet, $prefix );
+    my ( $from_addr, $to_addr ) = netmask_prefix2range( $subnet, $prefix );
 
-    $from_addr = Manoc::IpAddress->new(int2ip($from_addr));
-    $to_addr   = Manoc::IpAddress->new(int2ip($to_addr));
+    $from_addr = Manoc::IPAddress::IPv4->new(int2ip($from_addr));
+    $to_addr   = Manoc::IPAddress::IPv4->new(int2ip($to_addr));
     
     my @ranges = $schema->resultset('IPRange')->search(
         {
@@ -85,7 +85,7 @@ sub search_inventory {
 
     while ( $e = $it->next ) {
         my $desc =
-            $e->network ? $e->network->address . '/' . Manoc::Utils::netmask2prefix( $e->netmask->address) :
+            $e->network ? $e->network->address . '/' . netmask2prefix( $e->netmask->address) :
                           $e->from_addr->address . '-' . $e->to_addr->address;
 
         my $item = Manoc::Search::Item::IpRange->new(

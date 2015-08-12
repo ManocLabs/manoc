@@ -4,13 +4,12 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::IPRange;
 
-use base 'DBIx::Class';
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-use Manoc::Utils;
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
-__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('ip_range');
 
 __PACKAGE__->add_columns(
@@ -20,24 +19,28 @@ __PACKAGE__->add_columns(
         size        => 64
     },
     'network' => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 15
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+	ipv4_address => 1,
     },
     'netmask' => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 15
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+	ipv4_address => 1,
     },
     'from_addr' => {
-        data_type   => 'varchar',
-        size        => '15',
-        is_nullable => 0
+        data_type    => 'varchar',
+        size         => '15',
+        is_nullable  => 0,
+	ipv4_address => 1,
     },
     'to_addr' => {
-        data_type   => 'varchar',
-        size        => '15',
-        is_nullable => 0
+        data_type    => 'varchar',
+        size         => '15',
+        is_nullable  => 0,
+	ipv4_address => 1,
     },
     'description' => {
         data_type   => 'varchar',
@@ -69,17 +72,6 @@ __PACKAGE__->has_many(
  );
 __PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 
-foreach my $col (qw( from_addr to_addr network netmask )) {
-  __PACKAGE__->inflate_column(
-			      $col => {
-				       inflate =>
-				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				       deflate => 
-				       sub { return $_[0]->padded if defined($_[0]) },
-				      } 
-			     );
-}
 
 
-__PACKAGE__->resultset_attributes( { order_by => [ 'from_addr', 'to_addr' ] } );
 1;

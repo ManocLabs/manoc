@@ -3,11 +3,11 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::System;
-use base 'DBIx::Class';
+
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
 __PACKAGE__->table('system');
 
 __PACKAGE__->add_columns(

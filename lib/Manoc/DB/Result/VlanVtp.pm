@@ -3,12 +3,12 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VlanVtp;
+
+use parent qw(DBIx::Class::Core);
 use strict;
 use warnings;
 
-use base qw(DBIx::Class);
-
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('vlan_vtp');
 
 __PACKAGE__->add_columns(

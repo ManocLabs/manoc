@@ -3,10 +3,10 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Building;
+
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
-
-use base 'DBIx::Class';
 
 __PACKAGE__->load_components(qw/PK::Auto Core/);
 

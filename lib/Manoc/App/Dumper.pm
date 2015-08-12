@@ -21,7 +21,6 @@ use File::Spec;
 
 use Archive::Tar;
 use Try::Tiny;
-use Manoc::Utils;
 
 use YAML::Syck;
 

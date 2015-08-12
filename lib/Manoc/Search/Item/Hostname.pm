@@ -3,7 +3,6 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::Search::Item::Hostname;
-use  Manoc::IpAddress;
 use Moose;
 
 extends 'Manoc::Search::Item';
@@ -21,8 +20,6 @@ has 'name' => (
     isa      => 'Str',
     required => 1,
 );
-
-use Data::Dumper;
 
 around BUILDARGS => sub {
     my $orig  = shift;

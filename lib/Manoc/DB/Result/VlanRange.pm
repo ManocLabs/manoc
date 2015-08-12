@@ -3,13 +3,15 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VlanRange;
+
+use parent 'DBIx::Class::Core';
+
 use strict;
 use warnings;
-
-use base qw(DBIx::Class);
 use Carp;
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
+
 __PACKAGE__->table('vlan_range');
 
 __PACKAGE__->add_columns(

@@ -15,7 +15,7 @@ use Net::Pcap;
 use NetPacket::Ethernet qw(:types);
 use NetPacket::ARP;
 
-use Manoc::IpAddress;
+use Manoc::IPAddress::IPv4;
 
 my $DEFAULT_VLAN     = 1;
 my $REFRESH_INTERVAL = 600;
@@ -211,7 +211,7 @@ sub handle_arp_packets {
     $arp_table->{$key} = [ $mac_addr, $timestamp ];
 
     # update DB
-    my $ip_obj = Manoc::IpAddress->new( $ip_addr  );
+    my $ip_obj = Manoc::IPAddress::IPv4->new( $ip_addr  );
     my @entries = $self->schema->resultset('Arp')->search(
         {
             ipaddr   => $ip_obj,

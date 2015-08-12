@@ -3,12 +3,14 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::ReportArchive;
+
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
 use base qw(DBIx::Class);
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+__PACKAGE__->load_components(qw/InflateColumn/);
 __PACKAGE__->table('report_archive');
 
 __PACKAGE__->add_columns(

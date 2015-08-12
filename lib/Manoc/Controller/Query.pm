@@ -5,11 +5,10 @@
 package Manoc::Controller::Query;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils;
+use Manoc::Utils qw(str2seconds clean_string);
+use Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-use Manoc::Utils qw(str2seconds);
 
 =head1 NAME
 
@@ -85,7 +84,7 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             };
     }
 
-    my $query_time  = time - Manoc::Utils::str2seconds("60d");
+    my $query_time  = time - str2seconds("60d");
     my @tot_actives = $c->model('ManocDB::Mat')->search(
                                                     {
                                                      'lastseen' => {'>=' => $query_time}
@@ -143,7 +142,7 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     my ( $r, $rs );
 
     my @conflicts =
-        map { ipaddr => Manoc::Utils::unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
+        map { ipaddr => unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
         $schema->resultset('Arp')->search_conflicts;
 
     
@@ -218,8 +217,8 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
 sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $device_id = Manoc::Utils::clean_string( $c->req->param('device') );
-    my $days      = Manoc::Utils::clean_string( $c->req->param('days') );
+    my $device_id = clean_string( $c->req->param('device') );
+    my $days      = clean_string( $c->req->param('days') );
 
     $days =~ /^\d+$/ or $days = 0;
 
@@ -419,11 +418,11 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     my @results;
     my $e;
     my @multimacs;
-    my $days       = Manoc::Utils::clean_string( $c->req->param('days') ) || "" ;
+    my $days       = clean_string( $c->req->param('days') ) || "" ;
     $days =~ /^\d+$/ or $days = "";
     
     if ($days) {
-        my $query_time = time - Manoc::Utils::str2seconds($days . "d");
+        my $query_time = time - str2seconds($days . "d");
         
         @results = $schema->resultset('Mat')->search(
             { },

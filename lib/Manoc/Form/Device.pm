@@ -6,7 +6,7 @@ package Manoc::Form::Device;
 
 use strict;
 use warnings;
-use Manoc::Utils qw(check_addr);
+use Manoc::Utils::IPAddress qw(check_addr);
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';

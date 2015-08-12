@@ -7,10 +7,8 @@ package Manoc::DataDumper::Converter::v2;
 
 use Moose;
 use Data::Dumper;
-use Manoc::Utils qw(padded_ipaddr check_addr);
+use Manoc::Utils::IPAddress qw(padded_ipaddr check_addr);
 extends 'Manoc::DataDumper::Converter::v3';
-
-use Manoc::IpAddress;
 
 #Convert Ip addresses in zero-padded ip addresses
 

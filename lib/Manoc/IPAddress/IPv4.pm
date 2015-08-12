@@ -1,9 +1,7 @@
-package Manoc::IpAddress::Ipv4;
+package Manoc::IPAddress::IPv4;
 
 use Moose;
-use Manoc::Utils;
-use Scalar::Util;
-extends 'Manoc::IpAddress';
+use Manoc::Utils::IPAddress qw/padded_ipaddr unpadded_ipaddr/;
 
 use overload ('""'  =>   \&to_string,
 	      'lt'  =>   \&less_than,
@@ -12,6 +10,11 @@ use overload ('""'  =>   \&to_string,
 	      'le'  =>   \&less_or_equal,
 	      'ne'  =>   \&not_equal);
 
+has 'address' => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
 has 'padded' => (
     is         => 'rw',
     isa        => 'Str',
@@ -19,15 +22,29 @@ has 'padded' => (
     trigger => \&_set_unpadded,
 );
 
+
+around BUILDARGS => sub {
+      my $orig  = shift;
+      my $class = shift;
+
+      if ( @_ == 1 && ! ref $_[0] ) {
+          return $class->$orig(address => $_[0]);
+      }
+      else {
+          return $class->$orig(@_);
+      }
+  };
+
+
 sub _build_padded {
     my $self = shift;
-    return Manoc::Utils::padded_ipaddr( $self->address );
+    return padded_ipaddr( $self->address );
   }
 
 sub _set_unpadded {
    my ($self, $new, $old) = @_;
 
-   $self->address(Manoc::Utils::unpadded_ipaddr( $new ));
+   $self->address(unpadded_ipaddr( $new ));
 }
 
 
