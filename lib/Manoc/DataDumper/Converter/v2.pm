@@ -8,10 +8,9 @@ package Manoc::DataDumper::Converter::v2;
 use Moose;
 use Data::Dumper;
 use Manoc::Utils::IPAddress qw(padded_ipaddr check_addr);
-extends 'Manoc::DataDumper::Converter::v3';
+extends 'Manoc::DataDumper::Converter::Base';
 
-#Convert Ip addresses in zero-padded ip addresses
-
+# Convert Ip addresses in zero-padded ip addresses
 sub _upgrade_ipcolumn {
   my ( $col_name, $data ) = @_;
   my ( $i, $ip );
@@ -25,18 +24,16 @@ sub _upgrade_ipcolumn {
   }
 }
 
-override 'upgrade_devices' => sub {
+sub upgrade_devices {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting devices...");
     _upgrade_ipcolumn("id",$data);
-    super();
 };
 
-override 'upgrade_uplinks' => sub {
+sub upgrade_uplinks {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting uplinks...");
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
 sub upgrade_arp {
@@ -45,11 +42,10 @@ sub upgrade_arp {
     _upgrade_ipcolumn("ipaddr",$data);
 }
 
-override 'upgrade_mat' => sub {
+sub upgrade_mat {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting mat entries...");
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
 sub upgrade_ip_notes {
@@ -91,56 +87,50 @@ sub upgrade_ip_range {
     _upgrade_ipcolumn("to_addr",$data);
 }
 
-override  upgrade_if_status => sub {
+sub upgrade_if_status {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting if_status entries...");    
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
-override 'upgrade_if_notes' => sub {
+sub upgrade_if_notes {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting if_notes entries...");
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
-override 'upgrade_cdp_neigh' => sub {
+sub upgrade_cdp_neigh {
     my ( $self, $data ) = @_;
     my $i;
     $self->log->debug("Start converting cdp entries...");
     _upgrade_ipcolumn("from_device",$data);
-    
+
     for ( $i = 0; $i < scalar( @{$data} ); $i++ ) {
 	next if (!defined($data->[$i]->{"to_device"}) or 
 		     $data->[$i]->{"to_device"} ne 'no-ip');
 	$data->[$i]->{"to_device"} = "0.0.0.0";
     }
     _upgrade_ipcolumn("to_device",$data);
-    super();
 };
 
-override upgrade_ssid_list => sub {
+sub upgrade_ssid_list {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting ssid entries...");
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
-override 'upgrade_dot11_assoc' => sub {
+sub upgrade_dot11_assoc {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting  dot11_assoc entries...");
     _upgrade_ipcolumn("device",$data);
     _upgrade_ipcolumn("ipaddr",$data);
-    super();
 };
 
-override upgrade_dot11client => sub {
+sub upgrade_dot11client {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting dot11client entries...");    
     _upgrade_ipcolumn("device",$data);
     _upgrade_ipcolumn("ipaddr",$data);
-    super();
 };
 
 sub upgrade_deleted_devices {
@@ -149,11 +139,10 @@ sub upgrade_deleted_devices {
     _upgrade_ipcolumn("ipaddr",$data);
 }
 
-override 'upgrade_device_config' => sub  {
+sub upgrade_device_config {
     my ( $self, $data ) = @_;
     $self->log->debug("Start converting device configurations entries...");    
     _upgrade_ipcolumn("device",$data);
-    super();
 };
 
 
