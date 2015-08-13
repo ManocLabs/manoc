@@ -1,7 +1,5 @@
-[% META
-   layout = 'onecol'
--%]
 [%
+page.title   = 'About Manoc'
 page.section = 'About'
 -%]
 <div>

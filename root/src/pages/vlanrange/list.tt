@@ -1,9 +1,12 @@
 [%
-page.title='VLAN list'
-page.subsection='VLAN'
-page.section= 'Network'
--%]
+  page.title = 'VLAN list'
+  page.subsection = 'VLAN'
+  page.section = 'Network'
 
+  page.layout = 'with_sidebar'
+  page.load_section_file = 1
+-%]
+[%# PROCESS sections/network/vlan.tt %]
 <div id="vlanrange_create">
   <a href="[% c.uri_for_action('/vlanrange/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add new range</a>
 </div>

@@ -3,9 +3,6 @@
    page.title="Manoc search"
    page.disable_search=1
  -%]	
-[% META 
-layout="onecol"
--%]
 <form method="get"  enctype="multipart/form-data">
 <table align="center" >
 [% FOREACH plugin IN plugins %]	

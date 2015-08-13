@@ -1,5 +1,7 @@
-[% META
-   title='VlanRange' subsection='VLAN' section='Network'
+[% 
+   page.title='VlanRange'
+   page.subsection='VLAN'
+   page.section='Network'
 -%]
 <div class="buttons">
 [% form.render %]

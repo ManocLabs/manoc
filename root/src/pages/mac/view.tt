@@ -1,9 +1,6 @@
 [%
    title='Mac Address View'
 -%]
-[% META
-layout='onecol'
--%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 <dl class="dl-horizontal">
   <dt>Mac Address</dt><dd>[% macaddr | html %]</dd>
