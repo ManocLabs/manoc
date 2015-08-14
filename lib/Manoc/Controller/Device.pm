@@ -289,7 +289,6 @@ sub get_object_list {
     my @devices = $rs->search(
         {},
         {
-            join     => [ { rack   => 'building' }, 'mng_url_format' ],
             prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
         }
     );
