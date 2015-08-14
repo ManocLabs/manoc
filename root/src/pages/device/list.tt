@@ -6,12 +6,13 @@ page.title = 'Devices'
 page.subsection = 'Device'
 page.section = 'Asset'
 %]
+
 <div id="device_create">
   <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
 
 [% init_table('device_list', { toolbar="device_create" }) %]
- <table id="device_list">
+ <table class="table" id="device_list">
        <thead>
 	 <tr>
  	   <th>Name</th>

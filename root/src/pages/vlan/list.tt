@@ -1,100 +1,43 @@
 [% META
-   title='VTP VLAN list'
-   subsection='VTP'   
-   section='Network'
    use_table=1
 -%]
+[%
+   page.title = 'VLAN list'
+   page.subsection = 'VLAN'   
+   page.section = 'Network'
 
-
-<div id="tabs">
-	<ul>
-		<li><a href="#tabs-1">Vlan List</a></li>
-		<li><a href="#tabs-2">DB-Missing Vlan</a></li>
-	</ul>
-
-<div id="tabs-1">
-[% FOREACH v IN vlan_list %]
-   [% IF loop.first %]
-    [% init_table('vlan_list') %]
-    <table class="display" id="vlan_list">
-      <thead>  
-	<tr>
- 	  <th>Vlan</th>
- 	  <th>Name on DB</th>
- 	  <th>Vtp Name</th>
-	  <th>Vlan Range</th>
-	  <th>Description</th>
-  	  <th>Commands</th>
-        </tr>
-      </thead>  
-      <tbody>
-  [% END %]
-       <tr>
- 	 <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.id %]</a></td>
-  	 <td>[% v.name | html %]</td>
-  	 <td>[% v.name_vtp | html %]</td>
-	 <td><a href="[% c.uri_for('/vlanrange/list') %]">[% v.vlan_range.name %]</a></td>
-  	 <td>[% v.description  | html %]</td>
-	 <td>
-	   <a href="[% c.uri_for_action('vlan/edit',[v.id],{backref=>c.req.uri})%] ">[% icon('edit') %]</a>
-           <a href="[% c.uri_for_action('vlan/delete',[v.id],{backref=>c.req.uri})%] ">[% icon('remove') %]</a>
-          [%IF v.name_vtp AND v.name != v.name_vtp %]
-	   <a href="[% c.uri_for_action('vlan/merge_name',[v.id], {new_name=>v.name_vtp}) %] ">[% icon('merge') %]</a>
-	  [% END %]
-	 </td>
-       </tr>
-  [% IF loop.last %]
-        </tbody>
-    </table>
-   [% END %]
-[% END %]
-
-</div> <!-- end of tab-1 -->
-
-<div id="tabs-2">
-
-[% FOREACH v IN vlan_vtp %]
-   [% IF loop.first %]
-   [% init_table('dbmissing',undef,{disable_sorting=>1}) %]
-    <table class="display" id="dbmissing">
-      <thead>  
-	<tr>
- 	  <th>Vlan</th>
- 	  <th>Name</th>
-	  <th>Vlan Range</th>
-  	  <th>Commands</th>
-        </tr>
-      </thead>  
-      <tbody>
-  [% END %]
-       <tr>
- 	 <td>[% v.id | html %]</td>
-  	 <td>[% v.name | html %]</td>
-	 <td>
-	  [% IF v.vlan_range.name %]
-	   <a href="[% c.uri_for('/vlanrange/list') %]">[% v.vlan_range.name %]</a>
-	  [% ELSE %] 
-	   Vlan Range not defined!
-	  [% END %]
-        </td>
-  	 <td>
- 	  [% IF v.vlan_range.name %]
-           <a href="[% c.uri_for('/vlan/create', {id => v.id, name => v.name,
-                                          forced_range_id => v.vlan_range.id }) %]">
-         [% icon('add') %]</a>
-	 [% ELSE %] 
-	   To create this VLAN, you have to create a <a
-      href="[%c.uri_for('/vlanrange/create',{backref=> c.req.uri _ '?def_tab=2'})%]">Vlan
-      Range </a> before!
-	 [% END%]
-       
-         </td>
-       </tr>
-  [% IF loop.last %]
-        </tbody>
-    </table>
-   [% END %]
-[% END %]
-</div> <!-- end of tab-2 -->
-
-</div><!-- end of #tabs -->
+   page.layout = 'with_sidebar';
+   page.load_section_file = 1
+-%]
+[%
+  table_options.columns = [
+       "{'sType': 'numeric'}",
+       "null",
+       "null",
+       "null",
+       "null",
+  ];
+  init_table('vlan_list', table_options)
+-%]
+<table class="table" id="vlan_list">
+  <thead>  
+    <tr>
+      <th>VLAN ID</th>
+      <th>Name</th>
+      <th>VTP Name</th>
+      <th>Vlan Range</th>
+      <th>Description</th>
+    </tr>
+  </thead>  
+  <tbody>
+    [% FOREACH v IN object_list %]
+    <tr>
+      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.id %]</a></td>
+      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.name | html %]</a></td>
+      <td>[% v.name_vtp | html %]</td>
+      <td><a href="[% c.uri_for('/vlanrange/list') %]">[% v.vlan_range.name %]</a></td>
+      <td>[% v.description  | html %]</td>
+    </tr>       
+    [% END %]
+  </tbody>
+</table>

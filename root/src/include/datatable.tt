@@ -1,39 +1,24 @@
 [% link_css.push(
-               c.uri_for('/static/external/datatable-bs/css/dataTables.bootstrap.css'),
+               c.uri_for('/static/external/datatables-1.10.8/datatables.css'),
              )
   -%]
   [%  link_js.push(
-               c.uri_for('/static/external/datatable/js/jquery.dataTables.min.js'),
-               c.uri_for('/static/external/datatable-bs/js/dataTables.bootstrap.js'),
+               c.uri_for('/static/external/datatables-1.10.8/datatables.min.js'),
+               c.uri_for('/static/external/datatables-1.10.8/ip-address.js'),
              ) 
   -%]
 [%# Init Table -%]
 [% MACRO init_table(id, options) BLOCK -%]
 [% capture = BLOCK -%]
 $(function() {
-    var page_rows=25;
-    var paginate=[% IF options.disable_pagination %]false[% ELSE %]$("#[% id  %] tr").length > 25[% END -%];
-    $("#[% id  %]").addClass('table table-striped table-bordered');
-    $("#[% id  %]").dataTable( {
-       [% IF options.sortby %]"aaSorting": [[ [% options.sortby %] , "[% options.order %]" ]],[% END -%]
-       "sPaginationType" : "full_numbers",
-       "iDisplayLength" : page_rows,
-       "bSort": [% IF options.disable_sorting %]false[% ELSE %]true[%END%],
-       "bPaginate": paginate,
-       "bInfo": paginate,
-       "dom":
-[%- IF options.toolbar -%]'<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip'
-[%- ELSE %]'frtip'
-[% END  -%],
-  [% IF options.columns -%]
-        "bAutoWidth": false,
-        "aoColumns" : [
-	     { "sWidth"      : "[% options.columns.shift %]%"} 
-   [% FOREACH col IN options.columns -%]
-	     ,{ "sWidth"    : "[% col %]%"}  
-   [% END -%]
-         ],
-   [% END -%]
+    $("#[% id  %]").DataTable( {
+[% IF options.paging   %] "paging":   true,[% END %]
+[% IF options.ordering %] "ordering": true,[% END %]
+[% IF options.info     %] "info":     true,[% END %]
+  "dom":
+    [%- IF options.toolbar -%]'<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip'
+    [%- ELSE %]'frtip'
+    [%- END  %],
    });
 [% IF options.toolbar -%]
    var origin=$("#[% options.toolbar %]");
