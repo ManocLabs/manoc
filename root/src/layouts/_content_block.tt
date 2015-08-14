@@ -1,16 +1,20 @@
 <!-- show messages before the content -->
-
 <div class="row">
   [% PROCESS 'message_box.tt' %]
 </div>
+
+<!-- title and toolbar -->
 <div class="row">
-  [% IF page.toolbar -%]
+[%- IF page.toolbar %]
+  [%- IF title %]
   <div class="pull-left"><h1>[% title %]</h1></div>
+  [%- END %]
   <div class="pull-right">[% page.toolbar %]</div>
-  [% ELSE -%]
+[% ELSE -%]
   [% bootstrap_pagetitle(title) %]	
-  [% END -%]
+[% END -%]
 </div>
-<div class="row">
-  <div id="content">[% content %]</div><!-- end of content -->
-</div>
+
+<div class="row"><!-- content -->
+  [% content %]
+</div><!-- end of content -->
