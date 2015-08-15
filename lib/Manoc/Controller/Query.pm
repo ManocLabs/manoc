@@ -74,6 +74,7 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
         $vlan_stats{ $r->get_column('vlan') }->{ipaddr} = $r->get_column('count');
     }
 
+    # TODO move to vlan controller
     my @vlan_table;
     foreach my $vlan ( sort { $a <=> $b } keys %vlan_stats ) {
         push @vlan_table,
@@ -84,54 +85,11 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             };
     }
 
-    my $query_time  = time - str2seconds("60d");
-    my @tot_actives = $c->model('ManocDB::Mat')->search(
-                                                    {
-                                                     'lastseen' => {'>=' => $query_time}
-                                                    },
-                                                    {
-                                                     select  => ['macaddr',{max => 'lastseen'}],
-                                                     group_by => 'macaddr',
-                                                    }
-                                                   );
-
-
-
-    my @db_stats = (
-        {
-            name => "Tot racks",
-            val  => $schema->resultset('Rack')->count
-        },
-        {
-            name => "Tot devices",
-            val  => $schema->resultset('Device')->count
-        },
-        {
-            name => "Tot interfaces",
-            val  => $schema->resultset('IfStatus')->count
-        },
-        {
-            name => "CDP entries",
-            val  => $schema->resultset('CDPNeigh')->count
-        },
-        {
-            name => "MAT entries",
-            val  => $schema->resultset('Mat')->count
-        },
-        {
-           name => "Active Mat entries",
-           val  => scalar(@tot_actives),
-        },
-        {
-            name => "ARP entries",
-            val  => $schema->resultset('Arp')->count
-        },
-    );
 
     $c->stash(
         disable_pagination => 1,
         vlan_table         => \@vlan_table,
-        db_stats           => \@db_stats,
+#        db_stats           => \@db_stats,
         template           => 'query/stats.tt',
     );
 }
