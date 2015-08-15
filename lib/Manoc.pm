@@ -5,7 +5,7 @@ use namespace::autoclean;
 
 require 5.10.1;
 use version 0.77; # even for Perl v.5.10.0
-our $VERSION = qv('2.002_001');
+our $VERSION = qv('2.002_000');
 
 
 use Catalyst::Runtime 5.90;
