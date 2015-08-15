@@ -46,6 +46,17 @@ sub index : Path : Args(0) {
     $c->res->redirect( $c->uri_for_action('vlanrange/list'));
 }
 
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c) = @_;
+
+    my $range_id = $c->req->query_parameters->{'range'};
+    $c->stash(form_defaults => { vlan_range => $range_id });
+};
+
 =head2 get_object_list
 
 =cut
