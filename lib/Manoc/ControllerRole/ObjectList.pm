@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::ControllerRole::Object;
+package Manoc::ControllerRole::ObjectList;
 
 use Moose::Role;
 use MooseX::MethodAttributes::Role;
@@ -16,11 +16,10 @@ Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
 
 =head1 DESCRIPTION
 
-This is a base role for all Manoc controllers which manage a row from
+This is a base role for Manoc controllers which manage a list of rows from
 a resultset.
 
-
-=head1 SYNPOSYS
+=head1 SYNOPSYS
 
   package Manoc::Controller::Artist;
 
@@ -38,44 +37,40 @@ a resultset.
       class      => 'ManocDB::Artist',
       );
 
-  # manages /artist/<id>
-  sub view : Chained('object') : PathPart('') : Args(0) {
+  # manages /artist/
+  sub list : Chained('object_list') : PathPart('') : Args(0) {
      my ( $self, $c ) = @_;
      
      # render with default template
-     # object will be accessible in $c->{object}
+     # objects are stored in $c->{object_list}
   }
 
 =head1 ACTIONS
 
-=head2 object
+=head2 object_list
 
-This action is the chain root for all the actions which operate on a
-single identifer, e.g. view, edit, delete.
+Load the list of objects from the resultset into the stash. Chained to base.
+This is the point for chaining all actions using the list of object
 
 =cut
 
-sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
-    my ( $self, $c, $id ) = @_;
-
-    $c->stash(
-        object => $self->get_object($c, $id),
-        object_pk => $id
-    );
-    if ( !$c->stash->{object} ) {
-        $c->detach('/error/http_404');
-    }
+sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
+    my ( $self, $c ) = @_;
+    $c->stash( object_list => $self->get_object_list($c) );
 }
+
 
 =head1 METHODS
 
-=head2 get_object
+=head2 get_object_list
 
 =cut
 
-sub get_object {
-    my ( $self, $c, $pk ) = @_;
-    return $c->stash->{resultset}->find($pk);
+sub get_object_list : Private {
+   my ( $self, $c ) = @_;
+
+   my $rs = $c->stash->{resultset};
+   return [ $rs->search( {} ) ];
 }
 
 1;
