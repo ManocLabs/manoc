@@ -4,12 +4,12 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Arp;
 
-use base 'DBIx::Class';
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
-__PACKAGE__->load_components(qw/InflateColumn Core/);
 __PACKAGE__->table('arp');
 
 __PACKAGE__->add_columns(
@@ -17,13 +17,12 @@ __PACKAGE__->add_columns(
         data_type   => 'varchar',
         is_nullable => 0,
         size        => 15,
-
+	ipv4_address => 1,
     },
     'macaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
         size        => 17,
-
     },
     'firstseen' => {
         data_type   => 'int',
@@ -51,15 +50,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
-
-
-__PACKAGE__->inflate_column(
-    ipaddr => {
-        inflate =>
-          sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-        deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-    }
-);
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

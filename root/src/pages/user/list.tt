@@ -1,63 +1,48 @@
-[% META
-   section='Config'
-   subsection='Users'
-   title='List'   
-   use_table=1
+[% 
+   page.section='Config'
+   page.subsection='Users'
+   page.title='List'   
 -%]
-
-<div class="buttons create_btn">
-<a href="[% c.uri_for_action('/user/create') %]" >
-   [% ui_icon('circle-plus') %] Create a User</a>
-[% add_css_create_btn %]
+<div id='user_create'>
+  <a href="[% c.uri_for_action('/user/create') %]" class="btn btn-sm btn-default">
+   [% bootstrap_icon('plus') %] Add</a>
 </div>
 
-[% FOREACH u IN user_table %]
-   [% IF loop.first %] 
-     [%init_table('user') %]  
-    <table class="display" id="user">
-       <thead>  
-	 <tr>
- 	 <th>Name</th>
- 	 <th>Full Name</th>
-   	 <th>Email</th>
- 	 <th>Roles</th>
-	 <th>Active</th>
-	 <th>Commands</th>
-         </tr>
-       </thead>  
-       <tbody>
-  [% END %]
-         <tr>
- 	 <td><a href=[% c.uri_for_action('/user/view', [u.id]) %]>[% u.username | html %]</a></td>
- 	 <td>[% u.fullname | html %]</td>
- 	 <td>[% u.email | html %]</td>
-	 <td>
-	 [% FOREACH r IN u.roles %]
-          [% r.role %] 
-	   [%IF loop.last %].[% ELSE %],[% END %]
-	 [% END %]
-	 </td>
- 	 <td align="center">
-	  [% IF u.active %] 
-              [% IF u.username == 'admin' %]  [% icon('ok_white') %] 
-              [% ELSE %] <a href="[% c.uri_for_action('user/switch_status',[u.id]) %]"> [% icon('ok') %] </a> 
-	      [% END %]
-	  [% ELSE %]   
-             <a href="[% c.uri_for_action('user/switch_status',[u.id]) %]">[% icon('remove') %] </a> 
-          [% END %]
-	 </td>
- 	 <td>
-	  <a href="[% c.uri_for_action('user/edit',[u.id])%]">[% icon('edit') %]</a>
-	  <a href="[% c.uri_for_action('user/delete',[u.id])%]">[% icon('remove') %]</a>
-	   <div class="buttons small_btn">
-	   <a href="[% c.uri_for_action('/user/set_roles', [u.id]) %]">Set Roles</a>
-	   </div>
-	 </td>
+<table class="table">
+  <thead>  
+    <tr>
+      <th>Name</th>
+      <th>Full Name</th>
+      <th>Email</th>
+      <th>Roles</th>
+      <th>Active</th>
+      <th></th>
+    </tr>
+  </thead>  
+  <tbody>
+    [% FOREACH user IN object_list  %]
+    <tr>
+      <td>[% user.username | html %]</td>
+      <td>[% user.fullname | html %]</td>
+      <td>[% user.email | html %]</td>
+      <td>[% FOREACH role IN user.roles %][% role.role %] [% END %]</td>
+      <td>
+	[% IF user.active -%]
+	[% bootstrap_icon('ok') %]<span class="sr-only">Active</span>
+        [% ELSE %]
+	[% bootstrap_icon('minus') %]<span class="sr-only">Not active</span>
+	[% END -%]
+      </td>
+      <td>
+	<a href="[% c.uri_for_action('user/edit',[user.id])%]">[% bootstrap_icon('pencil') %]
+	  <span class="sr-only">Edit</span>
+	</a>  
+	<a href="[% c.uri_for_action('user/delete',[user.id])%]">[% bootstrap_icon('trash') %]
+	  <span class="sr-only">Delete</span>
+	</a>
+      </td>          
+    </tr>
+    [% END %]
+  </tbody>
+</table>
 
-
-         </tr>
-  [% IF loop.last %]
-        </tbody>
-    </table>
-   [% END %]
-[% END %]

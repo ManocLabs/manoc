@@ -10,7 +10,7 @@ use namespace::autoclean;
 
 with 'Manoc::ControllerRole::ResultSet';
 with 'Manoc::ControllerRole::ObjectForm';
-
+with 'Manoc::ControllerRole::ObjectList';
 
 =head1 NAME
 
@@ -113,17 +113,6 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     $c->detach('form');
 }
 
-=head2 object_list
-Load the list of objects from the resultset into the stash. Chained to base.
-This is the point for chaining all actions using the list of object
-
-=cut
-
-sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( object_list => $self->get_object_list($c) );
-}
-
 
 =head2 list
 
@@ -139,6 +128,11 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
     );
 }
 
+=head2 view
+
+Display a single items.
+
+=cut
 
 sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
@@ -149,11 +143,15 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     );
 }
 
+=head2 edit
+
+Use a form to edit a row.
+
+=cut
 
 sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
-    # show confirm page
     $c->stash(
         title    => $self->edit_page_title,
         template => $self->edit_page_template,
@@ -161,6 +159,9 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
+=haed2 delete
+
+=cut
 
 sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
@@ -168,11 +169,11 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $c->uri_for_action($c->namespace . "/list") );
+            $c->res->redirect( $self->get_delete_failure_url($c) );
             $c->detach();
         } else {
-            my $action = $c->namespace . "/view";
-            $c->res->redirect( $c->uri_for_action( $action,[ $c->stash->{object_pk} ] ));
+            $c->res->redirect( $self->get_delete_success_url($c) );
+            $c->detach();
         }
     }
 
@@ -186,17 +187,6 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
 =head1 METHODS
 
-=head2 get_object_list
-
-=cut
-
-sub get_object_list : Private {
-   my ( $self, $c ) = @_;
-
-   my $rs = $c->stash->{resultset};
-   return [ $rs->search( {} ) ];
-}
-
 =head2 delete_object
 
 =cut
@@ -205,6 +195,19 @@ sub delete_object {
     my ( $self, $c ) = @_;
 
     return $c->stash->{object}->delete;
+}
+
+sub get_delete_failure_url {
+    my ( $self, $c ) = @_;
+    
+    my $action = $c->namespace . "/view";
+    return $c->uri_for_action( $action,[ $c->stash->{object_pk} ] );
+}
+
+sub get_delete_success_url {
+    my ( $self, $c ) = @_;
+
+    return $c->uri_for_action($c->namespace . "/list");
 }
 
 1;

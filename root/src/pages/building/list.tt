@@ -10,8 +10,8 @@ page.title='Buildings'
 <a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
 
-[% init_table('building_list',{ columns=[30,50,20], toolbar="building_create" } ) %]
- <table id="building_list">
+[% init_table('building_list',{ toolbar="building_create" } ) %]
+ <table id="building_list" class="table">
    <thead>  
      <tr>
         <th>Name</th>

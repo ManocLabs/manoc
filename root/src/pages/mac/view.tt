@@ -1,13 +1,10 @@
 [%
    title='Mac Address View'
 -%]
-[% META
-layout='onecol'
--%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 <dl class="dl-horizontal">
   <dt>Mac Address</dt><dd>[% macaddr | html %]</dd>
-  <dt>Device vendor</dt>[% vendor  | html %]</dd>
+  <dt>Device vendor</dt><dd>[% vendor  | html %]</dd>
 </dl>
 
 <!-- Nav tabs -->

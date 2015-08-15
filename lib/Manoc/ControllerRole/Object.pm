@@ -19,6 +19,33 @@ Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
 This is a base role for all Manoc controllers which manage a row from
 a resultset.
 
+
+=head1 SYNPOSYS
+
+  package Manoc::Controller::Artist;
+
+  use Moose;
+  extends "Catalyst::Controller";
+  with "Manoc::ControllerRole::Object";
+
+  __PACKAGE__->config( 
+      # define PathPart
+      action => {
+          setup => {
+              PathPart => 'artist',
+          }
+      },
+      class      => 'ManocDB::Artist',
+      );
+
+  # manages /artist/<id>
+  sub view : Chained('object') : PathPart('') : Args(0) {
+     my ( $self, $c ) = @_;
+     
+     # render with default template
+     # object will be accessible in $c->{object}
+  }
+
 =head1 ACTIONS
 
 =head2 object

@@ -3,7 +3,7 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::Search::Item::IpAddr;
-use Manoc::IpAddress;
+
 use Moose;
 
 extends 'Manoc::Search::Item::Group';

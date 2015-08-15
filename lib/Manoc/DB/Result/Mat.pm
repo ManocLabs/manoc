@@ -4,13 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Mat;
 
-use base 'DBIx::Class';
-use Manoc::IpAddress::Ipv4;
-
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/ Core InflateColumn/);
 __PACKAGE__->table('mat');
 
 __PACKAGE__->add_columns(
@@ -58,14 +55,6 @@ __PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'vlan' );
 __PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Mat');
-
-__PACKAGE__->inflate_column(
-			    device => {
-				       inflate =>
-				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-				      } 
-			   );
 
 
 sub sqlt_deploy_hook {

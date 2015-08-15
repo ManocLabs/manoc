@@ -1,8 +1,7 @@
 [%
-title='IP Address ' _ id.address
+page.title='IP Address ' _ id.address
 -%]
 [% META
-layout='onecol'
 use_table=1
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]

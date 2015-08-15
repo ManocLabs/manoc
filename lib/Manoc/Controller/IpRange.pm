@@ -6,8 +6,8 @@ package Manoc::Controller::IpRange;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
-use Manoc::IpAddress;
-use Manoc::Utils qw/netmask_prefix2range int2ip ip2int padded_ipaddr
+use Manoc::IPAddress::IPv4;
+use Manoc::Utils::IPAddress qw/netmask_prefix2range int2ip ip2int padded_ipaddr
     prefix2wildcard netmask2prefix
     check_addr /;
 use POSIX qw/ceil/;
@@ -91,8 +91,8 @@ sub range : Chained('base') : PathPart('range') : CaptureArgs(2) {
     my $range = $c->stash->{'resultset'}->search(
         {
             -and => [
-                from_addr => Manoc::IpAddress->new( $from ),
-                to_addr   => Manoc::IpAddress->new( $to ),
+                from_addr => Manoc::IPAddress::IPv4->new( $from ),
+                to_addr   => Manoc::IPAddress::IPv4->new( $to ),
             ]
         }
     )->single;
@@ -100,7 +100,7 @@ sub range : Chained('base') : PathPart('range') : CaptureArgs(2) {
         $c->stash( object => $range );
     }
     else {
-        $c->stash( host => Manoc::IpAddress->new( $host ), prefix => $prefix );
+        $c->stash( host => Manoc::IPAddress::IPv4->new( $host ), prefix => $prefix );
     }
 }
 
@@ -116,7 +116,7 @@ sub view_iprange : Chained('range') : PathPart('view') : Args(0) {
         $c->response->redirect( $c->uri_for_action( 'iprange/view', [ $range->name ] ) );
         $c->detach();
     }
-    #N.B. in stash->{host} there is a Manoc::IpAddress object
+    #N.B. in stash->{host} there is a Manoc::IPAddress object
     my $host   = $c->stash->{'host'}->address;
     my $prefix = $c->stash->{'prefix'};
     my ( $from_i, $to_i, $network_i, $netmask ) = netmask_prefix2range( $host, $prefix );
@@ -187,8 +187,8 @@ sub ip_list : Private {
     ( $page >= $num_pages ) and $c->stash( next_page => undef );
 
     # convert numeric address to normalized strings
-    my $page_start_addr = Manoc::IpAddress->new(  int2ip($page_start_addr_i) );
-    my $page_end_addr   = Manoc::IpAddress->new(  int2ip($page_end_addr_i) );
+    my $page_start_addr = Manoc::IPAddress::IPv4->new(  int2ip($page_start_addr_i) );
+    my $page_end_addr   = Manoc::IPAddress::IPv4->new(  int2ip($page_end_addr_i) );
 
     my @rs;
 
@@ -237,8 +237,8 @@ sub ip_list : Private {
     my $rs = $c->model('ManocDB::Arp')->search(
 					       {
 						-and => [
-							 ipaddr  => {'>=' => Manoc::IpAddress->new($from) },
-							 ipaddr  => {'<=' => Manoc::IpAddress->new($to)   },
+							 ipaddr  => {'>=' => Manoc::IPAddress::IPv4->new($from) },
+							 ipaddr  => {'<=' => Manoc::IPAddress::IPv4->new($to)   },
 							]
 					       },
 					       {
@@ -451,7 +451,7 @@ sub edit : Chained('object') : PathPart('edit') : Args(0) {
     if ( !$type && $network && $netmask) {
         $type   = 'subnet';
 	$c->log->info("netmask = '$netmask");
-        $prefix = Manoc::Utils::netmask2prefix($netmask->address);
+        $prefix = netmask2prefix($netmask->address);
     }
     
     if ( !defined($prefix) ) {
@@ -706,7 +706,7 @@ sub process_split : Private {
     if ($split_point_addr) {
 	if ( check_addr($split_point_addr) ) {
 
-	    $split_point_addr = Manoc::IpAddress->new($split_point_addr);
+	    $split_point_addr = Manoc::IPAddress::IPv4->new($split_point_addr);
 	    
 	    if ( ( $from_addr gt $split_point_addr ) ||
 		 ( $to_addr le $split_point_addr ) )
@@ -751,7 +751,7 @@ sub process_split : Private {
                 {
                     name      => $name2,
                     parent    => $parent,
-                    from_addr => Manoc::IpAddress->new( int2ip($split_next_addr) ),
+                    from_addr => Manoc::IPAddress::IPv4->new( int2ip($split_next_addr) ),
                     to_addr   => $to_addr,
                     netmask   => undef,
                     network   => undef,
@@ -974,7 +974,7 @@ sub check_iprange_form : Private {
         $network_str or $error->{type} = "Please insert range network";
         check_addr($network_str) or $error->{type} = "Invalid network address";
 
-	$network   = Manoc::IpAddress->new($network_str);
+	$network   = Manoc::IPAddress::IPv4->new($network_str);
 
         my $prefix  = $c->req->param('prefix');
         $prefix or $error->{prefix} = "Please insert network prefix";
@@ -985,15 +985,15 @@ sub check_iprange_form : Private {
         scalar( keys(%$error) ) and return 0;
 
         my ( $from_addr_i, $to_addr_i, $network_i, $netmask_i ) =
-            Manoc::Utils::netmask_prefix2range( $network_str, $prefix );
+            netmask_prefix2range( $network_str, $prefix );
 
         if ( $network_i != $from_addr_i ) {
             $error->{type} = "Bad network. Do you mean " . int2ip($from_addr_i) . "?";
 	  }
 
-	$to_addr   = Manoc::IpAddress->new(int2ip($to_addr_i));
-	$from_addr = Manoc::IpAddress->new(int2ip($from_addr_i));
-	$netmask   = Manoc::IpAddress->new(int2ip($netmask_i));
+	$to_addr   = Manoc::IPAddress::IPv4->new(int2ip($to_addr_i));
+	$from_addr = Manoc::IPAddress::IPv4->new(int2ip($from_addr_i));
+	$netmask   = Manoc::IPAddress::IPv4->new(int2ip($netmask_i));
     } elsif ( $type eq 'range' ) {
       if( !check_addr($from_addr_str) ){ 
 	$error->{from_addr} = "Not a valid IPv4 address";
@@ -1003,8 +1003,8 @@ sub check_iprange_form : Private {
 	$error->{to_addr} = "Not a valid IPv4 address";
 	return 0;
       }
-      $to_addr   = Manoc::IpAddress->new($to_addr_str);
-      $from_addr = Manoc::IpAddress->new($from_addr_str);
+      $to_addr   = Manoc::IPAddress::IPv4->new($to_addr_str);
+      $from_addr = Manoc::IPAddress::IPv4->new($from_addr_str);
 
       if($to_addr le $from_addr) {                
 	$error->{from_addr} = "Bad range!";
@@ -1149,8 +1149,8 @@ sub get_neighbour {
         {
             parent => $parent,
             -or    => [
-                { 'to_addr'   => Manoc::IpAddress->new($lower_addr) },
-                { 'from_addr' => Manoc::IpAddress->new($upper_addr) },
+                { 'to_addr'   => Manoc::IPAddress::IPv4->new($lower_addr) },
+                { 'from_addr' => Manoc::IPAddress::IPv4->new($upper_addr) },
             ]
         }
     );

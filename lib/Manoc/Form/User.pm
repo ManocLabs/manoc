@@ -4,12 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::Form::User;
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
+extends 'Manoc::Form::Base';
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+with 'Manoc::Form::Base::SaveButton';
 
 has '+name' => ( default => 'form-user' );
 has '+html_prefix' => ( default => 1 );
@@ -29,30 +27,42 @@ has_field 'username' => (
 
 has_field 'password' => (
     type      => 'Password',
+    label     => 'Password',
     required  => 1,
-    minlength => 6,
+    minlength => 8,
 );
 
-has_field 'conf_password' => (
+has_field 'password2' => (
     type     => 'PasswordConf',
-    required => 1,
     label    => 'Confirm Password',
 );
 
-has_field 'email' => ( type => 'Email', );
-
-has_field 'fullname' => (
-    type  => 'Text',
-    apply => [
-        'Str',
-        {
-            check => sub { $_[0] =~ /\w/ },
-            message => 'Invalid Name'
-        },
-    ]
+has_field 'email' => (
+    label => 'Email',
+    type  => 'Email',
 );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
+has_field 'fullname' => (
+    type     => 'Text',
+    required => 1,
+);
+
+has_field 'roles' => (
+    type         => 'Multiple',
+    label        => 'Roles',
+    label_column => 'role',
+);
+
+has_field 'active' => (
+    label => 'Active',
+    type  => 'Boolean',
+);
+
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

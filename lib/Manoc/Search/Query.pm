@@ -12,7 +12,7 @@ use Carp;
 
 use Manoc::Utils qw(str2seconds);
 use Manoc::Search::QueryType;
-use Manoc::Utils qw(padded_ipaddr);
+use Manoc::Utils::IPAddress qw(padded_ipaddr check_partial_addr);
 
 has 'search_string' => (
     is       => 'rw',
@@ -216,7 +216,7 @@ sub _guess_query {
         return;
     }
 
-    if ( Manoc::Utils::check_partial_addr($text) ) {
+    if ( check_partial_addr($text) ) {
       $self->query_type('ipaddr');
       return;
     }
@@ -227,7 +227,7 @@ sub _build_sql_pattern {
     my $pattern = join( ' ', @{ $self->words } );
     return $pattern if ( !$pattern );
     
-    if( Manoc::Utils::check_partial_addr($pattern) ){
+    if( check_partial_addr($pattern) ){
       $pattern = padded_ipaddr($pattern);
     }
     

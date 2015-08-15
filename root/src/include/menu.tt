@@ -1,8 +1,7 @@
 [%-
-  menu_sections = [
+  navbar_items = [
 		{
 		     name = 'Asset',
-		     path =  c.uri_for_action('/building/list'),
 		     subsections = [
   	       	     {
 			name = 'Device', 
@@ -20,19 +19,14 @@
 		},
 		{
 		     name = 'Network',
-		     path = c.uri_for_action('/vlanrange/list'),
-		     subsections = [
-  	       		 {
+                     subsections = [
+			{
+				name = 'IP Address Plan',
+				path = c.uri_for_action('/iprange/list'),
+			},
+  	       		{
 	        	     name = 'VLAN', 
 		     	     path = c.uri_for_action('/vlanrange/list'),
-			},
-			{
-			    name = 'VTP',
-		     	    path = c.uri_for_action('/vlan/list'),
-			},
-			{
-				name = 'Address Plan',
-				path = c.uri_for_action('/iprange/list'),
 			},
 			{
 				name = 'SSid',
@@ -43,7 +37,6 @@
 		},		     
 		{
 		     name = 'Reports',
-		     path = c.uri_for('/reports'),
 		     subsections = [
                         {
 			   name = "Queries",
@@ -53,9 +46,10 @@
 		           name = 'Report Archive',
 		           path = c.uri_for_action('/reportarchive/list'),
 		        },
-			{
-			    path=c.uri_for_action('/query/statistics'),
-			    name="Manoc DB Statistics",
+                        {
+			    name = 'Manoc DB Statistics'
+			    path = c.uri_for_action('/query/statistics'),
+
 			},
 		     ]
 		},
@@ -71,10 +65,6 @@
 		        name = 'Management Urls',
 		        path = c.uri_for_action('/mngurlformat/list'),
 		     },
-		     {
-			name = 'Credentials',
-		     	path = '#',
-		     }		
 		     ]
  		 }
 	]
@@ -92,36 +82,47 @@
           <a class="navbar-brand" href="[% c.uri_for('/about') %]">Manoc</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
+[%- UNLESS page.empty_navbar %]	
           <ul class="nav navbar-nav navbar-right">
-[% FOREACH s IN menu_sections -%]	  
-            <li><a href="[% s.path %]">[% s.name | html %]</a></li>
-[% END -%]
-[% IF c.user -%]
+	    [%- FOREACH s IN navbar_items %]
+            <li>
+	      <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% s.name | html  %]
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+		[%- FOREACH i IN s.subsections %]
+		<li><a href="[% i.path %]">[% i.name | html %]</a></li>
+		[%- END %]
+	      </ul>
+	    </li>
+	    [%- END %]
+	    [%- IF c.user %]
             <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% bootstrap_icon("user") %]</a>
                 <ul class="dropdown-menu">
-		    <li class="dropdown-header">User: [% c.user.username %]</li>
-	            <li><a href="[% c.uri_for('/auth/logout') %]">Logout</a></li>
+		  <li class="dropdown-header">User: [% c.user.username %]</li>
+		  <li><a href="[% c.uri_for('/user/change_password') %]">Change password</a></li>
+	          <li><a href="[% c.uri_for('/auth/logout') %]">Logout</a></li>
 		</ul>
 	    </li>	    
-[% END -%]
+	    [%- END %]
           </ul>
-[% UNLESS page.disable_search %]
+[%- UNLESS page.disable_search %]
           <form action="[% c.uri_for('/search') %]" method="get" class="navbar-form navbar-right" >
             <input name="q" type="text" class="form-control" placeholder="Search...">
           </form>
-[% END %]
+[%- END %]
+[%- END %]
         </div>
       </div>
     </nav>
-[% END -%]
+[%- END %]
 [% MACRO sidebar BLOCK -%]
 <ul class="nav nav-sidebar">
-[% FOREACH s IN menu_sections %]
-  [% IF s.name == page.section -%]
-    [% FOREACH i IN s.subsections %]
-  <li><a href="[% i.path %]">[% i.name %]</a></li>
-    [% END -%]
-  [% END -%]
+  [% FOREACH i IN page.sidebar_items -%]
+  [% active = c.action == i.action -%]
+  <li [% IF active %]class="active"[% END %]>
+    <a href="[% c.uri_for_action(i.action) %]">[% i.name %][% IF active %] <span class="sr-only">(current)</span>[% END %]</a>
+  </li>
 [% END -%]
 </ul>
 [% END -%]

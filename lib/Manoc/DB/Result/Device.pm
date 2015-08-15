@@ -3,9 +3,12 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Device;
-use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
@@ -17,6 +20,7 @@ __PACKAGE__->add_columns(
 	data_type   => 'varchar',
 	is_nullable => 0,
 	size        => 15,
+	ipv4_address => 1,
     },
     rack => {
         data_type      => 'int',
@@ -196,20 +200,6 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
-sub _inflate_addr {
-    return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0])
-}
-
-sub _deflate_addr {
-    return scalar $_[0]->padded if defined($_[0]);
-}
-
-__PACKAGE__->inflate_column(
-			    mng_address => {
-				   inflate => \&_inflate_addr,
-				   deflate => \&_deflate_addr
-				  }
-			   );
 
 sub get_mng_url {
     my $self = shift;

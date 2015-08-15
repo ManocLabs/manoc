@@ -5,7 +5,7 @@
 package Manoc::Controller::Interface;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(clean_string int2ip ip2int);
+
 use Manoc::Form::IfNotes;
 
 BEGIN { extends 'Catalyst::Controller'; }

@@ -149,16 +149,12 @@ sub _load_tables_loop {
     $version eq '20121115' and $version = 3;
     
     if ( $version < $self->version ) {
-        my $converter_class =
-            Manoc::DataDumper::Converter->get_converter_class( $version );
-
-        if (defined($converter_class) ) {
-            $converter = $converter_class->new({
-                log => $self->log,
-                schema => $self->schema,
-            });
-            $self->log->info("Using converter $converter_class.");
-        }
+        $converter = Manoc::DataDumper::Converter->new(
+            log => $self->log,
+            schema => $self->schema,
+            from_version => $version,
+            to_version   => $self->version,
+        );
     }
 
     my $source_names = $self->source_names;

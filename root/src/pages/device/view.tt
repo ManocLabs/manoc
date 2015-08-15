@@ -137,7 +137,7 @@ page.subsection = 'Device'
 	[% FOREACH if IN iface_info %]
 	[% row_class = if.up == 'up' ? 'active' : 'warning' %]
 	<tr class="[% row_class %]">
-          <td>[% print_short_iface(object.id, if.interface) %]</td>
+          <td>[% print_iface(object.id, if.interface) %]</td>
           <td>[% if.up | html %]</td>
           <td>[% if.up_admin | html %]</td>
 	  <td>[% if.speed | html %]</td>
@@ -171,7 +171,7 @@ page.subsection = 'Device'
 	[% FOREACH if IN iface_info %]      
 	<tr>
 	  <td>
-	    [% print_short_iface(object.id,if.interface) %]
+	    [% print_iface(object.id,if.interface) %]
 	  </td>
 	  <td>[% if.up_admin %]</td>
 	  <td>[% date.format(if.last_mat) %]</td>
@@ -194,7 +194,7 @@ page.subsection = 'Device'
       <tbody>
 	[% FOREACH if IN unused_ifaces %]
 	<tr>
-	  <td>[% print_short_iface(object.id,if.interface) %]</td>
+	  <td>[% print_iface(object.id,if.interface) %]</td>
           <td>[% if.description %]</td>
 	</tr>
 	[% END %]

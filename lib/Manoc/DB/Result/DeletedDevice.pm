@@ -3,9 +3,12 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DeletedDevice;
-use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('deleted_devices');
 __PACKAGE__->add_columns(
@@ -18,6 +21,7 @@ __PACKAGE__->add_columns(
         data_type   => 'varchar',
         is_nullable => 0,
         size        => 15,
+	ipv4_address => 1,
     },
     name => {
         data_type     => 'varchar',
@@ -45,14 +49,5 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many( mat_assocs => 'Manoc::DB::Result::MatArchive', 'device_id' );
-
-__PACKAGE__->inflate_column(
-			    ipaddr => {
-				       inflate =>
-				       sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				       deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-				      }
-			   );
-
 
 1;

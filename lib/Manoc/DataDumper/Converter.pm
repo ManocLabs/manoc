@@ -18,48 +18,95 @@ has 'schema' => (
     required => 1,
 );
 
-sub get_converter_class {
-    my ( $self, $version ) = @_;
+has 'from_version' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+);
 
-    my $class_name = "v$version";
-    $class_name = "Manoc::DataDumper::Converter::$class_name";
-    Class::Load::load_class($class_name) or return undef;
-    return $class_name;
+has 'to_version' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+);
+
+# sorted by ascending version
+has 'converters' => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => {
+         add_converter => 'push',
+     }
+);
+
+
+sub BUILD {
+    my ( $self ) = @_;
+
+    $self->_load_converters;
+}
+
+sub _load_converters {
+    my ( $self ) = @_;
+
+    my $first_converter = $self->from_version;
+    my $last_converter = $self->to_version - 1;
+
+    for my $v ( $first_converter .. $last_converter ) {
+        my $class_name = "v$v";
+        $self->log->info("Loading converter $class_name");
+        $class_name = "Manoc::DataDumper::Converter::$class_name";
+        Class::Load::load_class($class_name) or return undef;
+
+        my $c = $class_name->new(log => $self->log, schema => $self->schema);
+        $self->add_converter($c);
+    }
 }
 
 sub get_table_name {
     my ($self, $table) = @_;
-    return $table;
+
+    # get name from lowest converter
+    return $self->converters->[0]->get_table_name($table);
 }
 
 sub upgrade_table {
     my ( $self, $table, $data ) = @_;
 
     my $method_name = "upgrade_$table";
-    return 0 unless $self->can($method_name);
 
-    $self->log->info("Running converter for table $table");
-    return $self->$method_name($data);
+    # use all converters
+    $self->log->info("Running converters for table $table");
+    foreach my $c (@{$self->converters}) {
+        next unless $c->can($method_name);
+        $c->$method_name($data);
+    }
 }
 
 sub before_import_table {
     my ( $self, $table, $data) = @_;
 
     my $method_name = "before_import_$table";
-    return 0 unless $self->can($method_name);
 
-    $self->log->info("Running callback for table $table");
-    return $self->$method_name($data);
+    $self->log->info("Running before callbacks for table $table");
+    foreach my $c (@{$self->converters}) {
+        next unless $c->can($method_name);
+        $c->$method_name($data);
+    }
 }
 
 sub after_import_table {
     my ( $self, $table,  $data) = @_;
 
     my $method_name = "after_import_$table";
-    return 0 unless $self->can($method_name);
 
-    $self->log->info("Running callback for table $table");
-    return $self->$method_name($data);
+    $self->log->info("Running after callbacks for table $table");
+    foreach my $c (@{$self->converters}) {
+        next unless $c->can($method_name);
+        $c->$method_name($data);
+    }
 }
 
 no Moose;    # Clean up the namespace.

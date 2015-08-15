@@ -10,7 +10,7 @@ page.section='Asset'
 <div id="rack_create">
      <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
- <table id="rack_list">
+ <table class="table" id="rack_list">
        <thead>  
 	 <tr>
  	 <th>Rack</th>

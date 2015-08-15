@@ -1,9 +1,8 @@
-[% META
-   section="Search"
-   title="Manoc search"
-   layout="onecol"
-   disable_search=1
--%]
+[% 
+   page.section="Search"
+   page.title="Manoc search"
+   page.disable_search=1
+ -%]	
 <form method="get"  enctype="multipart/form-data">
 <table align="center" >
 [% FOREACH plugin IN plugins %]	

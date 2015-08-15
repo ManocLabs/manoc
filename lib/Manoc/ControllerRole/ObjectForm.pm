@@ -50,8 +50,13 @@ sub form : Private {
         return;
     }
 
-    $c->res->redirect( $c->uri_for($self->action_for('list')) );
+    $c->res->redirect( $self->get_form_success_url($c) );
     $c->detach();
+}
+
+sub get_form_success_url {
+    my ($self, $c) = @_;
+    return $c->uri_for_action($c->namespace . "/list");
 }
 
 1;

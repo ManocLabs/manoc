@@ -1,9 +1,6 @@
-[% META
-   layout = 'onecol'
-%]
 [%
    page.title = 'Login'
-   page.disable_search = 1
+   page.empty_navbar = 1
 %]
 [% form.render %]
 

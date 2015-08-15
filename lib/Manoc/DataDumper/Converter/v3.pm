@@ -7,7 +7,7 @@ package Manoc::DataDumper::Converter::v3;
 
 use Moose;
 use Data::Dumper;
-extends 'Manoc::DataDumper::Converter';
+extends 'Manoc::DataDumper::Converter::Base';
 
 has 'device_id_map' => (
     isa => 'HashRef',

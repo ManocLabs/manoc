@@ -1,11 +1,14 @@
 [% IF no_wrapper;
-        debug("Passing page through as text: $template.name");
-        content;
-    ELSE;
-        layout = template.layout || 'standard';
-        wrapper = "layouts/${layout}.tt";
-        debug("Applying wrapper $wrapper to $template.name");
-	title = title || page.title || template.title;
-        content WRAPPER $wrapper;
-    END;
+       debug("Passing page through as text: $template.name");
+       content;
+   ELSE;
+       layout = template.layout || page.layout || 'onecol';
+       wrapper = "layouts/${layout}.tt";
+       debug("Applying wrapper $wrapper to $template.name");
+       title = title || page.title || template.title;
+       IF page.load_section_file;
+           PROCESS "sections/${page.section.lower}/${page.subsection.lower}.tt";
+       END;
+       content WRAPPER $wrapper;
+   END;
 -%]

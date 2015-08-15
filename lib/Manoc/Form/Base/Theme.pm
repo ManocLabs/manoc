@@ -8,8 +8,6 @@ use Moose::Role;
 
 with 'HTML::FormHandler::Widget::Theme::Bootstrap3';
 
-sub build_form_element_class { ['form-horizontal'] }
-
 # widget wrapper must be set before the fields are built in BUILD
 
 sub build_do_form_wrapper {1}

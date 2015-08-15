@@ -4,9 +4,9 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DeviceConfig;
 
-use base qw(DBIx::Class);
-
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
 
 __PACKAGE__->table('device_config');
 __PACKAGE__->add_columns(
@@ -47,13 +47,6 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.device' }
 );
 
-__PACKAGE__->inflate_column(
-			    device => {
-				   inflate =>
-				   sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-				   deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-				  }
-			   );
 
 
 

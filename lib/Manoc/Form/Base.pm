@@ -18,7 +18,9 @@ sub html_attributes {
     my ( $self, $field, $type, $attr ) = @_;
     if ($type eq 'label' && $field->{required}) {
         my $label = $field->{label};
-        $field->{label} = "$label *" unless $label =~ /\*$/;
+        if ( $label ) {
+            $field->{label} = "$label *" unless $label =~ /\*$/;
+        }
     }
     return $attr;
 }

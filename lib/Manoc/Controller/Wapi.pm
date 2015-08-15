@@ -13,7 +13,7 @@ use Encode;
 use POSIX qw(strftime);
 use Data::Dumper;
 
-use Manoc::IpAddress;
+use Manoc::IPAddress::IPv4;
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
@@ -37,7 +37,7 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $user   = $c->req->param('user');
-    my $ipaddr = Manoc::IpAddress->new($c->req->param('ipaddr'));
+    my $ipaddr = Manoc::IPAddress::IPv4->new($c->req->param('ipaddr'));
  
     unless ($user) {
         $c->stash( error => "Missing user param" );
@@ -151,7 +151,7 @@ sub dhcp_leases : Chained('base') : PathPart('dhcp_leases') : Args(0) {
     my $n_created = 0;
     foreach my $r (@records) {
          my $macaddr = $r->{macaddr} or next;
-         my $ipaddr  = Manoc::IpAddress->new($r->{ipaddr})  or next;
+         my $ipaddr  = Manoc::IPAddress::IPv4->new($r->{ipaddr})  or next;
          my $start   = $r->{start}   or next;
          my $end     = $r->{end}     or next;
 
@@ -193,7 +193,7 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
     my $n_created = 0;
     foreach my $r (@records) {
         my $macaddr  = $r->{macaddr}  or next;
-        my $ipaddr  = Manoc::IpAddress->new($r->{ipaddr})  or next;
+        my $ipaddr  = Manoc::IPAddress::IPv4->new($r->{ipaddr})  or next;
         my $hostname = $r->{hostname} or next;
         my $name     = $r->{name}     or next;
 
@@ -217,7 +217,7 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
 sub ip_info : Chained('base') : PathPart('ipinfo') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $ipaddr      = Manoc::IpAddress->new($c->req->param('ipaddr'));
+    my $ipaddr      = Manoc::IPAddress::IPv4->new($c->req->param('ipaddr'));
     my $descr       = $c->req->param('descr');
     my $assigned_to = $c->req->param('assigned');
     my $phone       = $c->req->param('phone');

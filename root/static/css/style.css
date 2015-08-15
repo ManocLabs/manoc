@@ -78,7 +78,12 @@ body {
   margin-top: 0;
 }
 
-/* Fix for datables */
+/*
+ * Tables
+ */
+
+
+/* Fix for dataTables */
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     padding : 0px;
@@ -86,4 +91,22 @@ body {
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
     border: 0px;
+}
+
+/* Used for indenting child rows */
+
+.table > tbody > tr.childrow > td:first-of-type {
+    padding-left : 4em;
+}
+
+.collapse-chevron:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114"; 
+    float: left;
+    color: grey;      
+}
+.collapse-chevron.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080"; 
 }

@@ -5,10 +5,9 @@
 package Manoc::Controller::Ip;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(clean_string int2ip ip2int check_addr);
+use Manoc::IPAddress::IPv4;
+use Manoc::Utils::IPAddress qw(check_addr);
 use Manoc::Form::Ip;
-use Manoc::IpAddress;
-use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -36,7 +35,7 @@ sub base : Chained('/') PathPart('ip') CaptureArgs(1) {
     }
 
     $c->stash(
-	ipaddress => Manoc::IpAddress->new( $address ),
+	ipaddress => Manoc::IPAddress::IPv4->new( $address ),
 	object    => $c->model('ManocDB::Ip')->find( { ipaddr => $address } )
     );
 }

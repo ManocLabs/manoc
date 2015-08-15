@@ -45,7 +45,6 @@ sub login : Local : CaptureArgs(0) {
     my $success = $form->process( params => $c->req->params );
     if ($success ) {
 	my $username = $c->user->username;
-	$c->flash( message => 'Logged In!' );
 	$c->log->info( 'User ' . $username . ' logged');
 	$c->detach('/follow_backref');
     }
