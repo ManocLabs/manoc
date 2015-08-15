@@ -198,7 +198,6 @@ after setup_finalize => sub {
         device/uplinks device/refresh 
         vlanrange/split vlanrange/merge 
         iprange/split iprange/merge
-        vlan/merge_name
         interface/edit_notes interface/delete_notes 
         ip/edit ip/delete
     };

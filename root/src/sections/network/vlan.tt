@@ -5,12 +5,12 @@
 	action = 'vlanrange/list',
     },
     {	
-	name = "VLAN list",
-	action = 'vlan/list',
+	name = "VTP list",
+	action = 'vtp/list',
     },
     {
     	name = "Compare with VTP",
-	action = 'vlan/vtp',
+	action = 'vtp/compare',
     },	
   ]
  -%]

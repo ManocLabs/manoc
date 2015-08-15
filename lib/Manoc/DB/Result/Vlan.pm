@@ -32,9 +32,41 @@ __PACKAGE__->add_columns(
     }
 );
 
+# return devices which are using the vlan, using ifstatus info
+sub devices {
+    my $self = shift;
+
+    my $ids = $self->interfaces->search(
+	{},
+	{
+	    columns => [ qw/device vlan/ ],
+	    distinct => 1
+	})->get_column('device')->as_query;
+
+    my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Device');
+    return $rs->search({ id => { -in => $ids }});
+}
+
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->has_many( ranges => 'Manoc::DB::Result::IPRange', 'vlan_id' );
+
 __PACKAGE__->belongs_to( vlan_range => 'Manoc::DB::Result::VlanRange' );
+__PACKAGE__->has_many( ip_ranges => 'Manoc::DB::Result::IPRange', 'vlan_id' );
+
+# weak relation with interfaces
+__PACKAGE__->has_many(
+    interfaces => 'Manoc::DB::Result::IfStatus', 
+    { 'foreign.vlan' => 'self.id' },
+    { join_type => 'left' }
+);
+
+# weak relation with vtp entries
+__PACKAGE__->belongs_to(
+    vtp_entry => 'Manoc::DB::Result::VlanVtp',
+    { 'foreign.id' => 'self.id' },
+    { join_type => 'left' }
+);
+
+
 
 =head1 NAME
 

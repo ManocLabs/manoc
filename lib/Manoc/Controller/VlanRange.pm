@@ -121,6 +121,16 @@ sub delete_object {
     return $range->delete;
 }
 
+=head2 get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    return $c->uri_for_action($c->namespace . "/list");
+}
+
 =head2 get_object_list
 
 =cut

@@ -8,8 +8,9 @@ use strict;
 use warnings;
 use HTML::FormHandler::Moose;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
+with 'Manoc::Form::Base::SaveButton';
+
 
 has '+name' => ( default => 'form-vlan' );
 has '+html_prefix' => ( default => 1 );
@@ -29,7 +30,12 @@ has_field 'name' => (
 
 has_field 'description' => ( type => 'TextArea' );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
-
+__PACKAGE__->meta->make_immutable;
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
+

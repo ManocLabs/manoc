@@ -8,7 +8,6 @@ use parent qw(DBIx::Class::Core);
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('vlan_vtp');
 
 __PACKAGE__->add_columns(
@@ -25,9 +24,16 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
+
+__PACKAGE__->belongs_to(
+    vlan => 'Manoc::DB::Result::Vlan',
+    { 'foreign.id' => 'self.id' },
+    { join_type => 'left' }
+);
+
 =head1 NAME
 
-Manoc::DB::Result::Vlan_vtp - A model object representing a class of access permissions to the system.
+Manoc::DB::Result::VlanVtp - A model object representing a class of access permissions to the system.
 
 =head1 DESCRIPTION
 
