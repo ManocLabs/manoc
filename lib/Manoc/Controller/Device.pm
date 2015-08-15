@@ -143,9 +143,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         vlan    => $_->vlan,
         quality => $_->quality . '/100',
         state   => $_->state,
-        detail_link => '',    #$app->manoc_url("dot11client?device=$id&macaddr=" . $_->macaddr),
-        },
-        $device->dot11clients;
+    }, $device->dot11clients;
 
     # prepare template
     $c->stash( template => 'device/view.tt' );
@@ -166,11 +164,11 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
-    my $device_id = $c->stash->{object}->id->address;
+    my $device_id = $c->stash->{object}->id;
     
     my $has_netwalker = eval { load Manoc::Device::Netwalker; 1 };
     if (!$has_netwalker) {
-	$c->flash( message => "Netwalker not installer");
+	$c->flash( error_msg => "Netwalker not installer");
 	$c->response->redirect(
 			       $c->uri_for_action( '/device/view', [$device_id] ) );
 	$c->detach();
