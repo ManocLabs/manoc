@@ -13,7 +13,7 @@ with 'Manoc::ControllerRole::CommonCRUD' => {
     -excludes => 'list'
 };
 # TODO
-# with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::JSONView";
 
 =head1 NAME
 
@@ -32,7 +32,8 @@ __PACKAGE__->config(
             PathPart => 'vlan',
         }
     },
-    class      => 'ManocDB::Vlan',
+    class        => 'ManocDB::Vlan',
+    json_columns => [ 'id', 'name', 'description' ],
 );
 
 =head1 METHODS
