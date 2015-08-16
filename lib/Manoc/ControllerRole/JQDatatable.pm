@@ -1,8 +1,25 @@
+# Copyright 2011-2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
 package Manoc::ControllerRole::JQDatatable;
 
 use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
+
+=head1 NAME
+
+Manoc::ControllerRole::JQDatatable - Support for DataTables Table jQuery
+
+=head1 DESCRIPTION
+
+Catalyst controller role for helping managing ajax request for datatables.
+See L<http://datatables.net/examples/data_sources/server_side.html>
+
+=cut
+
+die "Not ready for use";
 
 has datatable_search_columns => (
     is  => 'rw',
@@ -20,7 +37,7 @@ has datatable_columns => (
 has datatable_search_options => (
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub { {} },
+    default => sub { {} },
 );
 
 sub get_datatable_resultset {
@@ -32,25 +49,24 @@ sub get_datatable_resultset {
 sub datatable_response : Private {
     my ($self, $c) = @_;
 
-    my $rs = $self->get_datatable_resultset($c);
+    my $start = $c->request->param('start') || 0;
+    my $size  = $c->request->param('length');
+    my $draw  = $c->request->param('draw') || 0;
+    my $search = $c->request->param('search');
     
     my $col_names      = $self->datatable_columns;
     my $col_formatters = $c->stash->{'col_formatters'} || {};
 
-    my $start = $c->request->param('iDisplayStart') || 0;
-    my $size  = $c->request->param('iDisplayLength');
-    my $echo  = $c->request->param('sEcho') || 0;
+    my $rs = $self->get_datatable_resultset($c);
+    
+    my $search_filter = {};
 
-    my $search_filter;
-
-    # create filter (WHERE clause)
-    my $search = $c->request->param('sSearch');
+    # create  search filter (WHERE clause)
     if ($search) {
         $search_filter = [];
 
         foreach my $col (@{$self->datatable_search_columns}) {
             push @$search_filter, { $col =>  { -like =>  "%$search%" } };
-
             $c->log->debug("$col like $search");
         }
     }
@@ -76,7 +92,7 @@ sub datatable_response : Private {
         my @cols;
         foreach my $i (0 .. $n_sort_cols - 1) {
             my $col_idx = $c->request->param("iSortCol_$i");
-            my $col = $searchable_columns->[ $col_idx ];
+            my $col = $self->searchable_columns->[ $col_idx ];
 
             my $dir = 
               $c->request->param("sSortDir_$i") eq 'desc' ? '-desc' : '-asc';
@@ -89,25 +105,27 @@ sub datatable_response : Private {
     my @rows;
     my $search_rs =  $rs->search($search_filter, $search_attrs);
     while (my $item = $search_rs->next) {
-        my @row;
-        foreach my $name (@$col_names) {
-            my $cell = '';
-
-            # defaul accessor is preferred
-            $cell = $item->can($name) ? $item->$name : $item->get_column($name);
-
-            my $f = $col_formatters->{$name};
-            $f and $cell = $f->($c, $cell, $item);
-            push @row, $cell;
+        my $row;
+        
+        if ($self->datatable_row_formatter) {
+            $row = $self->datatable_row_formatter->($c, $item);
+        } else {
+            $row = [];
+            
+            foreach my $name (@$col_names) {
+                # defaul accessor is preferred
+                my $v = $item->can($name) ? $item->$name : $item->get_column($name);
+                push @$row, $v;
+            }
         }
-        push @rows, \@row;
+        push @rows, $row;
     }
 
     my $data = {
-        aaData => \@rows, 
-        sEcho  => int($echo),
-        iTotalRecords => $total_rows,
-        iTotalDisplayRecords => $total_rows,
+        draw => int($draw),
+        data => \@rows,
+        recordsTotal => $total_rows,
+        recordsFiltered => $total_rows,
     };
 
     $c->stash('json_data' => $data);
