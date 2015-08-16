@@ -36,12 +36,9 @@ Catalyst controller role for Manoc common CRUD implementation.
           }
       },
       class      => 'ManocDB::Artist',
-      );
+      form_class => 'Manoc::Form::Artist',
 
-  sub get_form {
-     my ($self, $c) = @_;
-     return Manoc::Form::Artist->new();
-  }
+   );
 
   __PACKAGE__->meta->make_immutable;
   no Moose;
