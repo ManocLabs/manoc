@@ -1,25 +1,41 @@
+# Copyright 2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
 package Manoc::IPAddress::IPv4;
 
 use Moose;
-use Manoc::Utils::IPAddress qw/padded_ipaddr unpadded_ipaddr/;
+use namespace::autoclean;
 
-use overload ('""'  =>   \&to_string,
-	      'lt'  =>   \&less_than,
-	      'gt'  =>   \&greater_than,
-	      'eq'  =>   \&equal,
-	      'le'  =>   \&less_or_equal,
-	      'ne'  =>   \&not_equal);
+use Manoc::Utils::IPAddress qw(ip2int int2ip padded_ipaddr);
 
-has 'address' => (
-    is  => 'rw',
-    isa => 'Str',
+
+use overload (
+    '""'   =>   sub { shift->_stringify() },
+    'cmp'  =>   \&_cmp_op,
+);
+
+
+has 'numeric' => (
+    is      => 'ro',
+    isa     => 'Int',
+    required => 1,
 );
 
 has 'padded' => (
-    is         => 'rw',
+    is         => 'ro',
     isa        => 'Str',
-    lazy_build => 1,
-    trigger => \&_set_unpadded,
+    init_arg   => undef,
+    lazy       => 1,
+    builder    => '_build_padded'
+);
+
+has 'unpadded' => (
+    is         => 'ro',
+    isa        => 'Str',
+    init_arg   => undef,
+    lazy       => 1,
+    builder    => '_build_unpadded'
 );
 
 
@@ -28,59 +44,43 @@ around BUILDARGS => sub {
       my $class = shift;
 
       if ( @_ == 1 && ! ref $_[0] ) {
-          return $class->$orig(address => $_[0]);
+          return $class->$orig(numeric => ip2int($_[0]));
       }
       else {
           return $class->$orig(@_);
       }
   };
 
+sub address {
+    return $_[0]->unpadded;
+}
 
 sub _build_padded {
-    my $self = shift;
-    return padded_ipaddr( $self->address );
-  }
-
-sub _set_unpadded {
-   my ($self, $new, $old) = @_;
-
-   $self->address(unpadded_ipaddr( $new ));
+    padded_ipaddr($_[0]->unpadded)
 }
 
-
-# WARNING: used by comparison operators
-sub to_string {
-    return $_[0]->padded;
+sub _build_unpadded {
+    int2ip($_[0]->numeric)
 }
 
-sub less_than {
-  my ($first, $second) = @_;
-  return unless defined $second;
-  return "$first" lt "$second";
+sub _stringify {
+    return $_[0]->unpadded;
 }
 
-sub less_or_equal {
+sub _cmp_op {
     my ($first, $second) = @_;
-    defined $second or return;
-    return "$first" le "$second";
+    if (blessed($second) && $second->isa("Manoc::IPAddress::IPv4")) {
+	return $first->numeric <=> $second->numeric;
+    }
+    return  ( $first->padded cmp padded_ipaddr($second) );
 }
 
-sub greater_than {
-    my ($first, $second) = @_;
-    defined $second or return 1;
-    return "$first" gt "$second";
-}
-
-sub not_equal {
-    my ($first, $second) = @_;
-    return !equal($first, $second);
-}
-
-sub equal {
-    my ($first, $second) = @_;
-    return 0 unless defined $second;
-    return "$first" eq "$second";
-}
-
-
+__PACKAGE__->meta->make_immutable;
 1;
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
