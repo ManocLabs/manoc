@@ -205,11 +205,7 @@ after setup_finalize => sub {
         __PACKAGE__->deny_access_unless( $acl, [qw/admin/] );
     }
 
-    #ACL to protect WApi with HTTP Authentication
-    __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agent' ) } );
-
-    #Load Search Plugins    
-
+    #Load Search Plugins
     __PACKAGE__->load_plugins;
 
 };
