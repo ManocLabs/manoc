@@ -47,6 +47,11 @@ The Manoc Team
 
 L<Catalyst::Controller>
 L<Manoc::Form::Base>
+L<MAnoc::ControllerRole::CommonCRUD>
+
+=head1 CAVEATS
+
+Form class must be customized in order to use Manoc::Form::Base.
 
 =head1 LICENSE
 
@@ -218,10 +223,6 @@ __PACKAGE__->config(
     class      => 'ManocDB::[% model %]',
     form_class => 'Manoc::Form::[% model %]',
 );
-
-=head1 CAVEATS
-
-Form class must be customized in order to use Manoc::Form::Base.
 
 =head1 AUTHOR
 
