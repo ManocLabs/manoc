@@ -164,7 +164,7 @@ sub _load_tables_loop {
         my $table = $source->from;
         $self->log->debug("Loading $source_name");
 
-        $converter and $table = $converter->get_table_name($table);
+        $converter and $table = $converter->get_table_name($source_name);
 
         if ($overwrite) {
             $self->log->debug("Cleaning $source_name");
@@ -198,23 +198,25 @@ sub _load_tables_loop {
             }
 
             # convert records if needed
-            $converter and $converter->upgrade_table( $table, $records );
+            $converter and
+                $converter->upgrade_table($records, $table );
 
             # converter callback
             $converter and
-                $converter->before_import_table($table, $records);
+                $converter->upgrade_table($records, $source_name);
 
             # load into db
             $self->_load_table( $source, $records, $force );
-
-            # converter callback
-            $converter and
-                $converter->after_import_table($table, $records);
 
             #free memory
             undef @$records;
             undef $records;
         }
+
+        # converter callback
+        $converter and
+            $converter->after_import_source($source);
+
     }
 }
 
@@ -262,7 +264,7 @@ sub _load_table {
 }
 
 sub load {
-    my ( $self, $disable_fk, $overwrite, $force ) = @_;
+    my ( $self, $enable_fk, $overwrite, $force ) = @_;
 
     my $datadump = Manoc::DataDumper::Data->load( $self->filename );
 
@@ -277,7 +279,9 @@ sub load {
     my $source_names = $self->source_names;
     $self->log->debug('Sources: ', join(',', @$source_names));
     
-    if ($disable_fk) {
+    if ($enable_fk) {
+        $self->_load_tables_loop( $datadump, $file_set, $overwrite, $force );
+    } else {
         # force loading the correct storage backend before
         # calling with_deferred_fk_checks
         $self->schema->storage->ensure_connected();
@@ -287,9 +291,6 @@ sub load {
                 $self->_load_tables_loop($datadump, $file_set, $overwrite, $force );
             }
         );
-    }
-    else {
-        $self->_load_tables_loop( $datadump, $file_set, $overwrite, $force );
     }
     $self->log->info("Database restored!");
 }

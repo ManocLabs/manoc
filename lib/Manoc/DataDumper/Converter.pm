@@ -66,46 +66,41 @@ sub _load_converters {
 }
 
 sub get_table_name {
-    my ($self, $table) = @_;
+    my ($self, $source_name) = @_;
+
+    my $method_name = "get_table_name_${source_name}";
 
     # get name from lowest converter
-    return $self->converters->[0]->get_table_name($table);
+    foreach my $c (@{$self->converters}) {
+        next unless $c->can($method_name);
+        my $name = $c->$method_name();
+        $name and return $name;
+    }
 }
 
 sub upgrade_table {
-    my ( $self, $table, $data ) = @_;
+    my ( $self, $data, $name ) = @_;
 
-    my $method_name = "upgrade_$table";
+    my $method_name = "upgrade_$name";
 
     # use all converters
-    $self->log->info("Running converters for table $table");
+    $self->log->info("Running converters for $name");
     foreach my $c (@{$self->converters}) {
         next unless $c->can($method_name);
         $c->$method_name($data);
     }
 }
 
-sub before_import_table {
-    my ( $self, $table, $data) = @_;
+sub after_import_source {
+    my ( $self, $source) = @_;
 
-    my $method_name = "before_import_$table";
+    my $source_name = $source->source_name;
+    my $method_name = "after_import_${source_name}";
 
-    $self->log->info("Running before callbacks for table $table");
+    $self->log->info("Running after callbacks for source $source");
     foreach my $c (@{$self->converters}) {
         next unless $c->can($method_name);
-        $c->$method_name($data);
-    }
-}
-
-sub after_import_table {
-    my ( $self, $table,  $data) = @_;
-
-    my $method_name = "after_import_$table";
-
-    $self->log->info("Running after callbacks for table $table");
-    foreach my $c (@{$self->converters}) {
-        next unless $c->can($method_name);
-        $c->$method_name($data);
+        $c->$method_name($source);
     }
 }
 
