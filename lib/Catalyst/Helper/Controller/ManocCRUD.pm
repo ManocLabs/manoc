@@ -141,12 +141,12 @@ __form_tt__
 __list_tt__
 [% TAGS <+ +> -%]
 [%
-   page.tile='List <+ model +>'
+   page.title='List <+ model +>'
    page.section='Section'
    page.subsection='Subsection'
 -%]
 <div id="<+ model +>_create">
-<a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<a href="[% c.uri_for_action('<+ model +>/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
  <table class="table" id="<+ model +>_list">
    <thead>
@@ -163,7 +163,7 @@ __list_tt__
 <+- FOREACH col IN columns +>
  	 <td>[% object.<+ col +> | html %]</td>
 <+- END +>
-     	 <td><a href=[% c.uri_for_action('/<+ model.lower +>/view', [object.id]) %]>View</a></td>
+     	 <td><a href=[% c.uri_for_action('<+ model.lower +>/view', [object.id]) %]>View</a></td>
          </tr>
 [% END %]
    </tbody>
