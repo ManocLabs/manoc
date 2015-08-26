@@ -24,9 +24,9 @@ JSON  utilities for Manoc TT View using L<JSON|JSON> module
 
 
 sub json {
-	my $self = shift;
-	my $o = shift;
-	return to_json($o);
+    my $self = shift;
+    my $o = shift;
+    return JSON->new->convert_blessed(1)->encode($o)
 }
 
 =head1 SEE ALSO
