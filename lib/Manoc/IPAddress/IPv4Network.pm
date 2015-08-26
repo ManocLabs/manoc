@@ -15,14 +15,14 @@ use overload (
     '""'   =>   sub { shift->_stringify() },
 );
 
-has 'network' => (
+has 'address' => (
     is       => 'ro',
     isa      => 'Manoc::IPAddress::IPv4',
     required => 1,
 );
 
-sub _network_i {
-    $_[0]->network->numeric();
+sub _address_i {
+    $_[0]->address->numeric();
 }
 
 has 'prefix' => (
@@ -64,7 +64,7 @@ has '_broadcast_i' => (
 );
 
 sub _build_broadcast_i {
-    $_[0]->_network_i | ~ $_[0]->_netmask_i;
+    $_[0]->_address_i | ~ $_[0]->_netmask_i;
 }
 
 has 'broadcast' => (
@@ -88,7 +88,7 @@ has _first_host_i => (
 );
 
 sub _build_first_host_i {
-    $_[0]->_network_i + 1;
+    $_[0]->_address_i + 1;
 }
 
 has first_host => (
@@ -147,10 +147,10 @@ around BUILDARGS => sub {
     my $class = shift;
 
     if ( @_ == 2) {
-	my $network = shift;
-	if (!ref($network)) {
-	    check_addr($network) and
-		$network = Manoc::IPAddress::IPv4->new($network);
+	my $address = shift;
+	if (!ref($address)) {
+	    check_addr($address) and
+		$address = Manoc::IPAddress::IPv4->new($address);
 	}
 	my $prefix = shift;
 	if (blessed($prefix) && $prefix->isa('Manoc::IPAddress::IPv4')) {
@@ -158,7 +158,7 @@ around BUILDARGS => sub {
 	}
 	check_addr($prefix) and $prefix = netmask2prefix($prefix);
 	return $class->$orig(
-	    network => $network,
+            address => $address,
 	    prefix  => $prefix,
 	);
     }
@@ -168,7 +168,7 @@ around BUILDARGS => sub {
 };
 
 sub _stringify {
-    return $_[0]->network->unpadded . "/" . $_[0]->prefix;
+    return $_[0]->address->unpadded . "/" . $_[0]->prefix;
 }
 
 
