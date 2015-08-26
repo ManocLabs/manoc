@@ -25,7 +25,7 @@ sub register_column {
 
 sub inflate_ipv4_column {
     my ($value, $obj) = @_;
-    return Manoc::IPAddress::IPv4->new({ padded => $value }) if defined($value);
+    return Manoc::IPAddress::IPv4->new( $value ) if defined($value);
 }
 
 sub deflate_ipv4_column {
