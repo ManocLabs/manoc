@@ -4,8 +4,28 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
+has json_columns => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+);
 
-requires 'prepare_json_object';
+=head2 prepare_json_object 
+
+Get an hashref from a row.
+
+=cut
+
+sub prepare_json_object {
+    my ($self, $row) = @_;
+
+    my $ret = {};
+    foreach my $name (@{$self->json_columns}) {
+        # default accessor is preferred
+        my $val = $row->can($name) ? $row->$name : $row->get_column($name);
+        $ret->{$name} = $val;
+    }
+    return $ret;
+}
 
 =head2 view_js
 

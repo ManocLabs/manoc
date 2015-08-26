@@ -1,8 +1,8 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::View::TT;;
+package Manoc::View::TT;
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ __PACKAGE__->config(
     ],
     PRE_PROCESS => 'init.tt',
     WRAPPER     => 'wrapper.tt',
+    PLUGIN_BASE => 'Manoc::View::TT::Plugin',
     render_die  => 1,
 );
 

@@ -9,12 +9,18 @@ use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
 with 'Manoc::ControllerRole::Object';
-requires 'get_form';
+
+has 'form_class' => (
+    is  => 'rw',
+    isa => 'ClassName'
+);
+
+=head1 ACTIONS
 
 =head2 form
 
-Handle creation and editing of resources.  Form defaults can be
-injected using form_defaults in stash.
+Handle creation and editing of resources. Form defaults can be
+injected using form_defaults in stash. Form is created by get_form method.
 
 =cut
 
@@ -53,6 +59,28 @@ sub form : Private {
     $c->res->redirect( $self->get_form_success_url($c) );
     $c->detach();
 }
+
+=head1 METHODS
+
+=head2 get_form
+
+Create a new form using form_class configuration parameter.
+
+=cut
+
+sub get_form {
+    my ($self, $c) = @_;
+
+    my $class = $self->form_class;
+    $class or die "Form class not set (use form_class)";
+    return $class->new();
+}
+
+=head2 get_form_success_url
+
+Get the URL to redirect after successful editing.
+
+=cut
 
 sub get_form_success_url {
     my ($self, $c) = @_;

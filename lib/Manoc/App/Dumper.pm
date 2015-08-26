@@ -26,7 +26,7 @@ use YAML::Syck;
 
 extends 'Manoc::App';
 
-has 'disable_fk' => (
+has 'enable_fk' => (
     is       => 'rw',
     isa      => 'Bool',
     required => 0,
@@ -107,7 +107,7 @@ sub run_load {
         }
     );
 
-    $datadumper->load( $self->disable_fk, $self->overwrite, $self->force );
+    $datadumper->load( $self->enable_fk, $self->overwrite, $self->force );
 }
 
 ########################################################################

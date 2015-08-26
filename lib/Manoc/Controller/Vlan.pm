@@ -13,7 +13,7 @@ with 'Manoc::ControllerRole::CommonCRUD' => {
     -excludes => 'list'
 };
 # TODO
-# with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::JSONView";
 
 =head1 NAME
 
@@ -32,7 +32,8 @@ __PACKAGE__->config(
             PathPart => 'vlan',
         }
     },
-    class      => 'ManocDB::Vlan',
+    class        => 'ManocDB::Vlan',
+    json_columns => [ 'id', 'name', 'description' ],
 );
 
 =head1 METHODS
@@ -45,6 +46,17 @@ sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
     $c->res->redirect( $c->uri_for_action('vlanrange/list'));
 }
+
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c) = @_;
+
+    my $range_id = $c->req->query_parameters->{'range'};
+    $c->stash(form_defaults => { vlan_range => $range_id });
+};
 
 =head2 get_object_list
 

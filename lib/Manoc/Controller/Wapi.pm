@@ -13,7 +13,16 @@ use Encode;
 use POSIX qw(strftime);
 use Data::Dumper;
 
+use Manoc::Utils::IPAddress qw(check_addr);
 use Manoc::IPAddress::IPv4;
+
+sub begin : Private {
+    my ( $self, $c ) = @_;
+
+    # WApi with HTTP Authentication
+    $c->user_exists or
+	$c->authenticate( {}, 'agent' );
+}
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
@@ -37,27 +46,24 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $user   = $c->req->param('user');
-    my $ipaddr = Manoc::IPAddress::IPv4->new($c->req->param('ipaddr'));
- 
     unless ($user) {
         $c->stash( error => "Missing user param" );
         $c->detach('apierror');
     }
-    unless ( $ipaddr->address =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o ) {
-        $c->stash( error => "Bad ipaddr" );
+
+    my $ipaddr = $c->req->param('ipaddr');
+    if ( ! check_addr($ipaddr) ) {
+        $c->stash( error => "Not a valid address in ipaddr" );
         $c->detach('apierror');
     }
+    $ipaddr = Manoc::IPAddress::IPv4->new($ipaddr);
 
     my $timestamp = time();
-
     if ( $user =~ /([^\$]+)\$$/ ) {
 
         # computer logon
-
         my $name = $1;
-
         my $rs = $c->model('ManocDB::WinHostname');
-
         my @entries = $rs->search(
             {
                 ipaddr   => $ipaddr,
