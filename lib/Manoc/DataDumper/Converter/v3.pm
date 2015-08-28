@@ -6,7 +6,9 @@
 package Manoc::DataDumper::Converter::v3;
 
 use Moose;
-use Data::Dumper;
+use Manoc::Utils::IPAddress qw(ip2int padded_ipaddr netmask2prefix);
+
+
 extends 'Manoc::DataDumper::Converter::Base';
 
 has 'device_id_map' => (
@@ -14,6 +16,16 @@ has 'device_id_map' => (
     is  => 'rw',
     lazy => 1,
     builder => '_build_device_id_map',
+);
+
+has 'device_id_counter' => (
+    isa   => 'Int',
+    is    => 'rw'
+);
+
+has 'network_id_counter' => (
+    isa   => 'Int',
+    is    => 'rw'
 );
 
 sub _build_device_id_map {
@@ -56,7 +68,7 @@ sub upgrade_devices {
     my ( $self, $data ) = @_;
 
     my %device_id_map = ();
-    my $id = 1;
+    my $id = $self->device_id_counter;
 
     foreach (@$data) {
         my $addr = $_->{id};
@@ -66,6 +78,7 @@ sub upgrade_devices {
         $device_id_map{$addr} = $id;
     }
 
+    $self->device_id_counter($id);
     $self->device_id_map(\%device_id_map);
 }
 
@@ -105,7 +118,6 @@ sub upgrade_sessions {
     my ( $self, $data ) = @_;
 
     @$data = ();
-    return 0;
 }
 
 sub upgrade_ssid_list {
@@ -127,8 +139,45 @@ sub upgrade_users {
     }
 }
 
+sub get_table_name_IPNetwork { 'ip_range' }
 
-no Moose;    # Clean up the namespace.
+sub upgrade_IPNetwork {
+    my ( $self, $data ) = @_;
+
+    @$data = grep {  $_->{network} } @$data;
+
+    foreach (@$data) {
+        $_->{address}   = $_->{network};
+	$_->{prefix}    = netmask2prefix($_->{netmask});
+        $_->{broadcast} = $_->{to_addr};
+	delete @$_{qw(from_addr to_addr network netmask parent)};
+    }
+}
+
+sub after_import_IPNetwork {
+    my ($self, $source) = @_;
+
+    $self->log->info("Rebuilding IPNetwork tree");
+    $source->resultset->rebuild_tree();
+}
+
+sub get_table_name_IPBlock { 'ip_range' }
+
+sub upgrade_IPBlock {
+    my ( $self, $data ) = @_;
+
+    my $id = $self->network_id_counter;
+    @$data = grep { ! $_->{network} } @$data;
+
+    foreach (@$data) {
+        $_->{id} = $id++;
+	delete @$_{qw(network netmask vlan_id parent)};
+    }
+
+    $self->network_id_counter($id);
+}
+
+no Moose; # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
 1;
 
