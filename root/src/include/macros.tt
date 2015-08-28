@@ -63,28 +63,8 @@
  [% END -%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%#                             IpRange                               -%]
-[%# ----------------------------------------------------------------- -%]
-[% MACRO print_iprange(range) BLOCK -%]
-<a href=[% c.uri_for_action('/iprange/view', [range.name]) %]>
-[%range.name | html %]
-</a>
-[% END -%]
-[%# ----------------------------------------------------------------- -%]
 [%#                            VlanRange                              -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vlanrange(name) BLOCK -%]
 <a href=[% c.uri_for('/vlanrange/list') %]>[% name | html %]</a>
-[% END -%]
-[%# ----------------------------------------------------------------- -%]
-[%#                           IpCalc                                  -%]
-[%# ----------------------------------------------------------------- -%]
-[% MACRO print_ipcalc(range, prefix) BLOCK -%]
-   [% IF range and range.isa("Manoc::IpAddress") -%]
-    <a href=[% c.uri_for_action('/iprange/view_iprange',
-    [range.address,prefix]) %]>
-    [%range.address | html %]/[% prefix | html %]</a> 
-   [% ELSE-%]
-    <a href=[% c.uri_for_action('/iprange/view_iprange', [range,prefix]) %]>[ %range | html %]/[% prefix | html %]</a> 
-   [% END -%]
 [% END -%]

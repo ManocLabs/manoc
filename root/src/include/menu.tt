@@ -22,7 +22,7 @@
                      subsections = [
 			{
 				name = 'IP Address Plan',
-				path = c.uri_for_action('/iprange/list'),
+				path = c.uri_for_action('/ipnetwork/list'),
 			},
   	       		{
 	        	     name = 'VLAN', 

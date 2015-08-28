@@ -1,0 +1,24 @@
+[%
+   page.title='View IPBlock'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>from_addr</dt>
+  <dd>[% object.from_addr | html %]</dd>
+  <dt>to_addr</dt>
+  <dd>[% object.to_addr | html %]</dd>
+  <dt>description</dt>
+  <dd>[% object.description | html %]</dd>
+</dl>

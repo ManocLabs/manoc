@@ -1,0 +1,28 @@
+[%
+   page.title='View IPNetwork'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>network</dt>
+  <dd>[% object.network | html %]</dd>
+  <dt>prefix</dt>
+  <dd>[% object.prefix | html %]</dd>
+  <dt>broadcast</dt>
+  <dd>[% object.broadcast | html %]</dd>
+  <dt>description</dt>
+  <dd>[% object.description | html %]</dd>
+  <dt>vlan_id</dt>
+  <dd>[% object.vlan_id | html %]</dd>
+</dl>
