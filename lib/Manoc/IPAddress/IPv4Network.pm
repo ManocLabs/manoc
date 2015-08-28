@@ -27,7 +27,7 @@ sub _address_i {
 
 has 'prefix' => (
     is       => 'ro',
-    isa      => subtype( 'Int' => where { $_ > 0 && $_ <= 32  } ),
+    isa      => subtype( 'Int' => where { $_ >= 0 && $_ <= 32  } ),
     required => 1,
 );
 

@@ -56,7 +56,12 @@ __PACKAGE__->has_many( ip_ranges => 'Manoc::DB::Result::IPRange', 'vlan_id' );
 __PACKAGE__->has_many(
     interfaces => 'Manoc::DB::Result::IfStatus', 
     { 'foreign.vlan' => 'self.id' },
-    { join_type => 'left' }
+    {
+	join_type      => 'LEFT',
+	cascade_delete => 0,
+	cascade_copy   => 0,
+	is_foreign_key_constraint => 0,
+    }
 );
 
 # weak relation with vtp entries

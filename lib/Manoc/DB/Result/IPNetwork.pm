@@ -89,7 +89,7 @@ sub address {
     my ($self, $value) = @_;
 
     if (@_ > 1) {
-        Manoc::IPAddress::IPv4Network->new($value, $self->prefix);
+        $self->network(Manoc::IPAddress::IPv4Network->new($value, $self->prefix));
         $self->_address($value);
     }
     return $self->_address();
@@ -103,7 +103,7 @@ sub prefix {
         ($value >= 0 && $value <= 32)
             or die "Bad prefix value $value";
 
-        Manoc::IPAddress::IPv4Network->new($self->address, $value);
+        $self->network( Manoc::IPAddress::IPv4Network->new($self->address, $value) );
         $self->_prefix($value);
     }
     return $self->_prefix();
