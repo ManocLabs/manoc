@@ -14,6 +14,7 @@ __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
     id => {
         data_type   => 'int',
+	is_auto_increment => 1,
         is_nullable => 0,
     },
     mng_address => {
