@@ -9,6 +9,8 @@ use warnings;
 
 use base 'Catalyst::View::TT';
 
+use Manoc;
+
 __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     INCLUDE_PATH       => [
