@@ -7,10 +7,12 @@ use strict;
 package Manoc::Controller::IPNetwork;
 use Moose;
 use namespace::autoclean;
+
 BEGIN {
-    extends 'Catalyst::Controller'; 
-    with 'Manoc::ControllerRole::CommonCRUD';
+    extends 'Catalyst::Controller';
 }
+
+with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::IPNetwork;
 
