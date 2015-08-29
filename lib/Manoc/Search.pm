@@ -2,9 +2,9 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-
 package Manoc::Search;
 use Moose::Role;
+
 use Manoc::Search::Engine;
 use Manoc::Search::Query;
 use Manoc::Utils qw(str2seconds);
@@ -37,7 +37,10 @@ sub search {
 sub _plugin_types {
   my $self = shift;
   my @types;
-  my $reg = Manoc->plugin_registry;
+
+  return unless $self->can('plugin_registry');
+  
+  my $reg = $self->plugin_registry;
   foreach my $plugin (keys(%{$reg})){
     push(@types, $plugin) if($reg->{$plugin}->{type} eq 'search');
   }

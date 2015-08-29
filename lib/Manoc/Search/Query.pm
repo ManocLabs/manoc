@@ -11,6 +11,7 @@ use Moose::Util::TypeConstraints;
 use Carp;
 
 use Manoc::Utils qw(str2seconds);
+
 use Manoc::Search::QueryType;
 use Manoc::Utils::IPAddress qw(padded_ipaddr check_partial_addr);
 
@@ -84,8 +85,10 @@ sub parse {
 
     # use non capturing brackets
     my @TYPES = @Manoc::Search::QueryType::TYPES;
-    scalar(Manoc::Search->_plugin_types) and 
-      push @TYPES,  Manoc::Search->_plugin_types;
+
+    # TODO!
+    # scalar(Manoc::Search->_plugin_types) and 
+    #  push @TYPES,  Manoc::Search->_plugin_types;
 
     my $types_re = '(?:' . join( '|', @TYPES ) . ')';
 
