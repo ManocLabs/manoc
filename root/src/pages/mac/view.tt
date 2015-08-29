@@ -1,0 +1,159 @@
+[%
+   title='Mac Address View'
+-%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+<dl class="dl-horizontal">
+  <dt>Mac Address</dt><dd>[% macaddr | html %]</dd>
+  <dt>Device vendor</dt><dd>[% vendor  | html %]</dd>
+</dl>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  [% bootstrap_nav_tab("arp", "IP Address Association", 1) -%]
+  [% bootstrap_nav_tab("mat", "Device History") %]
+  [% bootstrap_nav_tab("dhcpleases", "DHCP Leases") %]
+  [% bootstrap_nav_tab("dhcpres", "DHCP Reservations") %]
+  [% bootstrap_nav_tab("ap", "Access Point Associations") %]
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="arp">
+    [% IF arp_results.size %]	
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Ip Address</th>
+ 	  <th>Vlan</th>
+ 	  <th>From</th>
+          <th>To</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN arp_results %]
+        <tr>
+ 	  <td>[% print_ip(r.ipaddr) %]</td>
+ 	  <td>[% print_vlan(r.vlan) %]</td>
+ 	  <td>[% date.format(r.firstseen) %]</td>
+	  <td>[% date.format(r.lastseen) %]</td>
+        </tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]    
+  </div>
+  
+  <div role="tabpanel" class="tab-pane" id="mat">
+    [% IF mat_results.size %]
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Device</th>
+ 	  <th>Interface</th>
+ 	  <th>Vlan</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[%- FOREACH r IN mat_results.nsort('lastseen').reverse %]
+        <tr>
+	  [%- IF r.device_entry %]
+ 	  <td>[% print_device(r.device_entry) %]</td>
+ 	  <td>[% print_iface(r.device_entry, r.interface) %]</td>
+	  [% ELSE %]
+ 	  <td>[% r.device.name | html %]</td>
+	  <td>-</td>
+	  [% END %]   
+	  <td>[% print_vlan(r.vlan) %]</td>
+ 	  <td>[% date.format(r.firstseen) %] </td>
+ 	  <td>[% date.format(r.lastseen) %] </td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div>
+  
+  <div role="tabpanel" class="tab-pane" id="dhcpleases">
+    [% IF (leases.size) %]
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Server</th>
+ 	  <th>Ip</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+ 	  <th>Status</th>
+ 	  <th>Hostname</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN leases %]
+        <tr>
+ 	  <td>[% r.server | html %]</td>
+ 	  <td>[% print_ip(r.ipaddr) %]</td>
+	  <td>[% date.format(r.start) %]</td>
+ 	  <td>[% date.format(r.end) %] </td>
+ 	  <td>[% r.status | html %] </td>
+ 	  <td>[% r.hostname | html %] </td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div>     <!-- end tabs-3 -->
+  
+  <div role="tabpanel" class="tab-pane" id="dhcpres">
+    [% IF (reservations.size) %]
+    <table class="display" id="res">
+      <thead>  
+	<tr>
+ 	  <th>Server</th>
+ 	  <th>Ip Address</th>
+ 	  <th>Name</th>
+ 	  <th>Hostname</th>
+	</tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN reservations %]
+	<tr>
+ 	  <td>[% r.server %]</td>
+ 	  <td>[% print_ip(r.ipaddr) %]</td>
+	  <td>[% r.name %]</td>
+ 	  <td>[% r.hostname %] </td>
+	</tr>
+	[% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div> <!-- end tabs-4 -->
+  
+  <div role="tabpanel" class="tab-pane" id="ap">
+    [% IF dot11_results.size %]	
+    <table class="table">
+      <thead>  
+        <tr>
+ 	  <th>Device</th>
+ 	  <th>SSID</th>
+ 	  <th>Ip Address</th>
+ 	  <th>Vlan</th>
+ 	  <th>From</th>
+ 	  <th>To</th>
+        </tr>
+      </thead>  
+      <tbody>
+	[% FOREACH r IN dot11_results %]
+        <tr>
+ 	  <td>[% print_device(r.device) %]</td>
+ 	  <td><a href="todo">[% r.ssid %]</a></td>
+	  <td>[% print_ip(r.ipaddr) %]</td>
+ 	  <td>[% r.firstseen %] </td>
+ 	  <td>[% r.lastseen %] </td>
+	</tr>
+	 [% END %]
+      </tbody>
+    </table>
+    [% END %]
+  </div> <!-- end tabs-5 -->
+  
+</div><!-- end tabs -->

@@ -1,3 +1,7 @@
+# Copyright 2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
 package Catalyst::Helper::Controller::ManocCRUD;
 
 use Class::Load;
@@ -14,12 +18,11 @@ use HTML::FormHandler::Generator::DBIC;
 
 =head1 NAME
 
-Catalyst::Helper::Controller::Manoc::CRUD
+Catalyst::Helper::Controller::ManocCRUD
 
 =head1 SYNOPSIS
 
-    $ script/manoc_create.pl controller Manoc::CRUD ResultClass
-
+$ script/manoc_create.pl controller <modelname> ManocCRUD
 
 =head1 DESCRIPTION 
 
@@ -44,6 +47,11 @@ The Manoc Team
 
 L<Catalyst::Controller>
 L<Manoc::Form::Base>
+L<MAnoc::ControllerRole::CommonCRUD>
+
+=head1 CAVEATS
+
+Form class must be customized in order to use Manoc::Form::Base.
 
 =head1 LICENSE
 
@@ -110,11 +118,12 @@ sub mk_compclass {
   
   my $controller_file = catfile( $manoc_lib_path, "Controller",
                                              $model_name . ".pm" );
-  $helper->render_file('compclass', $controller_file, $params);
+  $helper->render_file('controller', $controller_file, $params);
 
-  my $tmpl_dir = catdir( $manoc_base_path, "root", "src", lc($model_name));
+  my $tmpl_dir = catdir( $manoc_base_path, "root", "src", "pages", lc($model_name));
   $helper->mk_dir($tmpl_dir);
   $helper->render_file('list_tt', catfile($tmpl_dir, 'list.tt'), $params);
+  $helper->render_file('create_tt', catfile($tmpl_dir, 'create.tt'), $params);
   $helper->render_file('form_tt', catfile($tmpl_dir, 'form.tt'), $params);
   $helper->render_file('view_tt', catfile($tmpl_dir, 'view.tt'), $params);
 }
@@ -123,74 +132,62 @@ sub mk_compclass {
 __DATA__
 =begin pod_to_ignore
 __form_tt__
-[% TAGS <+ +> %]
-[%  META
-    title='Create/Edit <+ model +> '
-    section='Section'
-    subsection='Subsection'
+[% TAGS <+ +> -%]
+[%
+  page.section='Section'
+  page.subsection='Subsection'
 %]
-
-<div class="buttons">
 [% form.render %]
-    </div>
 __list_tt__
-[% TAGS <+ +> %]
-[% META
-   tile='List <+ model +>'
-   section='Section'
-   subsection='Subsection'
-   use_table=1
+[% TAGS <+ +> -%]
+[%
+   page.title='List <+ model +>'
+   page.section='Section'
+   page.subsection='Subsection'
 -%]
-<div class="buttons create_btn">
-<a href="[% c.uri_for_action('/<+ $model.lower +>/create') %]" >
-   [% ui_icon('circle-plus') %] Create</a>
- [% add_css_create_btn %]
+<div id="<+ model +>_create">
+<a href="[% c.uri_for_action('<+ model +>/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-[% init_table('list') %]
- <table class="display" id="list">
+ <table class="table" id="<+ model +>_list">
    <thead>
      <tr>
-<+ FOREACH col IN columns +>
+<+- FOREACH col IN columns +>
         <th><+ col +></th>
-<+ END +>
+<+- END +>
         <th></th>
      </tr>
    </thead>
    <tbody>
-[% FOREACH o IN objects %]
+[% FOREACH object IN object_list %]
          <tr>
-<+ FOREACH col IN columns +>
- 	 <td>[% o.<+ attr+> | html %]</td>
-<+ END +>
- 	 <td><a href=[% c.uri_for_action('/<+ model.lower +>/view', [o.id]) %]>View</a></td>
+<+- FOREACH col IN columns +>
+ 	 <td>[% object.<+ col +> | html %]</td>
+<+- END +>
+     	 <td><a href=[% c.uri_for_action('<+ model.lower +>/view', [object.id]) %]>View</a></td>
          </tr>
 [% END %]
    </tbody>
 </table>
 __view_tt__
-[% TAGS <+ +> %]
-[% META
-   title='View <+ model +>'
-   section='Section'
-   subsection='Subsection'
+[% TAGS <+ +> -%]
+[%
+   page.title='View <+ model +>'
+   page.section='Section'
+   page.subsection='Subsection'
    use_table=1
 -%]
-    <table id="info">
-      <+ FOREACH col IN columns +>
-        <tr>
-        <th><+ col +></th>
-        <td>[% o.<+ attr+> | html %]</td>
-        </tr>
-      <+ END +>
-    </table>
-    [% add_css_tableinfo -%]
-    <p>
-      <div class="buttons">	
-	<a href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
-	&nbsp;<a href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>
-	[% ui_icon('closethick') %] Delete</a>
-      </div>
-    </p>
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <+- FOREACH col IN columns +>
+  <dt><+ col +></dt>
+  <dd>[% object.<+ col +> | html %]</dd>
+  <+- END +>
+</dl>
 __controller__
 # Copyright 2015 by the Manoc Team
 #
@@ -202,6 +199,7 @@ package Manoc::Controller::[% model %];
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
+with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::[% model %];
 
@@ -215,133 +213,16 @@ Catalyst Controller.
 
 =cut
 
-has 'object_form' => (
-    isa => 'Manoc::Form::[% model %]',
-    is => 'rw',
-    lazy => 1,
-    default => sub { Manoc::Form::[% model %]->new }
+__PACKAGE__->config(
+    # define PathPart
+    action => {
+        setup => {
+            PathPart => '[% model.lower %]',
+        }
+    },
+    class      => 'ManocDB::[% model %]',
+    form_class => 'Manoc::Form::[% model %]',
 );
-
-=head1 METHODS
-
-=cut
-
-=head2 index
-
-=cut
-
-sub index : Path() : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->response->redirect( $c->uri_for_action( '[% model.lower %]/list' ) );
-    $c->detach();
-}
-
-
-
-=head2 base
-
-=cut
-
-sub base : Chained('/') : PathPart('[% model.lower %]') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( resultset => $c->model('ManocDB::[% model %]') );
-}
-
-=head2 object
-
-=cut
-
-sub object : Chained('base') : PathPart('id') : CaptureArgs(1) { my (
-    $self, $c, $id ) = @_;
-
-    $c->stash( object => $c->stash->{resultset}->find($id) );
-
-    if ( !$c->stash->{object} ) {
-        $c->stash( error_msg => "Object $id not found!" );
-        $c->detach('/error/index');
-    }
-}
-
-=Head2 view
-
-=cut
-
-sub view : Chained('object') : PathPart('view') : Args(0) {
-    my ( $self, $c ) = @_;
-    my $obj = $c->stash->{'object'};
-
-    $c->stash( template => '[% model.lower %]/view.tt' );
-}
-
-sub list : Chained('base') PathPart('list') Args(0)
-{
-   my ( $self, $c ) = @_;
-
-   my @objectes = $c->stash->{resultset}->all;
-   $c->stash(
-       objects => \@objects,
-       template => '[% model.lower %]/list.tt'
-   );
-}
-
-=head2 create
-
-=cut
-
-sub create : Chained('base') PathPart('create') Args(0)
-{
-    my ( $self, $c ) = @_;
-
-    my $attrs = {}
-    $c->stash( object  => $c->stash->{resultset}->new_result($attrs) );
-    return $self->form($c);
-}
-
-=head2 edit
-
-=cut
-
-sub edit : Chained('object') PathPart('edit') Args(0)
-{
-    my ( $self, $c ) = @_;
-    return $self->form($c);
-}
-
-=head2 form
-
-Used by add and edit
-
-=cut
-
-sub form
-{
-    my ( $self, $c ) = @_;
-
-    $c->stash(
-	form => $self->object_form,
-	template => '[% model.lower %]/form.tt',
-	action => $c->uri_for($c->action, $c->req->captures)
-    );
-
-    return unless $self->object_form->process( item => $c->stash->{object},
-					      params => $c->req->parameters );
-    $c->res->redirect( $c->uri_for($self->action_for('list')) );
-}
-
-sub delete : Chained('object') PathPart('delete') Args(0)
-{
-    my ( $self, $c ) = @_;
-
-    $c->stash( default_backref => $c->uri_for('/[% model.lower %]/list') );
-
-    if ( lc $c->req->method eq 'post' ) {
-	$c->stash->{object}->delete;
-	$c->flash( message => 'Object deleted.' );
-        $c->detach('/follow_backref');
-    } else {
-        $c->stash( template => 'generic_delete.tt' );
-    }
-}
 
 =head1 AUTHOR
 
@@ -357,3 +238,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

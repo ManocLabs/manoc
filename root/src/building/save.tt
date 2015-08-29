@@ -1,9 +1,0 @@
-[%  META
-    title='Create/Edit'
-    subsection='Building'    
-    section='Asset'
-%]
-
-<div class="buttons">
-[% form.render %]
-</div>

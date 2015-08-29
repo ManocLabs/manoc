@@ -4,9 +4,12 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::CDPNeigh;
 
-use base qw(DBIx::Class);
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
+
 
 __PACKAGE__->table('cdp_neigh');
 __PACKAGE__->add_columns(
@@ -23,7 +26,8 @@ __PACKAGE__->add_columns(
     'to_device' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
+	ipv4_address => 1,
     },
     'to_interface' => {
         data_type   => 'varchar',
@@ -56,22 +60,12 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.from_device' }
 );
 
-__PACKAGE__->inflate_column(
-    to_device => {
-	inflate =>
-	    sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-	deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-    }
+__PACKAGE__->belongs_to(
+    to_device_info => 'Manoc::DB::Result::Device',
+    { 'foreign.mng_address' => 'self.to_device' },
+    { join_type => 'left' },
 );
 
-# TODO is_foreign_key_constraint doesn't work!!
-#__PACKAGE__->might_have(to_device_info => 'Manoc::DB::Result::Device',
-#			{ 'foreign.id' => 'self.to_device' },
-#			{
-#			    cascade_delete => 0,
-#			    is_foreign_key_constraint => 0,
-#			}
-#			);
 
 =head1 NAME
 

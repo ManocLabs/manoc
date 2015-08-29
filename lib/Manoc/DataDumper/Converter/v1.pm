@@ -8,7 +8,7 @@ package Manoc::DataDumper::Converter::v1;
 use Moose;
 use Data::Dumper;
 
-extends 'Manoc::DataDumper::Converter::v2';
+extends 'Manoc::DataDumper::Converter::Base';
 
 # check for spurious data
 sub upgrade_winlogon {

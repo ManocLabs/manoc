@@ -15,7 +15,8 @@ with 'Manoc::Logger::Role';
 use Manoc::Netwalker::DeviceReport;
 use Manoc::Netwalker::Source::SNMP;
 
-use Manoc::IpAddress;
+use Manoc::Utils::IPAddress qw(unpadded_ipaddr);
+use Manoc::IPAddress::IPv4;
 
 # the Manoc::DB::Device entry associated to this device
 has 'entry' => (
@@ -134,7 +135,7 @@ sub _build_device_set {
     my $self = shift;
 
     my @addresses = $self->schema->resultset('Device')->get_column('mng_address')->all;
-    my %addr_set = map { Manoc::Utils::unpadded_ipaddr($_) => 1 } @addresses;
+    my %addr_set = map { unpadded_ipaddr($_) => 1 } @addresses;
     return \%addr_set;
 }
 
@@ -275,7 +276,7 @@ sub update_cdp_neighbors {
         foreach my $s (@$n) {
             
             my $from_dev_obj = $entry->id;
-            my $to_dev_obj   = Manoc::IpAddress->new($s->{addr});
+            my $to_dev_obj   = Manoc::IPAddress::IPv4->new($s->{addr});
 
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
@@ -289,7 +290,7 @@ sub update_cdp_neighbors {
             
             unless ( scalar(@cdp_entries) ) {
                 
-                my $temp_obj = Manoc::IpAddress->new($entry->id->address);
+                my $temp_obj = Manoc::IPAddress::IPv4->new($entry->id->address);
                 
                 $self->schema->resultset('CDPNeigh')->create(
                 {
@@ -483,7 +484,7 @@ sub update_arp_table {
     while (($ip_addr, $mac_addr) = each(%$arp_table)) {
         $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
-        my $ip_obj =  Manoc::IpAddress->new( $ip_addr  );
+        my $ip_obj =  Manoc::IPAddress::IPv4->new( $ip_addr  );
 	my @entries = $self->schema->resultset('Arp')->search({
 	    ipaddr	=> $ip_obj,
 	    macaddr	=> $mac_addr,

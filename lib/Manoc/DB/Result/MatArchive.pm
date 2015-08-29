@@ -43,14 +43,6 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key( 'device_id', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->belongs_to( device => 'Manoc::DB::Result::DeletedDevice', 'device_id' );
 
-__PACKAGE__->inflate_column(
-			    device_id => {
-					  inflate =>
-					  sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-					  deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-					 } 
-			   );
-
 
 1;
 

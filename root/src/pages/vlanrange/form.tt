@@ -1,0 +1,8 @@
+[% 
+   page.title='VlanRange'
+   page.subsection='VLAN'
+   page.section='Network'
+-%]
+<div class="buttons">
+[% form.render %]
+</div>

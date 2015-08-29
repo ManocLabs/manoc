@@ -8,6 +8,7 @@ requires 'Log::Log4perl', '1.46';
 requires 'DBI';
 requires 'DBIx::Class';
 requires 'DBIx::Class::EncodedColumn';
+requires 'DBIx::Class::Tree', '0.03003';
 requires 'Catalyst::Runtime', '5.90077';
 requires 'Catalyst::Authentication::Credential::HTTP';
 requires 'Catalyst::Plugin::ConfigLoader';
@@ -37,10 +38,14 @@ requires 'Plack::Middleware::CSRFBlock';
 requires 'Plack::Middleware::Session';
 requires 'Plack::Middleware::ReverseProxy';
 
-
 recommends 'Net::Pcap';
 recommends 'NetPacket';
 recommends 'SNMP::Info', '3.27';
+
+on 'test' => sub {
+  requires 'Test::More';
+  requires 'Test::WWW::Mechanize::Catalyst', '0.60';
+};
 
 on 'develop' => sub {
   recommends 'Devel::NYTProf';

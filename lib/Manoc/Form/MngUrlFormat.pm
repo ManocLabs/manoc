@@ -8,8 +8,8 @@ use strict;
 use warnings;
 use HTML::FormHandler::Moose;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
+with 'Manoc::Form::Base::SaveButton';
 
 has '+name' => ( default => 'form-mngurlformat' );
 has '+html_prefix' => ( default => 1 );
@@ -28,6 +28,4 @@ has_field 'name' => (
 
 has_field 'format' => ( type => 'Text' );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
 1;

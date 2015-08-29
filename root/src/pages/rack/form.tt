@@ -1,0 +1,5 @@
+[%
+page.subsection = 'Rack'
+page.section = 'Asset' 
+-%]
+[% form.render %]

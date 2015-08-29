@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  [% PROCESS layouts/_head_block.tt %]
+  <body>
+    [% navbar %]
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 main">
+        [% PROCESS layouts/_content_block.tt %]
+	</div>
+      </div><!-- end of row -->
+    </div><!-- end of container -->
+    [% make_js_block %]  
+  </body>
+</html>

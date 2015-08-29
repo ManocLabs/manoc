@@ -1,20 +1,30 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::Form::VlanRange;
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
+use Manoc::Form::Types::VlanID;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
 
 has '+name' => ( default => 'form-vlanrange' );
 has '+html_prefix' => ( default => 1 );
 
+sub build_form_element_class { ['form-horizontal'] }
+
+sub build_form_tags {
+    {
+        'layout_classes' => {
+            element_wrapper_class => [ 'col-sm-10' ],
+            label_class           => [ 'col-sm-2' ],
+        }
+    }
+}
+
 has_field 'name' => (
+    label    => 'Name',
     type     => 'Text',
     required => 1,
     apply    => [
@@ -23,13 +33,84 @@ has_field 'name' => (
             check => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
-    ]
+    ],
 );
 
-has_field 'start' => ( type => 'Integer', required => 1 );
-has_field 'end'   => ( type => 'Integer', required => 1 );
-has_field 'description' => ( type => 'TextArea' );
-has_field 'submit'      => ( type => 'Submit', value => 'Submit' );
-has_field 'discard'     => ( type => 'Submit', value => 'Discard' );
+has_field 'start' => (
+    label => 'From VLAN',
+    type => 'Integer',
+    apply => [ 'VlanID' ],
+    required => 1,
+);
+
+has_field 'end' => (
+    label => 'To VLAN',
+    type => 'Integer',
+    apply => [ 'VlanID' ],
+    required => 1,
+);
+
+has_field 'description' => (
+    label => 'Description',
+    type  => 'TextArea',
+);
+
+has_field 'save' => (
+    type => 'Submit',
+    widget => 'ButtonTag',
+    element_attr => { class => ['btn', 'btn-primary'] },
+    widget_wrapper => 'None',
+    value => "Save"
+);
+
+
+sub validate {
+    my $self = shift;
+
+    $self->field('end')->value < $self->field('start')->value and
+	$self->field('end')->add_error('Not a valid range');
+}
+
+sub validate_model {
+    my $self = shift;
+
+    # some handy shortcuts
+    my $start = $self->field('start')->value;
+    my $end   = $self->field('end')->value;
+    my $item  = $self->item;
+
+    # check for overlapping ranges (excluding self!)
+    my $rs = $self->source->resultset;
+    my $overlap = $rs->get_overlap_ranges( $start, $end );
+    $overlap = $overlap->search( id => { '<>' => $self->item->id } )
+        if $item->in_storage;
+    $overlap->count() > 0
+        and $self->add_form_error('Overlaps with existing range');
+
+    # check for vlans outside boundaries
+    if ($item->in_storage) {
+        $item->vlans->search( { id => { '<' => $start } } )->count() > 0
+            and $self->field('start')->add_error('There are associated vlans which will be below the lower end of the range');
+        $item->vlans->search( { id => { '>' => $end } } )->count() > 0
+            and $self->field('end')->add_error('There are associated vlans which will be above the upper end of the range');
+    }
+    
+}
+
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

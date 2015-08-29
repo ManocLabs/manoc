@@ -1,0 +1,32 @@
+[%
+   page.title='List IPBlock'
+   page.section='Section'
+   page.subsection='Subsection'
+-%]
+<div id="IPBlock_create">
+<a href="[% c.uri_for_action('IPBlock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+ <table class="table" id="IPBlock_list">
+   <thead>
+     <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>from_addr</th>
+        <th>to_addr</th>
+        <th>description</th>
+        <th></th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH object IN object_list %]
+         <tr>
+ 	 <td>[% object.id | html %]</td>
+ 	 <td>[% object.name | html %]</td>
+ 	 <td>[% object.from_addr | html %]</td>
+ 	 <td>[% object.to_addr | html %]</td>
+ 	 <td>[% object.description | html %]</td>
+     	 <td><a href=[% c.uri_for_action('ipblock/view', [object.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

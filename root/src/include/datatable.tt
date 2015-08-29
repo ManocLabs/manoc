@@ -1,96 +1,31 @@
-[% MACRO init_row_group BLOCK -%]
-	[% link_css.push(c.uri_for('/static/external/datatable/rowGrouping.css') ) -%]
-	[% link_js.push(c.uri_for('/static/external/datatable/jquery.dataTables.rowGrouping.js')) -%]
-[%  END -%]
-
-[% MACRO init_datatable BLOCK -%]
-[%  link_css.push(c.uri_for('/static/external/datatable/table.css')) -%]
-[%  link_js.push(c.uri_for('/static/external/datatable/jquery.dataTables.js'),
-               c.uri_for('/static/external/datatable/dataTables.typeDetectPlugin.js'),
-	       c.uri_for('/static/external/datatable/dataTables.typeSortPlugin.js'),
+[% link_css.push(
+               c.uri_for('/static/external/datatables-1.10.8/datatables.css'),
+             )
+  -%]
+  [%  link_js.push(
+               c.uri_for('/static/external/datatables-1.10.8/datatables.min.js'),
+               c.uri_for('/static/external/datatables-1.10.8/ip-address.js'),
              ) 
--%]
-[% END -%]
-
-[% MACRO init_exp_table BLOCK -%]
-[% link_js.push(c.uri_for('/static/js/jExpand.js')) -%]
-[% link_css.push( c.uri_for('/static/css/jExpand.css')) 
-
--%]
-[%  END -%]
-
-[%                                                                   -%]
+  -%]
 [%# Init Table -%]
-[%MACRO init_table(id,columns, options) BLOCK -%]
+[% MACRO init_table(id, options) BLOCK -%]
 [% capture = BLOCK -%]
-$(function() { 
-	  if ( $("#[% id  %]").dataTable ) {
-             var page_rows=25;
-             var paginate=[% IF options.disable_pagination %]false[% ELSE %]$("#[% id  %] tr").lenght > 25[%END%];  
- 	     /* inizializzazione della tabella */
-	     $("#[% id  %]").dataTable( {
-	       //to use JQuery UI style
-	       "bJQueryUI"       : true,
-	       //to decide which column to sort at the beginning
-	       [% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
-	       //pagination button (two_button, full_numbers)
- 	       "sPaginationType" : "full_numbers",
-	       "iDisplayLength" : page_rows,
-	       //to disable sorting
-	        "bSort": [% IF options.disable_sorting %]false[% ELSE %]true[%END%],
-		     //to disable pagination
-	       	"bPaginate": paginate,
-                "bInfo": paginate,
-		 [% IF options.cust_pag -%]
-       		 "sDom": '<"H"f<"toolbar">>t<"F"i>',
-      		 [% END -%]
-	       //in columns trovo l'array per l'inizializzazione delle colonne della tabella
-	       [% IF columns %]
-	       "bAutoWidth": false,
-               "aoColumns" : [
-			     {"sWidth"      : "[% columns.shift %]%"} 
-			     [% FOREACH col IN columns %]
-			     ,{ "sWidth"    : "[% col %]%"}  
-			     [% END %]
-			     ],
-		[% ELSE %]
-	        "test": false,
-	        [% END %]               
-           	});
-                var sel = $("div.create_btn");
-		if (sel) {
-                    var dest=$("#[% id %]_wrapper div").first();
-    		    sel.appendTo(dest);
-		}
-	 }      
+$(function() {
+    $("#[% id  %]").DataTable( {
+[% IF options.paging   %] "paging":   true,[% END %]
+[% IF options.ordering %] "ordering": true,[% END %]
+[% IF options.info     %] "info":     true,[% END %]
+  "dom":
+    [%- IF options.toolbar -%]'<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip'
+    [%- ELSE %]'frtip'
+    [%- END  %],
+   });
+[% IF options.toolbar -%]
+   var origin=$("#[% options.toolbar %]");
+   var dest=$("#[% id %]_wrapper div.toolbar").first();
+   origin.appendTo(dest);
+[% END -%]
 });
 [% END -%]
 [% js_scripts.push(capture) -%]
 [% END -%]
-
-[%MACRO init_row_group_table(id,columns, options) BLOCK -%]
-[% capture = BLOCK -%]
-$(function() { 
-	  if ( $("#[% id  %]").dataTable ) {
-	   
- 	     /* inizializzazione della tabella */
-	     $("#[% id  %]").dataTable( 
-	     							//to use JQuery UI style
-	      							{
-	       "bJQueryUI"       : true,
-	       //[% IF options.sortby %]"aaSorting"       : [[ [% options.sortby %] , "[% options.order %]" ]],[%END%]
-	       //pagination button (two_button, full_numbers)
- 	       "bLengthChange": false,
-	       //to disable sorting
-	       //"bSort": true,
-		   //to disable pagination
-	       "bPaginate": false
-	       }).rowGrouping({ bExpandableGrouping: true,
-	         				asExpandedGroups: ["Active"],
-						  });
-		}
-});
-[% END -%]
-[% js_scripts.push(capture) -%]
-[% END -%]
-

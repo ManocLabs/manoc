@@ -14,7 +14,7 @@ with 'Manoc::Logger::Role';
 use Carp;
 use SNMP::Info;
 use Try::Tiny;
-use Manoc::IpAddress;
+use Manoc::IPAddress::IPv4;
 
 has 'host' => (
     is       => 'ro',
@@ -161,7 +161,7 @@ sub _build_neighbors {
         my $port = $interfaces->{ $c_if->{$neigh} };
         defined($port) or next;
 
-        my $neigh_ip   = $c_ip->{$neigh}         || Manoc::IpAddress->new("0.0.0.0");
+        my $neigh_ip   = $c_ip->{$neigh}         || Manoc::IPAddress::IPv4->new("0.0.0.0");
         my $neigh_port = $c_port->{$neigh}       || "";
         my $neigh_id   = $c_id->{$neigh}         || "";
         my $neigh_model= $c_platform->{$neigh}   || "";

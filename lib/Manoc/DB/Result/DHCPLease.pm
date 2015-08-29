@@ -4,11 +4,12 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DHCPLease;
 
-use base 'DBIx::Class';
+use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/Core InflateColumn/);
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
+
 __PACKAGE__->table('dhcp_lease');
 
 __PACKAGE__->add_columns(
@@ -27,7 +28,8 @@ __PACKAGE__->add_columns(
     'ipaddr' => {
         data_type   => 'varchar',
         is_nullable => 0,
-        size        => 15
+        size        => 15,
+	ipv4_address => 1,
     },
 
     'hostname' => {
@@ -53,13 +55,5 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key( 'server', 'macaddr' );
-
-__PACKAGE__->inflate_column(
-			    ipaddr =>  {
-					inflate =>
-					sub { return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0]) },
-					deflate => sub { return scalar $_[0]->padded if defined($_[0]) },
-				       }
-			   );
 
 1;

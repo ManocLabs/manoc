@@ -10,6 +10,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Moose;
 use Archive::Tar;
+use Manoc::Utils;
 use YAML::Syck;
 use File::Temp qw/tempdir/;
 use File::Spec;

@@ -5,8 +5,7 @@
 package Manoc::Controller::ReportArchive;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(print_timestamp);
-use Data::Dumper;
+
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME

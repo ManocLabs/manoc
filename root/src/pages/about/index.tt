@@ -1,0 +1,108 @@
+[%
+page.title   = 'About Manoc'
+page.section = 'About'
+-%]
+<div id="poetry">
+<img class="center-block" src="[% c.uri_for('/static/images/manoc-logo.jpg') %]">
+<p class="text-center" id="fir">One Query to know them all,</p>
+<p class="text-center" id="sec">One Query to find them,</p>
+<p class="text-center" id="thi">One Query to bring them all and</p>
+<p class="text-center" id="fou">in the darkness shut them</p>
+</div>
+
+<div class="row" id="stats">
+  <div class="col-sm-6 col-xs-12">		
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">Software info</h3>
+      </div>
+      <div class="panel-body">
+	<table class="table table-condensed ">
+	  <tbody>
+	    <tr>
+	      <th>Manoc</th>
+	      <td>[% stats.manoc_ver %]</td>
+	    </tr>
+	    <tr>
+	      <th>Manoc DB</th>
+	      <td>ver [% stats.db_version %]</td>
+	    </tr>
+	    <tr>
+	      <th><a href="http://dbi.perl.org">DBI</a></th>
+	      <td>[% stats.dbi_ver %]</td>
+	    </tr>
+	    <tr>
+	      <th><a href="http://www.dbix-class.org/">DBIx::Class</a></th>
+	      <td>[% stats.dbic_ver %]</td>
+	    </tr>
+	    <tr>
+	      <th><a href="http://www.catalystframework.org/">Catalyst</a></th>
+	      <td>[% stats.catalyst_ver%]</td>
+	    </tr>
+	    <tr>
+	      <th><a href="http://snmp-info.sourceforge.net/">SNMP::Info</a></th>
+	      <td>[% stats.snmpinfo_ver %]</td>
+	    </tr>
+	    <tr>
+	      <th><a href="https://www.perl.org/">Perl</a></th>
+	      <td>[% stats.perl_version %]</td>
+	    </tr>
+	  </tbody>
+	</table>
+      </div><!-- panel body-->
+    </div><!-- panel -->
+  </div><!-- col -->
+  
+  <div class="col-sm-6 col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	<h3 class="panel-title">DB stats</h3>
+      </div>
+      <div class="panel-body">
+	  <table class="table table-condensed">
+	    <tbody>
+	      <tr>
+		<th>Devices</th>
+		<td>[% stats.tot_devices %] with [% stats.tot_ifaces %] L2 interfaces</td>
+	      </tr>
+	      <tr>
+		<th>Racks</th>
+		<td>[% stats.tot_racks %]</td>
+	      </tr>
+	      <tr>
+		<th>CDP Entries</th>
+		<td>[% stats.tot_cdps %]</td>
+	      </tr>
+	      <tr>
+		<th>MAT entries</th>
+		<td>[% stats.mat_entries %]</td>
+	      </tr>
+	      <tr>
+		<th>ARP entries</th>
+		<td>[% stats.arp_entries %]</td>
+	      </tr>
+	    </tbody>
+	  </table>
+      </div>
+     </div><!-- panel body-->
+    </div><!-- panel -->
+  </div><!-- col -->
+
+</div><!-- row -->
+
+
+[% script = BLOCK %]
+$(function() { 
+  $( "#fir" ).hide();
+  $( "#sec" ).hide();
+  $( "#thi" ).hide();
+  $( "#fou" ).hide();
+  $( "#fir" ).fadeIn("slow");
+  $( "#sec" ).delay(1000).fadeIn("slow");
+  $( "#thi" ).delay(2000).fadeIn("slow");
+  $( "#fou" ).delay(3000).fadeIn("slow");
+  $( "#poetry" ).delay(4000).fadeOut("slow");
+  $( "#stats").hide().delay(5000).fadeIn();
+});
+[% END -%]
+[% js_scripts.push(script) -%]

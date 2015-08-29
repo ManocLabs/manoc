@@ -1,0 +1,32 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title = 'VTP DB'
+   page.subsection = 'VLAN'   
+   page.section = 'Network'
+
+   page.layout = 'with_sidebar';
+   page.load_section_file = 1
+-%]
+
+[% init_table('vlan_list', {}) %]
+<table class="table" id="vlan_list">
+  <thead>  
+    <tr>
+      <th>VLAN ID</th>
+      <th>VTP Name</th>
+      <th>Manoc VLAN</th>      
+    </tr>
+  </thead>  
+  <tbody>
+    [% FOREACH v IN object_list %]
+    [%- SET warning =  v.vlan.name != v.name ? 1 : 0 -%]
+    <tr[% ' class="warning"' IF warning %]>
+      <td>[% v.id %]</td>
+      <td>[% v.name | html %]</td>
+      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.vlan.name | html %]</a></td>
+    </tr>       
+    [% END %]
+  </tbody>
+</table>
