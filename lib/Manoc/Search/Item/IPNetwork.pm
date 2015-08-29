@@ -2,14 +2,20 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Search::Item::IpRange;
+package Manoc::Search::Item::IPNetwork;
 use Moose;
 
 extends 'Manoc::Search::Item';
 
 has '+item_type' => ( default => 'iprange' );
 
-has 'iprange' => (
+has 'id' => (
+    is       => 'ro',
+    isa      => 'Int',
+    required => 1,
+);
+
+has 'network' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,

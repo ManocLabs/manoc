@@ -10,6 +10,8 @@ BEGIN {
     use_ok 'Manoc::Search::Item::Group';
     use_ok 'Manoc::Search::Item::IpAddr';
     use_ok 'Manoc::Search::Item::MacAddr';
+    use_ok 'Manoc::Search::Item::IPNetwork';
+
 
     use_ok 'Manoc::Search::Engine';
     use_ok 'Manoc::Search::Query';
