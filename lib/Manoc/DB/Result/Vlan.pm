@@ -50,7 +50,7 @@ sub devices {
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->belongs_to( vlan_range => 'Manoc::DB::Result::VlanRange' );
-__PACKAGE__->has_many( ip_ranges => 'Manoc::DB::Result::IPRange', 'vlan_id' );
+__PACKAGE__->has_many( ip_networks => 'Manoc::DB::Result::IPNetwork', 'vlan_id' );
 
 # weak relation with interfaces
 __PACKAGE__->has_many(
