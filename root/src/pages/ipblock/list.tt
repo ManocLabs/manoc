@@ -1,8 +1,7 @@
 [%
-   page.title='List IPBlock'
-   page.section='Section'
-   page.subsection='Subsection'
+   page.title='IP Blocks'
 -%]
+[% PROCESS 'ipblock/_common.tt' -%]
 <div id="IPBlock_create">
 <a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>

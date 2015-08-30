@@ -1,5 +1,5 @@
+[% PROCESS 'ipblock/_common.tt' -%]
 [%
-  page.section='Section'
-  page.subsection='Subsection'
-%]
+  page.title='IP Block'
+-%]
 [% form.render %]

@@ -1,9 +1,7 @@
 [%
    page.title='Network ' _ object.name
-   page.section='Section'
-   page.subsection='Subsection'
-   use_table=1
 -%]
+[% PROCESS 'ipnetwork/_common.tt' -%]
 [% page.toolbar = BLOCK -%]
 <div>
   <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
