@@ -12,16 +12,16 @@
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ip(ip) BLOCK %]
    [% IF ip and ip.isa("Manoc::IpAddress") -%]
-      <a href=[% c.uri_for_action('/ip/view', [ip.address]) %]> [% ip.address | html %]</a>
+      <a href=[% c.uri_for_action('ip/view', [ip.address]) %]> [% ip.address | html %]</a>
    [% ELSE-%]
-      <a href=[% c.uri_for_action('/ip/view', [ip]) %]> [% ip | html %]</a>
+      <a href=[% c.uri_for_action('ip/view', [ip]) %]> [% ip | html %]</a>
    [% END-%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                            MAC address                            -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_mac(mac) BLOCK -%]
-<a href=[% c.uri_for('/mac', mac) %]> [% mac | html %] </a>
+<a href=[% c.uri_for('mac', mac) %]> [% mac | html %] </a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                           Interface                               -%]
@@ -36,7 +36,7 @@
 [%#                          Building                                 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_building(building) BLOCK -%]
-<a href=[% c.uri_for_action('/building/view', [ building.id ]) %]>[% building.name | html %]</a>
+<a href=[% c.uri_for_action('building/view', [ building.id ]) %]>[% building.name | html %]</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                           Rack                                    -%]
@@ -50,7 +50,19 @@
 [% MACRO print_vlan(vlan) BLOCK -%]
 [% id = vlan.isa("HASH") ? vlan.id : vlan -%]
 [% name = vlan.isa("HASH") ? vlan.name : vlan -%]
-<a href="[% c.uri_for_action('/vlan/view', [id]) %]"> [% name | html %] </a>
+<a href="[% c.uri_for_action('vlan/view', [id]) %]"> [% name | html %] </a>
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                            VlanRange                              -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_vlanrange(range) BLOCK -%]
+<a href=[% c.uri_for_action('vlanrange/view', [ range.id ]) %]>[% range.name | html %]</a>
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                            IP Network                             -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_ipnetwork(network) BLOCK -%]
+<a href=[% c.uri_for_action('ipnetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Hostname                                  -%]
@@ -61,10 +73,4 @@
  [% ELSE-%]
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
  [% END -%]
-[% END -%]
-[%# ----------------------------------------------------------------- -%]
-[%#                            VlanRange                              -%]
-[%# ----------------------------------------------------------------- -%]
-[% MACRO print_vlanrange(name) BLOCK -%]
-<a href=[% c.uri_for('/vlanrange/list') %]>[% name | html %]</a>
 [% END -%]
