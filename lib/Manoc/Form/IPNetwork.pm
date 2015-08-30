@@ -7,6 +7,7 @@ package Manoc::Form::IPNetwork;
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::Base::Horizontal';
 
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
@@ -18,18 +19,7 @@ has '+item_class' => (
     default => 'IPNetwork'
 );
 
-sub build_form_element_class { ['form-horizontal'] }
-
-sub build_form_tags {
-    {
-        'layout_classes' => {
-            element_wrapper_class => [ 'col-sm-10' ],
-            label_class           => [ 'col-sm-2' ],
-        }
-    }
-}
-
-sub build_render_list {[ 'network_block', 'name', 'vlan_id', 'description' ]}
+sub build_render_list {[ 'network_block', 'name', 'vlan_id', 'description', 'save' ]}
 
 has_block 'network_block' => (
     render_list => ['address', 'prefix'],
@@ -49,7 +39,7 @@ has_field 'address' => (
         before_element => '<div class="col-sm-6">' , after_element => '</div>'
     },
     label_class =>  [ 'col-sm-2' ],
-    element_attr => { placeholder => 'x.y.z.w' }
+    element_attr => { placeholder => 'IP Address' }
 );
 
 has_field 'prefix' => (
