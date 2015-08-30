@@ -145,10 +145,10 @@ __list_tt__
    page.section='Section'
    page.subsection='Subsection'
 -%]
-<div id="<+ model +>_create">
-<a href="[% c.uri_for_action('<+ model +>/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<div id="<+ model.lower +>_create">
+<a href="[% c.uri_for_action('<+ model.lower +>/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
- <table class="table" id="<+ model +>_list">
+ <table class="table" id="<+ model.lower +>_list">
    <thead>
      <tr>
 <+- FOREACH col IN columns +>
