@@ -22,3 +22,19 @@
 <a href="#[% name %]" aria-controls="[% name %]" role="tab" data-toggle="tab">[% label %]</a>
 </li>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_progressbar(value, class) BLOCK -%]
+ <div class="progress">
+  <div class="progress-bar [% class %]" role="progressbar" aria-valuenow="[% value %]" aria-valuemin="0" aria-valuemax="100" style="width: [% value %]%;">
+   <span class="sr-only">[% value %]% Complete</span>
+  </div>
+</div>
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_alert(content, type) BLOCK -%]
+[% DEFAULT type = 'info' %]
+<div class="alert alert-[% type %] alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  [% content %]
+</div>
+[% END -%]

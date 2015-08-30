@@ -1,20 +1,17 @@
-[% IF c.flash.message -%]
-<div class="alert alert-success" role="alert">
-[% c.flash.message | html %]
-</div>
-[% END -%]
-[% IF message -%]
-<div class="alert alert-success" role="alert">
-[% message | html %]
-</div>
-[% END -%]
-[% IF c.flash.error_msg -%]
-<div class="alert alert-warning" role="alert">
-[% c.flash.error_msg | html %]
-</div>
-[% END -%]
-[% IF error_msg -%]
-<div class="alert alert-warning" role="alert">
-[% error_msg | html %]
-</div>
-[% END -%]
+[%
+IF c.flash.message;
+ bootstrap_alert(c.flash.message);
+END;
+
+IF message;
+ bootstrap_alert(c.message);
+END;
+
+IF c.flash.error_msg;
+ bootstrap_alert(c.flash.error_msg, 'warning');
+END;
+
+IF c.error_msg;
+ bootstrap_alert(c.error_msg, 'warning');
+END;
+-%]
