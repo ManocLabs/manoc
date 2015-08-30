@@ -90,7 +90,7 @@ sub compare : Chained('base') : PathPart('compare') : Args(0) {
     }
     
     # sort diff entries by id
-    @diff = sort { $a->id <=> $a->id } @diff;
+    @diff = sort { $a->{id} <=> $a->{id} } @diff;
 
     $c->stash(diff => \@diff);
 }
