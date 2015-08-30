@@ -182,7 +182,7 @@ sub arp_entries {
     $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->address, $self->broadcast ] }
+		-between => [ $self->address->padded, $self->broadcast->padded ] }
 	});
 
     return wantarray() ? $rs->all() : $rs;
@@ -195,7 +195,7 @@ sub ip_entries {
     $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->address, $self->broadcast ] }
+		-between => [ $self->address->padded, $self->broadcast->padded ] }
 	});
     return wantarray() ? $rs->all() : $rs;
 }
@@ -203,6 +203,20 @@ sub ip_entries {
 sub supernets {
     my $self = shift;
     my $rs = $self->search_related('supernets');
+    return wantarray() ? $rs->all : $rs;
+}
+
+
+sub supernets_ordered {
+    my $self = shift;
+    my $rs = $self->supernets->search({}, { order_by => { -asc => 'me.address' }});
+
+    return wantarray ? $rs->all : $rs;
+}
+
+sub subnets {
+    my $self = shift;
+    my $rs = $self->search_related('subnets');
     return wantarray() ? $rs->all : $rs;
 }
 

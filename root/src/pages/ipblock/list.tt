@@ -4,7 +4,7 @@
    page.subsection='Subsection'
 -%]
 <div id="IPBlock_create">
-<a href="[% c.uri_for_action('IPBlock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
  <table class="table" id="IPBlock_list">
    <thead>

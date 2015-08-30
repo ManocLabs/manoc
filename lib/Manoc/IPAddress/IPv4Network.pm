@@ -143,6 +143,18 @@ sub _build_wildcard {
     return Manoc::IPAddress::IPv4->new(numeric => $addr);
 }
 
+has num_hosts => (
+    is       => 'ro',
+    isa      => 'Int',
+    lazy     => 1,
+    init_arg => undef,
+    builder  => '_build_num_hosts'
+);
+
+sub _build_num_hosts {
+    return $_[0]->_last_host_i - $_[0]->_first_host_i + 1;
+}
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;

@@ -1,28 +1,82 @@
 [%
-   page.title='View IPNetwork'
+   page.title='Network ' _ object.name
    page.section='Section'
    page.subsection='Subsection'
    use_table=1
 -%]
 [% page.toolbar = BLOCK -%]
 <div>
- <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
-    </div>
+  <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
+</div>
 [% END %]
-<dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
-  <dt>name</dt>
-  <dd>[% object.name | html %]</dd>
-  <dt>network</dt>
-  <dd>[% object.network | html %]</dd>
-  <dt>prefix</dt>
-  <dd>[% object.prefix | html %]</dd>
-  <dt>broadcast</dt>
-  <dd>[% object.broadcast | html %]</dd>
-  <dt>description</dt>
-  <dd>[% object.description | html %]</dd>
-  <dt>vlan_id</dt>
-  <dd>[% object.vlan_id | html %]</dd>
-</dl>
+
+<div class="col-sm-8">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+	<dt>Network</dt>
+	<dd>[% object.network | html %]</dd>
+	<dt>Description</dt>
+	<dd>[% object.description | html %]</dd>
+	<dt>VLAN</dt>
+	<dd>[% print_vlan(object.vlan) %]</dd>	    
+	<dt>Netmask</dt>
+	<dd>[% object.network.netmask | html %]</dd>
+	<dt>Broadcast</dt>
+	<dd>[% object.broadcast | html %]</dd>
+	<dt>Wild card</dt>
+	<dd>[% object.network.wildcard | html %]</dd>
+	<dt>Max hosts</dt>
+	<dd>[% object.network.num_hosts | html %]</dd>	    
+	<dt>First host</dt>
+	<dd>[% object.network.first_host | html %]</dd>
+	<dt>Last host</dt>
+	<dd>[% object.network.last_host | html %]</dd>
+	<dt>Supernets</dt>
+	<dd>[% FOREACH net IN object.supernets_ordered.reverse %]
+	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
+	  [% print_ipnetwork(net) -%]
+	  [% END -%]
+	</dd>
+      </dl>
+    </div><!-- end of content -->	
+  </div><!-- end of panel -->
+</div><!-- end of row -->	
+
+<div class="col-sm-4">
+  <div class="panel panel-default">
+  <div class="panel-body">
+    <p><a href="#">Usage by ARP activity (60 days)</a></p>
+    [% bootstrap_progressbar(arp_usage) %]
+    <p><a href="#">Registered hosts</a></p>
+    [% bootstrap_progressbar(host_usage) %]
+  </div>
+  </div>
+</div>
+
+[% IF object.children_ordered %]
+<div class="col-sm-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">Subnets</div>
+    <table class="table">
+      <thead>
+	<tr>
+	  <th>Network</th>
+	  <th>Broadcast</th>
+	<th>Name</th>	  
+	</tr>
+      </thead>
+    <tbody>
+      [% FOREACH network IN object.children_ordered -%]
+      <tr>
+	<td>[% network.network %]</td>
+	  <td>[% network.network.broadcast %]</td>
+	<td>[% print_ipnetwork(network) %]</td>	  
+      </tr>
+      [% END -%]
+    </tbody>
+    </table>
+  </div>
+  </div>
+[% END %]
