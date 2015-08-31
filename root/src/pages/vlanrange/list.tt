@@ -15,11 +15,11 @@
 <table class="table">
   <thead>	
     <tr>
-        <th>Range</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Description</th>
-	<th></th>
+        <th class="col-sm-4">Range</th>
+        <th class="col-sm-1">Start</th>
+        <th class="col-sm-1">End</th>
+        <th class="col-sm-4">Description</th>
+	<th class="col-sm-2"></th>
     </tr>
   </thead>
   [%- FOREACH range IN object_list %]
