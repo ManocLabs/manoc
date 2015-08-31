@@ -10,7 +10,9 @@ use warnings;
 
 BEGIN {
     use Exporter 'import';
-    our @EXPORT_OK = qw/clean_string str2seconds check_mac_addr/;
+    our @EXPORT_OK = qw/clean_string 
+			str2seconds print_timestamp
+			check_mac_addr/;
 };
 
 use POSIX qw(strftime);
@@ -167,5 +169,12 @@ sub str2seconds {
     return $num * $map{$m};
 }
 
+
+sub print_timestamp {
+    my $timestamp = shift @_;
+    defined($timestamp) || croak "Missing timestamp";
+    my @timestamp = localtime($timestamp);
+    return strftime( "%d/%m/%Y %H:%M:%S", @timestamp );
+}
 
 1;
