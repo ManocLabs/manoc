@@ -36,4 +36,21 @@ sub search_multihomed {
     );
 }
 
+sub first_last_seen {
+    my $self = shift;
+
+    $self->search(
+	{ },
+	{
+            select   => [
+		'ipaddr',
+		{ MAX => 'lastseen' },
+		{ MIN => 'firstseen' },
+	    ],
+	    as       => [ 'ip_address', 'lastseen', 'firstseen' ],
+	    group_by => [ 'ipaddr'],
+	}
+    );
+}
+
 1;
