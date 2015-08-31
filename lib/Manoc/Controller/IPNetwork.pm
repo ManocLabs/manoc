@@ -13,8 +13,11 @@ BEGIN {
 }
 
 with 'Manoc::ControllerRole::CommonCRUD';
+with 'Manoc::ControllerRole::JQDatatable';
 
 use Manoc::Form::IPNetwork;
+use Manoc::Utils qw/print_timestamp str2seconds/;
+
 
 =head1 NAME
 
@@ -41,28 +44,6 @@ __PACKAGE__->config(
 
 =cut
 
-before 'view' => sub {
-    my ( $self, $c ) = @_;
-
-    my $network = $c->stash->{object};
-    my $max_hosts = $network->network->num_hosts;
-
-    my $query_time = time - 60 * 24 * 3600;
-    my $arp_60days = $network->arp_entries->search(
-        {lastseen => { '>=' => $query_time }},
-        {
-            columns => [ qw/ipaddr/ ],
-            distinct => 1
-        })->count();
-
-    
-    
-    $c->stash(arp_usage => int($arp_60days / $max_hosts * 100 ));
-
-    my $hosts = $network->ip_entries;
-    $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
-};
-
 sub get_object_list {
    my ( $self, $c ) = @_;
 
@@ -76,6 +57,66 @@ sub get_object_list {
            } )
    ];
 };
+
+before 'view' => sub {
+    my ( $self, $c ) = @_;
+
+    my $network = $c->stash->{object};
+    my $max_hosts = $network->network->num_hosts;
+
+    my $query_by_time = {
+        lastseen => { '>=' => time - str2seconds(60, 'd') }
+    };
+    my $select_column =  {
+            columns => [ qw/ipaddr/ ],
+            distinct => 1
+        };
+    my $arp_60days = $network->arp_entries
+        ->search($query_by_time, $select_column)
+        ->count();
+    $c->stash(arp_usage60 => int($arp_60days / $max_hosts * 100 ));
+
+    my $arp_total = $network->arp_entries
+        ->search({}, $select_column)
+        ->count();
+    $c->stash(arp_usage => int($arp_total / $max_hosts * 100 ));
+
+    my $hosts = $network->ip_entries;
+    $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
+};
+
+sub arp : Chained('object') { }
+
+sub arp_js : Chained('object') {
+    my ( $self, $c ) = @_;
+
+    my $network = $c->stash->{object};
+    my $days    = int($c->req->param('days'));
+    
+    my $rs = $network->arp_entries->first_last_seen();
+    if ($days) {
+        $rs = $rs->search({ lastseen => time - str2seconds($days, 'd') });
+    }
+
+    my $row_callback = sub {
+        my ($ctx, $row) = @_;
+        my $address = Manoc::IPAddress::IPv4->new($row->get_column('ip_address'));
+        return [
+            "$address",
+            print_timestamp($row->get_column('firstseen')),
+            print_timestamp($row->get_column('lastseen')),
+        ]
+    };
+
+    $c->stash(
+        datatable_row_callback   => $row_callback,
+        datatable_resultset      => $rs,
+        datatable_search_columns => [ qw/ipaddr/ ],
+        datatable_columns        => [ qw/ipaddr firstseen lastseen/],
+    );
+
+    $c->detach('datatable_response');
+}
 
 
 sub root : Chained('base') {

@@ -1,22 +1,20 @@
 [%
    page.title='IP Block' _ object.name
 -%]
-[% PROCESS 'ipblock/_common.tt -%]
+[% PROCESS 'ipblock/_common.tt' -%]
 [% page.toolbar = BLOCK -%]
 <div>
  <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
   &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
     </div>
 [% END %]
-<dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
-  <dt>name</dt>
+<dl class='dl-horizontal'>
+  <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
-  <dt>from_addr</dt>
+  <dt>From</dt>
   <dd>[% object.from_addr | html %]</dd>
-  <dt>to_addr</dt>
+  <dt>To</dt>
   <dd>[% object.to_addr | html %]</dd>
-  <dt>description</dt>
+  <dt>Description</dt>
   <dd>[% object.description | html %]</dd>
 </dl>

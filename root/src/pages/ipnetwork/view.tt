@@ -45,8 +45,10 @@
 <div class="col-sm-4">
   <div class="panel panel-default">
   <div class="panel-body">
-    <p><a href="#">Usage by ARP activity (60 days)</a></p>
+    <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id])  %]">ARP activity</a></p>
     [% bootstrap_progressbar(arp_usage) %]
+     <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id], {days=>60}) %]">ARP activity (last 60 days)</a></p>
+    [% bootstrap_progressbar(arp_usage60) %]
     <p><a href="#">Registered hosts</a></p>
     [% bootstrap_progressbar(host_usage) %]
   </div>

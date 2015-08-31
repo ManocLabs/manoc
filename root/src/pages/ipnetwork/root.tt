@@ -8,13 +8,18 @@
 </div>
 [% END -%]
 
+[% IF root_network -%]
+<p>Networks contained in root network [% print_ipnetwork(root_network) %]
+([% root_network.network %])</p>
+[% END -%]
+
 <div class="col-md-12">
   <table class="table" id="network_list">
    <thead>
      <tr>
-        <th>Name</th>
-        <th>Network</th>
-        <th>Vlan</th>
+        <th class="col-sm-4">Name</th>
+        <th class="col-sm-4">Network</th>
+        <th class="col-sm-4">Vlan</th>
      </tr>
    </thead>
    [% FOREACH object IN networks %]
@@ -29,7 +34,6 @@
 	   [% object.name | html %]</a></td>    
        <td data-sort="[% object.network.address.padded  %]">[% object.network | html %]</td>
        <td>[% print_vlan(object.vlan) %]</td>
-       <td>[% object.description | truncate(40) | html %]</td>
      </tr>
    </tbody>
    [% IF object.children.size %]
@@ -39,7 +43,6 @@
        <td><a href="[% c.uri_for_action('ipnetwork/view', [child.id]) %]">[% child.name | html %]</a></td>
        <td data-sort="[% child.network.address.padded  %]">[% child.network | html %]</td>
        <td>[% print_vlan(child.vlan) %]</td>
-       <td>[% child.description | truncate(40) | html %]</td>
      </tr>   <!-- end of childrens -->
      [% END -%] 
    </tbody>
