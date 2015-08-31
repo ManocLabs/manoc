@@ -145,11 +145,15 @@ sub tar {
 ########################################################################
 
 sub str2seconds {
-    my ($str) = @_;
+    my ($str, $unit) = @_;
 
-    return unless defined $str;
+    croak "empty input string" unless defined $str;
 
-    return $str if $str =~ m/^[-+]?\d+$/;
+    my ( $num, $unit2 ) = $str =~ m/^([+-]?\d+)([smhdwMy]?)$/;
+    if (defined($unit) && defined($unit2)) {
+	warn "multiple units specified";
+    }
+    $unit //= $unit2;
 
     my %map = (
         's' => 1,
@@ -161,12 +165,10 @@ sub str2seconds {
         'y' => 31536000
     );
 
-    my ( $num, $m ) = $str =~ m/^([+-]?\d+)([smhdwMy])$/;
-
-    ( defined($num) && defined($m) ) or
+    defined($num) or
         carp "couldn't parse '$str'. Possible invalid syntax";
 
-    return $num * $map{$m};
+    return $num * $map{$unit};
 }
 
 
