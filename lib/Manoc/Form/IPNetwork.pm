@@ -6,9 +6,11 @@ package Manoc::Form::IPNetwork;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::Base::Horizontal';
 
 use namespace::autoclean;
-
+use HTML::FormHandler::Types ('IPAddress');
 
 has '+name' => ( default => 'form-ipnetwork' );
 has '+html_prefix' => ( default => 1 );
@@ -17,34 +19,58 @@ has '+item_class' => (
     default => 'IPNetwork'
 );
 
+sub build_render_list {[ 'network_block', 'name', 'vlan_id', 'description', 'save' ]}
+
+has_block 'network_block' => (
+    render_list => ['address', 'prefix'],
+    tag => 'div',
+    class => [ 'form-group' ],
+);
+
 has_field 'address' => (
-    type => 'Text',
+    apply => [ IPAddress ],
     size => 15,
     required => 1,
-    label => 'address',
+    label    => 'Address',
+    do_wrapper => 0,
+
+    # we set wrapper=>0 so we don't have the inner div too!
+    tags => {
+        before_element => '<div class="col-sm-6">' , after_element => '</div>'
+    },
+    label_class =>  [ 'col-sm-2' ],
+    element_attr => { placeholder => 'IP Address' }
 );
 
 has_field 'prefix' => (
     type => 'Integer',
     required => 1,
-    label => 'prefix',
+    size     => 2,
+    label    => 'Prefix',
+    do_wrapper => 0,
+    tags => {
+        before_element => '<div class="col-sm-2">' , after_element => '</div>'
+    },
+    label_class =>  [ 'col-sm-2' ],
+    element_attr => { placeholder => '24' }
 );
 
 has_field 'name' => (
-    type => 'TextArea',
+    type => 'Text',
     required => 1,
-    label => 'name',
+    label => 'Name',
+    element_attr => { placeholder => 'Network name' }
 );
 
 has_field 'vlan_id' => (
     type => 'Select',
-    label => 'vlan',
+    label => 'Vlan',
     empty_select => '---Choose a VLAN---',
 );
 
 has_field 'description' => (
     type => 'TextArea',
-    label => 'description',
+    label => 'Description',
 );
 
 sub options_vlan_id {

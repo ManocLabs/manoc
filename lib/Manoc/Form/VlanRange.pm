@@ -8,20 +8,11 @@ use HTML::FormHandler::Moose;
 use Manoc::Form::Types::VlanID;
 
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::Base::Horizontal';
 
 has '+name' => ( default => 'form-vlanrange' );
 has '+html_prefix' => ( default => 1 );
-
-sub build_form_element_class { ['form-horizontal'] }
-
-sub build_form_tags {
-    {
-        'layout_classes' => {
-            element_wrapper_class => [ 'col-sm-10' ],
-            label_class           => [ 'col-sm-2' ],
-        }
-    }
-}
 
 has_field 'name' => (
     label    => 'Name',
@@ -53,14 +44,6 @@ has_field 'end' => (
 has_field 'description' => (
     label => 'Description',
     type  => 'TextArea',
-);
-
-has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
-    widget_wrapper => 'None',
-    value => "Save"
 );
 
 

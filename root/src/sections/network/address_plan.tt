@@ -1,0 +1,16 @@
+[%
+  page.sidebar_items = [
+    {
+	name = "All IP Networks",
+	action = 'ipnetwork/list',
+    },
+    {	
+	name = "Top level IP Networks",
+	action = 'ipnetwork/root',
+    },
+    {
+    	name = "IP Blocks",
+	action = 'ipblock/list',
+    },	
+  ]
+ -%]

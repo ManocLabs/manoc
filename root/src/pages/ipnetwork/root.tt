@@ -1,8 +1,7 @@
 [%
-   page.title='List Networks'
-   page.section='Network'
-   page.subsection='Address plan'
+   page.title='Top level IP networks'
 -%]
+[% PROCESS 'ipnetwork/_common.tt' -%]
 [% page.toolbar = BLOCK %]
 <div id="IPNetwork_create">
 <a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>

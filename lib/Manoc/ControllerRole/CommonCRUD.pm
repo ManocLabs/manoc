@@ -166,10 +166,10 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $self->get_delete_failure_url($c) );
+            $c->res->redirect( $self->get_delete_success_url($c) );
             $c->detach();
         } else {
-            $c->res->redirect( $self->get_delete_success_url($c) );
+            $c->res->redirect( $self->get_delete_failure_url($c) );
             $c->detach();
         }
     }

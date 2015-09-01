@@ -1,0 +1,7 @@
+[%
+page.section='Network'
+page.subsection='Address plan'
+
+page.layout = 'with_sidebar';
+page.load_section_file = 1
+ -%]

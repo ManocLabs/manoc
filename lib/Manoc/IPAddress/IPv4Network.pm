@@ -19,6 +19,7 @@ has 'address' => (
     is       => 'ro',
     isa      => 'Manoc::IPAddress::IPv4',
     required => 1,
+    writer => '_set_address',
 );
 
 sub _address_i {
@@ -142,6 +143,18 @@ sub _build_wildcard {
     return Manoc::IPAddress::IPv4->new(numeric => $addr);
 }
 
+has num_hosts => (
+    is       => 'ro',
+    isa      => 'Int',
+    lazy     => 1,
+    init_arg => undef,
+    builder  => '_build_num_hosts'
+);
+
+sub _build_num_hosts {
+    return $_[0]->_last_host_i - $_[0]->_first_host_i + 1;
+}
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -166,6 +179,19 @@ around BUILDARGS => sub {
 	return $class->$orig(@_);
     }
 };
+
+sub BUILD {
+    my $self = shift;
+
+    my $address_i  = $self->address->numeric;
+    my $prefix     = $self->prefix;
+    my $wildcard_i = $prefix ? ( ( 1 << ( 32 - $prefix ) ) - 1 ) : 0xFFFFFFFF;
+
+    if (($address_i & $wildcard_i) != 0) {
+        my $new_address_i = $address_i & prefix2netmask_i($prefix);
+        $self->_set_address(Manoc::IPAddress::IPv4->new(numeric => $new_address_i));
+    }
+}
 
 sub _stringify {
     return $_[0]->address->unpadded . "/" . $_[0]->prefix;

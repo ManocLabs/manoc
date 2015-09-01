@@ -117,12 +117,16 @@
     </nav>
 [%- END %]
 [% MACRO sidebar BLOCK -%]
-<ul class="nav nav-sidebar">
-  [% FOREACH i IN page.sidebar_items -%]
-  [% active = c.action == i.action -%]
-  <li [% IF active %]class="active"[% END %]>
-    <a href="[% c.uri_for_action(i.action) %]">[% i.name %][% IF active %] <span class="sr-only">(current)</span>[% END %]</a>
-  </li>
+<div class="sidebar-menu">  
+  <div class="sidebar-menu-list">
+     <ul id="sidebar-menu-content" class="sidebar-menu-content">
+[% FOREACH i IN page.sidebar_items -%]
+      [% active = c.action == i.action -%]
+      <li [% IF active %]class="active"[% END %]>
+         <a href="[% c.uri_for_action(i.action) %]">[% i.name %][% IF active %] <span class="sr-only">(current)</span>[% END %]</a>
+      </li>      
 [% END -%]
-</ul>
+    </ul>
+  </div>
+</div>
 [% END -%]

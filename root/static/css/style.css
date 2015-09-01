@@ -29,37 +29,88 @@ body {
  * Sidebar
  */
 
-.sidebar {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
-    border-right: 1px solid #eee;
+.sidebar-menu {
+  font-size: 12px;
+  background-color: #2e353d;
+  position: fixed;
+  width: 200px;
+  height: 100%;
+  color: #e1ffff;
 }
 
-/* Sidebar navigation */
-.nav-sidebar {
-  margin-right: -21px; /* 20px padding + 1px border */
-  margin-bottom: 20px;
-  margin-left: -20px;
+.sidebar-menu ul,
+.sidebar-menu li {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  line-height: 35px;
+  cursor: pointer;
 }
-.nav-sidebar > li > a {
+
+.sidebar-menu ul .active,
+.sidebar-menu li .active {
+  border-left: 3px solid #d19b3d;
+  background-color: #4f5b69;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: #e1ffff;
+}
+.sidebar-menu li a i {
+  padding-left: 10px;
+  width: 20px;
   padding-right: 20px;
-  padding-left: 20px;
-}
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
-  color: #fff;
-  background-color: #428bca;
 }
 
+
+@media (max-width: 767px) {
+  .sidebar-menu {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-menu ul, .sidebar-menu li {
+      display: inline;
+  }
+
+  .sidebar-menu li {
+      padding: 5px;
+      padding-left: 10px;
+  }
+
+  .sidebar-menu li:hover {
+      background-color: #4f5b69;
+  }
+}
+@media (min-width: 767px) {
+    .sidebar-menu {
+	top: 50px; /* navbar size */
+	padding-top: 50px; 
+
+    }
+    
+    .sidebar-menu .sidebar-menu-list .sidebar-menu-content {
+	display: block;
+    }
+    
+    .sidebar-menu li {
+	padding-left: 2px;
+	border-left: 3px solid #2e353d;
+	border-bottom: 1px solid #23282e;
+    }
+
+    .sidebar-menu li:hover {
+	border-left: 3px solid #d19b3d;
+	background-color: #4f5b69;
+	-webkit-transition: all 1s ease;
+	-moz-transition: all 1s ease;
+	-o-transition: all 1s ease;
+	-ms-transition: all 1s ease;
+	transition: all 1s ease;
+    }
+}
 
 /*
  * Main content
@@ -72,6 +123,10 @@ body {
   .main {
     padding-right: 40px;
     padding-left: 40px;
+  }
+
+  .side-navbar-container {
+      margin-left:200px;
   }
 }
 .main .page-header {
@@ -93,10 +148,19 @@ body {
     border: 0px;
 }
 
-/* Used for indenting child rows */
+
+/**********************************************************************/
+/* Expand Table trick by GM                                           */
+/* Used for indenting child rows                                      */
+/**********************************************************************/
+
 
 .table > tbody > tr.childrow > td:first-of-type {
-    padding-left : 4em;
+    padding-left : 8ex;
+}
+
+.table > tbody > tr.leafrow > td:first-of-type {
+    padding-left : 3ex;
 }
 
 .collapse-chevron:after {

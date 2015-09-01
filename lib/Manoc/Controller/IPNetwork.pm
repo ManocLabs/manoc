@@ -7,10 +7,12 @@ use strict;
 package Manoc::Controller::IPNetwork;
 use Moose;
 use namespace::autoclean;
+
 BEGIN {
-    extends 'Catalyst::Controller'; 
-    with 'Manoc::ControllerRole::CommonCRUD';
+    extends 'Catalyst::Controller';
 }
+
+with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::IPNetwork;
 
@@ -38,6 +40,28 @@ __PACKAGE__->config(
 =head1 METHODS
 
 =cut
+
+before 'view' => sub {
+    my ( $self, $c ) = @_;
+
+    my $network = $c->stash->{object};
+    my $max_hosts = $network->network->num_hosts;
+
+    my $query_time = time - 60 * 24 * 3600;
+    my $arp_60days = $network->arp_entries->search(
+        {lastseen => { '>=' => $query_time }},
+        {
+            columns => [ qw/ipaddr/ ],
+            distinct => 1
+        })->count();
+
+    
+    
+    $c->stash(arp_usage => int($arp_60days / $max_hosts * 100 ));
+
+    my $hosts = $network->ip_entries;
+    $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
+};
 
 sub get_object_list {
    my ( $self, $c ) = @_;

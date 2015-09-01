@@ -74,6 +74,8 @@ has network => (
 
 sub build_network {
     my $self = shift;
+    defined ($self->address) or return;
+    defined ($self->prefix)  or return;
     Manoc::IPAddress::IPv4Network->new($self->address, $self->prefix);
 }
 
@@ -89,7 +91,8 @@ sub address {
     my ($self, $value) = @_;
 
     if (@_ > 1) {
-        $self->network(Manoc::IPAddress::IPv4Network->new($value, $self->prefix));
+        defined($self->prefix) and
+            $self->network(Manoc::IPAddress::IPv4Network->new($value, $self->prefix));
         $self->_address($value);
     }
     return $self->_address();
@@ -103,7 +106,8 @@ sub prefix {
         ($value >= 0 && $value <= 32)
             or die "Bad prefix value $value";
 
-        $self->network( Manoc::IPAddress::IPv4Network->new($self->address, $value) );
+        defined($self->address) and
+            $self->network( Manoc::IPAddress::IPv4Network->new($self->address, $value) );
         $self->_prefix($value);
     }
     return $self->_prefix();
@@ -178,7 +182,7 @@ sub arp_entries {
     $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->address, $self->broadcast ] }
+		-between => [ $self->address->padded, $self->broadcast->padded ] }
 	});
 
     return wantarray() ? $rs->all() : $rs;
@@ -191,7 +195,7 @@ sub ip_entries {
     $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->address, $self->broadcast ] }
+		-between => [ $self->address->padded, $self->broadcast->padded ] }
 	});
     return wantarray() ? $rs->all() : $rs;
 }
@@ -199,6 +203,20 @@ sub ip_entries {
 sub supernets {
     my $self = shift;
     my $rs = $self->search_related('supernets');
+    return wantarray() ? $rs->all : $rs;
+}
+
+
+sub supernets_ordered {
+    my $self = shift;
+    my $rs = $self->supernets->search({}, { order_by => { -asc => 'me.address' }});
+
+    return wantarray ? $rs->all : $rs;
+}
+
+sub subnets {
+    my $self = shift;
+    my $rs = $self->search_related('subnets');
     return wantarray() ? $rs->all : $rs;
 }
 

@@ -27,11 +27,11 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4' };
 BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
 {
     my $net = Manoc::IPAddress::IPv4Network->new('192.168.1.0', '24');
-    ok( $net, 'create IPv4 Network from network/prefix');
+    ok( $net, 'create IPv4 Network from address/prefix');
 
     cmp_ok( "$net", 'eq', '192.168.1.0/24', 'stringify');
     
-    cmp_ok( $net->network,    'eq', '192.168.1.0',   'network');
+    cmp_ok( $net->address,    'eq', '192.168.1.0',   'address');
     cmp_ok( $net->prefix,     '==', '24',            'prefix');
     cmp_ok( $net->netmask,    'eq', '255.255.255.0', 'netmask');
     cmp_ok( $net->broadcast,  'eq', '192.168.1.255', 'broadcast');
@@ -42,13 +42,28 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
 
 {
     my $net = Manoc::IPAddress::IPv4Network->new('10.10.0.0', '255.255.0.0');
-    ok( $net, 'Create IPv4 Network from network/netmask');
+    ok( $net, 'Create IPv4 Network from address/netmask');
 
     cmp_ok( "$net", 'eq', '10.10.0.0/16', 'stringify');
 
 }
 
-done_testing;
+
+{
+    my $net = Manoc::IPAddress::IPv4Network->new('10.10.0.0', '0');
+    ok( $net, 'Create IPv4 Network with /0 prefix');
+
+    cmp_ok( "$net", 'eq', '0.0.0.0/0', 'stringify');
+}
+
+{
+    my $net = Manoc::IPAddress::IPv4Network->new('1.2.3.4', '32');
+    ok( $net, 'Create IPv4 Network with /32 prefix');
+
+    cmp_ok( "$net", 'eq', '1.2.3.4/32', 'stringify');
+}
+
+done_testing();
 
 1;
 

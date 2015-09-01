@@ -5,6 +5,6 @@ use Test::More;
 
 BEGIN { use_ok 'Catalyst::Test', 'Manoc' }
 
-ok( request('/')->is_success, 'Request should succeed' );
+ok( request('/auth/login')->is_success, 'Test initial login page' );
 
 done_testing();

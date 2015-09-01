@@ -50,7 +50,7 @@ sub arp_entries {
     return $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->network, $self->broadcast ] }
+		-between => [ $self->network->padded, $self->broadcast-padded ] }
 	});
 }
 
@@ -61,7 +61,7 @@ sub ip_entries {
     return $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->network, $self->broadcast ] }
+		-between => [ $self->network->padded, $self->broadcast->padded ] }
 	});
 }
 
