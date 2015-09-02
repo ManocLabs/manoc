@@ -194,18 +194,37 @@ sub insert {
     $self->next::method( @_ );
 }
 
+sub is_larger_than_parent {
+    my $self = shift;
+    
+    $self->parent or return;
+    return $self->address < $self->parent->address ||
+        $self->broadcast > $self->parent->broadcast;
+}
+
+sub is_smaller_than_children {
+    my $self = shift;
+    
+    $self->children or return;
+    return $self->children->search([
+        {  address   => { '<=' => $self->address->padded   } },
+        {  broadcast => { '>=' => $self->broadcast->padded } },
+    ])->count() > 1;
+}
+
 sub update {
     my $self = shift;
 
     my %dirty = $self->get_dirty_columns;
 
     if ( $dirty{address} || $dirty{broadcast} ) {
-        if ($self->parent && (
-            ( $self->address < $self->parent->address ||
-                  $self->broadcast > $self->parent->broadcast) ))
-            {
-                die "network cannot be larger than its parent"
-            }
+        # check if larger than parent
+        $self->is_larger_than_parent and
+            die "network cannot be larger than its parent";
+
+        $self->is_smaller_than_children and
+            die "network cannot be smaller than its children";
+
         $self->_rebuild_subtree();
     }
     $self->next::method( @_ );
