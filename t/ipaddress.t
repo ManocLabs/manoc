@@ -22,6 +22,11 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4' };
     cmp_ok( $addr gt Manoc::IPAddress::IPv4->new('2.1.1.1'), '==', 1, "operator lt object");
     cmp_ok( $addr lt '192.10.0.0', '==', 1, "operator lt string");
     cmp_ok( $addr lt Manoc::IPAddress::IPv4->new('192.10.0.0'), '==', 1, "operator lt object");
+
+    # <=> overload
+    ok( $addr < Manoc::IPAddress::IPv4->new('192.10.0.0'), "operator < object");
+    ok( $addr > Manoc::IPAddress::IPv4->new('10.0.0.0'),  "operator > object");
+
 }
 
 BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };

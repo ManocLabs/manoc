@@ -13,6 +13,7 @@ use Manoc::Utils::IPAddress qw(ip2int int2ip padded_ipaddr);
 use overload (
     '""'   =>   sub { shift->_stringify() },
     'cmp'  =>   \&_cmp_op,
+    '<=>'  =>   \&_cmp_op,
 );
 
 
