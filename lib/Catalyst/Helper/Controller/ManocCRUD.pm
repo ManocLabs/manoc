@@ -179,7 +179,7 @@ __view_tt__
 [% page.toolbar = BLOCK -%]
 <div>
  <a class="btn btn-default" href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>Delete</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>Delete</a>
     </div>
 [% END %]
 <dl>
