@@ -69,6 +69,40 @@ sub ip_entries {
 }
 
 
+sub contained_networks {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('IPNetwork');
+    $rs = $rs->search(
+            {
+                'address'   => { '>=' => $self->from_addr->padded },
+                'broadcast' => { '<=' => $self->to_addr->padded   }
+            }
+    );
+
+    return wantarray() ? $rs->all() : $rs;
+}
+
+sub container_network {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('IPNetwork');
+    $rs = $rs->search(
+          {
+              'address'   => { '<=' => $self->from_addr->padded },
+              'broadcast' => { '>=' => $self->to_addr->padded   }
+          },
+          {
+              order_by => [
+                  { -asc  => 'address'   },
+                  { -desc => 'broadcast' }
+              ],
+          }
+    );
+    return $rs->first;
+}
+
+
 1;
 # Local Variables:
 # mode: cperl

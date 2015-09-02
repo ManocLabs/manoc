@@ -32,10 +32,15 @@
 	<dt>Last host</dt>
 	<dd>[% object.network.last_host | html %]</dd>
 	<dt>Supernets</dt>
-	<dd>[% FOREACH net IN object.supernets_ordered.reverse %]
+	<dd>[% FOREACH net IN object.supernets_ordered %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
+	</dd>
+	<dt>Blocks</td>	
+	<dd>[% FOREACH block IN object.ipblock_entries %]
+	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
+	[%END -%]
 	</dd>
       </dl>
     </div><!-- end of content -->	

@@ -265,6 +265,20 @@ sub ip_entries {
     return wantarray() ? $rs->all() : $rs;
 }
 
+sub ipblock_entries {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('IPBlock');
+    $rs = $rs->search(
+            {
+                'from_addr' => { '>=' => $self->address->padded   },
+                'to_addr'   => { '<=' => $self->broadcast->padded }
+            }
+    );
+
+    return wantarray() ? $rs->all() : $rs;
+}
+
 sub supernets {
     my $self = shift;
     my $rs = $self->search_related('supernets');

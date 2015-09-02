@@ -24,9 +24,11 @@
 	<dd>[% object.to_addr | html %]</dd>
 	<dt>Description</dt>
 	<dd>[% object.description | html %]</dd>
-	<dt>Related networks</dt>
-	<dd>[% FOREACH net IN object.relate_networks %]
-	  [% print_ipnetwork(net) -%][% "," UNLESS loop.lasst -%]
+	<dt>In network</dt>
+	<dd>[% print_ipnetwork(object.container_network) %]</dd>
+	<dt>Contained networks</dt>
+	<dd>[% FOREACH net IN object.contained_networks %]
+	  [% print_ipnetwork(net) -%][% "," UNLESS loop.last -%]
 	  [% END -%]
 	</dd>
       </dl>
