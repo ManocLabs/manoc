@@ -46,14 +46,20 @@ sub _build_config {
     my $self = shift;
     my $config;
 
-    my @config_paths = ( File::Spec->catdir( $FindBin::Bin, File::Spec->updir() ), '/etc', );
-
-    foreach my $path (@config_paths) {
+    if ($ENV{MANOC_CONF} ) {
         $config = Config::JFDI->open(
-            path => $path,
-            name => 'manoc',
+            file => $ENV{MANOC_CONF},
         );
-        $config and last;
+    } else {
+        my @config_paths = ( File::Spec->catdir( $FindBin::Bin, File::Spec->updir() ), '/etc', );
+
+        foreach my $path (@config_paths) {
+            $config = Config::JFDI->open(
+                path => $path,
+                name => 'manoc',
+            );
+            $config and last;
+        }
     }
     $config or die "Cannot find config file";
 
