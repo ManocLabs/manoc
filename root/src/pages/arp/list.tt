@@ -1,5 +1,5 @@
 [%
-   page.title='ARP activity for Network ' _ object.name
+   page.title='ARP activity'
 -%]
 [% PROCESS 'ipnetwork/_common.tt' -%]
 [% META

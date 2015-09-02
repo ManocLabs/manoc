@@ -81,6 +81,13 @@ sub options_vlan_id {
     return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 }
 
+
+sub validate_model {
+    # TODO
+    # cannot be larger than the parent net (if any)
+
+}
+
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
 1;

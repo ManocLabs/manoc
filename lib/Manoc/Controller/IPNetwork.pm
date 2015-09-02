@@ -13,10 +13,9 @@ BEGIN {
 }
 
 with 'Manoc::ControllerRole::CommonCRUD';
-with 'Manoc::ControllerRole::JQDatatable';
 
 use Manoc::Form::IPNetwork;
-use Manoc::Utils qw/print_timestamp str2seconds/;
+use Manoc::Utils qw/str2seconds/;
 
 
 =head1 NAME
@@ -85,7 +84,16 @@ before 'view' => sub {
     $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
 };
 
-sub arp : Chained('object') { }
+sub arp : Chained('object') {
+    my ( $self, $c ) = @_;
+
+    my $network = $c->stash->{object};
+
+    # override default title
+    $c->stash(title => 'ARP activity for Network ' . $network->name);
+    
+    $c->detach('/arp/list');
+}
 
 sub arp_js : Chained('object') {
     my ( $self, $c ) = @_;
@@ -97,25 +105,9 @@ sub arp_js : Chained('object') {
     if ($days) {
         $rs = $rs->search({ lastseen => time - str2seconds($days, 'd') });
     }
+    $c->stash(datatable_resultset => $rs);
 
-    my $row_callback = sub {
-        my ($ctx, $row) = @_;
-        my $address = Manoc::IPAddress::IPv4->new($row->get_column('ip_address'));
-        return [
-            "$address",
-            print_timestamp($row->get_column('firstseen')),
-            print_timestamp($row->get_column('lastseen')),
-        ]
-    };
-
-    $c->stash(
-        datatable_row_callback   => $row_callback,
-        datatable_resultset      => $rs,
-        datatable_search_columns => [ qw/ipaddr/ ],
-        datatable_columns        => [ qw/ipaddr firstseen lastseen/],
-    );
-
-    $c->detach('datatable_response');
+    $c->detach('/arp/list_js');
 }
 
 

@@ -46,23 +46,26 @@ __PACKAGE__->set_primary_key(qw(id));
 sub arp_entries {
     my $self = shift;
 
-    my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Arp');
-    return $rs->search(
+    my $rs = $self->result_source->schema->resultset('Arp');
+    $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->network->padded, $self->broadcast-padded ] }
+		-between => [ $self->from_addr->padded, $self->to_addr->padded ] }
 	});
+    return wantarray() ? $rs->all() : $rs;
+
 }
 
 sub ip_entries {
     my $self = shift;
 
-    my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Arp');
-    return $rs->search(
+    my $rs = $self->result_source->schema->resultset('Ip');
+    $rs = $rs->search(
 	{
 	    'ipaddr' => {
-		-between => [ $self->network->padded, $self->broadcast->padded ] }
+		-between => [ $self->from_addr->padded, $self->to_addr->padded ] }
 	});
+    return wantarray() ? $rs->all() : $rs;
 }
 
 

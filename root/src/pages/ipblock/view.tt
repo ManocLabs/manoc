@@ -1,20 +1,74 @@
 [%
-   page.title='IP Block' _ object.name
+   page.title='IP block ' _ object.name
 -%]
 [% PROCESS 'ipblock/_common.tt' -%]
 [% page.toolbar = BLOCK -%]
 <div>
  <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a lass="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
     </div>
 [% END %]
 <dl class='dl-horizontal'>
-  <dt>Name</dt>
-  <dd>[% object.name | html %]</dd>
-  <dt>From</dt>
-  <dd>[% object.from_addr | html %]</dd>
-  <dt>To</dt>
-  <dd>[% object.to_addr | html %]</dd>
-  <dt>Description</dt>
-  <dd>[% object.description | html %]</dd>
+  
 </dl>
+
+<div class="col-sm-8">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+	<dt>Name</dt>
+	<dd>[% object.name | html %]</dd>
+	<dt>From</dt>
+	<dd>[% object.from_addr | html %]</dd>
+	<dt>To</dt>
+	<dd>[% object.to_addr | html %]</dd>
+	<dt>Description</dt>
+	<dd>[% object.description | html %]</dd>
+	<dt>Related networks</dt>
+	<dd>[% FOREACH net IN object.relate_networks %]
+	  [% print_ipnetwork(net) -%][% "," UNLESS loop.lasst -%]
+	  [% END -%]
+	</dd>
+      </dl>
+    </div><!-- end of content -->	
+  </div><!-- end of panel -->
+</div><!-- end of row -->	
+
+<div class="col-sm-4">
+  <div class="panel panel-default">
+  <div class="panel-body">
+    <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id])  %]">ARP activity</a></p>
+    [% bootstrap_progressbar(arp_usage) %]
+     <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id], {days=>60}) %]">ARP activity (last 60 days)</a></p>
+    [% bootstrap_progressbar(arp_usage60) %]
+    <p><a href="#">Registered hosts</a></p>
+    [% bootstrap_progressbar(host_usage) %]
+  </div>
+  </div>
+</div>
+
+[% IF object.children_ordered %]
+<div class="col-sm-12">
+  <div class="panel panel-default">
+    <div class="panel-heading">Subnets</div>
+    <table class="table">
+      <thead>
+	<tr>
+	  <th>Network</th>
+	  <th>Broadcast</th>
+	<th>Name</th>	  
+	</tr>
+      </thead>
+    <tbody>
+      [% FOREACH network IN object.children_ordered -%]
+      <tr>
+	<td>[% network.network %]</td>
+	  <td>[% network.network.broadcast %]</td>
+	<td>[% print_ipnetwork(network) %]</td>	  
+      </tr>
+      [% END -%]
+    </tbody>
+    </table>
+  </div>
+  </div>
+[% END %]

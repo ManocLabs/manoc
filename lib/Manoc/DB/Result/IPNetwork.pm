@@ -122,6 +122,71 @@ sub broadcast {
     return $self->_broadcast;
 }
 
+# call this method after resizing a network
+sub _rebuild_subtree {
+    my $self = shift;
+
+    warn "build subtree";
+    if ($self->children) {
+        my $outside = $self->children->search(
+            [
+                { address   => { '<' => $self->address->padded   } },
+                { broadcast => { '>' => $self->broadcast->padded } },
+            ]);
+        while ( my $child = $outside->next()) {
+            $child->parent($self->parent);
+        }
+    }
+    
+    if ($self->siblings) {
+        my $outside = $self->siblings->search(
+            {
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+        while ( my $child = $outside->next()) {
+            $child->parent($self);
+        }
+    }
+}
+
+sub insert {
+    my $self = shift;
+
+    if ( ! defined( $self->parent )) {
+        my $supernets = $self->result_source->resultset->search(
+            {
+                address  =>  { '<=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded },
+            },
+            {
+                order_by => [
+                    { -asc => 'me.address' },
+                    { -desc => 'me.broadcast' }
+                ]
+            });
+        #bypass dbic::tree
+        $self->_parent( $supernets->first() );
+    }
+    $self->next::method( @_ );
+}
+
+sub update {
+    my $self = shift;
+
+    my %dirty = $self->get_dirty_columns;
+
+    if ( $dirty{address} || $dirty{broadcast} ) {
+        if ($self->parent && (
+            ( $self->address < $self->parent->address ||
+                  $self->broadcast > $self->parent->broadcast) ))
+            {
+                die "network cannot be larger than its parent"
+            }
+        $self->_rebuild_subtree();
+    }
+    $self->next::method( @_ );
+}
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [ 'name' ] );
@@ -209,7 +274,14 @@ sub supernets {
 
 sub supernets_ordered {
     my $self = shift;
-    my $rs = $self->supernets->search({}, { order_by => { -asc => 'me.address' }});
+    my $rs = $self->supernets->search(
+        {},
+        {
+            order_by => [
+                { -asc => 'me.address' },
+                { -desc => 'me.broadcast' }
+            ]
+        });
 
     return wantarray ? $rs->all : $rs;
 }
