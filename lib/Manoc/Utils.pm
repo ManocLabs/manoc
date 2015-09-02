@@ -150,8 +150,8 @@ sub str2seconds {
     croak "empty input string" unless defined $str;
 
     my ( $num, $unit2 ) = $str =~ m/^([+-]?\d+)([smhdwMy]?)$/;
-    if (defined($unit) && defined($unit2)) {
-	warn "multiple units specified";
+    if ($unit && $unit2) {
+	warn "multiple units specified ($unit, $unit2)";
     }
     $unit //= $unit2;
 
