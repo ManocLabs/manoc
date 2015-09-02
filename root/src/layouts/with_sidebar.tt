@@ -6,7 +6,7 @@
     [% sidebar %]
     <div class="side-navbar-container container-fluid">
       <div class="row">
-        <div class="col-sm-12 col-md-10 col-md-offset-1 main">
+        <div class="col-sm-12 main">
         [% PROCESS layouts/_content_block.tt %]
         </div>
      </div><!-- end of row -->
