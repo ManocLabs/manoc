@@ -153,7 +153,8 @@ sub _rebuild_subtree {
 sub insert {
     my $self = shift;
 
-    if ( ! defined( $self->parent )) {
+    my $parent = $self->parent;
+    if ( ! $parent ) {
         my $supernets = $self->result_source->resultset->search(
             {
                 address  =>  { '<=' => $self->address->padded   },
@@ -165,9 +166,31 @@ sub insert {
                     { -desc => 'me.broadcast' }
                 ]
             });
+        $parent = $supernets->first();
+        
         #bypass dbic::tree
-        $self->_parent( $supernets->first() );
+        $self->_parent( $parent );
     }
+
+    my $new_children;
+    if ($parent) {
+        $new_children = $parent->children->search(
+            {
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+    } else {
+        $new_children = $self->result_source->resultset->search(
+            {
+                parent    => undef,
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+    }
+    while ( my $child = $new_children->next()) {
+        $child->parent($self);
+    }
+    
     $self->next::method( @_ );
 }
 
