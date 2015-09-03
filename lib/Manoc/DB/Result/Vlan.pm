@@ -50,7 +50,16 @@ sub devices {
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->belongs_to( vlan_range => 'Manoc::DB::Result::VlanRange' );
-__PACKAGE__->has_many( ip_networks => 'Manoc::DB::Result::IPNetwork', 'vlan_id' );
+__PACKAGE__->has_many(
+    ip_networks => 'Manoc::DB::Result::IPNetwork',
+    { 'foreign.vlan_id' => 'self.if' },
+    {
+	join_type      => 'LEFT',
+	cascade_update => 0,
+	cascade_delete => 0,
+	cascade_copy   => 0,
+    }
+);
 
 # weak relation with interfaces
 __PACKAGE__->has_many(
@@ -68,7 +77,10 @@ __PACKAGE__->has_many(
 __PACKAGE__->belongs_to(
     vtp_entry => 'Manoc::DB::Result::VlanVtp',
     { 'foreign.id' => 'self.id' },
-    { join_type => 'left' }
+    {
+	join_type      => 'LEFT',
+	is_foreign_key_constraint => 0,
+    }
 );
 
 

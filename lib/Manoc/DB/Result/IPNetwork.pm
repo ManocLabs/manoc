@@ -119,7 +119,8 @@ sub broadcast {
     if (@_ > 1) {
         die "The broadcast attribute is automatically set from address and prefix";
     }
-    return $self->_broadcast;
+    return $self->_broadcast if defined($self->_broadcast);
+    return $self->_broadcast($self->network->broadcast);
 }
 
 # call this method after resizing a network
@@ -167,7 +168,7 @@ sub insert {
                 ]
             });
         $parent = $supernets->first();
-        
+
         #bypass dbic::tree
         $self->_parent( $parent );
     }
@@ -182,7 +183,7 @@ sub insert {
     } else {
         $new_children = $self->result_source->resultset->search(
             {
-                parent    => undef,
+                parent_id => undef,
                 address   => { '>=' => $self->address->padded   },
                 broadcast => { '<=' => $self->broadcast->padded }
             });
@@ -238,7 +239,7 @@ __PACKAGE__->parent_column('parent_id');
 
 __PACKAGE__->belongs_to( vlan => 'Manoc::DB::Result::Vlan',
                          'vlan_id',
-                         { join_type => 'left' });
+                         { join_type => 'LEFT' });
 
 __PACKAGE__->add_relationship(
     'supernets' => 'IPNetwork',

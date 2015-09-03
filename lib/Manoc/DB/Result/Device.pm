@@ -183,7 +183,12 @@ __PACKAGE__->belongs_to( vlan_arpinfo    => 'Manoc::DB::Result::Vlan' );
 __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
     { 'foreign.from_device' => 'self.id' },
-    { delete_cascade        => 0 }
+    {
+	cascade_copy   => 0,
+	cascade_delete => 0,
+	cascade_update => 0,
+	    
+    }
 );
 
 __PACKAGE__->might_have(
@@ -198,7 +203,7 @@ __PACKAGE__->might_have(
 __PACKAGE__->belongs_to(
     mng_url_format => 'Manoc::DB::Result::MngUrlFormat',
     'mng_url_format',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 
