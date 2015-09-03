@@ -10,7 +10,9 @@ use warnings;
 
 BEGIN {
     use Exporter 'import';
-    our @EXPORT_OK = qw/clean_string str2seconds check_mac_addr/;
+    our @EXPORT_OK = qw/clean_string 
+			str2seconds print_timestamp
+			check_mac_addr/;
 };
 
 use POSIX qw(strftime);
@@ -143,11 +145,15 @@ sub tar {
 ########################################################################
 
 sub str2seconds {
-    my ($str) = @_;
+    my ($str, $unit) = @_;
 
-    return unless defined $str;
+    croak "empty input string" unless defined $str;
 
-    return $str if $str =~ m/^[-+]?\d+$/;
+    my ( $num, $unit2 ) = $str =~ m/^([+-]?\d+)([smhdwMy]?)$/;
+    if ($unit && $unit2) {
+	warn "multiple units specified ($unit, $unit2)";
+    }
+    $unit //= $unit2;
 
     my %map = (
         's' => 1,
@@ -159,13 +165,18 @@ sub str2seconds {
         'y' => 31536000
     );
 
-    my ( $num, $m ) = $str =~ m/^([+-]?\d+)([smhdwMy])$/;
-
-    ( defined($num) && defined($m) ) or
+    defined($num) or
         carp "couldn't parse '$str'. Possible invalid syntax";
 
-    return $num * $map{$m};
+    return $num * $map{$unit};
 }
 
+
+sub print_timestamp {
+    my $timestamp = shift @_;
+    defined($timestamp) || croak "Missing timestamp";
+    my @timestamp = localtime($timestamp);
+    return strftime( "%d/%m/%Y %H:%M:%S", @timestamp );
+}
 
 1;

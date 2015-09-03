@@ -81,6 +81,20 @@ sub options_vlan_id {
     return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 }
 
+
+override validate_model => sub {
+    my $self  = shift;
+    my $item  = $self->item;
+
+    $item->is_larger_than_parent and
+        $self->add_form_error('A network cannot be larger than its parent');
+
+    $item->is_smaller_than_children and
+        $self->add_form_error('A network cannot be smaller than its children');
+
+    super();
+};
+
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
 1;

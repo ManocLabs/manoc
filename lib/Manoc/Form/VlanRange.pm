@@ -54,7 +54,7 @@ sub validate {
 	$self->field('end')->add_error('Not a valid range');
 }
 
-sub validate_model {
+override validate_model => sub {
     my $self = shift;
 
     # some handy shortcuts
@@ -77,8 +77,7 @@ sub validate_model {
         $item->vlans->search( { id => { '>' => $end } } )->count() > 0
             and $self->field('end')->add_error('There are associated vlans which will be above the upper end of the range');
     }
-    
-}
+};
 
 
 =head1 LICENSE

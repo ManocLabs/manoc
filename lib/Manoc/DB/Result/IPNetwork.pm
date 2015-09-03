@@ -122,6 +122,113 @@ sub broadcast {
     return $self->_broadcast;
 }
 
+# call this method after resizing a network
+sub _rebuild_subtree {
+    my $self = shift;
+
+    warn "build subtree";
+    if ($self->children) {
+        my $outside = $self->children->search(
+            [
+                { address   => { '<' => $self->address->padded   } },
+                { broadcast => { '>' => $self->broadcast->padded } },
+            ]);
+        while ( my $child = $outside->next()) {
+            $child->parent($self->parent);
+        }
+    }
+    
+    if ($self->siblings) {
+        my $outside = $self->siblings->search(
+            {
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+        while ( my $child = $outside->next()) {
+            $child->parent($self);
+        }
+    }
+}
+
+sub insert {
+    my $self = shift;
+
+    my $parent = $self->parent;
+    if ( ! $parent ) {
+        my $supernets = $self->result_source->resultset->search(
+            {
+                address  =>  { '<=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded },
+            },
+            {
+                order_by => [
+                    { -asc => 'me.address' },
+                    { -desc => 'me.broadcast' }
+                ]
+            });
+        $parent = $supernets->first();
+        
+        #bypass dbic::tree
+        $self->_parent( $parent );
+    }
+
+    my $new_children;
+    if ($parent) {
+        $new_children = $parent->children->search(
+            {
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+    } else {
+        $new_children = $self->result_source->resultset->search(
+            {
+                parent    => undef,
+                address   => { '>=' => $self->address->padded   },
+                broadcast => { '<=' => $self->broadcast->padded }
+            });
+    }
+    while ( my $child = $new_children->next()) {
+        $child->parent($self);
+    }
+    
+    $self->next::method( @_ );
+}
+
+sub is_larger_than_parent {
+    my $self = shift;
+    
+    $self->parent or return;
+    return $self->address < $self->parent->address ||
+        $self->broadcast > $self->parent->broadcast;
+}
+
+sub is_smaller_than_children {
+    my $self = shift;
+    
+    $self->children or return;
+    return $self->children->search([
+        {  address   => { '<=' => $self->address->padded   } },
+        {  broadcast => { '>=' => $self->broadcast->padded } },
+    ])->count() > 1;
+}
+
+sub update {
+    my $self = shift;
+
+    my %dirty = $self->get_dirty_columns;
+
+    if ( $dirty{address} || $dirty{broadcast} ) {
+        # check if larger than parent
+        $self->is_larger_than_parent and
+            die "network cannot be larger than its parent";
+
+        $self->is_smaller_than_children and
+            die "network cannot be smaller than its children";
+
+        $self->_rebuild_subtree();
+    }
+    $self->next::method( @_ );
+}
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [ 'name' ] );
@@ -200,6 +307,20 @@ sub ip_entries {
     return wantarray() ? $rs->all() : $rs;
 }
 
+sub ipblock_entries {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('IPBlock');
+    $rs = $rs->search(
+            {
+                'from_addr' => { '>=' => $self->address->padded   },
+                'to_addr'   => { '<=' => $self->broadcast->padded }
+            }
+    );
+
+    return wantarray() ? $rs->all() : $rs;
+}
+
 sub supernets {
     my $self = shift;
     my $rs = $self->search_related('supernets');
@@ -209,7 +330,14 @@ sub supernets {
 
 sub supernets_ordered {
     my $self = shift;
-    my $rs = $self->supernets->search({}, { order_by => { -asc => 'me.address' }});
+    my $rs = $self->supernets->search(
+        {},
+        {
+            order_by => [
+                { -asc => 'me.address' },
+                { -desc => 'me.broadcast' }
+            ]
+        });
 
     return wantarray ? $rs->all : $rs;
 }

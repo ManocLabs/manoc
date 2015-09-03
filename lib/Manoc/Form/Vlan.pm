@@ -46,7 +46,7 @@ has_field 'description' => (
     type  => 'TextArea'
 );
 
-sub validate_model {
+override validate_model => sub {
     my $self = shift;
 
     my $vlan_id   = $self->field('id')->value;
@@ -58,7 +58,9 @@ sub validate_model {
     if ( $vlan_id < $vlan_from || $vlan_id > $vlan_to) {
         $self->field('id')->add_error("VLAN id must be within range $vlan_from-$vlan_to")
     }
-}
+
+    super();
+};
 
 
 sub options_range {

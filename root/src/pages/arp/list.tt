@@ -1,0 +1,42 @@
+[%
+   page.title='ARP activity'
+-%]
+[% PROCESS 'ipnetwork/_common.tt' -%]
+[% META
+  use_table = 1
+-%]
+
+<table class="table" id="arptable">
+  <thead>
+    <th>Address</th>
+    <th>First seen</th>
+    <th>Last seen</th>
+  </thead>
+
+</table>
+
+[% script = BLOCK %]
+$(document).ready(function() {
+    $('#arptable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "ajax": "arp_js",
+    });
+} );
+[% END -%]
+[% js_scripts.push(script) -%]
+
+<!--
+"columnDefs": [
+            {
+                // The `data` parameter refers to the data for the cell (defined by the
+                // `data` option, which defaults to the column being worked with, in
+                // this case `data: 0`.
+                "render": function ( data, type, row ) {
+                    return data +' ('+ row[3]+')';
+                },
+                "targets": 0
+            },
+            { "visible": false,  "targets": [ 3 ] }
+        ]
+-->

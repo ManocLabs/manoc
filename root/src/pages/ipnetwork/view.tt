@@ -32,10 +32,15 @@
 	<dt>Last host</dt>
 	<dd>[% object.network.last_host | html %]</dd>
 	<dt>Supernets</dt>
-	<dd>[% FOREACH net IN object.supernets_ordered.reverse %]
+	<dd>[% FOREACH net IN object.supernets_ordered %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
+	</dd>
+	<dt>Blocks</td>	
+	<dd>[% FOREACH block IN object.ipblock_entries %]
+	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
+	[%END -%]
 	</dd>
       </dl>
     </div><!-- end of content -->	
@@ -45,8 +50,10 @@
 <div class="col-sm-4">
   <div class="panel panel-default">
   <div class="panel-body">
-    <p><a href="#">Usage by ARP activity (60 days)</a></p>
+    <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id])  %]">ARP activity</a></p>
     [% bootstrap_progressbar(arp_usage) %]
+     <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id], {days=>60}) %]">ARP activity (last 60 days)</a></p>
+    [% bootstrap_progressbar(arp_usage60) %]
     <p><a href="#">Registered hosts</a></p>
     [% bootstrap_progressbar(host_usage) %]
   </div>

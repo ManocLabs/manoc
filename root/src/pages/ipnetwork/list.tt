@@ -5,11 +5,11 @@
 [% META
   use_table = 1
 -%]
-<!--div id="IPNetwork_create">
+<div id="ipnetwork_create">
 <a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
-</div-->
+</div>
 
-[% init_table("network_list") -%]
+[% init_table("network_list", { toolbar="ipnetwork_create" }) -%]
 <div class="col-md-12">
  <table class="table" id="network_list">
    <thead>
