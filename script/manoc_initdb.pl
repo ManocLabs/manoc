@@ -10,7 +10,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Moose;
 use Manoc::Logger;
-use Manoc::IpAddress;
+use Manoc::IPAddress::IPv4;
 
 extends 'Manoc::App';
 with 'MooseX::Getopt::Dashes';
@@ -33,7 +33,7 @@ sub run {
     # full init
     $self->do_reset_admin;
     $self->init_vlan;
-    $self->init_iprange;
+    $self->init_ipnetwork;
     $self->init_management_url;
 }
 
@@ -77,38 +77,68 @@ sub init_vlan {
         start => 1,
         end   => 10,
        });
-    $vlan_range->add_to_vlans({ name => 'native', id => 1 });
+    $vlan_range->add_to_vlans({ name => 'native', id => 1});
 }
 
-sub init_iprange {
+sub init_ipnetwork {
     my ($self) = @_;
 
+    $self->log->info('Creating some sample networks');
     my $schema = $self->schema;
-    my $rs = $schema->resultset('IPRange');
-    if ($rs->count() > 0) {
-            $self->log->info('We have a IP range: skipping init.');
-            return;
-    }
-    $self->log->info('Creating a sample IP range for 0.0.0.0/0.');
-    $rs->update_or_create({
-        name => 'IPV4',
-        description => 'all ipv4 addresses',
-        from_addr =>  Manoc::IpAddress->new('0.0.0.0'),
-        to_addr   =>  Manoc::IpAddress->new('255.255.255.255'),
-        network   =>  Manoc::IpAddress->new('0.0.0.0'),
-        netmask   =>  Manoc::IpAddress->new('0.0.0.0'),
-       });
+    my $rs = $schema->resultset('IPNetwork');
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.0.0"),
+        prefix  => 16,
+        name    => 'My Corp network'
+    });
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.0.0"),
+        prefix  => 22,
+        name    => 'Server Farm'
+    });
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.0.0"),
+        prefix  => 24,
+        name    => 'Yellow zone'
+    });
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.0.0"),
+        prefix  => 24,
+        name    => 'Yellow zone'
+    });
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.1.0"),
+        prefix  => 24,
+        name    => 'Green zone'
+    });
+    $rs->update_or_create( {
+        address => Manoc::IPAddress::IPv4->new("10.10.5.0"),
+        prefix  => 23,
+        name    => 'Workstations'
+    });
 }
 
 sub init_management_url {
     my ($self) = @_;
     my $schema = $self->schema;
-    $self->log->info('Creating default management url...done');
-    $schema->resultset('MngUrlFormat')->update_or_create( { 
-        name  => 'telnet', 
+    my $rs = $schema->resultset('MngUrlFormat');
+    $self->log->info('Creating default management urls');
+    $rs->update_or_create( {
+        name  => 'telnet',
         format=> 'telnet:%h',
     } );
-
+    $rs->update_or_create( {
+        name  => 'ssh',
+        format=> 'ssh:%h',
+    } );
+    $rs->update_or_create( {
+        name  => 'http',
+        format=> 'http://:%h',
+    } );
+    $rs->update_or_create( {
+        name  => 'https',
+        format=> 'https://:%h',
+    } );
 }
 
 
