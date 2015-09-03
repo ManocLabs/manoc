@@ -127,7 +127,6 @@ sub broadcast {
 sub _rebuild_subtree {
     my $self = shift;
 
-    warn "build subtree";
     if ($self->children) {
         my $outside = $self->children->search(
             [
@@ -159,23 +158,25 @@ sub insert {
         my $supernets = $self->result_source->resultset->search(
             {
                 address  =>  { '<=' => $self->address->padded   },
-                broadcast => { '<=' => $self->broadcast->padded },
+                broadcast => { '>=' => $self->broadcast->padded },
             },
             {
                 order_by => [
-                    { -asc => 'me.address' },
-                    { -desc => 'me.broadcast' }
+                    { -desc => 'me.address' },
+                    { -asc => 'me.broadcast' }
                 ]
             });
         $parent = $supernets->first();
 
         #bypass dbic::tree
-        $self->_parent( $parent );
+        $parent and $self->_parent( $parent );
     }
+
+    $self->next::method( @_ );
 
     my $new_children;
     if ($parent) {
-        $new_children = $parent->children->search(
+        $new_children = $self->siblings->search(
             {
                 address   => { '>=' => $self->address->padded   },
                 broadcast => { '<=' => $self->broadcast->padded }
@@ -183,7 +184,8 @@ sub insert {
     } else {
         $new_children = $self->result_source->resultset->search(
             {
-                parent_id => undef,
+                parent_id => { '='  => undef                    },
+                id        => { '!=' => $self->id                },
                 address   => { '>=' => $self->address->padded   },
                 broadcast => { '<=' => $self->broadcast->padded }
             });
@@ -191,8 +193,6 @@ sub insert {
     while ( my $child = $new_children->next()) {
         $child->parent($self);
     }
-    
-    $self->next::method( @_ );
 }
 
 sub is_larger_than_parent {
