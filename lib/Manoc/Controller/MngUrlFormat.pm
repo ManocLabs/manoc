@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -9,6 +9,9 @@ use namespace::autoclean;
 use Manoc::Form::MngUrlFormat;
 
 BEGIN { extends 'Catalyst::Controller'; }
+with "Manoc::ControllerRole::CommonCRUD" => {
+    -excludes => 'view'
+} ;
 
 =head1 NAME
 
@@ -18,161 +21,64 @@ Manoc::Controller::MngUrl - Catalyst Controller
 
 Catalyst Controller.
 
+=cut
+
+
+__PACKAGE__->config(
+    # define PathPart
+    action => {
+        setup => {
+            PathPart => 'mngurlformat',
+        }
+    },
+    class      => 'ManocDB::MngUrlFormat',
+);
+
 =head1 METHODS
 
 =cut
 
-=head2 index
-
-=cut
-
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-    $c->response->redirect($c->uri_for_action('/mngurlformat/list'));
-    $c->detach();
-}
-
-=head2 base
-
-=cut
-
-sub base : Chained('/') : PathPart('mngurlformat') : CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( resultset => $c->model('ManocDB::MngUrlFormat') );
-}
-
-=head2 object
-
-=cut
-
-sub object : Chained('base') : PathPart('id') : CaptureArgs(1) {
-
-    # $id = primary key
-    my ( $self, $c, $id ) = @_;
-
-    return if ( $id eq '' );
-    $c->stash( object => $c->stash->{resultset}->find($id) );
-
-    if ( !defined( $c->stash->{object} ) ) {
-        $c->stash( error_msg => "Object $id not found!" );
-        $c->detach('/error/index');
-    }
-}
 
 =head2 list
 
 =cut
 
-sub list : Chained('base') : PathPart('list') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $rs = $c->stash->{resultset};
-
-    $c->stash( obj_list => [ $rs->all() ] );
-    $c->stash( template => 'mngurlformat/list.tt' );
-}
-
-=head2 edit
+=head2 get_form
 
 =cut
 
-sub edit : Chained('object') : PathPart('edit') : Args(0) {
+sub get_form {
     my ( $self, $c ) = @_;
-
-    $c->forward('save');
-
+    return Manoc::Form::MngUrlFormat->new();
 }
 
-=head2 set_default
-
-=cut
-
-sub set_default : Chained('object') : PathPart('set_default') : Args(0) {
-    my ( $self, $c ) = @_;
-    my ($it, $e);
-
-    if ( lc $c->req->method eq 'post' ) {
-      my $it = $c->model('ManocDB::Device')->search();
-      while($e = $it->next){
-	$e->mng_url_format($c->stash->{object}->id);
-	$e->update;
-      }
-      $c->stash(message => "Default Management URL setted to ".$c->stash->{object}->name);
-      $c->forward('list');
-    }
-    else {
-      $c->stash( template => 'generic_confirm.tt' );
-    }
-
-}
-
-
-
-=head2 create
-
-=cut
-
-sub create : Chained('base') : PathPart('create') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->forward('save');
-}
-
-sub save : Private {
-    my ( $self, $c ) = @_;
-
-    my $item = $c->stash->{object} ||
-        $c->stash->{resultset}->new_result( {} );
-
-    my $form = Manoc::Form::MngUrlFormat->new( item => $item );
-    $c->stash( form => $form, template => 'mngurlformat/save.tt' );
-    $c->stash( default_backref => $c->uri_for_action('mngurlformat/list') );
-
-    # the "process" call has all the saving logic,
-    #   if it returns False, then a validation error happened
-
-    my $is_create = !defined( $c->stash->{'object'} );
-    if ( $c->req->param('discard') ) {
-        $c->detach('/follow_backref');
-    }
-
-    return unless $form->process( params => $c->req->params );
-
-    $c->flash( message => 'Saved.' );
-
-    $c->detach('/follow_backref');
-
-    # prepare template
-    $c->stash( template => 'mngurlformat/save.tt' );
-}
 
 =head2 delete
 
 =cut
 
-sub delete : Chained('object') : PathPart('delete') : Args(0) {
+sub delete_object {
     my ( $self, $c ) = @_;
 
-    my $building = $c->stash->{'object'};
-    my $id       = $building->id;
-    my $name     = $building->name;
-    $c->stash( default_backref => $c->uri_for_action('mngurlformat/list') );
-
-    if ( lc $c->req->method eq 'post' ) {
-        if ( $c->model('ManocDB::Device')->search( { mng_url_format => $id } )->count ) {
-            $c->flash( error_msg => 'Format in use. Cannot be deleted.' );
-            $c->detach('/follow_backref');
-        }
-
-        $building->delete;
-
-        $c->flash( message => 'Success!!  ' . $name . ' successful deleted.' );
-        $c->detach('/follow_backref');
-    }
-    else {
-        $c->stash( template => 'generic_delete.tt' );
+    my $id = $c->stash->{object_pk};
+    if ( $c->model('ManocDB::Device')->search( { mng_url_format => $id } )->count ) {
+	$c->flash( error_msg => 'Format is in use. Cannot be deleted.' );
+        return undef;
     }
 
+    return $c->stash->{'object'}->delete;
 }
+
+=head2 get_delete_failure_url
+
+=cut
+
+sub get_delete_failure_url {
+    my ( $self, $c ) = @_;
+
+    my $action = $c->namespace . "/list";
+    return $c->uri_for_action( $action );
+}
+
 
 1;

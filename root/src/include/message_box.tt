@@ -1,5 +1,17 @@
-<div class="ui-state-highlight ui-corner-all"> 
-     <p> <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;" ></span>
-		<strong>[% msg | html %]</strong> 
-     </p>   	
-</div>
+[%
+IF c.flash.message;
+ bootstrap_alert(c.flash.message);
+END;
+
+IF message;
+ bootstrap_alert(c.message);
+END;
+
+IF c.flash.error_msg;
+ bootstrap_alert(c.flash.error_msg, 'warning');
+END;
+
+IF c.error_msg;
+ bootstrap_alert(c.error_msg, 'warning');
+END;
+-%]

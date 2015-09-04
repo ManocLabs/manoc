@@ -89,7 +89,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '10.1.2.234' &&
+            $q->words->[0] eq '10.1.2.234' &&
             $q->query_type eq 'ipaddr' &&
             $q->match      eq 'exact'
     ),
@@ -102,7 +102,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '10.1.2.' &&
+            $q->words->[0] eq '10.1.2.' &&
             $q->query_type eq 'ipaddr' &&
             $q->match      eq 'begin'
     ),
@@ -154,7 +154,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '0a:b8:' &&
+            $q->words->[0] eq '0a:b8:' &&
             $q->query_type eq 'macaddr' &&
             $q->match      eq 'begin'
     ),
@@ -167,7 +167,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq ':00:08' &&
+            $q->words->[0] eq ':00:08' &&
             $q->query_type eq 'macaddr' &&
             $q->match      eq 'end'
     ),
@@ -180,7 +180,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '172.16.100.0' &&
+            $q->words->[0] eq '172.16.100.0' &&
             $q->query_type eq 'subnet' &&
             $q->match      eq 'exact'
     ),
@@ -193,7 +193,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '23' &&
+            $q->words->[0] eq '23' &&
             $q->query_type eq 'rack' &&
             $q->match      eq 'partial'
     ),
@@ -206,7 +206,7 @@ $q->parse();
 ok(
     (
         @{ $q->words() } == 1 &&
-            $q->query_word eq '172.18.19.4' &&
+            $q->words->[0] eq '172.18.19.4' &&
             $q->query_type eq 'device' &&
             $q->match      eq 'exact'
     ),

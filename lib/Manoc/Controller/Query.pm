@@ -5,11 +5,10 @@
 package Manoc::Controller::Query;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils;
+use Manoc::Utils qw(str2seconds clean_string);
+use Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-use Manoc::Utils qw(print_timestamp str2seconds);
 
 =head1 NAME
 
@@ -75,6 +74,7 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
         $vlan_stats{ $r->get_column('vlan') }->{ipaddr} = $r->get_column('count');
     }
 
+    # TODO move to vlan controller
     my @vlan_table;
     foreach my $vlan ( sort { $a <=> $b } keys %vlan_stats ) {
         push @vlan_table,
@@ -85,54 +85,11 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             };
     }
 
-    my $query_time  = time - Manoc::Utils::str2seconds("60d");
-    my @tot_actives = $c->model('ManocDB::Mat')->search(
-                                                    {
-                                                     'lastseen' => {'>=' => $query_time}
-                                                    },
-                                                    {
-                                                     select  => ['macaddr',{max => 'lastseen'}],
-                                                     group_by => 'macaddr',
-                                                    }
-                                                   );
-
-
-
-    my @db_stats = (
-        {
-            name => "Tot racks",
-            val  => $schema->resultset('Rack')->count
-        },
-        {
-            name => "Tot devices",
-            val  => $schema->resultset('Device')->count
-        },
-        {
-            name => "Tot interfaces",
-            val  => $schema->resultset('IfStatus')->count
-        },
-        {
-            name => "CDP entries",
-            val  => $schema->resultset('CDPNeigh')->count
-        },
-        {
-            name => "MAT entries",
-            val  => $schema->resultset('Mat')->count
-        },
-        {
-           name => "Active Mat entries",
-           val  => scalar(@tot_actives),
-        },
-        {
-            name => "ARP entries",
-            val  => $schema->resultset('Arp')->count
-        },
-    );
 
     $c->stash(
         disable_pagination => 1,
         vlan_table         => \@vlan_table,
-        db_stats           => \@db_stats,
+#        db_stats           => \@db_stats,
         template           => 'query/stats.tt',
     );
 }
@@ -143,7 +100,7 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     my ( $r, $rs );
 
     my @conflicts =
-        map { ipaddr => Manoc::Utils::unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
+        map { ipaddr => unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
         $schema->resultset('Arp')->search_conflicts;
 
     
@@ -218,8 +175,8 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
 sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $device_id = Manoc::Utils::clean_string( $c->req->param('device') );
-    my $days      = Manoc::Utils::clean_string( $c->req->param('days') );
+    my $device_id = clean_string( $c->req->param('device') );
+    my $days      = clean_string( $c->req->param('days') );
 
     $days =~ /^\d+$/ or $days = 0;
 
@@ -289,7 +246,7 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
         from_iface  => $_->from_interface,
         to_device   => $_->to_device->address,
         to_iface    => $_->to_interface,
-        date        => Manoc::Utils::print_timestamp( $_->last_seen )
+        date        => $_->last_seen
     }, @results;
 
     $c->stash(
@@ -419,11 +376,11 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     my @results;
     my $e;
     my @multimacs;
-    my $days       = Manoc::Utils::clean_string( $c->req->param('days') ) || "" ;
+    my $days       = clean_string( $c->req->param('days') ) || "" ;
     $days =~ /^\d+$/ or $days = "";
     
     if ($days) {
-        my $query_time = time - Manoc::Utils::str2seconds($days . "d");
+        my $query_time = time - str2seconds($days . "d");
         
         @results = $schema->resultset('Mat')->search(
             { },
@@ -439,7 +396,7 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
             macaddr      => $_->macaddr,
             device       => $_->device_entry,
             iface        => $_->interface,
-            from         => Manoc::Utils::print_timestamp($_->firstseen),
+            from         => $_->firstseen,
         }, @results;
 
         $c->stash( new_devs => \@new_devices );

@@ -1,0 +1,78 @@
+[%
+  page.title = 'VLAN list'
+  page.subsection = 'VLAN'
+  page.section = 'Network'
+
+  page.layout = 'with_sidebar';
+  page.load_section_file = 1
+-%]
+[%# PROCESS sections/network/vlan.tt %]
+[% page.toolbar = BLOCK %]
+<div id="vlanrange_create">
+  <a href="[% c.uri_for_action('/vlanrange/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add new range</a>
+</div>
+[% END -%]
+<table class="table">
+  <thead>	
+    <tr>
+        <th class="col-sm-4">Range</th>
+        <th class="col-sm-1">Start</th>
+        <th class="col-sm-1">End</th>
+        <th class="col-sm-4">Description</th>
+	<th class="col-sm-2"></th>
+    </tr>
+  </thead>
+  [%- FOREACH range IN object_list %]
+  <tbody>
+    <tr id="row[%range.id%]">
+      <td>
+	<a role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%range.id %]" aria-expanded="false" aria-controls="children[%range.id %]" >[%range.name | html %]</a>
+      </td>
+      <td>[%range.start | html %]</td>
+      <td>[%range.end | html %]</td>
+      <td>[%range.description | html %]</td>
+      <td>
+	<div class="btn-group" role="group">
+	  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    Actions
+	    <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu dropdown-menu-right">
+	    <li>
+	      <a href="[% c.uri_for_action('vlan/create', {range => range.id })%]">[%bootstrap_icon('plus')%] Add VLAN</a>
+	    </li>
+	    <li role="separator" class="divider"></li>
+	    <li>
+	      <a href="[% c.uri_for_action('vlanrange/edit',[range.id])%]">[% bootstrap_icon('pencil') %] Edit</a>
+	    </li>
+	    <li>
+	      <a href="[% c.uri_for_action('vlanrange/delete',[range.id])%]">[% bootstrap_icon('trash') %] Delete</a>
+	    </li>
+	    <li>
+	      <a href="[% c.uri_for_action('vlanrange/split',[range.id])%]">[% bootstrap_icon('resize-full') %] Split</a>
+	    </li>
+	    <li>
+	      <a href="[% c.uri_for_action('vlanrange/merge',[range.id])%]">[% bootstrap_icon('resize-small') %] Merge</a>
+	    </li>
+	  </ul>
+	</div>
+      </td>
+    </tr>
+  </tbody>
+  [% IF range.vlans %]
+  <tbody id="children[%range.id%]" class="collapse" aria-labelledby="row[%range.id%]">
+    [% FOREACH vlan  IN range.vlans %]
+    <tr class="childrow">
+      <td><a href="[% c.uri_for_action('vlan/view', [vlan.id]) %]">[% vlan.name | html %]</a></td>
+      <td colspan="2">[% vlan.id | html %]</td>
+      <td>[% vlan.description | truncate(40) | html %]</td>
+      <td>
+	<a href="[% c.uri_for_action('vlan/edit',[vlan.id] )%]">[% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span></a>
+	<a href="[% c.uri_for_action('vlan/delete',[vlan.id] )%]">[% bootstrap_icon('trash')%]<span class="sr-only">Delete</span></a>
+      </td>
+    </tr>   <!-- end of specific vlans--> 
+    [% END -%] 
+  </tbody>
+  [% END -%]
+  [% END -%]
+</table>

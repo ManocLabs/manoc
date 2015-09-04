@@ -1,0 +1,6 @@
+[%
+	section='Network'
+	subsection='VLAN'
+	title='Split Range'
+-%]
+[% form.render %]

@@ -10,9 +10,8 @@ BEGIN { extends 'Catalyst::Controller' }
 
 with 'Manoc::BackRef::Actions';
 
-#
 # Sets the actions in this controller to be registered with no prefix
-# so they function identically to actions created in MyApp.pm
+# so they function identically to actions created in Manoc.pm
 #
 __PACKAGE__->config( namespace => '' );
 
@@ -22,13 +21,13 @@ Manoc::Controller::Root - Root Controller for Manoc
 
 =head1 DESCRIPTION
 
-[enter your description here]
+The Root controller is used to implement global actions.
 
 =head1 METHODS
 
 =head2 index
 
-The root page (/)
+The root page (/), redirect to search page.
 
 =cut
 
@@ -41,58 +40,68 @@ sub index : Path : Args(0) {
 
 =head2 auto
 
+Performs 
+Sets is_xhr for asyncrho
 
 =cut
 
 sub auto : Private {
-  my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-  ##  XHR detection ##
-  if (my $req_with =  $c->req->header('X-Requested-With')) {
-      $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
-  } else {
-      $c->stash->{is_xhr} = 0;
-  }
+    ##  XHR detection ##
+    if (my $req_with =  $c->req->header('X-Requested-With')) {
+        $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
+    } else {
+        $c->stash->{is_xhr} = 0;
+    }
 
-  ## output format selection ##
-  if ( my $fmt = $c->req->param('format') ) {
-      $fmt eq 'fragment' and $c->stash('current_view' => 'HTMLFragment');
-      delete $c->req->params->{'format'};
-  }
+    ## output format selection ##
+    if ( my $fmt = $c->req->param('format') ) {
+        $fmt eq 'fragment' and $c->stash(no_wrapper => 1);
+        delete $c->req->params->{'format'};
+    }
 
+    ## check authentication ##
+    if (! $self->check_auth($c) ) {
 
-  ## redirect to login if needed ##
-  my $skip_login_redirect;
-  if ( $c->stash->{is_xhr} ||
-         $c->controller eq $c->controller('Auth') ||
-           $c->controller eq $c->controller('Wapi') ) {
-      $skip_login_redirect = 1;
-  }
+        if ( $c->stash->{is_xhr} ) {
+            $self->forward('error/http_403');
+        } else {
+            $c->flash( backref => $c->request->uri );
+            $c->request->path !~ m|^$|o
+                and $c->flash( error_msg => 'You must login to view this page!');
+            $c->response->redirect($c->uri_for_action('/auth/login'));
+        }
+        return 0;
+    }
 
-  # If a user doesn't exist, force login
-  if ( !$c->user_exists && !$skip_login_redirect ) {
-      $c->flash( backref => $c->request->uri );
-      $c->request->path !~ m|^$|o
-        and $c->flash( error_msg => 'You must login to view this page!');
-      $c->response->redirect($c->uri_for_action('/auth/login'));
-      return 0;
-  }
-
-  return 1;
+    return 1;
 }
 
+sub check_auth {
+    my ($self, $c) = @_;
+
+    $c->config->{demo_mode}
+        and return 1;
+
+    $c->controller eq $c->controller('Auth')
+        and return 1;
+
+    $c->controller eq $c->controller('Wapi')
+        and return 1;
+
+    return $c->user_exists;
+}
 
 =head2 default
 
-Standard 404 error page
+Shows 404 error page for Manoc using Error controller
 
 =cut
 
 sub default : Path {
     my ( $self, $c ) = @_;
-    my $url = $c->request->uri;
-    $c->response->body("Page not found $url");
-    $c->response->status(404);
+    $c->detach('error/http_404');
 }
 
 =head2 message
@@ -118,18 +127,20 @@ sub end : ActionClass('RenderView') {
 
 =head2 access_denied
 
+Action called by ACL rules for failed checks.
+Shows 403 error page for Manoc using Error controller
+
+
 =cut
 
 sub access_denied : Private {
-    my ( $self, $c ) = @_;
-    $c->flash( backref => $c->req->uri );
-    $c->stash( template  => 'auth/access_denied.tt' );
-    $c->stash( error_msg => "Sorry, you are not allowed to see this page!" );
+    my ( $self, $c, $action ) = @_;
+    $c->detach('error/http_403');
 }
 
 =head1 AUTHOR
 
-gabriele
+The Manoc Team
 
 =head1 LICENSE
 

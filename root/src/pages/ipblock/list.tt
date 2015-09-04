@@ -1,0 +1,29 @@
+[%
+   page.title='IP Blocks'
+-%]
+[% PROCESS 'ipblock/_common.tt' -%]
+[% META use_table = 1 %]
+<div id="ipblock_create">
+<a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+[% init_table('ipblock_list', { toolbar="ipblock_create" }) %]
+<table class="table" id="ipblock_list">
+  <thead>
+     <tr>
+       <th>Name</th>
+       <th>From</th>
+       <th>To</th>
+       <th>Description</th>
+     </tr>
+  </thead>
+  <tbody>
+    [% FOREACH object IN object_list %]
+    <tr>
+      <td><a href=[% c.uri_for_action('ipblock/view', [object.id]) %]>[% object.name | html %]</a></td>
+      <td data-sort="[% object.from_addr.padded %]">[% object.from_addr | html %]</td>
+      <td data-sort="[% object.to_addr.padded %]">[% object.to_addr | html %]</td>
+      <td>[% object.description.truncate(40) | html %]</td>      
+    </tr>
+[% END %]
+   </tbody>
+</table>

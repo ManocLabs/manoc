@@ -1,0 +1,16 @@
+[%
+  page.sidebar_items = [
+    {
+	name = "VLAN by range",
+	action = 'vlanrange/list',
+    },
+    {	
+	name = "VTP list",
+	action = 'vtp/list',
+    },
+    {
+    	name = "Compare with VTP",
+	action = 'vtp/compare',
+    },	
+  ]
+ -%]

@@ -12,12 +12,8 @@ use Moose;
 use Manoc::Logger;
 use Manoc::Utils qw(str2seconds print_timestamp);
 use Manoc::CiscoUtils;
-use Manoc::Report::BackupReport;
 use Manoc::IpAddress; 
-use Data::Dumper;
 
-use Sys::Hostname qw(hostname);
- 
 extends 'Manoc::App';
 
 has 'device' => (
@@ -34,13 +30,12 @@ has 'timestamp' => (
     lazy_build => 1,
 );
 
-has 'report' => (
-    traits   => ['NoGetopt'],
-    is       => 'rw',
-    isa      => 'Manoc::Report::BackupReport',
-    required => 0,
-    default  => sub { Manoc::Report::BackupReport->new },
+has ['count_uptodate', 'count_updated', 'count_error', 'count_new'] => (
+    is         => 'rw',
+    isa        => 'Int',
+    default    => 0,
 );
+        
 
 sub _build_timestamp { time }
 
@@ -57,7 +52,7 @@ sub visit_all {
         ( $res, $message ) = $self->do_device( $host, \%visited );
         if ( !$res ) {
             $self->log->error("configuration for $host not saved: $message");
-            $self->report->add_error( {id => $host, message => $message } );
+            $self->count_error( $self->count_error + 1 );
         }
         else {
             $self->log->debug("$host done");
@@ -74,9 +69,8 @@ sub visit_device {
 
     if ( !$res ) {
         $self->log->error("configuration for $host not saved: $message");
-        $self->report->add_error( {id => $host, message => $message } );
-    }
-    else {
+        $self->error_count( $self->error_count + 1);
+    } else {
         $self->log->debug("$host done");
    
     }
@@ -86,10 +80,7 @@ sub do_device {
     my ( $self, $device_id, $visited_ref ) = @_;
     my ( $config, $message, $res );
 
-    #Check device id
-    my $device_ipobj = Manoc::IpAddress->new( $device_id );
-
-    my $device = $self->schema->resultset('Device')->find($device_ipobj);
+    my $device = $self->schema->resultset('Device')->find($device_id);
     $device or return ( 0, "$device_id not in device list" );
 
     if ( $device->backup_enabled == 1 ) {
@@ -111,14 +102,11 @@ sub do_device {
 
     }
     else {
-
         #Backup disabled
         my $message = "device $device_id has backup disabled";
         $self->log->info($message);
-        $self->report->add_error( {id => $device_id, message => $message } );
         $visited_ref->{$device_id} = 1;
         return ( 1, "Backup disabled" );
-
     }
 }
 
@@ -164,12 +152,9 @@ sub update_device_config {
             $dev_config->last_visited( $self->timestamp );
             $dev_config->update or return ( 0, "Impossible update DB" );
             $self->log->info("$device_id backup is up to date");
-            $self->report->add_up_to_date( $device_id );
-
+            $self->count_uptodate( $self->count_uptodate + 1);
+        } else {
             #Update configuration
-        }
-        else {
-
             $dev_config->prev_config( $dev_config->config );
             $dev_config->prev_config_date( $dev_config->config_date );
             $dev_config->config($config);
@@ -177,15 +162,12 @@ sub update_device_config {
             $dev_config->last_visited( $self->timestamp );
             $dev_config->update or return ( 0, "Impossible update DB" );
             $self->log->info("$device_id backup updated");
-            $self->report->add_updated( $device_id );
+            $self->count_updated($self->count_updated + 1);
 
         }
 
-    }
-    else {
-
+    } else {
         #Create DB entry
-
         $self->schema->resultset('DeviceConfig')->create(
             {
                 device       => $ip_obj,
@@ -195,8 +177,7 @@ sub update_device_config {
             }
         ) or return ( 0, "Impossible update DB" );
         $self->log->info("$device_id backup created");
-        $self->report->add_created( $device_id );
-
+        $self->count_new($self->count_new + 1);
     }
 
     return ( 1, "Ok" );
@@ -235,31 +216,17 @@ sub run {
     
     $self->check_lastrun or $self->log->logdie("Too soon to backup again!");
 
-     #Start backup
-     $self->device ? $self->visit_device( $self->device, {$self->device => 0} ) : $self->visit_all();
+    #Start backup
+    $self->device ? $self->visit_device( $self->device, {$self->device => 0} ) : $self->visit_all();
+    
+    #Print final report
+    $self->log->info("Backup Done");
+    $self->log->info("Configurations up to date:  " . $self->count_uptodate );
+    $self->log->info("Configurations updated:     " . $self->count_updated );
+    $self->log->info("New configurations created: " . $self->count_new );
+    $self->log->info("Errors occurred:            " . $self->count_error );
 
-      #Print final report
-      $self->log->info("Backup Done");
-      $self->log->info(
-          "Configurations up to date:  " . $self->report->up_to_date_count );
-      $self->log->info( "Configurations updated:     " . $self->report->updated_count );
-      $self->log->info(
-          "Configurations not saved:   " . $self->report->not_updated_count );
-      $self->log->info( "New configurations created: " . $self->report->created_count );
-      $self->log->info( "Errors occurred:            " . $self->report->error_count );
-
-      $self->log->debug(Dumper($self->report));
-
-      $self->schema->resultset('ReportArchive')->create(
-          {
-              timestamp => $timestamp,
-              name      => 'backup report',
-              type      => 'BackupReport',
-              s_class   => $self->report,
-          }
-      );
-
-      $self->update_lastrun;
+    $self->update_lastrun;
 
     exit 0;
 }

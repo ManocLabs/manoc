@@ -11,8 +11,6 @@ use Moose;
 use namespace::autoclean;
 use Manoc::Search::QueryType;
 
-#use Manoc::Utils qw(str2seconds ip2int);
-
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME

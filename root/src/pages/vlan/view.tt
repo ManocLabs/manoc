@@ -1,0 +1,41 @@
+[% META 
+   use_table = 1
+-%]
+[%
+  page.title='View VLAN ' _ object.id
+  page.subsection='VLAN'
+  page.section='Network'
+
+  page.layout = 'with_sidebar';
+  page.load_section_file = 1
+-%]
+[% page.toolbar = BLOCK %]
+<div id="toolbar">	
+    <a class="btn btn-default" href="[%c.uri_for_action('vlan/edit',[object.id])%]">
+    [% bootstrap_icon('pencil') %]Edit</a>
+    <a class="btn btn-default" href="[%c.uri_for_action('vlan/delete',[object.id])%]">[% bootstrap_icon('trash') %]Delete</a>
+</div>
+[% END -%]
+
+<dl class="dl-horizontal">
+  <dt>VLAN ID</dt>
+  <dd>[% object.id | html %]</dd>	
+  <dt>Name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>Description</dt>
+  <dd>[% object.description | html %]</dd>
+  <dt>VLAN Range</dt>
+  <dd><a href="[%c.uri_for('/vlanrange/list')%]"> [% object.vlan_range.name %]</a></dd>
+  <dt>Associated subnets</dt>
+  <dd>
+    [% FOREACH range IN object.ranges -%]
+    <a href="[%c.uri_for_action('iprange/view',[range.name])%]">[% r.name | html %]</a>
+    [% END -%]
+  </dd>
+  <dt>Device using</dt>
+  <dd>
+    [% FOREACH device IN object.devices %]
+    <a href="[%c.uri_for_action('device/view',[device.id])%]"> [% device.name.html %] </a>  
+    [% END -%]
+  </dd>
+</dl>

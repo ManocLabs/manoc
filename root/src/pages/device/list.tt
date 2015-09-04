@@ -1,0 +1,43 @@
+[% META 
+   use_table=1
+-%]
+[%
+page.title = 'Devices'
+page.subsection = 'Device'
+page.section = 'Asset'
+%]
+
+<div id="device_create">
+  <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+
+[% init_table('device_list', { toolbar="device_create" }) %]
+ <table class="table" id="device_list">
+       <thead>
+	 <tr>
+ 	   <th>Name</th>
+	   <th>Building</th>
+	   <th>Rack</th>
+	   <th>Floor</th>
+	   <th>Vendor</th>
+           <th>OS Version</th>
+           <th>Serial</th>
+	   <th>Model</th>
+         </tr>
+       </thead>  
+       <tbody>
+[% FOREACH d IN object_list %]
+         <tr>
+ 	   <td>[% print_device(d) %]</td>
+	   <td>[% print_building(d.rack.building) %]</td>
+	   <td>[% print_rack(d.rack) %]</td>
+	   <td>[% d.rack.floor | html %]</td>
+	   <td>[% d.vendor | html %]</td>
+           <td>[% d.os_ver | html %]</td>
+	   <td>[% d.serial | html %]</td>
+	   <td>[% d.model | html%]</td>
+         </tr>
+[% END %]
+        </tbody>
+    </table>
+</div>

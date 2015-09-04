@@ -1,0 +1,40 @@
+[% link_css.push(               
+      c.uri_for('/static/external/bootstrap/css/bootstrap.min.css'),
+      c.uri_for('/static/external/bootstrap/css/bootstrap-theme.min.css'),
+      )
+-%]
+[% link_js.push(
+      c.uri_for('/static/external/jquery/jquery-2.1.4.min.js'),
+      c.uri_for('/static/external/bootstrap/js/bootstrap.min.js'),
+      ) 
+-%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_icon(name) BLOCK -%]
+<span class="glyphicon glyphicon-[% name %]" aria-hidden="true"></span>
+[%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_pagetitle(title) BLOCK -%]
+<h1 class="page-header">[% title %]</h1>
+[%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_nav_tab(name, label, active) BLOCK -%]
+<li role="presentation" [% IF active %]class="active"[% END %]>
+<a href="#[% name %]" aria-controls="[% name %]" role="tab" data-toggle="tab">[% label %]</a>
+</li>
+[%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_progressbar(value, class) BLOCK -%]
+ <div class="progress">
+  <div class="progress-bar [% class %]" role="progressbar" aria-valuenow="[% value %]" aria-valuemin="0" aria-valuemax="100" style="width: [% value %]%;">
+   <span class="sr-only">[% value %]% Complete</span>
+  </div>
+</div>
+[% END -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO bootstrap_alert(content, type) BLOCK -%]
+[% DEFAULT type = 'info' %]
+<div class="alert alert-[% type %] alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  [% content %]
+</div>
+[% END -%]

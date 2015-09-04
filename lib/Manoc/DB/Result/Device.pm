@@ -3,20 +3,25 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Device;
-use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
     id => {
         data_type   => 'int',
+	is_auto_increment => 1,
         is_nullable => 0,
     },
     mng_address => {
 	data_type   => 'varchar',
 	is_nullable => 0,
 	size        => 15,
+	ipv4_address => 1,
     },
     rack => {
         data_type      => 'int',
@@ -178,7 +183,12 @@ __PACKAGE__->belongs_to( vlan_arpinfo    => 'Manoc::DB::Result::Vlan' );
 __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
     { 'foreign.from_device' => 'self.id' },
-    { delete_cascade        => 0 }
+    {
+	cascade_copy   => 0,
+	cascade_delete => 0,
+	cascade_update => 0,
+	    
+    }
 );
 
 __PACKAGE__->might_have(
@@ -193,23 +203,9 @@ __PACKAGE__->might_have(
 __PACKAGE__->belongs_to(
     mng_url_format => 'Manoc::DB::Result::MngUrlFormat',
     'mng_url_format',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
-sub _inflate_addr {
-    return Manoc::IpAddress::Ipv4->new({ padded => $_[0] }) if defined($_[0])
-}
-
-sub _deflate_addr {
-    return scalar $_[0]->padded if defined($_[0]);
-}
-
-__PACKAGE__->inflate_column(
-			    mng_address => {
-				   inflate => \&_inflate_addr,
-				   deflate => \&_deflate_addr
-				  }
-			   );
 
 sub get_mng_url {
     my $self = shift;

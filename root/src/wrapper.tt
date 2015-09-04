@@ -1,64 +1,14 @@
-[% init_row_group IF template.use_row_group -%]
-[% init_datatable IF template.use_table -%]
-[% init_exp_table IF template.use_exp_table -%]
-
-[% title = BLOCK -%]
-[% IF template.section AND template.section != "Home" -%]
-[% template.section -%][% " - " IF template.title -%]
-[% END -%] 
-[% template.title -%]
-[% END -%]
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<title>Manoc [% IF title -%]- [% title -%][% END -%]</title>
-<!-- init media common style -->
-[% FOREACH link IN link_css -%]
-<link rel="stylesheet" type="text/css" href="[% link %]" />
-[% END -%]
-</head>
-
-<body>
-[% PROCESS 'menu.tt' %]
-<div id="wrapper">
-   <div id="banner" class="ui-widget-header float-container">
-     <h1 class="logo"><a href="/" title="Manoc"><span>Manoc</span></a></h1>
-     [% IF c.user %]
-     <div id="logged">
-	<i>User:</i> [% c.user.username %] ([% FOR role = c.user.roles %] [% role %] [% END %])
-	<div id="dock" class="ui-widget-content ui-corner-all">
-        [% dock_menu %]
-        </div><!-- dock -->
-     </div><!-- logged -->
-     [%END%]
-  </div><!-- banner -->
-  <div id="content-wrapper" class="float-container">
-    [% IF c.user %]
-    <div id="panel" class="left">
-     [% menu_panel %]
-    </div>
-    [% END -%]
-    <div id="body" class="right">
-      [% breadcrumbs %]
-      <!-- show messages before the content -->
-      [% PROCESS 'message_box.tt' msg=c.flash.message IF c.flash.message -%]
-      [% PROCESS 'message_box.tt' msg=message IF message -%]
-      [% PROCESS 'error_message_box.tt' msg=c.flash.error_msg IF c.flash.error_msg -%]
-      [% PROCESS 'error_message_box.tt' msg=error_msg IF error_msg -%]
-      <div id="content">[% content %]</div><!-- end of content -->
-    </div><!-- end of body -->
-  </div><!-- end of content-wrapper -->
-</div><!-- end of wrapper -->
-[% FOREACH link IN link_js -%]
-<script type="text/javascript" src="[% link %]"></script>
-[% END -%]
-<script type="text/javascript">
-[% FOREACH fragment IN js_scripts -%]
-[% fragment %]
-[% END -%]
-[% menu_js %]
-</script>
-</body>
-</html>
+[% IF no_wrapper;
+       debug("Passing page through as text: $template.name");
+       content;
+   ELSE;
+       layout = template.layout || page.layout || 'onecol';
+       wrapper = "layouts/${layout}.tt";
+       debug("Applying wrapper $wrapper to $template.name");
+       title = title || page.title || template.title;
+       IF page.load_section_file;
+           PROCESS "sections/${page.section.lower}/${page.subsection.replace(' ', '_').lower}.tt";
+       END;
+       content WRAPPER $wrapper;
+   END;
+-%]

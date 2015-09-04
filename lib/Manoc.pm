@@ -5,7 +5,7 @@ use namespace::autoclean;
 
 require 5.10.1;
 use version 0.77; # even for Perl v.5.10.0
-our $VERSION = qv('2.002_001');
+our $VERSION = qv('2.009_001');
 
 
 use Catalyst::Runtime 5.90;
@@ -19,7 +19,6 @@ use Catalyst::Runtime 5.90;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
     Authentication
@@ -38,9 +37,6 @@ with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
 with 'Catalyst::ClassData';
 
-use Data::Dumper;
-use Manoc::Search::QueryType;
-
 __PACKAGE__->mk_classdata("plugin_registry");
 __PACKAGE__->plugin_registry({});
 
@@ -57,8 +53,8 @@ __PACKAGE__->config(
     name         => 'Manoc',
 
     # Views setup
-    default_view => 'WebPage',
- 
+    default_view => 'TT',
+
     use_request_uri_for_path => 1,
 
     'Model::ManocDB' => {
@@ -123,7 +119,8 @@ __PACKAGE__->config(
     psgi_middleware => [
         Session => { store => 'File' },
         'CSRFBlock'
-    ]) unless ( $ENV{MANOC_NO_CSRFBLOCK} );
+    ])
+    unless ( $ENV{MANOC_NO_CSRFBLOCK} );
 
 
 ########################################################################
@@ -185,7 +182,7 @@ after setup_finalize => sub {
 
     #default admin ACL for full CRUD resources
     my @CRUD        = qw/create edit delete/;
-    my @controllers = qw/device building rack iprange vlan vlanrange mngurlformat user/;
+    my @controllers = qw/device building rack ipnetwork vlan vlanrange mngurlformat user/;
 
     foreach my $ctrl (@controllers) {
         foreach (@CRUD) {
@@ -195,19 +192,17 @@ after setup_finalize => sub {
 
     #Additional acl for admin privileges
     my @add_acl =
-        qw{ device/uplinks device/refresh vlanrange/split vlanrange/merge iprange/split
-        iprange/merge user/switch_status user/set_roles vlan/merge_name
-        interface/edit_notes interface/delete_notes ip/edit ip/delete
+        qw{ 
+        device/uplinks device/refresh 
+        vlanrange/split vlanrange/merge 
+        interface/edit_notes interface/delete_notes 
+        ip/edit ip/delete
     };
     foreach my $acl (@add_acl) {
         __PACKAGE__->deny_access_unless( $acl, [qw/admin/] );
     }
 
-    #ACL to protect WApi with HTTP Authentication
-    __PACKAGE__->deny_access_unless( "/wapi", sub { $_[0]->authenticate( {}, 'agent' ) } );
-
-    #Load Search Plugins    
-
+    #Load Search Plugins
     __PACKAGE__->load_plugins;
 
 };

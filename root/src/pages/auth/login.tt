@@ -1,0 +1,6 @@
+[%
+   page.title = 'Login'
+   page.empty_navbar = 1
+%]
+[% form.render %]
+

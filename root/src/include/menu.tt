@@ -1,52 +1,32 @@
 [%-
-  menu_sections = [
-  		{
-		     name = 'Search', 
-		     path = c.uri_for('/search'),
-		     subsections = [
-		        {
-		            name = 'Simple', 
-		            path = c.uri_for('/search'),
-	                },
-		        {
-		            name = 'Help', 
-		            path = "#",
-	                },
-		     ]		
-	        },
+  navbar_items = [
 		{
 		     name = 'Asset',
-		     path = c.uri_for('/device'),
 		     subsections = [
   	       	     {
 			name = 'Device', 
-		        path = c.uri_for('/device/list'),
+		        path = c.uri_for_action('/device/list'),
 	             },
 	             {
 		         name = 'Building',
-		         path = c.uri_for('/building/list'),
+		         path = c.uri_for_action('/building/list'),
 	  	     },
 		     {
 		         name = 'Rack',
-		         path = c.uri_for('/rack/list'),
+		         path = c.uri_for_action('/rack/list'),
 		     },		     
 		     ]
 		},
 		{
 		     name = 'Network',
-		     path = c.uri_for('/vlanrange'),
-		     subsections = [
-  	       		 {
+                     subsections = [
+			{
+				name = 'IP Address Plan',
+				path = c.uri_for_action('/ipnetwork/list'),
+			},
+  	       		{
 	        	     name = 'VLAN', 
-		     	     path = c.uri_for('/vlanrange/list'),
-			},
-			{
-			    name = 'VTP',
-		     	    path = c.uri_for('/vlan/list'),
-			},
-			{
-				name = 'Address Plan',
-				path = c.uri_for('/iprange/list'),
+		     	     path = c.uri_for_action('/vlanrange/list'),
 			},
 			{
 				name = 'SSid',
@@ -56,99 +36,79 @@
 
 		},		     
 		{
-		     name = 'Reports',
-		     path = c.uri_for('/reports'),
-		     subsections = [
-                        {
-			   name = "Queries",
-			   path = c.uri_for('/query'),
-			}
-	                {
-		           name = 'Report Archive',
-		           path = c.uri_for('/reportarchive'),
-		        },
-			{
-			    path=c.uri_for_action('/query/statistics'),
-			    name="Manoc DB Statistics",
-			},
-		     ]
-		},
-		{
 		     name = 'Config',
-     		     path = c.uri_for('/user/list'),
+     		     path = c.uri_for_action('/user/list'),
 		     subsections = [		     
   	       	     {
 			name = 'Users', 
-		     	path = c.uri_for('/user/list'),
-	       	      },
-	     	      {
-		     name = 'Management Urls',
-		     path = c.uri_for('/mngurlformat'),
+		     	path = c.uri_for_action('/user/list'),
+	       	     },
+	     	     {
+		        name = 'Management Urls',
+		        path = c.uri_for_action('/mngurlformat/list'),
 		     },
-		     {
-			name = 'Credentials',
-		     	path = '#',
-			}	     
-			]
+		     ]
  		 }
 	]
 -%]
-[%-
-dock_sections = [
-		 {
-		     name = 'About',
-     		     path = c.uri_for('/about'),
- 		 },
-		 {
-		     name = 'Logout',
-     		     path = c.uri_for('/auth/logout'),
- 		 },
-		 ]
--%]
-[% MACRO menu_panel BLOCK -%]
-[% FOREACH s IN menu_sections %]
-<h3 [% "class=\"panel-selected\"" IF s.name == template.section %]>[% s.name %]</h3>
-<div>
-<ul class="menu">
-   [% FOREACH i IN s.subsections %]
-   <li [% "class=\"selected\"" IF i.name == template.subsection %]>
-     <a href="[% i.path %]">[% i.name %]</a>
-   </li>
-   [% END -%]
-</ul>
-</div>
+[% MACRO navbar BLOCK -%]
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="[% c.uri_for('/about') %]">Manoc</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+[%- UNLESS page.empty_navbar %]	
+          <ul class="nav navbar-nav navbar-right">
+	    [%- FOREACH s IN navbar_items %]
+            <li>
+	      <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% s.name | html  %]
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+		[%- FOREACH i IN s.subsections %]
+		<li><a href="[% i.path %]">[% i.name | html %]</a></li>
+		[%- END %]
+	      </ul>
+	    </li>
+	    [%- END %]
+	    [%- IF c.user %]
+            <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% bootstrap_icon("user") %]</a>
+                <ul class="dropdown-menu">
+		  <li class="dropdown-header">User: [% c.user.username %]</li>
+		  <li><a href="[% c.uri_for('/user/change_password') %]">Change password</a></li>
+	          <li><a href="[% c.uri_for('/auth/logout') %]">Logout</a></li>
+		</ul>
+	    </li>	    
+	    [%- END %]
+          </ul>
+[%- UNLESS page.disable_search %]
+          <form action="[% c.uri_for('/search') %]" method="get" class="navbar-form navbar-right" >
+            <input name="q" type="text" class="form-control" placeholder="Search...">
+          </form>
+[%- END %]
+[%- END %]
+        </div>
+      </div>
+    </nav>
+[%- END %]
+[% MACRO sidebar BLOCK -%]
+<div class="sidebar-menu">  
+  <div class="sidebar-menu-list">
+     <ul id="sidebar-menu-content" class="sidebar-menu-content">
+[% FOREACH i IN page.sidebar_items -%]
+      [% active = c.action == i.action -%]
+      <li [% IF active %]class="active"[% END %]>
+         <a href="[% c.uri_for_action(i.action) %]">[% i.name %][% IF active %] <span class="sr-only">(current)</span>[% END %]</a>
+      </li>      
 [% END -%]
-[% END -%]
-[% MACRO dock_menu BLOCK -%]
-<ul>
-[% FOREACH s IN dock_sections %]
-   <li><a href="[% s.path %]">[% s.name %]</a></li>
-[% END -%]
-</ul>
-[% END -%]
-[% MACRO menu_js BLOCK -%]
-$(function() {
-  $("#panel").accordion({
-	     heightStyle: "content",
-	     collapsible: true,
-	     active: $('.panel-selected').index() / 2,
-	     } );
-});
-[% END -%]
-[% MACRO breadcrumbs BLOCK %]
-<div id="breadcrumbs" class="ui-widget float-container">
-<ul>
-[% FOREACH s IN menu_sections %]
-  [% IF s.name == template.section -%]
-  <li><a href="[% s.path %]">[% s.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
-    [% FOREACH i IN s.subsections %]
-       [% IF i.name == template.subsection -%]
-  <li><a href="[% i.path %]">[% i.name %]</a><i class="ui-icon ui-icon-triangle-1-e"></i></li>
-       [% END -%]
-    [% END -%]
-  [% END -%]
-[% END -%]
-  <li><a href="#">[% template.title %]</a></li>
-</ul>
+    </ul>
+  </div>
 </div>
 [% END -%]

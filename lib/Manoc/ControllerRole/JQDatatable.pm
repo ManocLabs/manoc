@@ -1,97 +1,138 @@
+# Copyright 2011-2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
 package Manoc::ControllerRole::JQDatatable;
 
 use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
+=head1 NAME
+
+Manoc::ControllerRole::JQDatatable - Support for DataTables Table jQuery
+
+=head1 DESCRIPTION
+
+Catalyst controller role for helping managing ajax request for datatables.
+See L<http://datatables.net/examples/data_sources/server_side.html>
+
+=cut
+
+
+has datatable_search_columns => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+    lazy    => 1,
+    builder => '_build_datatable_search_columns'
+);
+
+has datatable_columns => (
+    is   => 'rw',
+    isa  => 'ArrayRef[Str]',
+);
+
+# used add options if needed (JOIN, PREFETCH, ...)
+has datatable_search_options => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+);
+
+has datatable_row_callback => (
+    is      => 'rw',
+);
+
+sub _build_datatable_search_columns {
+    my $self = shift;
+    $self->datatable_columns or return [];
+    return [  @{ $self->datatable_columns } ];
+}
+
+sub get_datatable_resultset {
+    my ($self, $c) = @_;
+
+    return $c->stash->{'resultset'};
+}
+
 sub datatable_response : Private {
     my ($self, $c) = @_;
 
-    my $rs = $c->stash->{'resultset'};
-    my $search_options = $c->stash->{'resultset_search_opt'};
-    my $col_names = $c->stash->{'col_names'};
-    my $col_formatters = $c->stash->{'col_formatters'} || {};
+    my $start  = $c->request->param('start') || 0;
+    my $length = $c->request->param('length');
+    my $draw   = $c->request->param('draw') || 0;
+    my $search = $c->request->param("search[value]");
 
-    my $searchable_columns =
-      $c->stash->{'col_searchable'} || [ @$col_names ];
+    my $rs = $c->stash->{'datatable_resultset'}
+        || $self->get_datatable_resultset($c);
 
-    my $start = $c->request->param('iDisplayStart') || 0;
-    my $size  = $c->request->param('iDisplayLength');
-    my $echo  = $c->request->param('sEcho') || 0;
+    my $col_names = $c->stash->{'datatable_columns'}
+        || $self->datatable_columns;
 
-    my $search_attrs = {};
-    my $search_filter;
+    my $search_columns = $c->stash->{'datatable_search_columns'} 
+        || $self->datatable_search_columns;
 
-    # create filter (WHERE clause)
-    my $search = $c->request->param('sSearch');
+    my $row_callback = $c->stash->{'datatable_row_callback'}
+        || $self->datatable_row_callback;
+    
+    # create  search filter (WHERE clause)
+    my $search_filter = {};
     if ($search) {
         $search_filter = [];
 
-        foreach my $col (@$searchable_columns) {
+        foreach my $col (@$search_columns) {
             push @$search_filter, { $col =>  { -like =>  "%$search%" } };
-
             $c->log->debug("$col like $search");
         }
     }
 
-    # add options if needed (JOIN, PREFETCH, ...)
-    if ($search_options) {
-        while ( my ($k, $v) = each(%$search_options) ) {
-            $search_attrs->{$k} = $v;
-        }
-    }
+    my $search_attrs = { %{$self->datatable_search_options} };
 
-    # number of rows after filtering (COUNT query)
-    my $total_rows = $rs->search($search_filter, $search_attrs)->count();
+    my $total_rows = $rs->count();
+    my $filtered_rows = $rs->search($search_filter, $search_attrs)->count();
 
     # paging (LIMIT clause)
-    if ($size) {
-        my $page = $size > 0 ? ($start+1) / $size : 1;
+    if ($length) {
+        my $page = $length > 0 ? ($start+1) / $length : 1;
         $page == int($page) or $page = int($page) + 1;
 
         $search_attrs->{page} = $page;
-        $search_attrs->{rows} = $size;
-        $c->log->debug("page = $page size=$size");
+        $search_attrs->{rows} = $length;
+        $c->log->debug("page = $page length = $length");
     }
 
-    # sorting (ORDER BY clause)
-    my $n_sort_cols = $c->request->param('iSortingCols');
-    if ( defined($n_sort_cols) && $n_sort_cols > 0) {
-        my @cols;
-        foreach my $i (0 .. $n_sort_cols - 1) {
-            my $col_idx = $c->request->param("iSortCol_$i");
-            my $col = $searchable_columns->[ $col_idx ];
+    my $sort_column_i = $c->request->param('order[0][column]');
+    if (defined($sort_column_i)) {
+        my $column = $col_names->[$sort_column_i];
+        my $dir = $c->request->param("order[0][dir]") eq 'desc' ? '-desc' : '-asc';
 
-            my $dir = 
-              $c->request->param("sSortDir_$i") eq 'desc' ? '-desc' : '-asc';
-            push @cols, { $dir => $col };
-        }
-        $search_attrs->{order_by} = \@cols;
-    };
+        $search_attrs->{order_by} = { $dir => $column };
+    }
 
-    # search!!!
+    # search
     my @rows;
     my $search_rs =  $rs->search($search_filter, $search_attrs);
     while (my $item = $search_rs->next) {
-        my @row;
-        foreach my $name (@$col_names) {
-            my $cell = '';
-
-            # defaul accessor is preferred
-            $cell = $item->can($name) ? $item->$name : $item->get_column($name);
-
-            my $f = $col_formatters->{$name};
-            $f and $cell = $f->($c, $cell, $item);
-            push @row, $cell;
+        my $row;
+        if ($row_callback) {
+            $row = $row_callback->($c, $item);
+        } else {
+            $row = [];
+            
+            foreach my $name (@$col_names) {
+                # default accessor is preferred
+                my $v = $item->can($name) ? $item->$name : $item->get_column($name);
+                push @$row, $v;
+            }
         }
-        push @rows, \@row;
+        push @rows, $row;
     }
 
     my $data = {
-        aaData => \@rows, 
-        sEcho  => int($echo),
-        iTotalRecords => $total_rows,
-        iTotalDisplayRecords => $total_rows,
+        draw => int($draw),
+        data => \@rows,
+        recordsTotal => $total_rows,
+        recordsFiltered => $filtered_rows,
     };
 
     $c->stash('json_data' => $data);

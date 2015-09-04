@@ -1,0 +1,18 @@
+[% title='Uplinks for ' _ object.name
+   subsection='Device'
+   section='Asset'
+-%]
+<form name="[% form.name %]" method="POST">
+  <table class="table">
+    <th>Uplink</th><th>Interface</th>
+    [%- FOREACH f IN form.field('interfaces').sorted_fields -%]
+    <tr>
+      <td> [% f.field('uplink_flag').render %]</td>
+      <td>[% f.field('name').fif %][% f.field('name').render %]
+        [% f.field('label').render %]</td>
+    </tr>
+    [%- END %]
+  </table>
+  <input class="btn btn-default" name="submit" value="Save" type="submit">	
+</form>
+

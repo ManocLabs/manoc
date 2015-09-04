@@ -1,0 +1,12 @@
+[%
+page.title='Ooops'
+
+%]
+ <div class="row">
+   <div class="col-md-12">
+     <div class="error-template">
+       <h2>404 Not Found</h2>
+       <div class="error-details">The page you requested was not found!</div>
+     </div>
+   </div>
+ </div>

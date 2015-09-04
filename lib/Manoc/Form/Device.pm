@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -6,17 +6,16 @@ package Manoc::Form::Device;
 
 use strict;
 use warnings;
-use Manoc::Utils qw(check_addr);
+use Manoc::Utils::IPAddress qw(check_addr);
 use HTML::FormHandler::Moose;
 
-extends 'HTML::FormHandler::Model::DBIC';
-with 'Manoc::FormRenderTable';
+extends 'Manoc::Form::Base';
 
 has '+name' => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'mng_address' => (
-    type     =>   'Text',
+    type     => 'Text',
     label    => 'IP Address',
     required => 1,
     apply    => [
@@ -125,8 +124,13 @@ has_field 'mng_url_format' => (
     empty_select => '---Choose a Format---'
 );
 
-has_field 'submit'  => ( type => 'Submit', value => 'Submit ' );
-has_field 'discard' => ( type => 'Submit', value => 'Discard' );
+has_field 'save' => (
+    type => 'Submit',
+    widget => 'ButtonTag',
+    element_attr => { class => ['btn', 'btn-primary'] },
+    widget_wrapper => 'None',
+    value => "Save"
+);
 
 sub options_rack {
     my $self = shift;
@@ -176,4 +180,24 @@ sub _do_options_vlan {
     return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 }
 
+
+=head1 AUTHOR
+
+The Manoc Team
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+__PACKAGE__->meta->make_immutable;
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
