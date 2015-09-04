@@ -5,33 +5,25 @@
 
 # A frontend for SNMP::Info
 
-package Manoc::Netwalker::Source::SNMP;
+package Manoc::Manifold::SNMP;
 use Moose;
 
-with 'Manoc::Netwalker::Source';
+with 'Manoc::ManifoldRole::Base';
 with 'Manoc::Logger::Role';
 
-use Carp;
 use SNMP::Info;
 use Try::Tiny;
-use Manoc::IPAddress::IPv4;
-
-has 'host' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1
-);
 
 has 'community' => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'public'
+    default => 'public',
 );
 
 has 'version' => (
     is      => 'ro',
     isa     => 'Str',
-    default => '1',
+    default => '2',
 );
 
 has 'is_subrequest' => (
@@ -42,20 +34,19 @@ has 'is_subrequest' => (
 
 has 'snmp_info' => (
     is      => 'ro',
-    lazy    => 1,
-    builder => '_build_snmp_info',
+    isa     => 'Object'
+    writer  => '_set_snmp_info',
 );
 
 has 'mat_force_vlan' => (
     is      => 'ro',
 );
 
+#----------------------------------------------------------------------#
 
-
-#-----------------------------------------------------------------------#
-sub _build_snmp_info {
+sub connect {
     my $self = shift;
-    my $info;
+    my $opts = shift || {};
 
     my %snmp_info_args = (
         # Auto Discover more specific Device Class
@@ -67,6 +58,7 @@ sub _build_snmp_info {
         DestHost  => $self->host,
         Community => $self->community,
         Version   => $self->version,
+        %$opts,
     );
 
     try{
@@ -81,31 +73,31 @@ sub _build_snmp_info {
         $self->log->error( "Could not connect to ", $self->host );
         return undef;
     }
+
     # guessing special devices...
     my $class = _guess_snmp_info_class($info);
-    return $info unless defined $class;
+    if ($defined($class) ) {
+        $self->log->debug("ovverriding SNMPInfo class: $class");
 
-    $self->log->debug("ovverriding SNMPInfo class: $class");
+        eval "require $class";
+        if ($@) {
+            croak "Loading $class failed. $@\n";
+        }
 
-    eval "require $class";
-    if ($@) {
-        croak "Manoc::SNMPInfo::try_specify() Loading $class failed. $@\n";
+        my $session = $info->session();
+        $info = $class->new(
+            Session     => $session,
+            AutoSpecify => 0
+        );
+
+        unless ($info) {
+            $self->log->error("Could not reconnect with new class ($class)");
+            return undef;
+        }
     }
-
-    my $args    = $self->{snmp_info_args};
-    my $session = $info->session();
-    my $sub_obj = $class->new(
-        %$args,
-        Session     => $session,
-        AutoSpecify => 0
-    );
-
-    unless ($sub_obj) {
-        $self->log->error("Could not reconnect with new class ($class)");
-        return;
-    }
-
-    return $sub_obj;
+    
+    $self->_set_snmp_info($info);
+    return 1;
 
 }
 
@@ -117,19 +109,11 @@ sub _guess_snmp_info_class {
     my $desc = $info->description() || 'undef';
     $desc =~ s/[\r\n\l]+/ /g;
 
-    $desc =~ /Cisco IOS Software, C1240 / and
-        $class = "SNMP::Info::Layer2::Aironet1240";
-
     $desc =~ /Cisco.*?IOS.*?CIGESM/ and
         $class = "SNMP::Info::Layer3::C3550";
 
     $desc =~ /Cisco.*?IOS.*?C2960/ and
       $class = "SNMP::Info::Layer3::C3550";
-
-
-    #broken
-    #$desc =~ /Cisco Controller/ and
-    #    $class = "SNMP::Info::Layer2::CiscoWCS";
 
     return unless $class;
 
@@ -161,7 +145,7 @@ sub _build_neighbors {
         my $port = $interfaces->{ $c_if->{$neigh} };
         defined($port) or next;
 
-        my $neigh_ip   = $c_ip->{$neigh}         || Manoc::IPAddress::IPv4->new("0.0.0.0");
+        my $neigh_ip   = $c_ip->{$neigh}         || "0.0.0.0";
         my $neigh_port = $c_port->{$neigh}       || "";
         my $neigh_id   = $c_id->{$neigh}         || "";
         my $neigh_model= $c_platform->{$neigh}   || "";
@@ -268,7 +252,7 @@ sub _build_mat {
 
 #----------------------------------------------------------------------#
 
-sub vtp_domain {
+sub _build_vtp_domain {
     my $self = shift;
     my $info = $self->snmp_info;
 
@@ -280,7 +264,7 @@ sub vtp_domain {
     return undef;
 }
 
-sub vtp_database {
+sub _build_vtp_database {
     my $self = shift;
     my $info = $self->snmp_info;
 
@@ -301,21 +285,14 @@ sub vtp_database {
 
 #----------------------------------------------------------------------#
 
-sub connect {
-    my $self = shift;
-    return defined( $self->snmp_info ) ? 1 : 0;
-}
-
-#----------------------------------------------------------------------#
-
-sub boottime {
+sub _build_boottime {
     my $self = shift;
     return time() - $self->snmp_info->uptime() / 100;
 }
 
 #----------------------------------------------------------------------#
 
-sub device_info {
+sub _build_device_info {
     my $self = shift;
     my $info = $self->snmp_info or return undef;
  

@@ -1,13 +1,12 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
 package Manoc::Netwalker::DeviceUpdater;
 
-# The DeviceUpdater is a bridge between a Netwalker::Source and the
+# The DeviceUpdater is a bridge between a Manifold and the
 # data in the Manoc DB
-
 
 use Moose;
 with 'Manoc::Logger::Role';
@@ -15,7 +14,6 @@ with 'Manoc::Logger::Role';
 use Manoc::Netwalker::DeviceReport;
 use Manoc::Netwalker::Source::SNMP;
 
-use Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 use Manoc::IPAddress::IPv4;
 
 # the Manoc::DB::Device entry associated to this device
@@ -103,7 +101,7 @@ sub _build_source {
     my $version        = $entry->snmp_ver() || $self->config->{snmp_version};
     my $mat_force_vlan = $self->config->{mat_force_vlan} || '';
 
-    my $source = Manoc::Netwalker::Source::SNMP->new(
+    my $source = Manoc::Manifold::SNMP->new(
         host      => $host,
         community => $comm,
         version   => $version,
@@ -135,7 +133,7 @@ sub _build_device_set {
     my $self = shift;
 
     my @addresses = $self->schema->resultset('Device')->get_column('mng_address')->all;
-    my %addr_set = map { unpadded_ipaddr($_) => 1 } @addresses;
+    my %addr_set = map { "$_" => 1 } @addresses;
     return \%addr_set;
 }
 
@@ -280,28 +278,24 @@ sub update_cdp_neighbors {
 
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $from_dev_obj->padded,
+                    from_device    => $entry,
                     from_interface => $p,
                     to_device      => $to_dev_obj,
                     to_interface   => $s->{port},
                 }
             );
 
-            
             unless ( scalar(@cdp_entries) ) {
-                
-                my $temp_obj = Manoc::IPAddress::IPv4->new($entry->id->address);
-                
                 $self->schema->resultset('CDPNeigh')->create(
-                {
-                    from_device    => $temp_obj->padded,
-                    from_interface => $p,
-                    to_device      => $to_dev_obj,
-                    to_interface   => $s->{port},
-                    remote_id      => $s->{remote_id},
-                    remote_type    => $s->{remote_type},
-                    last_seen      => $self->timestamp,
-                }
+                    {
+                        from_device    => $entry,
+                        from_interface => $p,
+                        to_device      => $to_dev_obj,
+                        to_interface   => $s->{port},
+                        remote_id      => $s->{remote_id},
+                        remote_type    => $s->{remote_type},
+                        last_seen      => $self->timestamp,
+                    }
                 ); 
                 $new_dev++;
                 $cdp_entries++; 
@@ -316,7 +310,6 @@ sub update_cdp_neighbors {
     }
     $self->report->cdp_entries($cdp_entries);
     $self->report->new_devices($new_dev);
-
 }
 
 #----------------------------------------------------------------------#

@@ -11,8 +11,7 @@ package Manoc::Backup;
 use Moose;
 use Manoc::Logger;
 use Manoc::Utils qw(str2seconds print_timestamp);
-use Manoc::CiscoUtils;
-use Manoc::IpAddress; 
+use Manoc::IpAddress;
 
 extends 'Manoc::App';
 
@@ -85,11 +84,13 @@ sub do_device {
 
     if ( $device->backup_enabled == 1 ) {
 
-        #Get configuration via telnet
-        ( $config, $message ) =
-          Manoc::CiscoUtils->get_config( $device_ipobj, $self->schema,
-            $self->config->{'Credentials'} );
-        $config or return ( 0, $message );
+        # TODO
+        die "Not implemented yet";
+        #Get configuration 
+        #( $config, $message ) =
+        #  Manoc::CiscoUtils->get_config( $device_ipobj, $self->schema,
+        #    $self->config->{'Credentials'} );
+        #$config or return ( 0, $message );
 
         #Update configuration in DB
         ( $res, $message ) = $self->update_device_config( $device_id, $config );

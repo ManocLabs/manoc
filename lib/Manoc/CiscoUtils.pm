@@ -5,8 +5,6 @@ package Manoc::CiscoUtils;
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-use Net::Telnet::Cisco;
-use Regexp::Common qw /net/;
 use Config::Simple;
 use Carp;
 use strict;
@@ -31,26 +29,6 @@ sub get_pwds {
     }
 
     return ( $telnet_pwd, $enable_pwd );
-}
-
-sub login_device {
-    my ( $device_id, $telnet_pwd, $enable_pwd ) = @_;
-    my $session;
-
-    #Connect and login in enable mode
-    eval {
-        $session = Net::Telnet::Cisco->new(
-            Host    => $device_id->address,
-            Timeout => 20,
-        );
-        $session->login( 'admin', $telnet_pwd ) or return (undef);
-        $enable_pwd and
-            $session->enable($enable_pwd) or
-            return (undef);
-    };
-    $@ and return (undef);
-
-    return $session;
 }
 
 sub switch_port_status {
@@ -110,20 +88,7 @@ sub get_config {
     ( $telnet_pwd && $enable_pwd ) or
         return ( undef, "Impossible retrieve device passwords to login" );
 
-    #Login in enable mode
-    $session = login_device( $device_id, $telnet_pwd, $enable_pwd );
-    $session or return ( undef, "Impossible login to device" );
-
-    #Get device configuration
-    eval { @config_arr = $session->cmd("show running"); };
-    $@ and return ( undef, "Impossible get device configuration" );
-
-    $session->close();
-
-    #Convert config array to string
-    foreach (@config_arr) {
-        $config .= $_;
-    }
+  
 
     return ( $config, "Ok" );
 }
