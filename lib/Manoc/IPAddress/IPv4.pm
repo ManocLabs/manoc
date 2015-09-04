@@ -7,7 +7,7 @@ package Manoc::IPAddress::IPv4;
 use Moose;
 use namespace::autoclean;
 
-use Manoc::Utils::IPAddress qw(ip2int int2ip padded_ipaddr);
+use Manoc::Utils::IPAddress qw(ip2int int2ip padded_ipaddr check_addr);
 
 
 use overload (
