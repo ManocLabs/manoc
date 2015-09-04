@@ -37,13 +37,13 @@ __PACKAGE__->add_columns(
         data_type   => 'int',
         is_nullable => 0,
         size        => 11,
-    }
+    },
 );
 
 __PACKAGE__->set_primary_key("device");
 
 __PACKAGE__->belongs_to(
-    device_info => 'Manoc::DB::Result::Device',
+    device => 'Manoc::DB::Result::Device',
     { 'foreign.id' => 'self.device' }
 );
 

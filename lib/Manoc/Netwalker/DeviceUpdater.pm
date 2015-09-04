@@ -12,7 +12,7 @@ use Moose;
 with 'Manoc::Logger::Role';
 
 use Manoc::Netwalker::DeviceReport;
-use Manoc::Netwalker::Source::SNMP;
+use Manoc::Manifold::SNMP;
 
 use Manoc::IPAddress::IPv4;
 
@@ -31,6 +31,12 @@ has 'timestamp' => (
 has 'schema' => (
     is       => 'ro',
     required => 1
+);
+
+has 'fast_mode' => (
+    is       => 'ro',
+    isa      => 'Bool',
+    default  => 0,
 );
 
 # a set of all mng_address knwon to Manoc
@@ -171,22 +177,26 @@ sub _build_uplinks {
 
 #----------------------------------------------------------------------#
 #                                                                      #
-#              A t t r i b u t e    B u i l d e r s                    #
+#                       D a t a   u p d a t e                          #
 #                                                                      #
 #----------------------------------------------------------------------#
 
-sub update_all_info {
+sub update {
     my $self = shift;
 
     $self->source or return undef;
 
-    $self->log->info( "Performing full update for device ", $self->mng_address->address );
+    my $entry = $self->entry;
 
-    $self->update_device_entry;
+    $self->log->info( "Updating device ", $self->mng_address->address );
+
+    $self->update_device_entry   unless $self->fast_mode;
+    $self->update_if_table       unless $self->fast_mode;
     $self->update_cdp_neighbors;
-    $self->update_if_table;
-    $self->entry->get_mat() and $self->update_mat;
-    $self->entry->get_arp() and $self->update_arp_table;
+
+    $entry->get_mat() and $self->update_mat;
+    $entry->get_arp() and $self->update_arp_table;
+    $entry->get_vtp() and $self->update_vtp_database;
     #update_dot11;
 
     #update last visited
@@ -195,26 +205,8 @@ sub update_all_info {
     return 1;
 }
 
-sub fast_update {
-    my $self = shift;
-
-    $self->source or return undef;
-
-    $self->log->info( "Performing fast update for device ", $self->entry->mng_address->address );
-
-    $self->update_cdp_neighbors;
-    $self->entry->get_mat() and $self->update_mat;
-    $self->entry->get_arp() and $self->update_arp_table;
-    #update_dot11;
-
-    #update last visited
-    $self->entry->last_visited($self->timestamp);
-    $self->entry->update();
-    return 1;
-}
 
 #----------------------------------------------------------------------#
-
 
 
 sub update_device_entry {
@@ -394,7 +386,7 @@ sub update_vtp_database {
 
     my $vlan_db = $source->vtp_database;
 
-    $self->log->info( "getting vtp info from ", $entry->id->address );
+    $self->log->info( "getting vtp info from ", $entry->mng_address );
     if ( !defined($vlan_db) ) {
         $self->log->error("cannot retrieve vtp info");
         $self->report->add_error("cannot retrieve vtp info");

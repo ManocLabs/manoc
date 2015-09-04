@@ -12,6 +12,7 @@ with "Manoc::ControllerRole::JSONView";
 
 use Text::Diff;
 use Manoc::Form::Device;
+use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
 
 # moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
@@ -173,7 +174,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 			       $c->uri_for_action( '/device/view', [$device_id] ) );
 	$c->detach();
     }
-
+    
     my %config = (
 	snmp_community => $c->config->{Credentials}->{snmp_community}
 	    || 'public',
@@ -215,7 +216,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $device = $c->stash->{'object'};
-    my $form = Manoc::Form::Uplink->new(device => $device);
+    my $form = Manoc::Form::Uplink->new({ device => $device, ctx => $c });
 
     if ($device->ifstatus->count() == 0) {
         $c->flash(error_msg => 'No known interfaces on this device');
@@ -236,6 +237,33 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     $c->detach();
 }
 
+
+=head2 nwinfo
+
+=cut
+
+sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $device_id = $c->stash->{object_pk};
+
+    my $nwinfo = $c->model('ManocDB::DeviceNWinfo')->find($device_id);
+    $nwinfo or $nwinfo = $c->model('ManocDB::DeviceNWInfo')->new_result({});
+
+    my $form = Manoc::Form::DeviceNWInfo->new( {
+        device => $device_id,
+        ctx    => $c,
+    });
+    $c->stash(form => $form);
+    return unless $form->process(
+	params => $c->req->params,
+	item   => $nwinfo );
+
+   $c->response->redirect(
+       $c->uri_for_action( 'device/view', [ $device_id ] )
+    );
+    $c->detach();
+}
 
 =head2 get_object_list
 

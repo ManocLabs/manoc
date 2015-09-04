@@ -1,12 +1,42 @@
 [% META 
    use_table = 1
 -%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 [%   
 page.title   = 'Device ' _ object.name
 page.section = 'Asset'
 page.subsection = 'Device'
 -%]
-[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+[% page.toolbar = BLOCK -%]
+<div>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Action <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+	<a  href="[% c.uri_for_action('/device/edit',[object.id]) %]">
+	[% bootstrap_icon('pencil') %] Edit device</a>
+      </li>   
+      <li>      
+	<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
+	  [% bootstrap_icon('link') %] Set uplink</a>
+      </li>
+      <li>      
+	<a href="[% c.uri_for_action('/device/nwinfo', [object.id]) %]">
+	  [% bootstrap_icon('cog') %] Netwalker config</a>
+      </li>
+      <li role="separator" class="divider"></li>   
+      <li>
+	<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
+	  [% bootstrap_icon('trash') %] Delete</a>
+      </li>
+    </ul>
+  </div>
+  <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]"> 
+    [% bootstrap_icon('refresh') %] Refresh Info</a>
+</div>
+[% END -%]
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
@@ -25,7 +55,7 @@ page.subsection = 'Device'
 	<dt>Name</dt><dd>[% object.name %]</dd>
 
 	<dt>Management Address</dt>
-	<dd><a href="[% object.get_mng_url %]">[% object.mng_address.address %]</a></dd>
+	<dd><a href="[% object.get_mng_url %]">[% object.get_mng_url %]</a></dd>
 
 	<dt>Building</dt>
 	<dd>[% print_building(object.rack.building) %]</dd>
@@ -49,11 +79,10 @@ page.subsection = 'Device'
 
 	<dt>Up from</dt><dd>[% date.format(object.boottime) | html %]</dd>
 
-	<dt>Backup</dt>
-	<dd>[% object.backup_enabled ? 'Yes' : 'No' %]</dd>
+	<dd>[% object.nwinfo.get_config ? 'Yes' : 'No' %]</dd>
 	<dt>Last backup</dt>
 	<dd>
-	  [% IF backup_date %][% backup_date %]
+	  [% IF object.config.config_date %][% date.format(object.config.config_date) %]
 	  <a href="[% c.uri_for_action('device/show_config', [object.id]) %]">View</a>
 	  [% ELSE %]
 	  No backup found
@@ -61,29 +90,18 @@ page.subsection = 'Device'
 	</dd>
 	<dt>Fetch ARP table</dt>
 	<dd>[% arp_enabled  ? 'Yes' : 'No' %]</dd>
-	[% IF object.vlan_arpinfo %]
+	[% IF object.nwinfo.vlan_arpinfo %]
 	<dt>ARP table vlan</dt>
-	<dd>[% print_vlan(object.vlan_arpinfo) %]</dd>
+	<dd>[% print_vlan(object.nwinfo.vlan_arpinfo) %]</dd>
 	[% END %]
 	<dt>Fetch MAT</dt>
-	<dd>[% mat_enabled  ? 'Yes' : 'No'%]</dd>
+	<dd>[% object.nwinfo.mat_enabled  ? 'Yes' : 'No'%]</dd>
 	<dt>Fetch Dot11</dt>
-	<dd>[% dot11_enabled ? 'Yes' : 'No'  %]</dd>
-	<dt>Uplinks</dt><dd>[% uplinks %]</dd>
+	<dd>[% object.nwinfo.dot11_enabled ? 'Yes' : 'No'  %]</dd>
+	<dt>Uplinks</dt><dd>[% object.uplinks %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- row -->
-    
-    <div class="row">	
-      <a class="btn btn-default" href="[% c.uri_for_action('/device/edit',[object.id]) %]">
-	[% bootstrap_icon('pencil') %] Edit</a>
-      <a class="btn btn-default" href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
-	[% bootstrap_icon('trash') %] Delete</a>
-      <a class="btn btn-default" href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
-	[% bootstrap_icon('link') %] Set Uplink</a>
-      <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]"> 
-	[% bootstrap_icon('refresh') %] Refresh Info</a>
-    </div>
   </div>
   
   <div role="tabpanel" class="tab-pane" id="cdp">

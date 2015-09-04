@@ -76,22 +76,15 @@ sub visit_device {
         $self->log->error("$device_id not in device list");
         return;
     }
-    my $updater = Manoc::Netwalker::DeviceUpdater->new(
-                                                       entry           => $device_entry,
-                                                       config          => $config,
-                                                       schema          => $self->schema,
-                                                       timestamp       => time,
-                                                      );
-    #deep update?
-    my $device_ip = $device_entry->id->address;
-    if($self->full_update){
-        $updater->update_all_info();
-        #update vtp info if is also a vtp server 
-        $config->{vtp_servers}->{$device_ip} and $updater->update_vtp_database();
-    }
-    else {
-        $updater->fast_update();
-    }
+    my $updater = Manoc::Netwalker::DeviceUpdater->new({
+        entry           => $device_entry,
+        config          => $config,
+        schema          => $self->schema,
+        timestamp       => time,
+        fast_mode       => ! $self->full_update,
+    });
+    $updater->update;
+    
     print @{POE::Filter::Reference->new->put([{ report => $updater->report->freeze  }])};
 }
 
@@ -101,7 +94,7 @@ sub worker_stderr  {
     print $stderr_msg,"\n"
 }
  
-sub worker_stdout  {  
+sub worker_stdout  {
     my ( $self, $result ) = @_;
 
     my $worker_report = Manoc::Netwalker::DeviceReport->thaw($result->{report});
@@ -140,18 +133,8 @@ sub run {
                   default_vlan         => $self->config->{Netwalker}->{default_vlan}       || 1,
                   iface_filter         => $self->config->{Netwalker}->{iface_filter}       || 1,
                   ignore_portchannel   => $self->config->{Netwalker}->{ignore_portchannel} || 1,
-                  vtp_server           => $self->config->{Netwalker}->{vtp_server} || '',
-                  mat_force_vlan       => $self->config->{Netwalker}->{mat_force_vlan} || '',
-                 ); 
-
-   #parse vtp servers
-   my $vtp_server_conf = $self->config->{Netwalker}->{vtp_server};
-    if ($vtp_server_conf) {
-	my @address_list = split /\s+/, $vtp_server_conf;
-	$config{vtp_servers} = { map { $_ => 1 } @address_list };
-    } else {
-	$self->log->info("no VTP servers defined");
-    }
+                  mat_force_vlan       => $self->config->{Netwalker}->{mat_force_vlan}     || '',
+                 );
 
     $self->max_workers($self->n_procs);
     

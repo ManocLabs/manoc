@@ -64,58 +64,6 @@ has_field 'level' => (
     required => 1,
 );
 
-#Retrieved Info
-
-has_field 'backup_enable' => (
-    type     => 'Checkbox',
-    accessor => 'backup_enabled',
-);
-
-has_field 'get_arp' => (
-    type           => 'Checkbox',
-    checkbox_value => 1,
-    label          => 'Get ARP'
-);
-
-has_field 'vlan_arpinfo' => (
-    type  => 'Select',
-    label => 'ARP info on VLAN',
-);
-
-has_field 'get_mat' => (
-    type  => 'Checkbox',
-    label => 'Get MAT'
-);
-
-has_field 'mat_native_vlan' => (
-    type  => 'Select',
-    label => 'Native VLAN for MAT info',
-);
-
-has_field 'get_dot11' => (
-    type  => 'Checkbox',
-    label => 'Get Dot11'
-);
-
-#Credentials
-has_field 'telnet_pwd' => ( type => 'Text', label => 'Telnet Password' );
-has_field 'enable_pwd' => ( type => 'Text', label => 'Enable Password' );
-
-has_field 'snmp_ver' => (
-    type    => 'Select',
-    label   => 'SNMP version',
-    options => [
-        { value => 0, label => 'Use Default', selected => '1' },
-        { value => 1, label => 1 },
-        { value => 2, label => '2c' },
-        { value => 3, label => 3 }
-    ],
-);
-
-has_field 'snmp_com'      => ( type => 'Text', label => 'SNMP Community String' );
-has_field 'snmp_user'     => ( type => 'Text', label => 'SNMP user' );
-has_field 'snmp_password' => ( type => 'Text', label => 'SNMP password' );
-
 has_field 'notes' => ( type => 'TextArea' );
 
 has_field 'mng_url_format' => (
@@ -160,26 +108,6 @@ sub options_mng_url_format {
 
     return map +{ value => $_->id, label => $_->name }, $rs->all();
 }
-
-sub options_mat_native_vlan {
-    my $self = shift;
-    return $self->_do_options_vlan()
-}
-
-sub options_vlan_arpinfo {
-    my $self = shift;
-    return $self->_do_options_vlan()
-}
-
-sub _do_options_vlan {
-    my $self = shift;
-
-    return unless $self->schema;
-    my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
-
-    return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
-}
-
 
 =head1 AUTHOR
 

@@ -34,7 +34,7 @@ sub load_namespace {
 }
 
 sub manifolds {
-    return keys(shift->name_mappings);
+    return keys(% {shift->name_mappings });
 }
 
 sub new_manifold {
