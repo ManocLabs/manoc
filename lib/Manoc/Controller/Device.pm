@@ -13,7 +13,6 @@ with "Manoc::ControllerRole::JSONView";
 use Text::Diff;
 use Manoc::Form::Device;
 use Manoc::Form::Uplink;
-use Manoc::Report::NetwalkerReport;
 
 # moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
 # where we need it
@@ -199,47 +198,8 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 	    $c->uri_for_action( '/device/view', [$device_id] ) );
 	$c->detach();
     }
-    
-    my $worker_report = $updater->report;
-    my $report        = Manoc::Report::NetwalkerReport->new;
-    
-    #create the report
-    my $errors = $worker_report->error;
-    scalar(@$errors) and $report->add_error(
-					    {
-					     id       => $device_id,
-					     messages => $errors
-					    }
-      );
-    my $warning = $worker_report->warning;
-    scalar(@$warning) and $report->add_warning(
-					       {
-						id       => $device_id,
-						messages => $warning
-					       }
-					      );
-    
-    $report->mat_entries( $worker_report->mat_entries );
-    $report->arp_entries( $worker_report->arp_entries );
-    $report->cdp_entries( $worker_report->cdp_entries );
-    $report->new_devices( $worker_report->new_devices );
-    $report->visited( $worker_report->visited );
-    
-    my $new_report = $c->model('ManocDB::ReportArchive')->create(
-	{
-	    'timestamp' => time,
-	    'name'      => 'Netwalker',
-	    'type'      => 'NetwalkerReport',
-	    's_class'   => $report,
-	}
-    );
-    
-    my $report_url =
-      $c->uri_for_action( '/reportarchive/view', [ $new_report->id ] );
-    
-    my $msg = "Success! Device infomations are now up to date!"
-	. " See the <a href=\"$report_url\">report</a> for details.";
-    
+
+    my $msg = "Success! Device infomations are now up to date.";
     $c->flash( message => $msg);
     $c->response->redirect(
 			   $c->uri_for_action( '/device/view', [$device_id] ) );

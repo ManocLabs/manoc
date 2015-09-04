@@ -36,24 +36,6 @@
 
 		},		     
 		{
-		     name = 'Reports',
-		     subsections = [
-                        {
-			   name = "Queries",
-			   path = "#",
-			}
-	                {
-		           name = 'Report Archive',
-		           path = c.uri_for_action('/reportarchive/list'),
-		        },
-                        {
-			    name = 'Manoc DB Statistics'
-			    path = c.uri_for_action('/query/statistics'),
-
-			},
-		     ]
-		},
-		{
 		     name = 'Config',
      		     path = c.uri_for_action('/user/list'),
 		     subsections = [		     

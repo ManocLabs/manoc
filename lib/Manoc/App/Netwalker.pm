@@ -28,14 +28,6 @@ has 'force_update' => (
                  required=> 0,
                 );
 
-has 'report' => (
-                 traits   => ['NoGetopt'],
-                 is       => 'rw',
-                 isa      => 'Manoc::Report::NetwalkerReport',
-                 required => 0,
-                 default  => sub { Manoc::Report::NetwalkerReport->new },
-                );
-
 has 'full_update' => (
                  traits   => ['NoGetopt'],
                  is       => 'ro',
@@ -118,21 +110,6 @@ sub worker_stdout  {
     my $id_worker = $worker_report->host;
 
     $self->log->debug("Device $id_worker is up to date");
-
-    my $errors = $worker_report->error;
-    scalar(@$errors) and $self->report->add_error({id       => $id_worker,
-                                                   messages =>  $errors });
-    my $warning = $worker_report->warning;
-    scalar(@$warning) and $self->report->add_warning({id      => $id_worker,
-                                                      messages=> $warning});
-
-    $self->report->update_stats({
-                                 mat_entries => $worker_report->mat_entries,
-                                 arp_entries => $worker_report->arp_entries,
-                                 cdp_entris  => $worker_report->cdp_entries,
-                                 new_devices => $worker_report->new_devices,
-                                 visited     => $worker_report->visited,
-                                });
 }
 
 sub stdout_filter  { POE::Filter::Reference->new }
@@ -144,23 +121,13 @@ sub set_update_status {
       $self->schema->resultset('System')->find("netwalker.if_update");
     $if_last_update_entry->value(time);
     $if_last_update_entry->update();
-} 
+}
 
 sub worker_manager_stop  { 
     my $self  = shift;
 
     #update netwalker.if_status variable
     $self->full_update and $self->set_update_status();
-
-    $self->schema->resultset('ReportArchive')->create(
-                                                      {
-                                                       'timestamp' => time,
-                                                       'name'      => 'Netwalker',
-                                                       'type'      => 'NetwalkerReport',
-                                                       's_class'   => $self->report,
-                                                      }
-                                                     );
-    $self->log->debug(Dumper($self->report));
 }
 
 sub run {
