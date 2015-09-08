@@ -33,6 +33,7 @@ __PACKAGE__->config(
         }
     },
     class        => 'ManocDB::Vlan',
+    form_class   => 'Manoc::Form::Vlan',
     json_columns => [ 'id', 'name', 'description' ],
 );
 
@@ -74,16 +75,6 @@ sub get_object_list {
     );
     return \@objects;
 }
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::Vlan->new();
-}
-
 
 =head2 object_delete
 

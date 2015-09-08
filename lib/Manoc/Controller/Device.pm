@@ -38,6 +38,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::Device',
+    form_class => 'Manoc::Form::Device',
 );
 
 =head1 ACTIONS
@@ -313,15 +314,6 @@ sub get_object {
 	$object = $c->stash->{resultset}->find({mng_address => $id});
     }
     return $object;
-}
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::Device->new();
 }
 
 =head2 delete_object

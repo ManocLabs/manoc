@@ -21,10 +21,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::Rack',
-
-    create_page_title  => 'New rack',
-    edit_page_title    => 'Edit rack',
-    list_page_title    => 'Rack list',
+    form_class => 'Manoc::Form::Rack',
 );
 
 =head1 NAME
@@ -67,16 +64,6 @@ before 'create' => sub {
     $c->log->debug("new rack in $building_id");
     $c->stash(form_defaults => { building => $building_id });
 };
-
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::Rack->new();
-}
 
 
 =head2 delete_object

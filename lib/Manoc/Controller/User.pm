@@ -32,6 +32,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::User',
+    form_class => 'Manoc::Form::User',
 );
 
 =head1 METHODS
@@ -46,7 +47,7 @@ sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(object => $c->user);
-    my $form = Manoc::Form::User::ChangePassword->new();
+    my $form = Manoc::Form::User::ChangePassword->new({ctx => $c});
 
     $c->stash(
         form   => $form,
@@ -58,16 +59,6 @@ sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
     );
     $c->detach();
 }
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::User->new();
-}
-
 
 =head1 AUTHOR
 

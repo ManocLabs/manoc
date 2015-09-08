@@ -32,6 +32,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::Building',
+    form_class => 'Manoc::Form::Building',
 );
 
 sub get_object_list {
@@ -39,11 +40,6 @@ sub get_object_list {
 
    my $rs = $c->stash->{resultset};
    return  [ $rs->search({}, {prefetch => 'racks'} ) ];
-}
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::Building->new();
 }
 
 sub delete_object {

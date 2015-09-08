@@ -28,6 +28,7 @@ use Catalyst qw/
     Session
     Session::Store::DBI
     Session::State::Cookie
+    +Manoc::CatalystPlugin::RequestToken
     StackTrace
     /;
 
@@ -113,14 +114,6 @@ __PACKAGE__->config(
         dbi_expires_field => 'expires',
     }
 );
-
-# use Plack middleware for CSRF protection
-__PACKAGE__->config(
-    psgi_middleware => [
-        Session => { store => 'File' },
-        'CSRFBlock'
-    ])
-    unless ( $ENV{MANOC_NO_CSRFBLOCK} );
 
 
 ########################################################################
