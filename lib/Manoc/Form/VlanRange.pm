@@ -8,8 +8,8 @@ use HTML::FormHandler::Moose;
 use Manoc::Form::Types::VlanID;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::Base::SaveButton';
-with 'Manoc::Form::Base::Horizontal';
+with 'Manoc::Form::TraitFor::SaveButton';
+with 'Manoc::Form::TraitFor::Horizontal';
 
 has '+name' => ( default => 'form-vlanrange' );
 has '+html_prefix' => ( default => 1 );

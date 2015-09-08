@@ -7,7 +7,7 @@ package Manoc::Form::User::ChangePassword;
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
 
-with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name' => ( default => 'form-user' );
 has '+html_prefix' => ( default => 1 );

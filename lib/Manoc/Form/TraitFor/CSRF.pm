@@ -2,12 +2,12 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Base::CSRF;
+package Manoc::Form::TraitFor::CSRF;
 use HTML::FormHandler::Moose::Role;
 
 =head1 NAME
 
-Manoc::Form::Base::CSRF - Role for Manoc forms CSRF
+Manoc::Form::TraitFor::CSRF - Role for Manoc forms CSRF
 
 =head1 DESCRIPTION
 

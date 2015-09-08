@@ -7,8 +7,8 @@ use utf8;
 use HTML::FormHandler::Moose;
 
 extends 'HTML::FormHandler';
-with 'Manoc::Form::Base::Theme';
-with 'Manoc::Form::Base::CSRF';
+with 'Manoc::Form::TraitFor::Theme';
+with 'Manoc::Form::TraitFor::CSRF';
 
 has '+name' => ( default => 'login_form' );
 

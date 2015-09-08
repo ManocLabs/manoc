@@ -2,12 +2,12 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Base::Horizontal;
+package Manoc::Form::TraitFor::Horizontal;
 use HTML::FormHandler::Moose::Role;
 
 =head1 NAME
 
-Manoc::Form::Base::Horizontal - Role for Manoc horizontal forms
+Manoc::Form::TraitFor::Horizontal - Role for Manoc horizontal forms
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ sub build_form_tags {
 
 =head1 SEE ALSO
 
-L<Manoc::Form::Base::Theme>
+L<Manoc::Form::TraitFor::Theme>
 L<HTML::FormHandler::Widget::Theme::Bootstrap3>
 
 =head1 AUTHOR

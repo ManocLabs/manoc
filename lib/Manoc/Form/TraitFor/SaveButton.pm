@@ -2,12 +2,12 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Base::SaveButton;
+package Manoc::Form::TraitFor::SaveButton;
 use HTML::FormHandler::Moose::Role;
 
 =head1 NAME
 
-Manoc::Form::Base::Horizontal - Role for adding a BS3 'Save' button
+Manoc::Form::TraitFor::Horizontal - Role for adding a BS3 'Save' button
 
 =head1 DESCRIPTION
 
