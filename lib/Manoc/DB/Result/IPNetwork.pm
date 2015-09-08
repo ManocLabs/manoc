@@ -11,7 +11,7 @@ extends 'DBIx::Class::Core';
 
 use Manoc::IPAddress::IPv4Network;
 
-__PACKAGE__->load_components( qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/ );
+__PACKAGE__->load_components(qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('ip_network');
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPNetwork');
