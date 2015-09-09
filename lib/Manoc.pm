@@ -24,7 +24,6 @@ use Catalyst qw/
     Authentication
     Authorization::Roles
     Authorization::ACL
-    Scheduler
     Session
     Session::Store::DBI
     Session::State::Cookie
@@ -203,10 +202,6 @@ after setup_finalize => sub {
 # Start the application
 __PACKAGE__->setup();
 
-__PACKAGE__->schedule(
-    at    => '@daily',
-    event => '/cron/remove_sessions'
-);
 
 =head1 NAME
 
