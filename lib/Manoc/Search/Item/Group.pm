@@ -28,5 +28,14 @@ sub sort_items {
     $self->_items( \@l );
 }
 
+override load_widgets => sub {
+    my $self = shift;
+
+    foreach my $i (@{$self->items}) {
+	$i->load_widgets;
+    }
+    super();
+};
+
 no Moose;
 __PACKAGE__->meta->make_immutable;

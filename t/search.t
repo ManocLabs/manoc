@@ -11,7 +11,10 @@ BEGIN {
     use_ok 'Manoc::Search::Item::IpAddr';
     use_ok 'Manoc::Search::Item::MacAddr';
     use_ok 'Manoc::Search::Item::IPNetwork';
-
+    use_ok 'Manoc::Search::Item::IPRange';
+    use_ok 'Manoc::Search::Item::Rack';
+    use_ok 'Manoc::Search::Item::Device';	
+    use_ok 'Manoc::Search::Item::Building';
 
     use_ok 'Manoc::Search::Engine';
     use_ok 'Manoc::Search::Query';
@@ -19,8 +22,8 @@ BEGIN {
     use_ok 'Manoc::Search';
 }
 
-my $engine;
-ok( $engine = Manoc::Search::Engine->new() );
+#my $engine;
+#ok( $engine = Manoc::Search::Engine->new() );
 
 my $item;
 ok( $item = Manoc::Search::Item::IpAddr->new( { match => '1.1.1.1' } ) );

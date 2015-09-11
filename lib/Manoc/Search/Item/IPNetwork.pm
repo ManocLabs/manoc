@@ -7,7 +7,7 @@ use Moose;
 
 extends 'Manoc::Search::Item';
 
-has '+item_type' => ( default => 'iprange' );
+has '+item_type' => ( default => 'ipnetwork' );
 
 has 'id' => (
     is       => 'ro',
@@ -26,6 +26,7 @@ has 'name' => (
     isa      => 'Str',
     required => 1,
 );
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -33,7 +33,6 @@ use Catalyst qw/
 
 extends 'Catalyst';
 
-with 'Manoc::Search';
 with 'Manoc::Logger::CatalystRole';
 with 'Catalyst::ClassData';
 

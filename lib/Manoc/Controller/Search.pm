@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -6,10 +6,13 @@ package Manoc::Controller::Search;
 use strict;
 use warnings;
 
-use Data::Dumper;
 use Moose;
 use namespace::autoclean;
+
 use Manoc::Search::QueryType;
+use Manoc::Search::Engine;
+use Manoc::Search::Query;
+use Manoc::Utils qw(str2seconds);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -46,69 +49,64 @@ sub index : Path : Args(0) {
         [ 'note',      'Notes' ],
     );
 
-    my $rdrctd_types = {
-        device   => 1,
-        rack     => 1,
-        building => 1
+    my $redirectable_types = {
+        device   => '/device/view',
+        rack     => '/rack/view',
+        building => '/building/view',
     };
 
     if ( $q =~ /\S/ ) {
         $q =~ s/^\s+//o;
         $q =~ s/\s+$//o;
 
-        my %extra_param;
-        $limit and $extra_param{limit} = $limit;
-        $type  and $extra_param{type}  = $type;
+        my %query_param;
+        $limit and $query_param{limit} = str2seconds($limit);
+        $type  and $query_param{type}  = $type;
 
-        my $result = $c->search( $c->model('ManocDB'), $q, \%extra_param );
+        my $result = $c->model('ManocDB')->search($q, \%query_param );
         $c->stash( result => $result );
 
         my $query = $result->query;
         my $type  = $query->query_type;
-        if ( !$advanced && $rdrctd_types->{$type} ) {
+
+        if ( !$advanced && $redirectable_types->{$type} ) {
+	    # search for an exact match and redirect
             foreach my $item ( @{ $result->items } ) {
                 my $item2 = $item->items->[0];
                 if ( lc( $item2->match ) eq lc( $query->query_as_word ) ) {
                     $c->response->redirect(
-                        $c->uri_for_action( "/$type/view", [ $item2->id ] ) );
-                    $c->detach();
-                }
+                        $c->uri_for_action( $redirectable_types->{$type},
+					    [ $item2->id ] ));
+		    $c->detach();
+		}
             }
-
         }
 
-        #Debug mode
-        $c->flash( message => Dumper($result) ) if ( $c->req->param('debug') );
+	$result->load_widgets;
     }
 
-    #prepare plugins variables
-    my @paths;
-    my @plugin = Manoc::Search->_plugin_types;
-    foreach my $type (@plugin){
-      push @paths, ucfirst($type)."/render.tt";
-      push @search_types, [ $type, ucfirst($type) ];
-    }
-       
-    $c->stash( 'q'             => $q );
-    $c->stash( limit           => $limit );
-    $c->stash( default_type    => $c->request->param('type') || 'ipaddr' );
+    $c->stash( fif => {
+	'q'       => $q,
+	limit     => $limit,
+	type      => $c->request->param('type') || 'ipaddr',
+	advanced  => $advanced,
+    });
     $c->stash( search_types    => \@search_types );
-    $c->stash( plugins         => \@paths );
-    $c->stash( advanced        => $advanced);
-    $c->stash( template => 'search/index.tt' );
 }
 
-sub instruction : Path('readme') Args(0) {
-    my ( $self, $c ) = @_;
-    my $page = $c->request->param('page');
-    $c->stash( template => 'search/readme.tt' );
+sub _plugin_types {
+  my ($self, $c) = shift;
 
-    $c->stash(template => "search/readme/$page.tt") if(defined $page);
+  return unless $self->can('plugin_registry');
+  # my $reg = $self->plugin_registry;
+  # foreach my $plugin TODO
+  return
 }
+
 
 =head1 AUTHOR
 
-gabriele
+The Manoc Team
 
 =head1 LICENSE
 

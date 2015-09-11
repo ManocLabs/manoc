@@ -31,7 +31,7 @@ sub search_ipaddr {
     while ( my $e = $it->next ) {
         my $item = Manoc::Search::Item::MacAddr->new(
             {
-                match     => $e->ipaddr->address,
+                match     => $e->ipaddr->unpadded,
                 addr      => $e->macaddr,
                 timestamp => $e->get_column('timestamp'),
             }
@@ -63,7 +63,7 @@ sub search_macaddr {
         my $item = Manoc::Search::Item::IpAddr->new(
             {
                 match     => $e->macaddr,
-                addr      => $e->ipaddr->address,
+                addr      => $e->ipaddr->unpadded,
                 timestamp => $e->get_column('timestamp'),
             }
         );

@@ -29,7 +29,7 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $b    = $args->{hostname};
         if ($b) {
-            $args->{ipaddr} =  $b->ipaddr->address;
+            $args->{ipaddr} =  $b->ipaddr->unpadded;
             $args->{name}   =  $b->name;
             $args->{match} ||= $b->name;
         }
@@ -38,6 +38,7 @@ around BUILDARGS => sub {
 
     return $class->$orig(@_);
 };
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
