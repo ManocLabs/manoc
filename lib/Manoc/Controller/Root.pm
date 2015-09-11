@@ -48,6 +48,11 @@ Sets is_xhr for asyncrho
 sub auto : Private {
     my ( $self, $c ) = @_;
 
+    # CSRF protection
+    if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf}) {
+        $c->require_valid_token();
+    }
+
     ##  XHR detection ##
     if (my $req_with =  $c->req->header('X-Requested-With')) {
         $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';

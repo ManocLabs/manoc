@@ -25,6 +25,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::VlanRange',
+    form_class => 'Manoc::Form::VlanRange',
 );
 
 
@@ -48,7 +49,7 @@ Catalyst Controller.
 sub split : Chained('object') : PathPart('split') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $form = Manoc::Form::VlanRange::Split->new();
+    my $form = Manoc::Form::VlanRange::Split->new({ ctx => $c });
 
     $c->stash(
         form   => $form,
@@ -68,7 +69,7 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
 sub merge : Chained('object') : PathPart('merge') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $form = Manoc::Form::VlanRange::Merge->new();
+    my $form = Manoc::Form::VlanRange::Merge->new({ ctx => $c });
 
     $c->stash(
         form   => $form,
@@ -89,16 +90,6 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
 =head1 METHODS
 
 =cut
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-
-    return Manoc::Form::VlanRange->new( );
-}
 
 =head2 delete_object
 

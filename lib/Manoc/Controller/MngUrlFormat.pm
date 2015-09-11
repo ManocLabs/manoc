@@ -32,26 +32,12 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::MngUrlFormat',
+    form_class => 'Manoc::Form::MngUrlFormat',
 );
 
 =head1 METHODS
 
 =cut
-
-
-=head2 list
-
-=cut
-
-=head2 get_form
-
-=cut
-
-sub get_form {
-    my ( $self, $c ) = @_;
-    return Manoc::Form::MngUrlFormat->new();
-}
-
 
 =head2 delete
 
