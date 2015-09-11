@@ -11,6 +11,7 @@ use warnings;
 
 use Carp;
 
+use FindBin;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 
