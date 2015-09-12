@@ -66,6 +66,12 @@ has 'exclude' => (
     default   => sub { [] },
 );
 
+has 'skip_notempty' => (
+    is        => 'ro',
+    isa       => 'Bool',
+    default   => 0,
+);
+
 has 'version' => (
     is        => 'rw',
     isa       => 'Int',
@@ -161,10 +167,17 @@ sub _load_tables_loop {
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
+
+        if ($self->skip_notempty and $source->resultset->count() ) {
+            $self->log->info("Source $source_name is not empty, skip.");
+            next;
+        }
+
         my $table = $source->from;
         $self->log->debug("Loading $source_name");
 
         $converter and $table = $converter->get_table_name($source_name);
+        $table ||= $source->from;
 
         if ($overwrite) {
             $self->log->debug("Cleaning $source_name");
