@@ -9,6 +9,8 @@ use parent 'DBIx::Class::Core';
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('ip_block');
+__PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPBlock');
+
 
 __PACKAGE__->add_columns(
     id => {

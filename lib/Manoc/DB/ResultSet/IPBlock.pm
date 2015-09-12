@@ -2,32 +2,13 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::ResultSet::IPNetwork;
+package Manoc::DB::ResultSet::IPBlock;
 
 use base 'DBIx::Class::ResultSet';
-use Scalar::Util qw(blessed);
 use strict;
 use warnings;
 
-sub get_root_networks {
-    my ($self) = @_;
-
-    my $rs = $self->search({ 'me.parent_id' => undef });
-    return wantarray() ? $rs->all : $rs;
-}
-
-sub rebuild_tree {
-    my $self = shift;
-
-    my @nodes = $self->all();
-
-    foreach my $node (@nodes) {
-        my $supernet = $node->first_supernet();
-        $supernet //= 0;
-        $node->parent($supernet);
-    }
-
-}
+use Scalar::Util qw(blessed);
 
 sub including_address {
     my ( $self, $ipaddress) = @_;
@@ -37,11 +18,10 @@ sub including_address {
     {
         $ipaddress = $ipaddress->padded;
     }
-    
     return $self->search(
         {
-            'address'    => { '<=' => $ipaddress },
-            'broadcast'  => { '>=' => $ipaddress },
+            'from_addr' => { '<=' => $ipaddress },
+            'to_addr'   => { '>=' => $ipaddress },
         }
     );
 }
@@ -49,7 +29,12 @@ sub including_address {
 sub including_address_ordered {
     shift->including_address(@_)->search(
         {},
-        { order_by => { -desc => 'address' }}
+        {
+	    order_by => [
+		{ -desc => 'from_addr' },
+		{ -asc  => 'to_addr'   }
+	    ]
+	}
     );
 }
 
@@ -60,4 +45,3 @@ sub including_address_ordered {
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

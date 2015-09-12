@@ -50,40 +50,45 @@ sub view : Chained('base') : PathPart('') : Args(0) {
     my $ipaddress = $c->stash->{ipaddress};
 
     $c->stash(
+	device => $c->model('ManocDB::Device')->search({mng_address => $ipaddress})->first
+    );
 
-	arp_results => [ $c->model('ManocDB::Arp')->search( 
-	    { ipaddr => $ipaddress },
-	    { order_by => 'lastseen DESC, firstseen DESC' }
-	) ] ,
+    $c->stash(
+	ipblocks => [ $c->model('ManocDB::IPBlock')->including_address_ordered($ipaddress) ]
+    );
 
-	subnets => [ $c->model('ManocDB::IPRange')->search(
-	    [
-		{
-		    'from_addr' => { '<=' => $ipaddress },
-		    'to_addr'   => { '>=' => $ipaddress },
-		}
-	    ],
-	    { order_by => 'from_addr DESC' }
-	) ],
+    $c->stash(
+	networks => [ $c->model('ManocDB::IPNetwork')->including_address_ordered($ipaddress) ]
+    );
 
+    $c->stash(
+	arp_entries => [ $c->model('ManocDB::Arp')->search_by_ipaddress_ordered($ipaddress) ]
+    );
+    
+    $c->stash(
 	hostnames => [ $c->model('ManocDB::WinHostname')->search(
-	    { ipaddr   => $ipaddress},
+	    { ipaddr   => $ipaddress->padded },
 	    { order_by => 'lastseen DESC, firstseen DESC' }
 	) ],
+    );
 
+    $c->stash(
 	logons => [ $c->model('ManocDB::WinLogon')->search(
-	    { ipaddr   => $ipaddress},
+	    { ipaddr   => $ipaddress->padded },
 	    { order_by => 'lastseen DESC' },
 	) ],
+    );
 
+    $c->stash(
 	reservations => [ $c->model('ManocDB::DHCPReservation')->search(
-	    { ipaddr => $ipaddress }
+	    { ipaddr => $ipaddress->padded }
 	) ],
+    );
 
+    $c->stash(
 	leases => [ $c->model('ManocDB::DHCPLease')->search(
-	    { ipaddr => $ipaddress }
+	    { ipaddr => $ipaddress->padded }
 	) ],
-
     );
 }
 
