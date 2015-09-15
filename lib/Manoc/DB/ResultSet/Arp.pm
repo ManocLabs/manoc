@@ -28,7 +28,7 @@ sub search_by_ipaddress_ordered {
     shift->search_by_ipaddress(@_)->search(
 	{},
 	{
-	    order_by => { -desc [ 'lastseen', 'firstseen' ] }
+	    order_by => { -desc => [ 'lastseen', 'firstseen' ] }
 	}
     );
 }
