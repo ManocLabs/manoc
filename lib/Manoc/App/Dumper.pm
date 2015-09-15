@@ -47,6 +47,14 @@ has 'force' => (
     default  => 0
 );
 
+
+has 'skip_notempty' => (
+    is       => 'rw',
+    isa      => 'Bool',
+    required => 0,
+    default  => 0
+);
+
 has 'load' => (
     is  => 'rw',
     isa => 'Str',
@@ -104,6 +112,7 @@ sub run_load {
             include  => $self->include,
             exclude  => $self->exclude,
 	    config   => $self->config,
+            skip_notempty => $self->skip_notempty,
         }
     );
 

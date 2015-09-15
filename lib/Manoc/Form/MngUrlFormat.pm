@@ -9,7 +9,7 @@ use warnings;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name' => ( default => 'form-mngurlformat' );
 has '+html_prefix' => ( default => 1 );

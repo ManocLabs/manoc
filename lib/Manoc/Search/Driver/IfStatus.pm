@@ -10,27 +10,30 @@ extends 'Manoc::Search::Driver';
 
 sub search_note {
     my ( $self, $query, $result ) = @_;
-    my ( $it, $e );
+
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
-    $it = $schema->resultset('IfStatus')->search(
-						 {description => { '-like' => $pattern }},
-						 { order_by => 'description',
-						   prefetch   => 'device_info',
-						 },
-						);
-    while ( $e = $it->next ) {
-      my $item = Manoc::Search::Item::Iface->new(
-             {
-                 device    => $e->device_info,
-                 interface => $e->interface,
-                 text      => $e->description,
-	         match     => $e->device_info->name,
-             }
-         );
-         $result->add_item($item);
-}
+    my $rs = $schema->resultset('IfStatus')->search(
+	{
+	    description => { '-like' => $pattern }
+	},
+	{
+	    order_by => 'description',
+	    prefetch   => 'device_info',
+	},
+    );
+    while ( my $e = $rs->next ) {
+	my $item = Manoc::Search::Item::Iface->new(
+	    {
+		device      => $e->device_info,
+		interface   => $e->interface,
+		text        => $e->description,
+		match       => $e->device_info->name,
+	    }
+	);
+	$result->add_item($item);
+    }
 }
 
 no Moose;

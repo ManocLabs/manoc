@@ -40,8 +40,7 @@ sub index : Path : Args(0) {
 
 =head2 auto
 
-Performs 
-Sets is_xhr for asyncrho
+Perform CSRF checks for POST requests, sets is_xhr for async request, check authentication.
 
 =cut
 
@@ -50,6 +49,7 @@ sub auto : Private {
 
     # CSRF protection
     if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf}) {
+        $c->log->debug("POST method, token validation required");
         $c->require_valid_token();
     }
 

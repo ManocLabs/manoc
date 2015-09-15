@@ -13,58 +13,66 @@ use Manoc::Search::Result;
 
 has driver_registry => (
     is      => 'rw',
-   isa     => 'HashRef',
+    isa     => 'HashRef',
     default => sub { +{} },
 );
 
-has schema => ( is => 'rw', );
+has schema => (
+    is       => 'ro',
+    required => 1,
+);
+
+has query_types => (
+    is       => 'rw',
+    isa      => 'ArrayRef[Str]',
+    default  =>  sub { \@Manoc::Search::QueryType::TYPES },
+);
+
 
 sub BUILD {
     my $self = shift;
 
     #load default searches methods
-    $self->_load_drivers;
-    #load plugins methods
-    my @plugin_types   = Manoc::Search->_plugin_types;
-    my $plugin_locator = Module::Pluggable::Object->new(
-						  search_path =>  ['Manoc::Plugin'],
-						  only        =>  qr/Driver$/,
-						 );
-    $self->_load_drivers($plugin_locator, \@plugin_types);
+    $self->_find_drivers;
+
 }
 
-sub _load_drivers {
-    my ($self, $locator, $types) = @_;
-    
-    $types or $types = \@Manoc::Search::QueryType::TYPES;
-    $locator or  $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver'], );
+sub _find_drivers {
+    my ($self) = @_;
 
+    my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver'], );
     foreach my $class ( $locator->plugins ) {
+	$self->_load_driver($class);
+    }
 
-        # hack stolen from catalyst:
-        # don't overwrite $@ if the load did not generate an error
-        my $error;
-        {
-            local $@;
-            my $file = $class . '.pm';
-            $file =~ s{::}{/}g;
-            eval { CORE::require($file) };
-            $error = $@;
-        }
-        die $error if $error;
+    # TODO plugin namespace
+}
 
-        my $o = $class->new( { engine => $self } );
-	
-        foreach my $type (@{$types}) {
-            $o->can("search_$type") and
-                $self->_add_driver( $type, $o );
-        }
+
+sub _load_driver {
+    my ($self, $class) = @_;
+    
+    # hack stolen from catalyst:
+    # don't overwrite $@ if the load did not generate an error
+    my $error;
+    {
+	local $@;
+	my $file = $class . '.pm';
+	$file =~ s{::}{/}g;
+	eval { CORE::require($file) };
+	$error = $@;
+    }
+    die $error if $error;
+    
+    my $o = $class->new( { engine => $self } );
+    foreach my $type (@{$self->query_types}) {
+	$o->can("search_$type") and
+	    $self->_register_driver( $type, $o );
     }
 }
 
-sub _add_driver {
+sub _register_driver {
     my ( $self, $type, $driver ) = @_;
-
     push @{ $self->driver_registry->{$type} }, $driver;
 }
 

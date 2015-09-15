@@ -6,8 +6,8 @@ package Manoc::Form::IPBlock;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::Base::Horizontal';
-with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::TraitFor::Horizontal';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');

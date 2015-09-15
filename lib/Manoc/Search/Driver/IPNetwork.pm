@@ -8,7 +8,7 @@ use Moose;
 use Manoc::Search::Item::IPNetwork;
 use Manoc::Search::Item::IpCalc;
 use Manoc::IPAddress::IPv4;
-use Manoc::Utils::IPAddress qw(netmask_prefix2range netmask2prefix ip2int int2ip check_addr);
+use Manoc::Utils::IPAddress qw(check_addr);
 
 extends 'Manoc::Search::Driver';
 
@@ -18,14 +18,14 @@ sub search_subnet {
     my $prefix = $query->prefix;
     my $schema = $self->engine->schema;
 
-    #if subnet isn't defined, the scope is specified
+    # if subnet isn't defined, the scope is specified
     # by the user
     $subnet = $query->sql_pattern unless ( defined($subnet) );
 
     return unless ( check_addr($subnet) );
     $prefix = '24' unless ( defined($prefix) );
 
-    my $addr = Manoc::IPAddress::IPv4->new(int2ip($subnet));
+    my $addr = Manoc::IPAddress::IPv4->new($subnet);
 
     my $filter = { address => $addr };
     $prefix and $filter->{prefix} = $prefix;
@@ -42,7 +42,7 @@ sub search_subnet {
 		    match   => $e->name,
 		}
 	    );
-        $result->add_item($item);
+	    $result->add_item($item);
 	}
     } else {
 
@@ -77,7 +77,7 @@ sub search_inventory {
 	    {
 		name    => $e->name,
 		id      => $e->id,
-		network => $e->address . "/" . $e->prefix,
+		network => $e->network->_stringify,
 		match   => $e->name,
 	    }
         );

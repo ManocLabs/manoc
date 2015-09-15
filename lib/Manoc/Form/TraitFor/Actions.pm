@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Base::Actions;
+package Manoc::Form::TraitFor::Actions;
 use HTML::FormHandler::Moose::Role;
 
 has_field 'form_actions' => (

@@ -6,20 +6,13 @@ package Manoc::Form::VlanRange::Merge;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has_field 'range' => (
     type         => 'Select',
     empty_select => '--- Choose a VLAN range ---',
     required     => 1,
     label        => 'Merge with',
-);
-
-has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
-    widget_wrapper => 'None',
-    value => "Merge"
 );
 
 sub options_range {

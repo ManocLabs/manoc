@@ -22,8 +22,7 @@ has 'name' => (
 
 has 'mng_url' => (
     is     => 'ro',
-    isa    => 'Str',
-    reader => 'get_mng_url',
+    isa    => 'Maybe[Str]',
 );
 
 has 'notes' => (
@@ -38,15 +37,14 @@ around BUILDARGS => sub {
     my $class = shift;
 
     if ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) {
-        my $args = $_[0];
-        my $b    = $args->{device};
-        if ($b) {
-            $args->{id}      = $b->id;
-            $args->{name}    = $b->name || '';
-	    $args->{notes}   = $b->notes if($b->notes);
-            $args->{match} ||= $b->name;
-            $b->get_mng_url and
-                $args->{mng_url} = $b->get_mng_url;
+        my $args   = $_[0];
+        my $device = $args->{device};
+        if ($device) {
+            $args->{id}      = $device->id;
+            $args->{name}    = $device->name || '';
+	    $args->{notes}   = $device->notes;
+            $args->{match}   ||= $device->name;
+	    $args->{mng_url} = $device->get_mng_url;
 
         }
         return $class->$orig($args);
@@ -54,6 +52,13 @@ around BUILDARGS => sub {
 
     return $class->$orig(@_);
 };
+
+sub render {
+    my ($self, $ctx) = @_;
+
+    my $url = $ctx->uri_for_action('device/view', [ $self->id]);
+    return '<a href="$url">' . $self->name . "</a>"
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -9,6 +9,8 @@ use Manoc::Search::Item::IpAddr;
 use Manoc::Search::Item::MacAddr;
 use Manoc::Search::Item::WinLogon;
 
+use Manoc::Search::Widget::ApplyRole;
+
 has query => ( is => 'ro' );
 
 has item_by_match => (
@@ -73,6 +75,15 @@ sub sort_items {
     my $groups = $self->groups;
     my @g = sort { $a->key cmp $b->key } @$groups;
     $self->_groups( \@g );
+}
+
+# use this method if
+sub load_widgets {
+    my $self = shift;
+
+    foreach my $group ( values %{ $self->item_by_match } ) {
+	$group->load_widgets(@_);
+    }
 }
 
 no Moose;

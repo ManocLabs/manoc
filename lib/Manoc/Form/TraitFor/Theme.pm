@@ -3,7 +3,7 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::Form::Base::Theme;
+package Manoc::Form::TraitFor::Theme;
 use Moose::Role;
 
 with 'HTML::FormHandler::Widget::Theme::Bootstrap3';

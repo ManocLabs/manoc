@@ -9,7 +9,7 @@ extends 'Manoc::Search::Item';
 
 has '+item_type' => ( default => 'ipcalc' );
 
-has 'iprange' => (
+has 'address' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,

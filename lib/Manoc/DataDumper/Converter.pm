@@ -97,7 +97,7 @@ sub after_import_source {
     my $source_name = $source->source_name;
     my $method_name = "after_import_${source_name}";
 
-    $self->log->info("Running after callbacks for source $source");
+    $self->log->info("Running after import callbacks");
     foreach my $c (@{$self->converters}) {
         next unless $c->can($method_name);
         $c->$method_name($source);

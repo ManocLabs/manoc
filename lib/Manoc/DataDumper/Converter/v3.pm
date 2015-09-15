@@ -6,7 +6,7 @@
 package Manoc::DataDumper::Converter::v3;
 
 use Moose;
-use Manoc::Utils::IPAddress qw(ip2int padded_ipaddr netmask2prefix);
+use Manoc::Utils::IPAddress qw(ip2int unpadded_ipaddr netmask2prefix);
 
 
 extends 'Manoc::DataDumper::Converter::Base';
@@ -43,7 +43,7 @@ sub _build_device_id_map {
         $self->log->logdie( "No devices found while loading address->id map" );
     }
 
-    my %id_map = map { $_->mng_address => $_->id } @devices;
+    my %id_map = map { unpadded_ipaddr( $_->mng_address ) => $_->id } @devices;
     return \%id_map;
 }
 
@@ -51,12 +51,20 @@ sub _rewrite_device_id {
     my ( $self, $data, $column_name ) = @_;
     my $map = $self->device_id_map;
 
+    my @new_data;
+    
     foreach (@$data) {
-        my $old_id = $_->{$column_name};
+        my $old_id = unpadded_ipaddr( $_->{$column_name} );
         my $new_id = $map->{$old_id};
-        $new_id or $self->log->logdie("No id found in map for device $old_id");
+        if (!defined($new_id) ) {
+            $self->log->error("No id found in map for device $old_id");
+            continue;
+        }
         $_->{$column_name} = $new_id;
+        push @new_data, $_;
     }
+
+    @$data = @new_data;
 }
 
 sub upgrade_cdp_neigh {

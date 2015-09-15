@@ -3,6 +3,7 @@
   [% PROCESS 'message_box.tt' %]
 </div>
 
+[% IF title || page.toolbar -%]
 <!-- title and toolbar -->
 <div class="row">
 [%- IF page.toolbar %]
@@ -14,7 +15,12 @@
   [% bootstrap_pagetitle(title) %]	
 [% END -%]
 </div>
+[%END%]
 
+[% UNLESS page.no_content_row -%]
 <div class="row"><!-- content -->
+[% END -%]
   [% content %]
+[% UNLESS page.no_content_row -%]
 </div><!-- end of content -->
+[% END -%]

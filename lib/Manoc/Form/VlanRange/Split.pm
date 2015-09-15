@@ -6,6 +6,7 @@ package Manoc::Form::VlanRange::Split;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name' => ( default => 'form-vlanrangesplit' );
 has '+html_prefix' => ( default => 1 );
@@ -37,14 +38,6 @@ has_field 'split_point' => (
     type => 'Integer',
     apply => [ 'VlanID' ],
     required => 1
-);
-
-has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
-    widget_wrapper => 'None',
-    value => "Split"
 );
 
 sub validate {

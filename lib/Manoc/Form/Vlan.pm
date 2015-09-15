@@ -9,7 +9,7 @@ use HTML::FormHandler::Moose;
 use Manoc::Form::Types::VlanID;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::Base::SaveButton';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name' => ( default => 'form-vlan' );
 has '+html_prefix' => ( default => 1 );
