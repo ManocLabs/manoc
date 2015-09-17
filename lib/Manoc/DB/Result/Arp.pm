@@ -54,7 +54,9 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_mac', fields => ['macaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_mac', fields => ['macaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_ip',  fields => ['ipaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_ipmac',  fields => ['ipaddr', 'macaddr'] );
 }
 
 1;

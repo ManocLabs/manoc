@@ -365,8 +365,10 @@ sub children_ordered {
 sub sqlt_deploy_hook {
    my ($self, $sqlt_table) = @_;
 
-   $sqlt_table->add_index(name => 'idx_address_broadcast', fields => ['address', 'broadcast']);
-   $sqlt_table->add_index(name => 'idx_address_prefix', fields => ['address', 'prefix']);
+   $sqlt_table->add_index(name => 'idx_ipnet_address_broadcast',
+                          fields => ['address', 'broadcast']);
+   $sqlt_table->add_index(name => 'idx_ipnet_address_prefix',
+                          fields => ['address', 'prefix']);
 }
 
 

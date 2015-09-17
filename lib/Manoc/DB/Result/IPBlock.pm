@@ -105,6 +105,14 @@ sub container_network {
 }
 
 
+
+sub sqlt_deploy_hook {
+   my ($self, $sqlt_table) = @_;
+
+   $sqlt_table->add_index(name => 'idx_ipblock_from_to',
+                          fields => ['from_addr', 'to_addr']);
+}
+
 1;
 # Local Variables:
 # mode: cperl
