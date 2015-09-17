@@ -32,7 +32,7 @@
     <a href="[%c.uri_for_action('iprange/view',[range.name])%]">[% r.name | html %]</a>
     [% END -%]
   </dd>
-  <dt>Device using</dt>
+  <dt>Used in</dt>
   <dd>
     [% FOREACH device IN object.devices %]
     <a href="[%c.uri_for_action('device/view',[device.id])%]"> [% device.name.html %] </a>  

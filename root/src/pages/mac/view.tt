@@ -1,5 +1,6 @@
 [%
-   title='Mac Address View'
+   page.title='Info about ' _ macaddr | html
+   
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 <dl class="dl-horizontal">
