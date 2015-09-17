@@ -8,7 +8,7 @@ use Moose::Role;
 sub render {
     my ($self, $ctx) = @_;
 
-    my $url = $ctx->uri_for_action('/interface/view', [ $device->device_id, $interface ]);
+    my $url = $ctx->uri_for_action('/interface/view', [ $self->device_id, $self->interface ]);
     return
 	"<a href=\"$url\">" .
 	$self->device_name . '/' . $self->interface .
