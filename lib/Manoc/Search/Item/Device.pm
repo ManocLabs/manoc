@@ -27,7 +27,7 @@ has 'mng_url' => (
 
 has 'notes' => (
     is     => 'ro',
-    isa    => 'Str',
+    isa    => 'Maybe[Str]',
     required => 0,
 
 );
