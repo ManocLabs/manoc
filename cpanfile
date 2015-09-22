@@ -26,14 +26,17 @@ requires 'Catalyst::View::JSON';
 requires 'Config::General';
 requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
-requires 'MooseX::Types::IPv4';
 requires 'MooseX::Storage';
+requires 'MooseX::Daemonize';
+requires 'MooseX::Workers';
+requires 'Moosex::Getopt';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
 requires 'SQL::Translator';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Plack::Middleware::ReverseProxy';
+requires 'POE';
 
 recommends 'Net::Pcap';
 recommends 'NetPacket';
