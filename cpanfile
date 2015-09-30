@@ -29,7 +29,7 @@ requires 'HTML::FormHandler::Model::DBIC';
 requires 'MooseX::Storage';
 requires 'MooseX::Daemonize';
 requires 'MooseX::Workers';
-requires 'Moosex::Getopt';
+requires 'MooseX::Getopt';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
@@ -37,10 +37,7 @@ requires 'SQL::Translator';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Plack::Middleware::ReverseProxy';
 requires 'POE';
-
-recommends 'Net::Pcap';
-recommends 'NetPacket';
-recommends 'SNMP::Info', '3.27';
+requires 'Digest::SHA1';
 
 on 'test' => sub {
   requires 'Test::More';
@@ -50,6 +47,15 @@ on 'test' => sub {
 on 'develop' => sub {
   recommends 'Devel::NYTProf';
   recommends 'Catalyst::Devel', '5.90077';
+};
+
+feature 'arpsniffer', 'ARP sniffer support' => sub {
+  requires 'Net::Pcap';
+  requires 'NetPacket';
+};
+
+feature 'snmp', 'SNMP support' => sub {
+  requires 'SNMP::Info', '3.27';
 };
 
 feature 'sqlite', 'SQLite support' => sub {
