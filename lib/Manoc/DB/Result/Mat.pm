@@ -60,10 +60,10 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Mat');
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_device',  fields => ['device'] );
-    $sqlt_schema->add_index( name => 'idx_macaddr', fields => ['macaddr'] );
+    $sqlt_schema->add_index( name => 'idx_mat_device',  fields => ['device'] );
+    $sqlt_schema->add_index( name => 'idx_mat_macaddr', fields => ['macaddr'] );
 
-    $sqlt_schema->add_index( name => 'idx_dev_iface', fields => [ 'device', 'interface' ] );
+    $sqlt_schema->add_index( name => 'idx_mat_dev_iface', fields => [ 'device', 'interface' ] );
 
 }
 

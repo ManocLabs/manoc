@@ -85,7 +85,7 @@ sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
     my $ifnotes = $c->model('ManocDB::IfNotes')->find($object_pk);
     $ifnotes or $ifnotes = $c->model('ManocDB::IfNotes')->new_result( {});
 
-    my $form = Manoc::Form::IfNotes->new( %$object_pk );
+    my $form = Manoc::Form::IfNotes->new( { %$object_pk, ctx => $c } );
     $c->stash(form => $form);
     return unless $form->process(
 	params => $c->req->params,

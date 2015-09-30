@@ -3,9 +3,13 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::Search::Widget::MacAddr;
-use Moose::Role;
 
-sub render {
+use Moose::Role;
+with 'Manoc::Search::Widget::Group' => {
+    -exclude => [ 'render_heading' ]
+};
+
+sub render_heading {
     my ($self, $ctx) = @_;
 
     my $url = $ctx->uri_for_action('/mac/view', [ $self->addr ]);

@@ -13,7 +13,6 @@ use POE qw(Filter::Reference Filter::Line);
 
 use Data::Dumper;
 use Manoc::Netwalker::DeviceUpdater;
-use Manoc::Report::NetwalkerReport;
 
 has 'device' => (
                  is      => 'ro',
@@ -105,7 +104,6 @@ sub worker_stderr  {
 sub worker_stdout  {  
     my ( $self, $result ) = @_;
 
-    #accumulate Manoc::Report::NetwalkerReport
     my $worker_report = Manoc::Netwalker::DeviceReport->thaw($result->{report});
     my $id_worker = $worker_report->host;
 

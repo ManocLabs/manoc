@@ -1,5 +1,5 @@
 [%
-page.title='IP Address ' _ id.address
+page.title='Info about ' _ ipaddress
 -%]
 [% META
 use_table=1
