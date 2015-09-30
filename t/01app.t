@@ -3,7 +3,11 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok 'Catalyst::Test', 'Manoc' }
+BEGIN { 
+	use FindBin;
+    	require "$FindBin::Bin/lib/inc.pl";
+	use_ok 'Catalyst::Test', 'Manoc' 
+}
 
 ok( request('/auth/login')->is_success, 'Test initial login page' );
 

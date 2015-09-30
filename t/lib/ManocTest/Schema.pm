@@ -11,7 +11,8 @@ sub connection {
 
     unlink($db_file) if -e $db_file;
     unlink($db_file . '-journal') if -e $db_file . '-journal';
-    mkdir("t/var") unless -d "t/var";
+    mkdir("var") unless -d "var";
+
 
     my $dsn = "dbi:SQLite:$db_file";
     my $schema = $self->next::method(
