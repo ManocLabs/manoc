@@ -13,10 +13,7 @@ BEGIN {
     use lib "$Bin/lib";
 
     $ENV{CATALYST_CONFIG} = "$Bin/lib/manoc_test.conf";
-    $ENV{MANOC_NO_CSRFBLOCK} = 1;
-    $ENV{MANOC_NO_AUTH} //= 0;
 }
 
-use Catalyst::Test 'Manoc';
 use HTTP::Request::Common;
 1;
