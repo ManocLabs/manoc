@@ -7,14 +7,9 @@ use base qw( Manoc::DB );
 sub connection {
     my $self = shift;
 
-    my $db_file = 'var/test.db';
-
-    unlink($db_file) if -e $db_file;
-    unlink($db_file . '-journal') if -e $db_file . '-journal';
-    mkdir("var") unless -d "var";
-
-
+    my $db_file = ':memory:';
     my $dsn = "dbi:SQLite:$db_file";
+
     my $schema = $self->next::method(
 	$dsn, '', '',
 	{ AutoCommit => 1,
