@@ -7,12 +7,12 @@ Makefile
 Makefile.old
 .build
 .DS_Store
+.vagrant
 *~
 *.bak
-log/
-manoc.conf
-manoc_log.conf
-scheduler.state
+/manoc.conf
+/manoc_log.conf
+local/
 lib/Manoc/Plugin
-local
+log/
 t/var

@@ -17,7 +17,8 @@
 
 . /etc/init.d/functions
 
-MANOC_ROOT=
+# change according to your installation
+MANOC_ROOT=/opt/manoc
 MANOC_ARPD=$MANOC_ROOT/
 
 LOCALLIB=

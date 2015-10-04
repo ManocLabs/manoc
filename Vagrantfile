@@ -7,5 +7,5 @@ Vagrant.configure(2) do |config|
 
   config.vm.network "forwarded_port", guest: 3000, host: 8080
 
-  config.vm.provision "shell", path: "vagrant/setup.sh"
+  config.vm.provision "shell", path: "maint/vagrant-setup.sh"
 end
