@@ -41,7 +41,7 @@ has 'enable_password' => (
 
 sub connect {
     my $self = shift;
-
+    
     my $host = self->host;
 
     #Connect and login in enable mode

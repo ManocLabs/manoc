@@ -29,6 +29,13 @@ sub make_credentials_columns {
 	    is_nullable   => 1,
 	},
 
+	key_path => {
+	    data_type     => 'varchar',
+	    size          => 256,
+	    default_value => 'NULL',
+	    is_nullable   => 1,
+	},
+	
 	snmp_community => {
 	    data_type     => 'varchar',
 	    size          => 64,
@@ -47,12 +54,27 @@ sub make_credentials_columns {
 	    default_value => 'NULL',
 	    is_nullable   => 1,
 	},
-	snmp_ver => {
+	snmp_version => {
 	    data_type     => 'int',
 	    size          => 1,
 	    default_value => '0',
 	},
     );
+}
+
+sub get_credentials_hash {
+    my $self = shift;
+
+    return {
+    	username        => $self->username,
+	password        => $self->password,
+	password2       => $self->password2,
+	key_path        => $self->key_path,
+	snmp_community  => $self->snmp_community,
+	snmp_user       => $self->snmp_user,
+	snmp_password   => $self->snmp_password,
+	snmp_version    => $self->snmp_version,
+    }
 }
 
 1;

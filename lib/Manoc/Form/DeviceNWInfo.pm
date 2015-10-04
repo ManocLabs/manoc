@@ -22,7 +22,6 @@ has 'device' => (
     required => 1,
 );
 
-
 has_field 'manifold' => (
     type     => 'Select',
     label    => 'Fetch info with',
@@ -74,14 +73,35 @@ has_field 'get_vtp' => (
     label          => 'Download VTP DB',
 );
 
-#Credentials
-has_field 'username' => ( type => 'Text', label => 'Telnet Password' );
+#Credentials, don't use username/password to avoid autofilling
 
-has_field 'password' => ( type => 'Password', label => 'First level Password' );
+has_field 'nw_username' => (
+    type     => 'Text',
+    label    => 'Username',
+    accessor => 'username',
+);
 
-has_field 'password2' => ( type => 'Password', label => 'Second level Password' );
+has_field 'nw_password' => (
+    type      => 'Text',
+    label     => 'First level Password',
+    accessor  => 'password',
+    widget    => 'Password',
+    writeonly => 1,
+);
 
-has_field 'snmp_ver' => (
+has_field 'password2' => (
+    type      => 'Text',
+    label     => 'Second level Password',
+    widget    => 'Password',
+    writeonly => 1,
+);
+
+has_field 'key_path' => (
+    type => 'Text',
+    label => 'Path to SSH key',
+);
+
+has_field 'snmp_version' => (
     type    => 'Select',
     label   => 'SNMP version',
     options => [
@@ -103,42 +123,52 @@ has_field 'snmp_user' => (
 );
 
 has_field 'snmp_password' => (
-    type => 'Text',
-    label => 'SNMP password'
+    type      => 'Text',
+    label     => 'SNMP password',
+    widget    => 'Password',
 );
 
 
 sub options_manifold {
-    return shift->_do_options_manifold;
+    return shift->_manifold_list;
 }
 
 sub options_config_manifold {
-    return shift->_do_options_manifold;
+    return shift->_manifold_list;
 }
 
-sub _do_options_manifold {
+
+sub _manifold_list {
     Manoc::Manifold->load_namespace;
     my @manifolds = Manoc::Manifold->manifolds;
-    return map +{ value => $_, label => $_ }, sort(@manifolds);
+    return  map +{ value => $_, label => $_ }, sort(@manifolds);
 }
+
 
 sub options_mat_native_vlan {
-    my $self = shift;
-    return $self->_do_options_vlan()
+    shift->_get_vlan_list;
 }
 
-sub options_vlan_arpinfo {
-    my $self = shift;
-    return $self->_do_options_vlan()
+sub options_arp_vlan {
+    shift->_get_vlan_list;
 }
 
-sub _do_options_vlan {
-    my $self = shift;
+has _vlan_list => (
+    is   => 'rw',
+    isa  => 'ArrayRef',
+);
 
+sub _get_vlan_list {
+    my $self = shift;
     return unless $self->schema;
-    my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
+    
+    return @{ $self->_vlan_list } if $self->_vlan_list;
 
-    return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
+    my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
+    my @list = map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
+    
+    $self->_vlan_list(\@list);
+    return @list;
 }
 
 

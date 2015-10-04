@@ -24,6 +24,13 @@ __PACKAGE__->add_columns(
         is_nullable   => 0,
     },
 
+    manifold_args => {
+	data_type     => 'varchar',
+        size          => 255,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
     # manifold to be used for getting
     # configuration
     config_manifold => {
@@ -33,15 +40,27 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    last_visited => {
-        data_type     => 'int',
-        default_value => '0',
-    },
     offline => {
         data_type     => 'int',
         size          => 1,
         default_value => '0',
     },
+
+    last_visited => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    last_full_update => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    last_backup => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
     netwalker_status => {
 	data_type     => 'varchar',
         size          => 255,
@@ -75,12 +94,12 @@ __PACKAGE__->add_columns(
         default_value => '0',
     },
 
-    
     mat_native_vlan => {
         data_type     => 'int',
         default_value => '1',
         is_nullable   => 1,
     },
+
     arp_vlan => {
         data_type     => 'int',
         default_value => '1',

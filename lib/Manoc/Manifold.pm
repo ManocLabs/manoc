@@ -14,6 +14,7 @@ use Module::Pluggable
     sub_name => '_plugins',
     search_path => 'Manoc::Manifold',
     ;
+use Class::Load qw(load_class);
 
 __PACKAGE__->mk_group_accessors(inherited => 'name_mappings');
 __PACKAGE__->mk_group_accessors(inherited => 'manifold_list');
@@ -41,15 +42,18 @@ sub new_manifold {
     my $self = shift;
     my $name = shift;
 
+    defined($self->name_mappings) or
+        $self->load_namespace;
+    
     my $mapped = $self->name_mappings->{$name};
     $mapped and $name = $mapped;
 
-    eval "require $name";
+    load_class $name;
     return $name->new(@_);
 }
 
 sub connect {
-    shift->manifold(shift, @_)->connect();
+    shift->new_manifold(shift, @_)->connect();
 }
 
 1;

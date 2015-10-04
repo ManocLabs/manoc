@@ -118,7 +118,7 @@ __PACKAGE__->might_have(
     { 'foreign.device' => 'self.id' },
     {
         cascade_delete => 1,
-        cascade_copy   => 1,
+        cascade_copy   => 0,
     }
 );
 
@@ -137,6 +137,12 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
+=head2 get_mng_url
+
+Return mng_address formatted using mng_url_format,
+
+=cut
+
 
 sub get_mng_url {
     my $self = shift;
@@ -149,6 +155,41 @@ sub get_mng_url {
     $str =~ s/%h/$ipaddr/go;
 
     return $str;
+}
+
+=head2 update_config( $config_text, [ $timestamp ] )
+
+Create or update the related DeviceConfig object. Check if configuration has changed before rotating the stored one.
+Return 1 if the config object has been refreshed, undef otherwise.
+
+=cut
+
+sub update_config {
+    my ($self, $config_text, $timestamp) = @_;
+
+    $timestamp ||= time;
+
+    my $config = $self->config;
+    if (!$config) {
+	$self->create_related('config' => {
+	    config       => $config_text,
+	    config_date  => $timestamp,
+	});
+
+	return 1;
+    }
+
+    if ($config->config ne $config_text) {
+	$config->prev_config( $config->config );
+	$config->prev_config_date( $config->config_date );
+	$config->config($config_text);
+	$config->config_date( $timestamp );
+	$config->update();
+
+	return 1;
+    }
+
+    return;
 }
 
 1;

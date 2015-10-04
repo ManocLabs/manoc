@@ -3,40 +3,67 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-# A frontend for CISCO IOS devices still using telnet
-
-package Manoc::Manifold::Telnet::IOS;
+package Manoc::Manifold::SSH::Linux;
 
 use Moose;
 
-with 'Manoc::ManifoldRole::Base';
 with 'Manoc::ManifoldRole::SSH';
+
+around '_build_username' => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return $self->$orig() || 'root';
+};
 
 use Try::Tiny;
 
+sub _build_boottime {
+    my $self = shift;
+
+    my $data = $self->cmd('cat /proc/uptime');
+    my ($seconds, undef) = split /\s+/, $data;
+    return time() - int($seconds);
+
+}
+
+sub _build_name {
+    my $self = shift;
+    return $self->cmd('uname -n');
+}
+
+sub _build_os {
+    my $self = shift;
+    return $self->cmd('uname -s');
+}
+
+sub _build_os_ver {
+    my $self = shift;
+    return $self->cmd('uname -r');
+}
 
 sub _build_arp_table {
     my $self = shift;
-    my $session = $self->session;
 
     my %arp_table;
-
+    my @data;
     try {
-	my @data = $self->cmd('/sbin/arp');
-	chomp @data;
+        @data = $self->cmd('/sbin/arp -n');
 
-	# 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
-	foreach my $line (@data) {
-	    if ($line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
-		my ($ip, $mac) = ($1, $2);
-		$arp_table{$ip} =  $mac;
-	    }
-	}
-	return \%arp_table;
+    } catch {
+        $self->log->error('Error fetching arp table: ', $self->get_error);
+        return undef;
     };
 
-    $self->log->error('Error fetching arp table');
-    return undef;
+    # parse arp table
+    # 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
+    foreach my $line (@data) {
+        if ($line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
+            my ($ip, $mac) = ($1, $2);
+            $arp_table{$ip} =  $mac;
+        }
+    }
+    return \%arp_table;
 }
 
 

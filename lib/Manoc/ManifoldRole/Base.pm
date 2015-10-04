@@ -13,6 +13,18 @@ has 'host' => (
     required => 1
 );
 
+has 'credentials' => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    required => 1,
+);
+
+has 'extra_params' => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
 has 'arp_table' => (
     is      => 'ro',
     isa     => 'Maybe[HashRef]',
@@ -20,6 +32,55 @@ has 'arp_table' => (
     builder => '_build_arp_table',
 );
 sub _build_arp_table { }
+
+has name => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_name',
+);
+sub _build_name { undef }
+
+has model => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_model',
+);
+sub _build_model { undef }
+
+has vendor => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_vendor',
+);
+sub _build_vendor { undef }
+
+has serial => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_serial',
+);
+sub _build_serial { undef }
+
+has os => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_os',
+);
+sub _build_os { undef }
+
+has os_ver => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_os_ver',
+);
+sub _build_os_ver { undef }
+
 
 has 'boottime' => (
     is      => 'ro',
@@ -29,21 +90,15 @@ has 'boottime' => (
 );
 sub _build_boottime { undef }
 
+
 has 'configuration' => (
     is      => 'ro',
-    isa     => 'Maybe[String]',
+    isa     => 'Maybe[Str]',
     lazy    => 1,
     builder => '_build_configuration',
 );
 sub _build_configuration {}
 
-has 'device_info' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_device_info',
-);
-sub _build_device_info { {} }
 
 has 'ifstatus_table' => (
     is      => 'ro',
@@ -71,7 +126,7 @@ sub _build_neighbors { }
 
 has 'vtp_domain' => (
     is      => 'ro',
-    isa     => 'Maybe[String]',
+    isa     => 'Maybe[Str]',
     lazy    => 1,
     builder => '_build_vtp_domain',
 );
@@ -84,7 +139,6 @@ has vtp_database => (
     builder => '_build_vtp_database'
 );
 sub _build_vtp_database {}
-
 
 no Moose::Role;
 1;

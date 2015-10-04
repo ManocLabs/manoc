@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Netwalker::TaskStatus;
+package Manoc::Netwalker::TaskReport;
 
 use Moose;
 use MooseX::Storage;

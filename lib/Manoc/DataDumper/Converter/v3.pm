@@ -120,7 +120,7 @@ sub upgrade_DeviceNWInfo  {
         $r->{snmp_community}  = $_->{snmp_com};
         $r->{snmp_user}       = $_->{snmp_user};
         $r->{snmp_password}   = $_->{snmp_password};
-        $r->{snmp_ver}        = $_->{snmp_ver};
+        $r->{snmp_version}    = $_->{snmp_ver};
 
         $r->{device}          = $_->{id};
         $r->{manifold}        = 'SNMP';
@@ -134,6 +134,10 @@ sub upgrade_DeviceNWInfo  {
 sub upgrade_device_config {
     my ( $self, $data ) = @_;
     $self->_rewrite_device_id($data, 'device');
+    
+    foreach (@$data) {
+	delete $_->{last_visited};
+    }
 }
 
 sub upgrade_dot11_assoc {

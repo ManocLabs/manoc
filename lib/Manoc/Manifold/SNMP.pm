@@ -12,18 +12,21 @@ with 'Manoc::ManifoldRole::Base';
 with 'Manoc::Logger::Role';
 
 use SNMP::Info;
+use Carp qw(croak);
 use Try::Tiny;
 
 has 'community' => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'public',
+    lazy    => 1,
+    builder => '_build_community',
 );
 
 has 'version' => (
     is      => 'ro',
-    isa     => 'Str',
-    default => '2',
+    isa     => 'Int',
+    lazy    => '1',
+    builder => '_build_version',
 );
 
 has 'is_subrequest' => (
@@ -34,41 +37,65 @@ has 'is_subrequest' => (
 
 has 'snmp_info' => (
     is      => 'ro',
-    isa     => 'Object'
+    isa     => 'Object',
     writer  => '_set_snmp_info',
 );
 
 has 'mat_force_vlan' => (
     is      => 'ro',
+    lazy    => 1,
+    builder => '_build_force_vlan'
 );
 
-#----------------------------------------------------------------------#
+sub _build_community {
+    my $self = shift;
+
+    return $self->credentials->{snmp_community} || 'public'
+}
+
+sub _build_version {
+    my $self = shift;
+    my $version =  $self->credentials->{snmp_version} || 2;
+    $version eq '2c' and $version = 2;
+
+    return $version;
+}
+
+sub _build_mat_force_vlan {
+    my $self = shift;
+    return $self->extra_params->{mat_force_vlan};
+}
 
 sub connect {
-    my $self = shift;
+    my ( $self ) = @_;
     my $opts = shift || {};
+
+    my $info;
+
+    my $snmp_options;
+    $snmp_options = $self->extra_params->{snmp_options} || {};
 
     my %snmp_info_args = (
         # Auto Discover more specific Device Class
         AutoSpecify => 1,
 
-        Debug => $ENV{SNMPINFO_DEBUG},
+        Debug => $ENV{MANOC_DEBUG_SNMPINFO},
 
         # The rest is passed to SNMP::Session
         DestHost  => $self->host,
         Community => $self->community,
         Version   => $self->version,
-        %$opts,
+        %$snmp_options,
     );
 
-    try{
-        $info = new SNMP::Info(%snmp_info_args);
-    } catch{
-        my $msg = "Could not connect to ".$self->host." .$_";
+    try {
+        $info = SNMP::Info->new(%snmp_info_args);
+    } catch {
+        my $msg = "Could not connect to " . $self->host . " .$_";
         $self->log->error( $msg );
         return undef;
     };
-
+    
     unless ($info) {
         $self->log->error( "Could not connect to ", $self->host );
         return undef;
@@ -76,7 +103,7 @@ sub connect {
 
     # guessing special devices...
     my $class = _guess_snmp_info_class($info);
-    if ($defined($class) ) {
+    if (defined($class) ) {
         $self->log->debug("ovverriding SNMPInfo class: $class");
 
         eval "require $class";
@@ -98,7 +125,6 @@ sub connect {
     
     $self->_set_snmp_info($info);
     return 1;
-
 }
 
 sub _guess_snmp_info_class {
@@ -212,7 +238,7 @@ sub _build_mat {
 	            $v =~  m/^\d+$/o and $vlans{$v}++;     
                 } 
             }
-            else{
+            else {
               $self->mat_force_vlan =~  m/^\d+$/o  and  
                  $vlans{$self->mat_force_vlan}++;  
             }   
@@ -287,24 +313,44 @@ sub _build_vtp_database {
 
 sub _build_boottime {
     my $self = shift;
-    return time() - $self->snmp_info->uptime() / 100;
+    return time() - int( $self->snmp_info->uptime() / 100 );
 }
 
-#----------------------------------------------------------------------#
-
-sub _build_device_info {
+sub _build_name {
     my $self = shift;
-    my $info = $self->snmp_info or return undef;
- 
-    return {
-        name   => $info->name,
-        model  => $info->model,
-        os     => $info->os,
-        os_ver => $info->os_ver,
-        vendor => $info->vendor,
-        serial => $info->serial,
-    };
+    my $info = $self->snmp_info;
+    return $info->name;
+}
 
+
+sub _build_model {
+    my $self = shift;
+    my $info = $self->snmp_info;
+    return $info->model;
+}
+
+sub _build_os {
+    my $self = shift;
+    my $info = $self->snmp_info;
+    return $info->os;
+}
+
+sub _build_os_ver {
+    my $self = shift;
+    my $info = $self->snmp_info;
+    return $info->os_ver;
+}
+
+sub _build_vendor {
+    my $self = shift;
+    my $info = $self->snmp_info;
+    return $info->vendor;
+}
+
+sub _build_serial {
+    my $self = shift;
+    my $info = $self->snmp_info;
+    return $info->serial;
 }
 
 #----------------------------------------------------------------------#
