@@ -14,7 +14,6 @@ install_script "script/manoc_dhcp_agent.pl";
 install_script "script/manoc_dump.pl";
 install_script "script/manoc_fastcgi.pl";
 install_script "script/manoc_initdb.pl";
-install_script "script/manoc_ipagent.pl";
 install_script "script/manoc_netwalker.pl";
 install_script "script/manoc_server.pl";
 install_script "script/manoc_snarewin_agent.pl";

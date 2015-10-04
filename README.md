@@ -13,3 +13,5 @@ It's able to collect and display:
 Data is stored using a SQL database for scalability and speed. It's written in Perl using Catalyst, DBIx::Class, Moose and SNMP::Info.
 
 See https://github.com/ManocLabs/manoc/wiki for more info.
+
+[![Build Status](https://travis-ci.org/ManocLabs/manoc.svg?branch=master)](https://travis-ci.org/ManocLabs/manoc)
