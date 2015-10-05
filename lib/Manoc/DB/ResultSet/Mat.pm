@@ -8,6 +8,11 @@ use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
 
+__PACKAGE__->load_components(qw/
+				   +Manoc::DB::Helper::ResultSet::TupleArchive
+			       /);
+
+
 sub search_multihost {
     my $self = shift;
 

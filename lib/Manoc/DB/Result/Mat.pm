@@ -8,6 +8,10 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
+__PACKAGE__->load_components(qw/
+				   +Manoc::DB::Helper::Row::TupleArchive
+			       /);
+
 __PACKAGE__->table('mat');
 
 __PACKAGE__->add_columns(
@@ -26,31 +30,21 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         size        => 64,
     },
-    'firstseen' => {
-        data_type   => 'int',
-        is_nullable => 0,
-        size        => 11
-    },
-    'lastseen' => {
-        data_type     => 'int',
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
+    # firstseen, lastseen, archived added by TupleArchive
+    
     'vlan' => {
         data_type     => 'int',
         default_value => 1,
         is_nullable   => 0,
         size          => 11
     },
-    'archived' => {
-        data_type     => 'int',
-        default_value => 0,
-        is_nullable   => 0,
-        size          => 1
-    },
 );
 
+__PACKAGE__->set_tuple_archive_columns('macaddr', 'device', 'interface', 'vlan');
+
 __PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'vlan' );
+
+
 
 __PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
 

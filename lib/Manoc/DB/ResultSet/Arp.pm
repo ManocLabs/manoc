@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -9,6 +9,10 @@ use strict;
 use warnings;
 
 use Scalar::Util qw(blessed);
+
+__PACKAGE__->load_components(qw/
+				   +Manoc::DB::Helper::ResultSet::TupleArchive
+			       /);
 
 
 sub search_by_ipaddress {
@@ -76,6 +80,18 @@ sub first_last_seen {
 	    group_by => [ 'ipaddr'],
 	}
     );
+}
+
+sub register_tuple {
+    my $self = shift;
+    my %params = @_;
+
+    my $ipaddr = $params{ipaddr};
+    $ipaddr = Manoc::IPAddress::IPv4->new( $params{ipaddr} )
+	unless blessed($params{ipaddr});
+    $params{ipaddr} = $ipaddr->padded;
+
+    $self->next::method(%params);
 }
 
 1;
