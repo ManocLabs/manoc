@@ -12,7 +12,6 @@ with 'Manoc::Form::TraitFor::SaveButton';
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
 
-
 has '+name' => ( default => 'form-ipnetwork' );
 has '+html_prefix' => ( default => 1 );
 
@@ -20,7 +19,12 @@ has '+item_class' => (
     default => 'IPBlock'
 );
 
-sub build_render_list {[ 'name', 'range_block', 'description', 'save' ]}
+sub build_render_list {
+    [
+        'name', 'range_block', 'description', 'save',
+        'csrf_token',
+    ]
+}
 
 has_block 'range_block' => (
     render_list => ['from_addr', 'to_addr'],

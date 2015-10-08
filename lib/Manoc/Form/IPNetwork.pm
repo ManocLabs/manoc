@@ -19,7 +19,12 @@ has '+item_class' => (
     default => 'IPNetwork'
 );
 
-sub build_render_list {[ 'network_block', 'name', 'vlan_id', 'description', 'save' ]}
+sub build_render_list {
+    [
+        'network_block', 'name', 'vlan_id', 'description', 'save',
+        'csrf_token'
+    ]
+}
 
 has_block 'network_block' => (
     render_list => ['address', 'prefix'],
