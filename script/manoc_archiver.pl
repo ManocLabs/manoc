@@ -21,34 +21,27 @@ has 'sources' => (
     is => 'rw', 
     isa => 'ArrayRef[Str]', 
     required => 0, 
-    default => sub { [qw(Mat Arp Dot11Assoc WinLogon WinHostname)] }, 
+    default => sub { [qw(Mat Arp Dot11Assoc WinLogon WinHostname)] },
    );
 
 sub archive {
     my ($self, $time) = @_;
     my $conf         = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!") ;
     my $schema       = $self->schema;
-    my $archive_age  = Manoc::Utils::str2seconds($conf->{'archive_age'}); 
+    my $archive_age  = Manoc::Utils::str2seconds($conf->{'archive_age'});
     my $tot_archived = 0;
 
    if (! $archive_age) {
 	$self->log->info("Archiver: archive_age = 0: skipping.");
 	return;
     }
-    my $archive_date = $time - $archive_age;
     
     $self->log->info("Archiver: archiving lastseen before " .
 		  Manoc::Utils::print_timestamp($archive_date));
 
     foreach my $source ( @{$self->sources} ) {
         $self->log->debug("Archiving in table $source");
-       
-        my $it = $schema->resultset($source)->search({
-            'archived'  => 0,
-            'lastseen' => { '<', $archive_date },	    
-	});
-        $tot_archived += $it->count;
-        $it->update({'archived' => 1});
+        $tot_archived = $schema->resultset($source)->archive_entries($archive_age);
     }
 }
 

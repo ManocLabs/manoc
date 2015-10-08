@@ -376,54 +376,13 @@ sub update_mat {
             next if $uplinks->{$p};
             next if $ignore_portchannel && lc($p) =~ /^port-channel/;
 
-            my @mat_entries = $self->schema->resultset('Mat')->search(
-                {
-                    macaddr   => $m,
-                    device    => $device_id,
-                    interface => $p,
-                    archived  => 0,
-                    vlan      => $vlan,
-                }
+            $self->schema->resultset('Mat')->register_tuple(
+                macaddr   => $m,
+                device    => $device_id,
+                interface => $p,
+                timestamp => $timestamp,
+                vlan      => $vlan,
             );
-            if ( scalar(@mat_entries) > 1 ) {
-                my $msg = "More than one non archived entry for ".$entry->name.",$m,$p";
-                $self->log->error($msg );
-                $self->report->add_error($msg );
-                next;
-            }
-            $mat_count++;
-            my $create_new_entry = 0;
-            if (@mat_entries) {
-                my $entry = $mat_entries[0];
-
-                # check for a vlan change
-                if ( $entry->vlan() != $vlan ) {
-                    $entry->archived(1);
-                    $entry->update();
-                    $create_new_entry = 1;
-                }
-                else {
-                    $entry->lastseen($timestamp);
-                    $entry->update();
-                }
-            }
-            else {
-                $create_new_entry = 1;
-            }
-
-            if ($create_new_entry) {
-                $schema->resultset('Mat')->update_or_create(
-                    {
-                        macaddr   => $m,
-                        device    => $device_id,
-                        interface => $p,
-                        firstseen => $timestamp,
-                        lastseen  => $timestamp,
-                        vlan      => $vlan,
-                        archived  => 0,
-                    }
-                );
-            }
 
         }    # end of entries loop
 
@@ -471,47 +430,26 @@ sub update_vtp_database {
 sub update_arp_table {
     my $self = shift;
 
-    my $source   = $self->source;
-    my $entry    = $self->entry;
-    my $timestamp= $self->timestamp;
-    my $vlan     = defined($entry->vlan_arpinfo) ? $entry->vlan_arpinfo->id : $self->config->{default_vlan};
-    my $arp_table= $source->arp_table;
-    my $arp_count= 0;
+    my $source    = $self->source;
+    my $entry     = $self->entry;
+    my $timestamp = $self->timestamp;
+    my $vlan      = defined($entry->vlan_arpinfo) ? $entry->vlan_arpinfo->id : $self->config->{default_vlan};
+    my $arp_table = $source->arp_table;
+    my $arp_count = 0;
 
     $self->log->debug("Fetching arp table from ",$self->entry->id->address);
-    
+
     my ($ip_addr, $mac_addr);
     while (($ip_addr, $mac_addr) = each(%$arp_table)) {
         $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
 
-        my $ip_obj =  Manoc::IPAddress::IPv4->new( $ip_addr  );
-	my @entries = $self->schema->resultset('Arp')->search({
-	    ipaddr	=> $ip_obj,
+        $self->schema->resultset('Arp')->register_tuple(
+	    ipaddr	=> $ip_addr,
 	    macaddr	=> $mac_addr,
 	    vlan	=> $vlan,
-	    archived => 0
-	    });
-    
-        if(scalar(@entries) > 1) {
-            $self->log->error("More than one non archived entry for $ip_addr,$mac_addr");
-            $self->report->add_error("More than one non archived entry for $ip_addr,$mac_addr");
-        }
-        $arp_count++;
-	if (@entries) {
-	    my $entry = $entries[0];	
-	    $entry->lastseen($timestamp);
-	    $entry->update();
-	} else {
-	    $self->schema->resultset('Arp')->create({
-		ipaddr    => $ip_obj,
-		macaddr   => $mac_addr,
-		firstseen => $timestamp,
-		lastseen  => $timestamp,
-		vlan      => $vlan,
-		archived  => 0
-	    });
-	}
-     }
+            timestamp   => $timestamp,
+        );
+    }
     $self->report->arp_entries($arp_count);
 }
 

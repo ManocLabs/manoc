@@ -209,41 +209,12 @@ sub handle_arp_packets {
 
     # update arp table
     $arp_table->{$key} = [ $mac_addr, $timestamp ];
-
-    # update DB
-    my $ip_obj = Manoc::IPAddress::IPv4->new( $ip_addr  );
-    my @entries = $self->schema->resultset('Arp')->search(
-        {
-            ipaddr   => $ip_obj,
-            macaddr  => $mac_addr,
-            vlan     => $vlan,
-            archived => 0,
-        }
+    $self->schema->resultset('Arp')->register_tuple(
+        ipaddr    => $ip_addr,
+        macaddr   => $mac_addr,
+        vlan      => $vlan,
+        timestamp => $timestamp,
     );
-
-    if ( scalar(@entries) > 1 ) {
-        $self->log->error("More than one non archived entry for $ip_addr,$mac_addr");
-    }
-    elsif ( scalar(@entries) == 1 ) {
-        my $entry = $entries[0];
-        $self->log->debug("Updating ip $ip_addr...");
-        $entry->lastseen($timestamp);
-        $entry->update();
-    }
-    else {
-        $self->log->debug("Trying to create entry fo r ip $ip_addr with mac $mac_addr");
-               
-        $self->schema->resultset('Arp')->create(
-            {
-                ipaddr    => $ip_obj,
-                macaddr   => $mac_addr,
-                firstseen => $timestamp,
-                lastseen  => $timestamp,
-                vlan      => $vlan,
-                archived  => 0
-            }
-        );
-    }
 }
 
 sub start_pcap_loop {
