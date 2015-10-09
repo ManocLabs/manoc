@@ -1,5 +1,6 @@
 <p>Are you sure?</p>
-<form class="form-horizontal" method="POST" >
+<form method="POST" >
+<input type="hidden" name="csrf_token" id="csrf_token" value="[% c.get_token %]"  />
 <button type="submit" class="btn btn-primary" name="submit" value="Submit"/>Yes</button>
 </form>
 
