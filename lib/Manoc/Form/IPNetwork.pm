@@ -88,16 +88,31 @@ sub options_vlan_id {
 
 
 override validate_model => sub {
-    my $self  = shift;
-    my $item  = $self->item;
-
-    $item->is_larger_than_parent and
-        $self->add_form_error('A network cannot be larger than its parent');
-
-    $item->is_smaller_than_children and
-        $self->add_form_error('A network cannot be smaller than its children');
+    my $self   = shift;
+    my $item   = $self->item;
+    my $values = $self->values;
 
     super();
+
+    if ($item->in_storage) {
+
+        my $saved_prefix = $item->prefix;
+        my $saved_address = $item->address;
+
+        $item->address( $values->{address} );
+        $item->prefix( $values->{prefix} );
+
+        if ( $item->is_outside_parent ) {
+            $self->add_form_error('Network would be outside its parent');
+        } else {
+            $item->is_inside_children and
+                $self->add_form_error('Network would be inside a child');
+        }
+
+        $item->prefix( $saved_prefix );
+        $item->address( $saved_address );
+    }
+
 };
 
 __PACKAGE__->meta->make_immutable;
