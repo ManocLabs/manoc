@@ -195,7 +195,7 @@ sub insert {
     }
 }
 
-sub is_larger_than_parent {
+sub is_outside_parent {
     my $self = shift;
     
     $self->parent or return;
@@ -203,7 +203,7 @@ sub is_larger_than_parent {
         $self->broadcast > $self->parent->broadcast;
 }
 
-sub is_smaller_than_children {
+sub is_inside_children {
     my $self = shift;
     
     $self->children or return;
@@ -220,10 +220,10 @@ sub update {
 
     if ( $dirty{address} || $dirty{broadcast} ) {
         # check if larger than parent
-        $self->is_larger_than_parent and
+        $self->is_outside_parent and
             die "network cannot be larger than its parent";
 
-        $self->is_smaller_than_children and
+        $self->is_inside_children and
             die "network cannot be smaller than its children";
 
         $self->_rebuild_subtree();

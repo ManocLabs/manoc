@@ -17,7 +17,6 @@ Include this role to include a CSRF hidden form.
 
 has_field 'csrf_token' => (
     type  => 'Hidden',
-    html_name => 'csrf_token',
 );
 
 sub default_csrf_token {

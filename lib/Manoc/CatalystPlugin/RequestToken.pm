@@ -84,7 +84,22 @@ sub check_token {
     $c->log->debug('validating token') if $c->debug;
 
     my $session_token = $c->get_token;
-    $request_token ||= $c->req->param( $c->token_request_name );
+
+    # get token from params
+    $request_token ||= $c->req->params->{ $c->token_request_name };
+
+    # try to get token from named forms
+    if (! $request_token ) {
+        my $params = $c->req->params;
+        while ( my ($key, $value) = each (%$params) ) {
+            my ($name, $attr) = split /\./, $key, 2;
+            if ( $attr eq $c->token_request_name ) {
+                $request_token = $value;
+                $c->log->debug("found token in form $name") if $c->debug;
+                last;
+            }
+        }
+    }
 
     if ( ( $session_token && $request_token ) &&
 	     $session_token eq $request_token ) {
