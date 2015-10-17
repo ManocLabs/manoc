@@ -10,9 +10,9 @@ use Moose::Util::TypeConstraints;
 #use Smart::Comments;
 use Carp;
 
-use Manoc::Utils qw(str2seconds);
-
 use Manoc::Search::QueryType;
+
+use Manoc::Utils::Datetime qw(str2seconds);
 use Manoc::Utils::IPAddress qw(padded_ipaddr check_partial_addr);
 
 has 'search_string' => (

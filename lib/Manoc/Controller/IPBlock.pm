@@ -12,7 +12,7 @@ with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::IPBlock;
 
-use Manoc::Utils qw(str2seconds);
+use Manoc::Utils::Datetime qw(str2seconds);
 
 =head1 NAME
 

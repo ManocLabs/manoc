@@ -24,6 +24,7 @@ requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::View::TT';
 requires 'Catalyst::View::JSON';
 requires 'Config::General';
+requires 'DateTime::Format::RFC3339';
 requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
 requires 'MooseX::Storage';

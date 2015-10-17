@@ -5,7 +5,8 @@
 package Manoc::Controller::Query;
 use Moose;
 use namespace::autoclean;
-use Manoc::Utils qw(str2seconds clean_string);
+use Manoc::Utils qw(clean_string);
+use Manoc::Utils::Datetime qw(str2seconds);
 use Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 
 BEGIN { extends 'Catalyst::Controller'; }
