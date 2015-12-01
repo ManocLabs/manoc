@@ -34,7 +34,7 @@ Define tuple columns for L<Manoc::DB::Helper::ResultSet::TupleArchive>
   # define resultset for using ResultSet::TupleArchive
   __PACKAGE__->resultset_class('MySchema::ResultSet::Bar');
 
-  __PACKAGE__->tuple_archive_columns(qw(macaddr ipaddr vlan));
+  __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
 
 
 =head METHODS
@@ -74,7 +74,7 @@ sub set_tuple_archive_columns {
       'archived' => {
 	  data_type     => 'int',
 	  default_value => 0,
-        is_nullable   => 0,
+          is_nullable   => 0,
 	  size          => 1
       },
   );
