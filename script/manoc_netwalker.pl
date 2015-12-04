@@ -7,9 +7,9 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Manoc::Support;
 
-use Manoc::App::Netwalker;
+use Manoc::Netwalker::Script;
 
-my $app = Manoc::App::Netwalker->new_with_options();
+my $app = Manoc::Netwalker::Script->new_with_options();
 $app->run();
 
 # Local Variables:

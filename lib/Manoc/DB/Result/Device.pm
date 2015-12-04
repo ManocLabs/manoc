@@ -23,6 +23,11 @@ __PACKAGE__->add_columns(
 	size        => 15,
 	ipv4_address => 1,
     },
+    mng_url_format => {
+        data_type      => 'int',
+        is_nullable    => 1,
+        is_foreign_key => 1,
+    },
     rack => {
         data_type      => 'int',
         is_nullable    => 0,
@@ -78,89 +83,9 @@ __PACKAGE__->add_columns(
         data_type     => 'int',
         default_value => '0',
     },
-    last_visited => {
-        data_type     => 'int',
-        default_value => '0',
-    },
-    offline => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
     notes => {
         data_type   => 'text',
         is_nullable => 1,
-    },
-    telnet_pwd => {
-        data_type     => 'varchar',
-        size          => 255,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    enable_pwd => {
-        data_type     => 'varchar',
-        size          => 255,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    snmp_com => {
-        data_type     => 'varchar',
-        size          => 255,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    snmp_user => {
-        data_type     => 'varchar',
-        size          => 50,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    snmp_password => {
-        data_type     => 'varchar',
-        size          => 50,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    snmp_ver => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-    backup_enable => {
-        accessor      => 'backup_enabled',
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-    get_arp => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-    get_mat => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-    get_dot11 => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-    mat_native_vlan => {
-        data_type     => 'int',
-        default_value => '1',
-        is_nullable   => 1,
-    },
-    vlan_arpinfo => {
-        data_type     => 'int',
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    mng_url_format => {
-        data_type      => 'int',
-        is_nullable    => 1,
-        is_foreign_key => 1,
     },
 );
 
@@ -169,6 +94,7 @@ __PACKAGE__->add_unique_constraint( [qw/id/] );
 __PACKAGE__->add_unique_constraint( [qw/mng_address/] );
 
 __PACKAGE__->belongs_to( rack => 'Manoc::DB::Result::Rack' );
+
 __PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus' );
 __PACKAGE__->has_many( uplinks      => 'Manoc::DB::Result::Uplink' );
 __PACKAGE__->has_many( ifnotes      => 'Manoc::DB::Result::IfNotes' );
@@ -177,9 +103,6 @@ __PACKAGE__->has_many( dot11clients => 'Manoc::DB::Result::Dot11Client' );
 __PACKAGE__->has_many( dot11assocs  => 'Manoc::DB::Result::Dot11Assoc' );
 __PACKAGE__->has_many( mat_assocs   => 'Manoc::DB::Result::Mat' );
 
-__PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan' );
-__PACKAGE__->belongs_to( vlan_arpinfo    => 'Manoc::DB::Result::Vlan' );
-
 __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
     { 'foreign.from_device' => 'self.id' },
@@ -187,12 +110,20 @@ __PACKAGE__->has_many(
 	cascade_copy   => 0,
 	cascade_delete => 0,
 	cascade_update => 0,
-	    
     }
 );
 
 __PACKAGE__->might_have(
     config => 'Manoc::DB::Result::DeviceConfig',
+    { 'foreign.device' => 'self.id' },
+    {
+        cascade_delete => 1,
+        cascade_copy   => 0,
+    }
+);
+
+__PACKAGE__->might_have(
+    netwalker_info => 'Manoc::DB::Result::DeviceNWInfo',
     { 'foreign.device' => 'self.id' },
     {
         cascade_delete => 1,
@@ -206,6 +137,12 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
+=head2 get_mng_url
+
+Return mng_address formatted using mng_url_format,
+
+=cut
+
 
 sub get_mng_url {
     my $self = shift;
@@ -214,10 +151,45 @@ sub get_mng_url {
     return unless $format;
 
     my $str    = $format->format;
-    my $ipaddr = $self->mng_address->address;
+    my $ipaddr = $self->mng_address->unpadded;
     $str =~ s/%h/$ipaddr/go;
 
     return $str;
+}
+
+=head2 update_config( $config_text, [ $timestamp ] )
+
+Create or update the related DeviceConfig object. Check if configuration has changed before rotating the stored one.
+Return 1 if the config object has been refreshed, undef otherwise.
+
+=cut
+
+sub update_config {
+    my ($self, $config_text, $timestamp) = @_;
+
+    $timestamp ||= time;
+
+    my $config = $self->config;
+    if (!$config) {
+	$self->create_related('config' => {
+	    config       => $config_text,
+	    config_date  => $timestamp,
+	});
+
+	return 1;
+    }
+
+    if ($config->config ne $config_text) {
+	$config->prev_config( $config->config );
+	$config->prev_config_date( $config->config_date );
+	$config->config($config_text);
+	$config->config_date( $timestamp );
+	$config->update();
+
+	return 1;
+    }
+
+    return;
 }
 
 1;

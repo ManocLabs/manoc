@@ -25,6 +25,7 @@ my $SOURCE_DEPENDECIES = {
     'IfNotes'   => 'Device',
     'CDPNeigh'  => 'Device',
     'DeviceConfig' => 'Device',
+    'DeviceNWInfo' => 'Device',
     'Uplink'     => 'Device',
     'SSIDList'   => 'Device',
     'Dot11Assoc' => 'Device',

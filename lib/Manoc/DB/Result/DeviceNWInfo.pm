@@ -1,0 +1,134 @@
+# Copyright 2011-2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
+package Manoc::DB::Result::DeviceNWInfo;
+
+use parent 'DBIx::Class::Core';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw'+Manoc::DB::Helper::NetwalkerCredentials');
+
+__PACKAGE__->table('device_nwinfo');
+__PACKAGE__->add_columns(
+    device => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+
+    manifold => {
+        data_type     => 'varchar',
+        size          => 64,
+        is_nullable   => 0,
+    },
+
+    manifold_args => {
+	data_type     => 'varchar',
+        size          => 255,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
+    # manifold to be used for getting
+    # configuration
+    config_manifold => {
+        data_type     => 'varchar',
+        size          => 64,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
+    offline => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+
+    last_visited => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    last_full_update => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    last_backup => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    netwalker_status => {
+	data_type     => 'varchar',
+        size          => 255,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
+    get_config => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+    get_arp => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+    get_mat => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+    get_dot11 => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+    get_vtp => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+
+    mat_native_vlan => {
+        data_type     => 'int',
+        default_value => '1',
+        is_nullable   => 1,
+    },
+
+    arp_vlan => {
+        data_type     => 'int',
+        default_value => '1',
+        is_nullable   => 1,
+    },
+);
+
+__PACKAGE__->make_credentials_columns;
+
+__PACKAGE__->set_primary_key("device");
+
+__PACKAGE__->belongs_to(
+    device => 'Manoc::DB::Result::Device',
+    { 'foreign.id' => 'self.device' }
+);
+
+__PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan' );
+__PACKAGE__->belongs_to( arp_vlan => 'Manoc::DB::Result::Vlan' );
+
+
+=head1 NAME
+
+Manoc::DB::Result::NetwalkerInfo - Device Netwalker configuration and
+connection information
+
+=head1 DESCRIPTION
+
+A model object to mantain netwalker configuration for a device.
+
+=cut
+
+1;

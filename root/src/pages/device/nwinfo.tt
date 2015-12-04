@@ -1,0 +1,5 @@
+[% META title='Edit Netwalker configuration'
+   subsection='Device'
+   section='Asset' -%]
+<h3>Device [% object.name %]</h3>
+[% form.render %] 
