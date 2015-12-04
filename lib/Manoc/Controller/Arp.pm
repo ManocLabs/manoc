@@ -10,7 +10,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 with 'Manoc::ControllerRole::JQDatatable';
 
-use Manoc::Utils qw/print_timestamp/;
+use Manoc::Utils::Datetime qw/print_timestamp/;
 
 =head1 NAME
 

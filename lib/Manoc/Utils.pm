@@ -11,11 +11,9 @@ use warnings;
 BEGIN {
     use Exporter 'import';
     our @EXPORT_OK = qw/clean_string 
-			str2seconds print_timestamp
 			check_mac_addr/;
 };
 
-use POSIX qw(strftime);
 
 use FindBin;
 use File::Spec;
@@ -134,49 +132,8 @@ sub tar {
 	    $o->prefix('');
 	}
 	return $tar->write( $tarname, 1  );
-    }    
-  }
-
-
-########################################################################
-#                                                                      #
-#           D a t e   &   t i m e   F u n c t i o n s                  #
-#                                                                      #
-########################################################################
-
-sub str2seconds {
-    my ($str, $unit) = @_;
-
-    croak "empty input string" unless defined $str;
-
-    my ( $num, $unit2 ) = $str =~ m/^([+-]?\d+)([smhdwMy]?)$/;
-    if ($unit && $unit2) {
-	warn "multiple units specified ($unit, $unit2)";
     }
-    $unit //= $unit2;
-
-    my %map = (
-        's' => 1,
-        'm' => 60,
-        'h' => 3600,
-        'd' => 86400,
-        'w' => 604800,
-        'M' => 2592000,
-        'y' => 31536000
-    );
-
-    defined($num) or
-        carp "couldn't parse '$str'. Possible invalid syntax";
-
-    return $num * $map{$unit};
 }
 
-
-sub print_timestamp {
-    my $timestamp = shift @_;
-    defined($timestamp) || croak "Missing timestamp";
-    my @timestamp = localtime($timestamp);
-    return strftime( "%d/%m/%Y %H:%M:%S", @timestamp );
-}
 
 1;

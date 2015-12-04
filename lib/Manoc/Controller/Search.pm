@@ -12,7 +12,7 @@ use namespace::autoclean;
 use Manoc::Search::QueryType;
 use Manoc::Search::Engine;
 use Manoc::Search::Query;
-use Manoc::Utils qw(str2seconds);
+use Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN { extends 'Catalyst::Controller'; }
 

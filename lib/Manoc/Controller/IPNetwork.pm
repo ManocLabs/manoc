@@ -15,7 +15,7 @@ BEGIN {
 with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::IPNetwork;
-use Manoc::Utils qw/str2seconds/;
+use Manoc::Utils::Datetime qw/str2seconds/;
 
 
 =head1 NAME
