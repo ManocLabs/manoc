@@ -25,19 +25,41 @@ has 'session' => (
 has 'username' => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'admin',
+    lazy     => 1,
+    builder  => '_build_username',
 );
 
 has 'password' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
+    lazy     => 1,
+    builder  => '_build_password',
 );
 
 has 'enable_password' => (
     is       => 'ro',
     isa      => 'Str',
+    lazy     => 1,
+    builder  => '_build_enable_password',
 ); 
+
+sub _build_username {
+    my $self = shift;
+
+    return $self->credentials->{username};
+}
+
+sub _build_password {
+    my $self = shift;
+    return $self->credentials->{password} || '';
+}
+
+sub _build_eable_password {
+    my $self = shift;
+    return $self->credentials->{password2} || '';
+}
+
 
 sub connect {
     my $self = shift;
