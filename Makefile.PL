@@ -7,7 +7,6 @@ author 'Gabriele Mambrini <g.mambrini@gmail.com>';
 install_share 'root';
 install_script "script/manoc_archiver.pl";
 install_script "script/manoc_arpsniffer.pl";
-install_script "script/manoc_backup.pl";
 install_script "script/manoc_cgi.pl";
 install_script "script/manoc_create_ddl.pl";
 install_script "script/manoc_dhcp_agent.pl";
