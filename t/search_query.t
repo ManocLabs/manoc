@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Utils qw(str2seconds);
+use Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN { use_ok 'Manoc::Search::Query' }
 

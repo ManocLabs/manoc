@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Manoc::Utils qw(str2seconds);
+use Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN {
 

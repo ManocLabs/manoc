@@ -13,6 +13,7 @@ ok(Manoc::Manifold->load_namespace, 'load manifold names');
 
     ok($manifolds{SNMP}, 'SNMP manifold found');
     ok($manifolds{'Telnet::IOS'}, 'Telnet::IOS manifold found');
+    ok($manifolds{'SSH::Linux'},  'Linux::SSH manifold found');
 }
 
 cmp_ok( Manoc::Manifold->name_mappings->{SNMP}, 'eq',
@@ -23,11 +24,12 @@ cmp_ok( Manoc::Manifold->name_mappings->{SNMP}, 'eq',
 SKIP: {
     eval { require 'Net::Telnet::Cisco' };
     skip 'Net::Telnet::Cisco based tests', 1 unless $@;
-        
-    
+
     my $m = Manoc::Manifold->new_manifold('Telnet::IOS',
-					  username => 'admin',
-					  password => 'test',
+                                          credentials => {
+                                              username => 'admin',
+                                              password => 'test',
+                                          },
 					  host => '127.0.0.1');
     ok($m, 'Create Telnet::IOS manifold');
 }
@@ -36,7 +38,9 @@ SKIP: {
     skip 'SNMP::Info based tests', 1 unless
         eval { require 'SNMP::Info' };
     
-    my $m = Manoc::Manifold->new_manifold('SNMP', host => '127.0.0.1');
+    my $m = Manoc::Manifold->new_manifold('SNMP',
+                                          credentials => { snmp_community => 'public' },
+                                          host => '127.0.0.1');
     ok($m, 'Create SNMP manifold');
 }
 
