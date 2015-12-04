@@ -22,8 +22,8 @@ cmp_ok( Manoc::Manifold->name_mappings->{SNMP}, 'eq',
 
 
 SKIP: {
-    eval { require 'Net::Telnet::Cisco' };
-    skip 'Net::Telnet::Cisco based tests', 1 unless $@;
+    skip 'Net::Telnet::Cisco based tests', 1 unless 
+        eval { require 'Net::Telnet::Cisco' };
 
     my $m = Manoc::Manifold->new_manifold('Telnet::IOS',
                                           credentials => {
