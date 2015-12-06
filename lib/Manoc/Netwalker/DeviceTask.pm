@@ -260,7 +260,7 @@ sub update {
     # check if there is a device object in the DB
     my $entry  = $self->device_entry;
     unless($entry){
-        $self->log->error("Cannot find device id", $self->device_id);
+        $self->log->error("Cannot find device id ", $self->device_id);
         return undef;
     }
 

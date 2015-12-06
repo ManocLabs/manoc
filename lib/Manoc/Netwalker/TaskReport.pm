@@ -33,7 +33,8 @@ has 'error' => (
         add_error   => 'push',
         map_error   => 'map',
         error_count => 'count',
-        all_error   => 'elements',
+	has_error   => 'count',
+        all_errors  => 'elements',
     },
 );
 
