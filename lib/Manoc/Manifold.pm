@@ -47,7 +47,8 @@ sub new_manifold {
     
     my $mapped = $self->name_mappings->{$name};
     $mapped and $name = $mapped;
-
+    $mapped or return undef;
+    
     load_class $name;
     return $name->new(@_);
 }
