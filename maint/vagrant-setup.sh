@@ -42,3 +42,6 @@ echo "-----> Setting firewall"
 firewall-cmd --get-default-zone | grep trusted || 
 	firewall-cmd --set-default-zone trusted
 echo "Done"
+
+echo "-----> Setting profile"
+echo -e "eval \$(perl -Mlocal::lib=$INSTALL_DIR)" > /etc/profile.d/manoc.sh
