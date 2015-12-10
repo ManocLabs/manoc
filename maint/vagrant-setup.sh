@@ -3,13 +3,16 @@
 # Fail fast and fail hard.
 set -eo pipefail
 
+MANOC_DIR="/vagrant"
 INSTALL_DIR="/opt/manoc"
-PATH="$INSTALL_DIR/bin:$PATH"
+PATH="$INSTALL_DIR/bin:/usr/local/bin:$PATH"
 
 yum install -y perl-core perl-DBD-MySQL net-snmp-perl libpcap-devel
 
+test -d "$INSTALL_DIR" || mkdir -p "$INSTALL_DIR"
+
 export PERL5LIB="$INSTALL_DIR/perl5"
-if ! [ -e "$INSTALL_DIR/bin/cpanm" ]; then
+if ! [ -e /usr/local/bin/cpanm ]; then
   echo "-----> Bootstrapping cpanm"
   curl -L --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 
 fi
@@ -23,8 +26,7 @@ export PERL_CPANM_OPT
 echo "-----> Installing dependencies"
 echo "cpanm options: $PERL_CPANM_OPT"
 
-( cd /vagrant && cpanm --installdeps . 2>&1 )
-
+( cd "$MANOC_DIR" && cpanm --installdeps . 2>&1 )
 
 echo "-----> Installing MIBS"
 MIBS_DIR="$INSTALL_DIR/netdisco-mibs"
@@ -39,8 +41,10 @@ perl -ne "s|/usr/local/netdisco/mibs|$MIBS_DIR|; if ( /^mibdirs/ ) { /cisco|rfc|
 echo "Done"
 
 echo "-----> Setting firewall"
-firewall-cmd --get-default-zone | grep trusted || 
+if firewall-cmd --state; then
+   firewall-cmd --get-default-zone | grep trusted || 
 	firewall-cmd --set-default-zone trusted
+fi
 echo "Done"
 
 echo "-----> Setting profile"
