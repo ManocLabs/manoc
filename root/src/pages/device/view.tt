@@ -63,8 +63,6 @@ page.subsection = 'Device'
 	<dt>Rack</dt>
 	<dd>[% print_rack(object.rack) %]</dd>
 
-	<dt>Last Visited</dt><dd>[% date.format(object.last_visited) %]</dd>
-
 	<dt>Model</dt>
 	<dd>[% object.vendor | html %] [% object.model  | html %]</dd>
 
@@ -79,25 +77,36 @@ page.subsection = 'Device'
 
 	<dt>Up from</dt><dd>[% date.format(object.boottime) | html %]</dd>
 
-	<dd>[% object.nwinfo.get_config ? 'Yes' : 'No' %]</dd>
-	<dt>Last backup</dt>
+[% IF object.netwalker_info -%]
+[% SET nwinfo = object.netwalker_info -%]
+	<dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
+	<dt>Fetch configuration<dt>
+	<dd>[% nwinfo.get_config ? 'Yes' : 'No' %]</dd>
+	<dt>Fetch ARP table</dt>
+	<dd>
+	[% IF nwinfo.get_arp  %]Yes
+	   [% IF nwinfo.arp_vlan -%]
+	   (VLAN [% print_vlan(nwinfo.arp_vlan) -%])
+	   [% END -%]
+	[% ELSE %]No
+	[% END %]
+	</dd>
+	<dt>Fetch MAT</dt>
+	<dd>[% nwinfo.get_mat  ? 'Yes' : 'No'%]</dd>
+	<dt>Fetch Dot11</dt>
+	<dd>[% nwinfo.get_dot11 ? 'Yes' : 'No'  %]</dd>
+[% ELSE -%]
+       	<dt>Netwalker</dt>
+	<dd>No netwalker configuration found. [%  object %]-</dd>
+[% END -%]
+	<dt>Configuration</dt>
 	<dd>
 	  [% IF object.config.config_date %][% date.format(object.config.config_date) %]
 	  <a href="[% c.uri_for_action('device/show_config', [object.id]) %]">View</a>
 	  [% ELSE %]
 	  No backup found
 	  [% END %]
-	</dd>
-	<dt>Fetch ARP table</dt>
-	<dd>[% arp_enabled  ? 'Yes' : 'No' %]</dd>
-	[% IF object.nwinfo.vlan_arpinfo %]
-	<dt>ARP table vlan</dt>
-	<dd>[% print_vlan(object.nwinfo.vlan_arpinfo) %]</dd>
-	[% END %]
-	<dt>Fetch MAT</dt>
-	<dd>[% object.nwinfo.mat_enabled  ? 'Yes' : 'No'%]</dd>
-	<dt>Fetch Dot11</dt>
-	<dd>[% object.nwinfo.dot11_enabled ? 'Yes' : 'No'  %]</dd>
+	</dd>	
 	<dt>Uplinks</dt><dd>[% object.uplinks %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
