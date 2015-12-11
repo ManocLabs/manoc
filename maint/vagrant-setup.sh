@@ -37,7 +37,7 @@ if ! [ -f "$MIBS_TAR" ]; then
 fi
 ( cd "$INSTALL_DIR" && tar -xzf "$MIBS_TAR" )
 test -d /etc/snmp || mkdir -p /etc/snmp
-perl -ne "s|/usr/local/netdisco/mibs|$MIBS_DIR|; if ( /^mibdirs/ ) { /cisco|rfc|net-snmp/ and print } else { print }" "$MIBS_DIR/snmp.conf"> /etc/snmp/snmp.conf
+perl -ne "s|/usr/local/netdisco/mibs|$MIBS_DIR|; if ( /^mibdirs/ ) { /cisco|rfc|net-snmp/ or print '# '; print; } else { print }" "$MIBS_DIR/snmp.conf"> /etc/snmp/snmp.conf
 echo "Done"
 
 echo "-----> Setting firewall"
