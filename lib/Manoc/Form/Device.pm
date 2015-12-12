@@ -10,6 +10,7 @@ use Manoc::Utils::IPAddress qw(check_addr);
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name' => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
@@ -70,14 +71,6 @@ has_field 'mng_url_format' => (
     type         => 'Select',
     label        => 'Management URL',
     empty_select => '---Choose a Format---'
-);
-
-has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
-    widget_wrapper => 'None',
-    value => "Save"
 );
 
 sub options_rack {
