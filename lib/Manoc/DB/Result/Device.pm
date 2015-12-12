@@ -22,6 +22,7 @@ __PACKAGE__->add_columns(
 	is_nullable => 0,
 	size        => 15,
 	ipv4_address => 1,
+	accessor     => '_mng_address',
     },
     mng_url_format => {
         data_type      => 'int',
@@ -136,6 +137,17 @@ __PACKAGE__->belongs_to(
     'mng_url_format',
     { join_type => 'LEFT' }
 );
+
+
+sub mng_address {
+    my ($self, $value) = @_;
+
+    if (@_ > 1) {
+	ref($value) or $value = Manoc::IPAddress::IPv4->new($value);
+        $self->_mng_address($value);
+    }
+    return $self->_mng_address();
+}
 
 =head2 get_mng_url
 
