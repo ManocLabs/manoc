@@ -9,6 +9,7 @@ use namespace::autoclean;
 with 'Manoc::Logger::Role';
 
 use IO::Socket;
+
 use POE qw(Wheel::ListenAccept Wheel::ReadWrite);
 
 
@@ -73,13 +74,30 @@ has clients => (
 sub _start {
     my ( $self, $job, $args, $kernel, $heap ) = @_[ OBJECT, ARG0, ARG1, KERNEL, HEAP ];
 
-    # Start the server.
-    my $server = POE::Wheel::ListenAccept->new(
-	Handle => IO::Socket::INET->new(
-            LocalPort => $self->config->control_port,
+
+    my $port = $self->config->control_port;
+
+    my $handle;
+    if ( $port =~ m|^/| ) {
+        # looks like a path, create a UNIX socket
+        $handle = IO::Socket::UNIX->new(
+            Type => SOCK_STREAM(),
+            Local => $port,
+            Listen => 1,
+        );
+    } else {
+        # TCP socket
+        $handle = IO::Socket::INET->new(
+            LocalPort => $port,
             Listen    => 5,
             ReuseAddr => 1,
-	),
+        );
+    }
+    $handle or $self->logger->logdie("Cannot create control socket");
+
+    # Start the server.
+    my $server = POE::Wheel::ListenAccept->new(
+	Handle => $handle;
 	AcceptEvent => "on_client_accept",
 	ErrorEvent  => "on_server_error",
     );
