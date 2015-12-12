@@ -344,14 +344,14 @@ sub update_cdp_neighbors {
 
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
-            my $from_dev_obj = $entry->id;
+            my $from_dev_id = $entry->id;
             my $to_dev_obj   = Manoc::IPAddress::IPv4->new($s->{addr});
 
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $entry,
+                    from_device    => $from_dev_id,
                     from_interface => $p,
-                    to_device      => $to_dev_obj,
+                    to_device      => $to_dev_obj->padded,
                     to_interface   => $s->{port},
                 }
             );
@@ -359,7 +359,7 @@ sub update_cdp_neighbors {
             unless ( scalar(@cdp_entries) ) {
                 $self->schema->resultset('CDPNeigh')->create(
                     {
-                        from_device    => $entry,
+                        from_device    => $from_dev_id,
                         from_interface => $p,
                         to_device      => $to_dev_obj,
                         to_interface   => $s->{port},
@@ -370,7 +370,7 @@ sub update_cdp_neighbors {
                 ); 
                 $new_dev++;
                 $cdp_entries++; 
-                $self->task_report->add_warning("New neighbor ".$s->{addr}." at ".$entry->id->address);
+                $self->task_report->add_warning("New neighbor ".$s->{addr}." at ".$entry->name);
                 next;
             }
             my $link = $cdp_entries[0];
@@ -418,7 +418,7 @@ sub update_mat {
     my $entry  = $self->device_entry;
     my $schema = $self->schema;
     
-    my $uplinks = $self->uplink_ports;
+    my $uplinks = $self->uplinks;
     $self->log->debug( "device uplinks: ", join( ",", keys %$uplinks ) );
  
     my $timestamp = $self->timestamp;
