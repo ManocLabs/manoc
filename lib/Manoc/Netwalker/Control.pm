@@ -9,7 +9,6 @@ use namespace::autoclean;
 with 'Manoc::Logger::Role';
 
 use IO::Socket;
-
 use POE qw(Wheel::ListenAccept Wheel::ReadWrite);
 
 
@@ -35,21 +34,7 @@ has session => (
     is       => 'ro',
     required => 1,
     lazy     => 1,
-    default  => sub {
-        POE::Session->create(
-            object_states => [
-                $_[0] => [
-                    qw(
-                      _start
-		      on_client_accept
-		      on_server_error
-		      on_client_input
-		      on_client_error
-		  )
-                ],
-            ],
-        );
-    },
+    builder  => '_build_session',
     clearer   => 'remove_server',
     predicate => 'has_server',
 );
@@ -70,6 +55,27 @@ has clients => (
         get_client_ids => 'keys',
     },
 );
+
+sub MANOC_CONSOLE_HELLO { "OK Manoc Netwalker console" };
+
+sub _build_session {
+    my $self = shift;
+
+    return POE::Session->create(
+        object_states => [
+            $self => [
+                qw(
+                      _start
+		      on_client_accept
+		      on_server_error
+		      on_client_input
+		      on_client_error
+              )
+            ],
+        ],
+    );
+}
+
 
 sub _start {
     my ( $self, $job, $args, $kernel, $heap ) = @_[ OBJECT, ARG0, ARG1, KERNEL, HEAP ];
@@ -93,11 +99,11 @@ sub _start {
             ReuseAddr => 1,
         );
     }
-    $handle or $self->logger->logdie("Cannot create control socket");
+    $handle or $self->log->logdie("Cannot create control socket");
 
     # Start the server.
     my $server = POE::Wheel::ListenAccept->new(
-	Handle => $handle;
+	Handle      => $handle,
 	AcceptEvent => "on_client_accept",
 	ErrorEvent  => "on_server_error",
     );
@@ -112,7 +118,7 @@ sub on_client_accept {
 	ErrorEvent => "on_client_error",
     );
 
-    $io_wheel->put( "HELLO Manoc Netwalker console" );
+    $io_wheel->put( MANOC_CONSOLE_HELLO );
 
     $self->set_client( $io_wheel->ID => $io_wheel );
 }
@@ -129,7 +135,7 @@ sub on_client_input {
     my $client = $self->get_client($wheel_id);
 
     my @tokens = split( /\s+/, $input);
-    my $command = shift @tokens;
+    my $command = lc(shift @tokens);
 
     my $handler = "command_$command";
     if ($self->can($handler)) {
@@ -138,7 +144,7 @@ sub on_client_input {
     } elsif ($command eq 'close') {
         $self->remove_client($wheel_id);
     } else {
-        $client->put("ERR Unknown command");
+        $client->put("ERR Unknown command $command");
     }
 };
 
@@ -165,12 +171,14 @@ sub command_status {
 
 
 sub command_enqueue {
-    my $self = shift;
+    my ($self, $type, $id) = @_;
 
-    my $id = shift;
-    $self->manager->enqueue_device($id);
-
-    return "OK added $id";
+    $type = lc($type);
+    if ($type eq 'device') {
+        $self->manager->enqueue_device($id);
+        return "OK added device $id";
+    }
+    return "ERR unknown object $type";
 }
 
 sub command_quit {

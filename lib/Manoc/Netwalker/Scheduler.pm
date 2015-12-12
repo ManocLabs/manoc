@@ -39,14 +39,14 @@ has tick_interval => (
     isa      => 'Int',
     is       => 'ro',
     required => 1,
-    default  => 10,
+    default  => 60,
 );
 
 has refresh_interval => (
     is       => 'ro',
     isa      => 'Int',
     lazy     => 1,
-    default  => sub { shift->config->refresh_interval },
+    builder  => '_build_refresh_interval',
 );
 
 has schema => (
@@ -59,8 +59,14 @@ has next_alarm_time => (
     isa      => 'Int',
 );
 
+sub _build_refresh_interval {
+    shift->config->refresh_interval;
+}
+
 sub _start {
     my ($self, $kernel) = @_[OBJECT, KERNEL];
+
+    $self->log->debug("starting scheduler, tick=",  $self->tick_interval);
 
     $self->next_alarm_time(time() + 1);
     $kernel->alarm(tick => $self->next_alarm_time);

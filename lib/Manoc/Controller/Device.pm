@@ -14,6 +14,8 @@ use Text::Diff;
 use Manoc::Form::Device;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
+use Manoc::Netwalker::Config;
+use Manoc::Netwalker::ControlClient;
 
 # moved  Manoc::Netwalker::DeviceUpdater to conditional block in refresh
 # where we need it
@@ -166,45 +168,20 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id;
-    
-    my $has_netwalker = eval { load Manoc::Device::Netwalker; 1 };
-    if (!$has_netwalker) {
-	$c->flash( error_msg => "Netwalker not installer");
-	$c->response->redirect(
-			       $c->uri_for_action( '/device/view', [$device_id] ) );
-	$c->detach();
-    }
-    
-    my %config = (
-	snmp_community => $c->config->{Credentials}->{snmp_community}
-	    || 'public',
-	snmp_version   => $c->config->{Netwalker}->{snmp_version} || 2,
-	default_vlan       => $c->config->{Netwalker}->{default_vlan} || 1,
-	iface_filter       => $c->config->{Netwalker}->{iface_filter} || 1,
-	ignore_portchannel => $c->config->{Netwalker}->{ignore_portchannel}
-	    || 1,
-    );
-    
-    my $updater = Manoc::Netwalker::DeviceUpdater->new(
-         entry        => $c->stash->{object},
-         config       => \%config,
-         schema       => $c->model('ManocDB'),
-         timestamp    => time
-     );
-   
-    my $ret_status = $updater->update_all_info();
-    unless(defined($ret_status)){
-	my $err_msg = "Error! An error occurred while retrieving infos. See the logs for details.";
-	$c->flash( error_msg => $err_msg );
-	$c->response->redirect(
-	    $c->uri_for_action( '/device/view', [$device_id] ) );
-	$c->detach();
+
+    my $config = Manoc::Netwalker::Config->new($c->config->{Netwalker});
+    my $client = Manoc::Netwalker::ControlClient->new(config => $config);
+
+    my $status = $client->enqueue_device($device_id);
+
+    if (!$status) {
+        $c->flash( error_msg => "An error occurred while scheduling device refresh" );
+    } else {
+        $c->flash( message => "Device refresh scheduled");
     }
 
-    my $msg = "Success! Device infomations are now up to date.";
-    $c->flash( message => $msg);
-    $c->response->redirect(
-			   $c->uri_for_action( '/device/view', [$device_id] ) );
+    $c->response->redirect(  $c->uri_for_action( '/device/view', [$device_id] ) );
+    $c->detach();
 }
 
 

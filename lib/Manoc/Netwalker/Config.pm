@@ -78,6 +78,12 @@ has control_port => (
     default => '8001',
 );
 
+has remote_control => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => '127.0.0.1',
+);
+
 has refresh_interval => (
     is      => 'rw',
     isa     => 'TimeInterval',

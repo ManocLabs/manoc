@@ -114,7 +114,7 @@ sub enqueue_device {
 
     # check if it's already scheduled
     my $status = $scoreboard->{$device_id};
-    if ($status eq 'QUEUED' || $status eq 'RUNNING') {
+    if (defined($status) && ($status eq 'QUEUED' || $status eq 'RUNNING')) {
         $self->log->debug("Device $device_id is $status, skipping");
         return;
     }
