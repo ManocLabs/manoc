@@ -44,7 +44,7 @@ has 'snmp_info' => (
 has 'mat_force_vlan' => (
     is      => 'ro',
     lazy    => 1,
-    builder => '_build_force_vlan'
+    builder => '_build_mat_force_vlan'
 );
 
 sub _build_community {
@@ -74,7 +74,6 @@ sub connect {
 
     my $snmp_options;
     $snmp_options = $self->extra_params->{snmp_options} || {};
-
     my %snmp_info_args = (
         # Auto Discover more specific Device Class
         AutoSpecify => 1,
@@ -122,7 +121,6 @@ sub connect {
             return undef;
         }
     }
-    
     $self->_set_snmp_info($info);
     return 1;
 }
@@ -260,14 +258,19 @@ sub _build_mat {
             }
 
             $self->log->debug(" VLAN: $vlan - $vlan_name");
-            my $vlan_comm = $self->community . '@' . $vlan;
-            my $subreq    = Manoc::Netwalker::Source::SNMP->new(
+	    #prepare credentials with the new community string
+	    my $new_credentials = { 
+		snmp_community => $self->community . '@' . $vlan, 
+		version   => $self->version,
+	    };
+
+            my $subreq    = Manoc::Manifold::SNMP->new(
                 host          => $self->host,
-                community     => $vlan_comm,
-                version       => $self->version,
-                is_subrequest => 1
+                credentials   => $new_credentials,
+	        is_subrequest => 1
             );
             next unless defined($subreq);
+            $subreq->connect();
             # merge mat
             $subreq->mat and $mat->{$vlan} = $subreq->mat->{default};
         }
