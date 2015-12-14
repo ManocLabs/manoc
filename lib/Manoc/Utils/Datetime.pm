@@ -44,7 +44,8 @@ sub str2seconds {
         warn "multiple units specified ($unit, $unit2)";
     }
     $unit //= $unit2;
-
+    $unit ||= 's';
+    
     my %map = (
         's' => 1,
         'm' => 60,
@@ -54,9 +55,11 @@ sub str2seconds {
         'M' => 2592000,
         'y' => 31536000
     );
-
+    exists $map{$unit} or 
+        carp "Couldn't parse '$str'. Unknown unit $unit.";
+    
     defined($num) or
-        carp "couldn't parse '$str'. Possible invalid syntax";
+        carp "Couldn't parse '$str'. Possible invalid syntax.";
 
     return $num * $map{$unit};
 }
