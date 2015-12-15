@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -6,7 +6,7 @@
 package Manoc::Netwalker::Script;
 
 use Moose;
-extends 'Manoc::App';
+extends 'Manoc::Daemonized';
 
 use POE;
 
@@ -16,7 +16,8 @@ use Manoc::Netwalker::Manager;
 use Manoc::Netwalker::Control;
 use Manoc::Netwalker::Scheduler;
 
-sub run {
+
+sub main {
     my $self = shift;
 
     $self->log->info("Starting netwalker");
@@ -30,6 +31,7 @@ sub run {
         schema  => $self->schema,
     );
 
+
     my $control = Manoc::Netwalker::Control->new(
         config  => $config,
         manager => $manager,
@@ -42,7 +44,8 @@ sub run {
     );
 
     POE::Kernel->run();
-}
+};
+
 
  # Clean up the namespace.
 no Moose;
