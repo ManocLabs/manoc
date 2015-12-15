@@ -1,4 +1,4 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -6,48 +6,46 @@
 package Manoc::Netwalker::Script;
 
 use Moose;
-extends 'Manoc::App';
+extends 'Manoc::Daemonized';
+
+use POE;
 
 use Manoc::Netwalker::Config;
+
 use Manoc::Netwalker::Manager;
+use Manoc::Netwalker::Control;
+use Manoc::Netwalker::Scheduler;
 
-has 'device' => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => '',
-);
 
-has 'force_full_update' => (
-    is       => 'ro',
-    isa      => 'Bool',
-    default  => 0,
-);
-
-sub run {
+sub main {
     my $self = shift;
 
     $self->log->info("Starting netwalker");
 
     # get configuration and store it in a Config object
     my %config_args = %{ $self->config->{Netwalker} };
-    $self->force_full_update and $config_args{force_full_update} = 1;
     my $config = Manoc::Netwalker::Config->new(%config_args);
 
-    # prepare the device (id) list to visit
-    my @devices;
-    if ($self->device) {
-        push @devices, $self->device;
-    } else {
-        @devices = $self->schema->resultset('Device')->get_column('id')->all;
-    }
-
     my $manager = Manoc::Netwalker::Manager->new(
-        schema => $self->schema,
-        config => $config,
+        config  => $config,
+        schema  => $self->schema,
     );
 
-    $manager->visit( \@devices );
-}
+
+    my $control = Manoc::Netwalker::Control->new(
+        config  => $config,
+        manager => $manager,
+    );
+
+    my $scheduler = Manoc::Netwalker::Scheduler->new(
+        config  => $config,
+        manager => $manager,
+        schema  => $self->schema,
+    );
+
+    POE::Kernel->run();
+};
+
 
  # Clean up the namespace.
 no Moose;

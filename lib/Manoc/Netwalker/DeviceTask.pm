@@ -6,8 +6,9 @@
 package Manoc::Netwalker::DeviceTask;
 
 use Moose;
-with 'Manoc::Logger::Role';
+use Try::Tiny;
 
+with 'Manoc::Logger::Role';
 use Manoc::Netwalker::TaskReport;
 use Manoc::Manifold;
 
@@ -167,20 +168,40 @@ sub _build_source {
 
     my $manifold_name = $nwinfo->manifold;
     $self->log->debug("Using Manifold $manifold_name");
-    
-    my $source = Manoc::Manifold->new_manifold(
-        $manifold_name,
-        host         => $host,
-        credentials  => $self->credentials,
-        extra_params => {
-            mat_force_vlan => $mat_force_vlan,
-        }
-    );
+
+    my $source;
+    try {
+        $source = Manoc::Manifold->new_manifold(
+            $manifold_name,
+            host         => $host,
+            credentials  => $self->credentials,
+            extra_params => {
+                mat_force_vlan => $mat_force_vlan,
+            }
+        );
+    } catch {
+        my $error = "Cannot create manifold $manifold_name: $_";
+        $self->log->error($error);
+        $self->task_report->add_error($error);
+        return undef;
+    };
+
     if ( !$source ) {
-        $self->log->error("Cannot create manifold $manifold_name");
+        my $error = "Cannot create manifold $manifold_name";
+        $self->log->error($error);
+        $self->task_report->add_error($error);
+        return undef;
     }
 
-    $source->connect() or return undef;
+    # auto connect 
+    if ( ! $source->connect() ) {
+        return undef;
+
+        my $error = "Cannot connect to $host";
+        $self->log->error($error);
+        $self->task_report->add_error($error);
+        return undef;
+    }
     return $source;
 }
 
@@ -239,7 +260,7 @@ sub update {
     # check if there is a device object in the DB
     my $entry  = $self->device_entry;
     unless($entry){
-        $self->log->error("Cannot find device id", $self->device_id);
+        $self->log->error("Cannot find device id ", $self->device_id);
         return undef;
     }
 

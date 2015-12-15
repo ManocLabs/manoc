@@ -9,6 +9,7 @@ use namespace::autoclean;
 with 'MooseX::Workers';
 with 'Manoc::Logger::Role';
 
+use Try::Tiny;
 use POE qw(Filter::Reference Filter::Line);
 
 use Manoc::Netwalker::DeviceTask;
@@ -19,9 +20,15 @@ has config => (
     required => 1
 );
 
-has 'schema' => (
+has schema => (
     is       => 'ro',
     required => 1
+);
+
+has scoreboard => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    default  => sub { {} },
 );
 
 =head2 worker_stdout
@@ -31,9 +38,8 @@ Called when a child prints to STDERR
 =cut
 
 sub worker_stderr  {
-    my ( $self, $stderr_msg ) = @_;  
-
-    print $stderr_msg,"\n"
+    my ( $self, $stderr_msg ) = @_;
+    print STDERR "$stderr_msg\n";
 }
 
 =head2 worker_stdout
@@ -45,10 +51,19 @@ Called when a child prints to STDOUT
 sub worker_stdout  {
     my ( $self, $result ) = @_;
 
-    my $report = Manoc::Netwalker::TaskReport->thaw($result->{report});
-    my $host   = $report->host;
+    my $device_id = $result->{device_id};
+    my $status    = $result->{status};
+    $self->log->debug("got feedback device=$device_id status=$status");
 
-    $self->log->debug("Device $host is up to date");
+    $self->scoreboard->{$device_id} = $status;
+
+    if ($status eq 'DONE' ) {
+        my $report = Manoc::Netwalker::TaskReport->thaw($result->{report});
+        my $host   = $report->host;
+        # TODO check status
+        my $has_errors = $report->has_error();
+        $self->log->debug("Device $host $status $has_errors");
+    }
 }
 
 =head2 stdout_filter
@@ -69,34 +84,44 @@ sub stderr_filter  { POE::Filter::Line->new }
 
 sub visit_device {
     my ($self, $device_id) = @_;
-    
-    my $updater = Manoc::Netwalker::DeviceTask->new({
-        schema     => $self->schema,
-        config     => $self->config,
-        device_id  => $device_id,
-    });
-    $updater->update;
 
-    print @{
-        POE::Filter::Reference->new->put([
-            {
-                device_id => $device_id,
-                report    => $updater->task_report->freeze
-            }
-        ])
-      };
+    my $task_info = {
+        device_id => $device_id,
+        status    => 'RUNNING',
+    };
+    print @{ POE::Filter::Reference->new->put([ $task_info ]) };
+
+    try {
+        my $updater = Manoc::Netwalker::DeviceTask->new({
+            schema     => $self->schema,
+            config     => $self->config,
+            device_id  => $device_id,
+        });
+        $updater->update;
+
+        $task_info->{status} = 'DONE';
+        $task_info->{report} = $updater->task_report->freeze;
+    } catch {
+        $task_info->{status} = 'ERROR';
+    };
+    print @{ POE::Filter::Reference->new->put([ $task_info ]) };
 }
 
-        sub visit {
-    my $self = shift;
-    my $devices = shift;
-    
-    foreach my $id (@$devices) {
-        $self->enqueue( sub {  $self->visit_device($id)  } );
-        $self->log->debug("Enqueued device $id");
+sub enqueue_device {
+    my ($self, $device_id) = @_;
+
+    my $scoreboard = $self->scoreboard;
+
+    # check if it's already scheduled
+    my $status = $scoreboard->{$device_id};
+    if (defined($status) && ($status eq 'QUEUED' || $status eq 'RUNNING')) {
+        $self->log->debug("Device $device_id is $status, skipping");
+        return;
     }
 
-    POE::Kernel->run();
+    $self->scoreboard->{$device_id} = 'QUEUED';
+    $self->enqueue( sub {  $self->visit_device($device_id)  } );
+    $self->log->debug("Enqueued device $device_id");
 }
 
 
