@@ -6,7 +6,7 @@
 package Manoc::Netwalker::Script;
 
 use Moose;
-extends 'Manoc::Daemonized';
+extends 'Manoc::Script::Daemon';
 
 use POE;
 

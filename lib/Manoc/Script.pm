@@ -1,4 +1,4 @@
-package Manoc::App;
+package Manoc::Script;
 
 # Copyright 2011 by the Manoc Team
 #

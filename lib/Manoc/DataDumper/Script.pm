@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::App::Dumper;
+package Manoc::DataDumper::Script;
 use warnings;
 use strict;
 
@@ -24,7 +24,7 @@ use Try::Tiny;
 
 use YAML::Syck;
 
-extends 'Manoc::App';
+extends 'Manoc::Script';
 
 has 'enable_fk' => (
     is       => 'rw',

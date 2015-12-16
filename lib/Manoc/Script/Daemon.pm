@@ -2,11 +2,11 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Daemonized;
+package Manoc::Script::Daemon;
 use Moose;
 
 # it must be a class in order to override foreground
-extends 'Manoc::App';
+extends 'Manoc::Script';
 with 'MooseX::Daemonize';
 
 sub main {

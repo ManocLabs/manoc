@@ -5,38 +5,12 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-eval { use local::lib "$FindBin::Bin/../support" };
+use Manoc::Support;
 
-use Manoc::App::ArpSniffer;
+use Manoc::ArpSniffer;
 
-my $daemon = Manoc::App::ArpSniffer->new_with_options();
-
-my ($command) = @{ $daemon->extra_argv };
-defined $command || die "No command specified";
-
-if ( $command eq 'start' ) {
-    if ( $daemon->debug ) {
-        $daemon->start_pcap_loop();
-    }
-    else {
-        $daemon->start;
-    }
-}
-elsif ( $command eq 'stop' ) {
-    $daemon->stop;
-}
-elsif ( $command eq 'status' ) {
-    $daemon->status;
-}
-elsif ( $command eq 'restart' ) {
-    $daemon->restart;
-}
-else {
-    die "Unkwown command $command";
-}
-
-warn( $daemon->status_message );
-exit( $daemon->exit_code );
+my $app = Manoc::ArpSniffer->new_with_options();
+$app->run;
 
 # Local Variables:
 # mode: cperl
