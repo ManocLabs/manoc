@@ -114,23 +114,6 @@ __PACKAGE__->config(
 );
 
 
-########################################################################
-
-sub check_backref {
-    my $c       = shift;
-    my $backref = $c->flash->{'backref'};
-    return $backref;
-}
-
-sub set_backref : Private {
-    my $c       = shift;
-    my $backref = $c->req->param('backref');
-    if ($backref) {
-        $c->flash( backref => $backref );
-        delete $c->request->parameters->{'backref'};
-    }
-}
-
 sub load_plugins {
   my $self    = shift;
   my $plugins = __PACKAGE__->config->{LoadPlugin};

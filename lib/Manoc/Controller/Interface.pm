@@ -117,7 +117,8 @@ sub delete_notes : Chained('object') : PathPart('delete_notes') : Args(0) {
 
     if ( $c->req->method eq 'POST' ) {
         $item->delete;
-        $c->detach('/follow_backref');
+        $c->res->redirect($dest_url);
+        $c->detach();
     }
     else {
         $c->stash( template => 'generic_delete.tt' );

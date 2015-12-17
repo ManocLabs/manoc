@@ -8,8 +8,6 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller' }
 
-with 'Manoc::BackRef::Actions';
-
 # Sets the actions in this controller to be registered with no prefix
 # so they function identically to actions created in Manoc.pm
 #
@@ -72,10 +70,12 @@ sub auto : Private {
         if ( $c->stash->{is_xhr} ) {
             $self->forward('error/http_403');
         } else {
-            $c->flash( backref => $c->request->uri );
-            $c->request->path !~ m|^$|o
-                and $c->flash( error_msg => 'You must login to view this page!');
-            $c->response->redirect($c->uri_for_action('/auth/login'));
+            $c->flash( );
+            $c->response->redirect(
+                $c->uri_for_action('/auth/login', {
+                    login_redirect => $c->request->path
+                })
+            );
         }
         return 0;
     }

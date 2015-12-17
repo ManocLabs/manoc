@@ -38,15 +38,21 @@ sub index : Path : Args(0) {
 
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
+    
+    my $login_redirect = $c->req->params()->{login_redirect};
+    my $redirect = $login_redirect
+	? $c->base . '/' . $login_redirect
+	: $c->uri_for('/search');
 
-    $c->keep_flash("backref");
-    $c->stash( 	default_backref => $c->uri_for('/search') );
     my $form = Manoc::Form::Login->new( ctx => $c );
-    my $success = $form->process( params => $c->req->params );
-    if ($success ) {
+    my $success = $form->process(
+	posted => ($c->req->method eq 'POST'),
+	params => $c->req->params );
+
+    if ( $success ) {
 	my $username = $c->user->username;
 	$c->log->info( 'User ' . $username . ' logged');
-	$c->detach('/follow_backref');
+	$c->response->redirect($redirect);
     }
 
     $c->stash(
