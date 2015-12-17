@@ -54,12 +54,6 @@ has force_full_update => (
     default => 0,
 );
 
-has full_update_interval => (
-    is      => 'rw',
-    isa     => 'Int',
-    default => 60 * 60 * 24,
-);
-
 has snmp_version => (
     is      => 'rw',
     isa     => 'Str',
@@ -90,6 +84,23 @@ has refresh_interval => (
     coerce  => 1,
     default => '10m',
 );
+
+
+has full_update_interval => (
+    is      => 'rw',
+    isa     => 'TimeInterval',
+    coerce  => 1,
+    default => '1h'
+);
+
+
+has config_update_interval => (
+    is      => 'rw',
+    isa     => 'TimeInterval',
+    coerce  => 1,
+    default => '1d',
+);
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

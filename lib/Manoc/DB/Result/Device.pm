@@ -169,6 +169,20 @@ sub get_mng_url {
     return $str;
 }
 
+=head2 get_config_date
+
+Return the date of the last saved config, undef if there isn't any
+
+=cut
+
+sub get_config_date {
+    my $self = shift;
+
+    my $config = $self->config;
+    $config or return undef;
+    return $config->config_date;
+}
+
 =head2 update_config( $config_text, [ $timestamp ] )
 
 Create or update the related DeviceConfig object. Check if configuration has changed before rotating the stored one.

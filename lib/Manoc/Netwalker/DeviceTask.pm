@@ -70,9 +70,18 @@ has 'device_set' => (
 # the source for information about the device
 has 'source' => (
     is      => 'ro',
+    does     => 'Manoc::ManifoldRold::Base',
     lazy    => 1,
     builder => '_build_source',
 );
+
+# the source for device configuration backup
+has 'config_source' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_source',
+);
+
 
 has 'task_report' => (
     is       => 'ro',
@@ -157,6 +166,59 @@ sub _build_nwinfo {
     return $self->device_entry->netwalker_info;
 }
 
+
+sub _create_manifold {
+    my $self = shift;
+    my $manifold_name = shift;
+    my %params = @_;
+
+    try {
+        return Manoc::Manifold->new_manifold($manifold_name, %params);
+    } catch {
+        my $error = "Error while creating manifold $manifold_name: $_";
+        $self->debug->($error);
+    };
+    return undef;
+}
+
+sub _build_config_source {
+    my $self = shift;
+    my $entry  = $self->device_entry;
+    my $nwinfo = $self->nwinfo;
+
+    my $manifold_name = $nwinfo->config_manifold;
+    if (!defined($manifold_name) || $manifold_name eq $nwinfo->manifold) {
+        $self->log->debug("Using common Manifold for config");
+        return $self->source;
+    }
+
+    $self->log->debug("Using Manifold $manifold_name for config");
+    my $host   = $entry->mng_address->unpadded;
+
+    my %params = (
+        host         => $host,
+        credentials  => $self->credentials
+    );
+    my $source = $self->_create_manifold($manifold_name, %params);
+
+    if ( !$source ) {
+        my $error = "Cannot create config manifold $manifold_name";
+        $self->log->error($error);
+        $self->task_report->add_error($error);
+        return undef;
+    }
+
+    # auto connect
+    if ( ! $source->connect() ) {
+        my $error = "Cannot connect to $host";
+        $self->log->error($error);
+        $self->task_report->add_error($error);
+        return undef;
+    }
+    return $source;
+}
+
+
 sub _build_source {
     my $self = shift;
 
@@ -164,27 +226,19 @@ sub _build_source {
     my $nwinfo = $self->nwinfo;
 
     my $host   = $entry->mng_address->unpadded;
-    my $mat_force_vlan = $self->config->mat_force_vlan;
 
     my $manifold_name = $nwinfo->manifold;
     $self->log->debug("Using Manifold $manifold_name");
 
-    my $source;
-    try {
-        $source = Manoc::Manifold->new_manifold(
-            $manifold_name,
-            host         => $host,
-            credentials  => $self->credentials,
-            extra_params => {
-                mat_force_vlan => $mat_force_vlan,
-            }
-        );
-    } catch {
-        my $error = "Cannot create manifold $manifold_name: $_";
-        $self->log->error($error);
-        $self->task_report->add_error($error);
-        return undef;
-    };
+    my %params = (
+        host         => $host,
+        credentials  => $self->credentials,
+        extra_params => {
+            mat_force_vlan => $self->config->mat_force_vlan,
+        }
+    );
+
+    my $source = $self->_create_manifold($manifold_name,  %params);
 
     if ( !$source ) {
         my $error = "Cannot create manifold $manifold_name";
@@ -195,8 +249,6 @@ sub _build_source {
 
     # auto connect 
     if ( ! $source->connect() ) {
-        return undef;
-
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
@@ -204,6 +256,7 @@ sub _build_source {
     }
     return $source;
 }
+
 
 sub _build_task_report {
     my $self = shift;
@@ -248,6 +301,7 @@ sub _build_uplinks {
 }
 
 
+
 #----------------------------------------------------------------------#
 #                                                                      #
 #                       D a t a   u p d a t e                          #
@@ -270,7 +324,6 @@ sub update {
         $self->log->error("No netwalker info for device", $entry->name);
         return undef;
     }
-
     
     # try to connect and update nwinfo accordingly
     $self->log->info( "Connecting to device ", $entry->name, " ", $entry->mng_address );
@@ -303,7 +356,8 @@ sub update {
     $nwinfo->get_vtp   and $self->update_vtp_database;
     $nwinfo->get_dot11 and $self->update_dot11;
 
-
+    $nwinfo->get_config and $self->update_config;
+    
     # TODO update nwinfo
     $nwinfo->update();
     return 1;
@@ -547,13 +601,24 @@ sub update_arp_table {
 sub update_config {
     my $self = shift;
 
-    my $timestamp = $self->timestamp;
+    my $device_entry = $self->device_entry;
+    my $config_date  = $device_entry->get_config_date;
+    my $update_interval = $self->config->config_update_interval;
+    my $timestamp    = $self->timestamp;
+    
+    if ( !defined($config_date) || $timestamp > $config_date + $update_interval ) {
+        $self->logger->info("Fetching configuration from ", $device_entry->mng_address );
+        my $config_text = $self->config_source->get_config();
 
-    my $config_text = $self->backup_source->get_config();
-    $self->device_entry->update_config($config_text, $timestamp);
+        if (! defined($config_text)) {
+            $self->logger->error("Cannot fetch configuration from ", $device_entry->mng_address );
+            return;
+        }
+
+        $self->device_entry->update_config($config_text, $timestamp);
+    }
 }
 
-#----------------------------------------------------------------------#
 
 1;
 
