@@ -2,17 +2,17 @@
 # -*- cperl -*-
 use strict;
 use warnings;
-
 package Manoc::InitDB;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use Manoc::Support;
 
 use Moose;
 use Manoc::Logger;
 use Manoc::IPAddress::IPv4;
 
-extends 'Manoc::App';
+extends 'Manoc::Script';
 with 'MooseX::Getopt::Dashes';
 
 has 'reset_admin' => (

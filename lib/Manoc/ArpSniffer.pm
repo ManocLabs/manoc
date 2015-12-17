@@ -3,13 +3,11 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::App::ArpSniffer;
+package Manoc::ArpSniffer;
 
 use Moose;
 
-extends 'Manoc::App';
-
-with qw(MooseX::Daemonize);
+extends 'Manoc::Script::Daemon';
 
 use Net::Pcap;
 use NetPacket::Ethernet qw(:types);
@@ -55,20 +53,15 @@ has 'arp_table' => (
     default => sub { {} }
 );
 
-after start => sub {
-    my $self = shift;
-    return unless $self->is_daemon;
-    $self->start_pcap_loop();
-};
-
 after setup_signals => sub {
     my $self = shift;
 
     # TODO! $SIG{HUP}  = \&update_conf;
-    $SIG{KILL} = \&leave;
-    $SIG{QUIT} = \&leave;
-    $SIG{INT}  = \&leave;
+    $SIG{QUIT} = sub { $self->leave };
+    $SIG{INT}  = sub { $self->leave };
 };
+
+before shutdown => sub { shift->leave; };
 
 ########################################################################
 #                                                                      #
@@ -217,7 +210,7 @@ sub handle_arp_packets {
     );
 }
 
-sub start_pcap_loop {
+sub main {
     my $self = shift;
 
     # force init

@@ -14,13 +14,13 @@ use Manoc::Utils qw(str2seconds print_timestamp);
 
 use Data::Dumper;
 
-extends 'Manoc::App';
+extends 'Manoc::Script';
 
 has 'sources' => (
     traits  => [ 'NoGetopt' ],
-    is => 'rw', 
-    isa => 'ArrayRef[Str]', 
-    required => 0, 
+    is => 'rw',
+    isa => 'ArrayRef[Str]',
+    required => 0,
     default => sub { [qw(Mat Arp Dot11Assoc WinLogon WinHostname)] },
    );
 

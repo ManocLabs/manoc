@@ -10,6 +10,7 @@ Makefile.old
 .vagrant
 *~
 *.bak
+*.tdy
 /manoc.conf
 /manoc_log.conf
 local/
