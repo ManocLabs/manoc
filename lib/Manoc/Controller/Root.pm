@@ -70,7 +70,6 @@ sub auto : Private {
         if ( $c->stash->{is_xhr} ) {
             $self->forward('error/http_403');
         } else {
-            $c->flash( );
             $c->response->redirect(
                 $c->uri_for_action('/auth/login', {
                     login_redirect => $c->request->path
