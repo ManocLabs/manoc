@@ -15,10 +15,10 @@ has '+widget_wrapper' => ( default => 'None' );
 has 'schema' => ( is => 'rw' );
 
 has 'device' => (
-    is  => 'ro',
-    isa => 'Object',
+    is       => 'ro',
+    isa      => 'Object',
     required => 1,
-    trigger => sub { shift->set_device(@_) }
+    trigger  => sub { shift->set_device(@_) }
 );
 
 sub set_device {
@@ -26,13 +26,13 @@ sub set_device {
     $self->schema( $device->result_source->schema );
 }
 
-has_field 'interfaces' => ( type => 'Repeatable' );
-has_field 'interfaces.label'   => ( type => 'Hidden' );
-has_field 'interfaces.name'    => ( type => 'PrimaryKey' );
+has_field 'interfaces'             => ( type => 'Repeatable' );
+has_field 'interfaces.label'       => ( type => 'Hidden' );
+has_field 'interfaces.name'        => ( type => 'PrimaryKey' );
 has_field 'interfaces.uplink_flag' => ( type => 'Boolean', label => 'Uplink' );
 
 sub init_object {
-    my $self = shift;
+    my $self   = shift;
     my $device = $self->device;
 
     my %uplinks = map { $_->interface => 1 } $device->uplinks->all;
@@ -42,14 +42,14 @@ sub init_object {
     while ( my $r = $rs->next() ) {
         my ( $controller, $port ) = split /[.\/]/, $r->interface;
         my $lc_if = lc( $r->interface );
-	my $label = $r->interface;
-	$r->description and $label .=  ' (' . $r->description . ')';
+        my $label = $r->interface;
+        $r->description and $label .= ' (' . $r->description . ')';
 
         push @iface_list, {
             controller  => $controller,                 # for sorting
             port        => $port,                       # for sorting
             name        => $r->interface,
-	    label       => $label,
+            label       => $label,
             uplink_flag => $uplinks{ $r->interface },
         };
     }
@@ -63,19 +63,18 @@ sub init_object {
 sub update_model {
     my $self = shift;
 
-    my $device = $self->device;
+    my $device     = $self->device;
     my $interfaces = $self->value->{interfaces};
     $self->schema->txn_do(
         sub {
             $device->uplinks()->delete();
             foreach my $i (@$interfaces) {
-		$i->{uplink_flag} and
-		    $device->add_to_uplinks( { interface => $i->{name} } );
+                $i->{uplink_flag} and
+                    $device->add_to_uplinks( { interface => $i->{name} } );
             }
         }
     );
 }
-
 
 =head1 AUTHOR
 

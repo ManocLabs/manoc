@@ -26,10 +26,10 @@ __PACKAGE__->add_columns(
     },
 
     'ipaddr' => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
 
     'hostname' => {

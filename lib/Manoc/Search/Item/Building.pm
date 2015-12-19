@@ -46,6 +46,5 @@ around BUILDARGS => sub {
     return $class->$orig(@_);
 };
 
-
 no Moose;
 __PACKAGE__->meta->make_immutable;

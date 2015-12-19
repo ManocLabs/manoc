@@ -19,11 +19,11 @@ sub options_range {
     my $self = shift;
     return unless $self->schema;
 
-    my @ranges = $self->item->get_mergeable_ranges({ order_by => 'start' });
+    my @ranges = $self->item->get_mergeable_ranges( { order_by => 'start' } );
 
     return map +{
-	label => $_->name,
-	value => $_->id,
+        label => $_->name,
+        value => $_->id,
     }, @ranges;
 }
 

@@ -25,7 +25,7 @@ sub search_device {
             }
         );
         $result->add_item($item);
-      }
+    }
 
     $rs = $self->_search_name($query);
     while ( my $e = $rs->next ) {
@@ -58,41 +58,36 @@ sub _search_addr {
     my ( $self, $query ) = @_;
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
-    return $schema->resultset('Device')->search(
-        {'mng_address' => { -like => $pattern }},
-        { order_by => ['name'] },
-	);
+    return $schema->resultset('Device')
+        ->search( { 'mng_address' => { -like => $pattern } }, { order_by => ['name'] }, );
 }
 
 sub _search_name {
     my ( $self, $query ) = @_;
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
-    return $schema->resultset('Device')->search(
-						{name => { -like => $pattern }},
-						{ order_by => 'name' },
-					       );
+    return $schema->resultset('Device')
+        ->search( { name => { -like => $pattern } }, { order_by => 'name' }, );
 }
 
 sub search_note {
-  my ( $self, $query, $result ) = @_;
-  my $pattern = $query->sql_pattern;
-  my $schema  = $self->engine->schema;
-  
-  my $rs = $schema->resultset('Device')->search({notes => { -like => $pattern }},
-						{ order_by => ['name'] },
-					       );
-  
-  while ( my $e = $rs->next ) {
-    my $item = Manoc::Search::Item::Device->new(
-						{
-						 device => $e,
-						 match  => $e->mng_address->address,
-						 notes  => $e->notes,
-						}
-					       );
-    $result->add_item($item);
-  }
+    my ( $self, $query, $result ) = @_;
+    my $pattern = $query->sql_pattern;
+    my $schema  = $self->engine->schema;
+
+    my $rs = $schema->resultset('Device')
+        ->search( { notes => { -like => $pattern } }, { order_by => ['name'] }, );
+
+    while ( my $e = $rs->next ) {
+        my $item = Manoc::Search::Item::Device->new(
+            {
+                device => $e,
+                match  => $e->mng_address->address,
+                notes  => $e->notes,
+            }
+        );
+        $result->add_item($item);
+    }
 }
 
 no Moose;

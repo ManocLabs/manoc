@@ -21,7 +21,7 @@ sub begin : Private {
 
     # WApi with HTTP Authentication
     $c->user_exists or
-	$c->authenticate( {}, 'agent' );
+        $c->authenticate( {}, 'agent' );
 }
 
 sub index : Path : Args(0) {
@@ -45,14 +45,14 @@ sub base : Chained('/') : PathPart('wapi') : CaptureArgs(0) {
 sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $user   = $c->req->param('user');
+    my $user = $c->req->param('user');
     unless ($user) {
         $c->stash( error => "Missing user param" );
         $c->detach('apierror');
     }
 
     my $ipaddr = $c->req->param('ipaddr');
-    if ( ! check_addr($ipaddr) ) {
+    if ( !check_addr($ipaddr) ) {
         $c->stash( error => "Not a valid address in ipaddr" );
         $c->detach('apierror');
     }
@@ -62,8 +62,8 @@ sub winlogon : Chained('base') : PathPart('winlogon') : Args(0) {
     if ( $user =~ /([^\$]+)\$$/ ) {
 
         # computer logon
-        my $name = $1;
-        my $rs = $c->model('ManocDB::WinHostname');
+        my $name    = $1;
+        my $rs      = $c->model('ManocDB::WinHostname');
         my @entries = $rs->search(
             {
                 ipaddr   => $ipaddr,
@@ -146,37 +146,37 @@ sub dhcp_leases : Chained('base') : PathPart('dhcp_leases') : Args(0) {
     $server ||= $req->hostname();
 
     my $data = $req->body || undef;
-    $c->detach unless(defined $data);
-    
+    $c->detach unless ( defined $data );
+
     my @records = LoadFile($data);
 
-    $c->detach() unless(scalar(@records));
+    $c->detach() unless ( scalar(@records) );
 
     $rs->search( { server => $server } )->delete();
 
     my $n_created = 0;
     foreach my $r (@records) {
-         my $macaddr = $r->{macaddr} or next;
-         my $ipaddr  = Manoc::IPAddress::IPv4->new($r->{ipaddr})  or next;
-         my $start   = $r->{start}   or next;
-         my $end     = $r->{end}     or next;
+        my $macaddr = $r->{macaddr}                               or next;
+        my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
+        my $start   = $r->{start}                                 or next;
+        my $end     = $r->{end}                                   or next;
 
-         my $hostname = $r->{hostname};
-         my $status   = $r->{status};
+        my $hostname = $r->{hostname};
+        my $status   = $r->{status};
 
-         $rs->update_or_create(
-             {
-                 server   => $server,
-                 macaddr  => $macaddr,
-                 ipaddr   => $ipaddr,
-                 hostname => $hostname,
-                 start    => $start,
-                 end      => $end,
-                 status   => $status,
-             }
-         );
-         $n_created++;
-     }
+        $rs->update_or_create(
+            {
+                server   => $server,
+                macaddr  => $macaddr,
+                ipaddr   => $ipaddr,
+                hostname => $hostname,
+                start    => $start,
+                end      => $end,
+                status   => $status,
+            }
+        );
+        $n_created++;
+    }
     $c->response->body( "$server: $n_created/" . scalar(@records) );
     $c->detach();
 }
@@ -192,16 +192,16 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
 
     my $data = $req->body() || '';
     my @records = LoadFile($data);
-    $c->detach() unless(scalar(@records));
+    $c->detach() unless ( scalar(@records) );
 
     $rs->search( { server => $server } )->delete();
 
     my $n_created = 0;
     foreach my $r (@records) {
-        my $macaddr  = $r->{macaddr}  or next;
-        my $ipaddr  = Manoc::IPAddress::IPv4->new($r->{ipaddr})  or next;
-        my $hostname = $r->{hostname} or next;
-        my $name     = $r->{name}     or next;
+        my $macaddr  = $r->{macaddr}                               or next;
+        my $ipaddr   = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
+        my $hostname = $r->{hostname}                              or next;
+        my $name     = $r->{name}                                  or next;
 
         $rs->create(
             {
@@ -223,13 +223,12 @@ sub dhcp_reservations : Chained('base') : PathPart('dhcp_reservations') : Args(0
 sub ip_info : Chained('base') : PathPart('ipinfo') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $ipaddr      = Manoc::IPAddress::IPv4->new($c->req->param('ipaddr'));
+    my $ipaddr      = Manoc::IPAddress::IPv4->new( $c->req->param('ipaddr') );
     my $descr       = $c->req->param('descr');
     my $assigned_to = $c->req->param('assigned');
     my $phone       = $c->req->param('phone');
     my $email       = $c->req->param('email');
     my $notes       = $c->req->param('notes');
-    
 
     unless ($ipaddr) {
         $c->stash( error => "Missing IP address param" );
@@ -242,33 +241,33 @@ sub ip_info : Chained('base') : PathPart('ipinfo') : Args(0) {
 
     my $timestamp = time();
 
-    my $rs = $c->model('ManocDB::Ip');
+    my $rs      = $c->model('ManocDB::Ip');
     my @entries = $rs->search(
-            {
-                ipaddr   => $ipaddr,
-            }
-        );
+        {
+            ipaddr => $ipaddr,
+        }
+    );
 
-    if ( scalar(@entries)  ) {
+    if ( scalar(@entries) ) {
         my $entry = $entries[0];
-        $descr and $entry->description($descr);
+        $descr       and $entry->description($descr);
         $assigned_to and $entry->assigned_to($assigned_to);
-	$phone and $entry->phone($phone);
-	$email and $entry->email($email);
-	$notes and $entry->notes($notes);    
-	$entry->update();
+        $phone       and $entry->phone($phone);
+        $email       and $entry->email($email);
+        $notes       and $entry->notes($notes);
+        $entry->update();
     }
     else {
-    	$rs->create(
-                {
-                  ipaddr      => $ipaddr,
-                  description => $descr,
-                  assigned_to => $assigned_to,
-		  phone       => $phone,
-                  email       => $email,
-		  notes       => $notes,
-                }
-            );
+        $rs->create(
+            {
+                ipaddr      => $ipaddr,
+                description => $descr,
+                assigned_to => $assigned_to,
+                phone       => $phone,
+                email       => $email,
+                notes       => $notes,
+            }
+        );
     }
     $c->response->body('ok');
     $c->detach();

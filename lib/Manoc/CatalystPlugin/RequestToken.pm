@@ -18,14 +18,15 @@ has [qw/ token_session_name token_request_name /] => (
 );
 
 has token_length => (
-    is  => 'ro',
-    isa => 'Int',
+    is      => 'ro',
+    isa     => 'Int',
     default => 16,
 );
 
 =head1 METHODS
 
 =cut
+
 sub setup {
     my $c = shift;
 
@@ -33,19 +34,16 @@ sub setup {
     $c->check_request_token_plugin_requirements();
 }
 
-
 sub check_request_token_plugin_requirements {
     my $c = shift;
-    
-    unless ( $c->isa("Catalyst::Plugin::Session") )
-    {
+
+    unless ( $c->isa("Catalyst::Plugin::Session") ) {
         my $err = "The Session plugin is required.";
 
         $c->log->fatal($err);
         Catalyst::Exception->throw($err);
     }
 }
-
 
 =cut
 
@@ -56,17 +54,17 @@ Get the current token from session. If not set generate it.
 =cut
 
 sub get_token {
-    my ( $c ) = @_;
-    return $c->session->{ $c->token_session_name } ||=  $c->_generate_token($c);
+    my ($c) = @_;
+    return $c->session->{ $c->token_session_name } ||= $c->_generate_token($c);
 }
 
 sub _generate_token {
-    my ( $c ) = @_;
+    my ($c) = @_;
 
     my $seed = join( time, rand(), $$ );
 
     my $token = Digest::SHA1::sha1_hex($seed);
-    $token = substr($token, 0 , $c->token_length);
+    $token = substr( $token, 0, $c->token_length );
 
     $c->log->debug("created request token $token") if $c->debug;
     return $token;
@@ -89,10 +87,10 @@ sub check_token {
     $request_token ||= $c->req->params->{ $c->token_request_name };
 
     # try to get token from named forms
-    if (! $request_token ) {
+    if ( !$request_token ) {
         my $params = $c->req->params;
-        while ( my ($key, $value) = each (%$params) ) {
-            my ($name, $attr) = split /\./, $key, 2;
+        while ( my ( $key, $value ) = each(%$params) ) {
+            my ( $name, $attr ) = split /\./, $key, 2;
             if ( $attr eq $c->token_request_name ) {
                 $request_token = $value;
                 $c->log->debug("found token in form $name") if $c->debug;
@@ -102,9 +100,10 @@ sub check_token {
     }
 
     if ( ( $session_token && $request_token ) &&
-	     $session_token eq $request_token ) {
+        $session_token eq $request_token )
+    {
         $c->log->debug('token is valid') if $c->debug;
-	return 1;
+        return 1;
     }
     else {
         $c->log->debug('token is invalid') if $c->debug;
@@ -122,9 +121,9 @@ a 403 error.
 sub require_valid_token {
     my ( $c, $token ) = @_;
 
-    if (! $c->check_token($token) ) {
+    if ( !$c->check_token($token) ) {
         $c->log->info('Invalid CSRF token');
-	$c->detach('/error/http_403');
+        $c->detach('/error/http_403');
     }
 }
 
@@ -137,5 +136,4 @@ no Moose;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
 

@@ -27,11 +27,11 @@ has session => (
     required => 1,
     lazy     => 1,
     default  => sub {
-	POE::Session->create(
-	    object_states => [
-		$_[0] => [ qw (_start tick ) ]
-	    ]
-	);
+        POE::Session->create(
+            object_states => [
+                $_[0] => [qw (_start tick )]
+            ]
+        );
     }
 );
 
@@ -43,10 +43,10 @@ has tick_interval => (
 );
 
 has refresh_interval => (
-    is       => 'ro',
-    isa      => 'Int',
-    lazy     => 1,
-    builder  => '_build_refresh_interval',
+    is      => 'ro',
+    isa     => 'Int',
+    lazy    => 1,
+    builder => '_build_refresh_interval',
 );
 
 has schema => (
@@ -55,8 +55,8 @@ has schema => (
 );
 
 has next_alarm_time => (
-    is       => 'rw',
-    isa      => 'Int',
+    is  => 'rw',
+    isa => 'Int',
 );
 
 sub _build_refresh_interval {
@@ -64,30 +64,29 @@ sub _build_refresh_interval {
 }
 
 sub _start {
-    my ($self, $kernel) = @_[OBJECT, KERNEL];
+    my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
-    $self->log->debug("starting scheduler, tick=",  $self->tick_interval);
+    $self->log->debug( "starting scheduler, tick=", $self->tick_interval );
 
-    $self->next_alarm_time(time() + 1);
-    $kernel->alarm(tick => $self->next_alarm_time);
+    $self->next_alarm_time( time() + 1 );
+    $kernel->alarm( tick => $self->next_alarm_time );
 }
 
 sub tick {
-    my ($self, $kernel) = @_[OBJECT, KERNEL];
+    my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
     # TODO better check
     my $last_visited = time() - $self->refresh_interval;
-    my @devices = $self->schema->resultset('DeviceNWInfo')
-	->search({ last_visited => { '<=' => $last_visited }  })
-	->get_column('device')->all();
+    my @devices      = $self->schema->resultset('DeviceNWInfo')
+        ->search( { last_visited => { '<=' => $last_visited } } )->get_column('device')->all();
 
-    $self->log->debug("Tick: devices=" . join(',', @devices));
+    $self->log->debug( "Tick: devices=" . join( ',', @devices ) );
     foreach my $id (@devices) {
-	$self->manager->enqueue_device($id);
+        $self->manager->enqueue_device($id);
     }
 
-    $self->next_alarm_time($self->next_alarm_time + $self->tick_interval);
-    $kernel->alarm(tick => $self->next_alarm_time);
+    $self->next_alarm_time( $self->next_alarm_time + $self->tick_interval );
+    $kernel->alarm( tick => $self->next_alarm_time );
 
 }
 

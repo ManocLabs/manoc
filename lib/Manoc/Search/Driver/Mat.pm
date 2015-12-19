@@ -22,27 +22,27 @@ sub search_macaddr {
             [ 'device', 'macaddr', 'interface', { max => 'lastseen', -as => 'timestamp' } ],
         as       => [ 'device', 'macaddr', 'interface', 'timestamp' ],
         group_by => [qw(device macaddr interface)],
-#        join     => { 'device_entry' => 'mng_url_format' },
-#        prefetch => { 'device_entry' => 'mng_url_format' },
+        #        join     => { 'device_entry' => 'mng_url_format' },
+        #        prefetch => { 'device_entry' => 'mng_url_format' },
     };
 
     $query->limit and
         $options->{having} = { timestamp => { '>' => $query->start_date } };
 
-     my $it = $schema->resultset('Mat')->search( $search, $options );
+    my $it = $schema->resultset('Mat')->search( $search, $options );
 
-     while ( my $e = $it->next ) {
-         #my $device = Manoc::Search::Item::Device->new( { device => $e->device_entry } );
-         my $item = Manoc::Search::Item::Iface->new(
-             {
-                 match     => $e->macaddr,
-                 device    => $e->device_entry,#$device,
-                 interface => $e->interface,
-                 timestamp => $e->get_column('timestamp'),
-             }
-         );
-         $result->add_item($item);
-     }
+    while ( my $e = $it->next ) {
+        #my $device = Manoc::Search::Item::Device->new( { device => $e->device_entry } );
+        my $item = Manoc::Search::Item::Iface->new(
+            {
+                match     => $e->macaddr,
+                device    => $e->device_entry,              #$device,
+                interface => $e->interface,
+                timestamp => $e->get_column('timestamp'),
+            }
+        );
+        $result->add_item($item);
+    }
 
 }
 

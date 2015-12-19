@@ -43,14 +43,16 @@ Catalyst Controller.
 sub get_object_list {
     my ( $self, $c ) = @_;
 
-    return [ $c->stash->{resultset}->search(
-	{},
-        {
-            prefetch => 'building',
-            join     => 'building',
-	    order_by => 'me.name',
-        })
-  ];
+    return [
+        $c->stash->{resultset}->search(
+            {},
+            {
+                prefetch => 'building',
+                join     => 'building',
+                order_by => 'me.name',
+            }
+        )
+    ];
 }
 
 =head2 create
@@ -58,13 +60,12 @@ sub get_object_list {
 =cut
 
 before 'create' => sub {
-    my ( $self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $building_id = $c->req->query_parameters->{'building'};
     $c->log->debug("new rack in $building_id");
-    $c->stash(form_defaults => { building => $building_id });
+    $c->stash( form_defaults => { building => $building_id } );
 };
-
 
 =head2 delete_object
 
@@ -76,31 +77,30 @@ sub delete_object {
     my $rack = $c->stash->{'object'};
 
     if ( $rack->devices->count ) {
-	$c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
-	return undef;
+        $c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
+        return undef;
     }
 
-     return $rack->delete;
+    return $rack->delete;
 }
 
 =head2 prepare_json_object
 
 =cut
 
-sub prepare_json_object  {
-    my ($self, $rack) = @_;
+sub prepare_json_object {
+    my ( $self, $rack ) = @_;
     return {
-	    id      => $rack->id,
-	    name    => $rack->name,
-	    building => $rack->building->id,
-	    building => {
-		id   => $rack->building->id,
-		name => $rack->building->name,
-	    },
-	    devices   => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
-	   };
+        id       => $rack->id,
+        name     => $rack->name,
+        building => $rack->building->id,
+        building => {
+            id   => $rack->building->id,
+            name => $rack->building->name,
+        },
+        devices => [ map +{ id => $_->id, name => $_->name }, $rack->devices ],
+    };
 }
-
 
 =head1 AUTHOR
 

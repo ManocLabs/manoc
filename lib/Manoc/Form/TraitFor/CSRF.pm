@@ -16,7 +16,7 @@ Include this role to include a CSRF hidden form.
 =cut
 
 has_field 'csrf_token' => (
-    type  => 'Hidden',
+    type     => 'Hidden',
     noupdate => 1,
 );
 

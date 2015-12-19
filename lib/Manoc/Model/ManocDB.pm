@@ -8,9 +8,7 @@ use Moose;
 extends 'Catalyst::Model::DBIC::Schema';
 use namespace::autoclean;
 
-__PACKAGE__->config(
-    schema_class => 'Manoc::DB',
-);
+__PACKAGE__->config( schema_class => 'Manoc::DB', );
 
 has 'search_engine' => (
     is      => 'ro',
@@ -42,8 +40,6 @@ sub search {
 
     return $engine->search($q);
 }
-
-
 
 =head1 NAME
 

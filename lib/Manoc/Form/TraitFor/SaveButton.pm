@@ -22,12 +22,12 @@ The save button itself. Order is set to 1000 to make sure it is always at the bo
 =cut
 
 has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
+    type           => 'Submit',
+    widget         => 'ButtonTag',
+    element_attr   => { class => [ 'btn', 'btn-primary' ] },
     widget_wrapper => 'None',
-    value => "Save",
-    order => 1000,
+    value          => "Save",
+    order          => 1000,
 );
 
 =head1 AUTHOR

@@ -6,7 +6,6 @@ package Manoc::Controller::Mac;
 use Moose;
 use namespace::autoclean;
 
-
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head1 NAME
@@ -27,54 +26,53 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
     my ( $self, $c, $macaddr ) = @_;
 
     $c->stash(
-	macaddr => $macaddr,
+        macaddr => $macaddr,
 
-	mat_results  => [
-	    $c->model('ManocDB::MatArchive')->search( 
-		{
-		    macaddr  => $macaddr
-		},
-		{
-		    prefetch => [ 'device', ],
-		}
-	    ),
-	    $c->model('ManocDB::Mat')->search(
-		{
-		    macaddr => $macaddr
-		},
-		{
-		    prefetch => { 'device_entry' => ['mng_url_format'] }
-		}
-	    ) ],
-	
-	arp_results => [
-	    $c->model('ManocDB::Arp')->search(
-		{
-		    macaddr => $macaddr,
-		},
-		{
-		    order_by => { -desc => [ 'lastseen', 'firstseen' ] }
-		}
-	    ) ],
+        mat_results => [
+            $c->model('ManocDB::MatArchive')->search(
+                {
+                    macaddr => $macaddr
+                },
+                {
+                    prefetch => [ 'device', ],
+                }
+            ),
+            $c->model('ManocDB::Mat')->search(
+                {
+                    macaddr => $macaddr
+                },
+                {
+                    prefetch => { 'device_entry' => ['mng_url_format'] }
+                }
+            )
+        ],
 
-	dot11_results => [
-	    $c->model('ManocDB::Dot11Assoc')->search(
-		{
-		    macaddr => $macaddr
-		},
-		{
-		    order_by => 'lastseen DESC, firstseen DESC'
-		}
-	    )
-	],
+        arp_results => [
+            $c->model('ManocDB::Arp')->search(
+                {
+                    macaddr => $macaddr,
+                },
+                {
+                    order_by => { -desc => [ 'lastseen', 'firstseen' ] }
+                }
+            )
+        ],
 
-	reservations => [
-	    $c->model('ManocDB::DHCPReservation')->search( { macaddr => $macaddr } )
-	],
+        dot11_results => [
+            $c->model('ManocDB::Dot11Assoc')->search(
+                {
+                    macaddr => $macaddr
+                },
+                {
+                    order_by => 'lastseen DESC, firstseen DESC'
+                }
+            )
+        ],
 
-	leases => [
-	    $c->model('ManocDB::DHCPLease')->search( { macaddr => $macaddr } )
-	],
+        reservations =>
+            [ $c->model('ManocDB::DHCPReservation')->search( { macaddr => $macaddr } ) ],
+
+        leases => [ $c->model('ManocDB::DHCPLease')->search( { macaddr => $macaddr } ) ],
 
     );
 

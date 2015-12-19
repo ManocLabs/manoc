@@ -26,9 +26,7 @@ has 'class' => ( is => 'ro', isa => 'Str', writer => '_set_class' );
 
 =cut
 
-sub setup :
-    Chained('/') : CaptureArgs(0) :
-    PathPart('specify.in.subclass.config') {}
+sub setup : Chained('/') : CaptureArgs(0) : PathPart('specify.in.subclass.config') { }
 
 =head2 base
 

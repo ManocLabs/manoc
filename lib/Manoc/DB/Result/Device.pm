@@ -13,16 +13,16 @@ __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('devices');
 __PACKAGE__->add_columns(
     id => {
-        data_type   => 'int',
-	is_auto_increment => 1,
-        is_nullable => 0,
+        data_type         => 'int',
+        is_auto_increment => 1,
+        is_nullable       => 0,
     },
     mng_address => {
-	data_type   => 'varchar',
-	is_nullable => 0,
-	size        => 15,
-	ipv4_address => 1,
-	accessor     => '_mng_address',
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
+        accessor     => '_mng_address',
     },
     mng_url_format => {
         data_type      => 'int',
@@ -108,9 +108,9 @@ __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
     { 'foreign.from_device' => 'self.id' },
     {
-	cascade_copy   => 0,
-	cascade_delete => 0,
-	cascade_update => 0,
+        cascade_copy   => 0,
+        cascade_delete => 0,
+        cascade_update => 0,
     }
 );
 
@@ -138,12 +138,11 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
-
 sub mng_address {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    if (@_ > 1) {
-	ref($value) or $value = Manoc::IPAddress::IPv4->new($value);
+    if ( @_ > 1 ) {
+        ref($value) or $value = Manoc::IPAddress::IPv4->new($value);
         $self->_mng_address($value);
     }
     return $self->_mng_address();
@@ -154,7 +153,6 @@ sub mng_address {
 Return mng_address formatted using mng_url_format,
 
 =cut
-
 
 sub get_mng_url {
     my $self = shift;
@@ -191,28 +189,30 @@ Return 1 if the config object has been refreshed, undef otherwise.
 =cut
 
 sub update_config {
-    my ($self, $config_text, $timestamp) = @_;
+    my ( $self, $config_text, $timestamp ) = @_;
 
     $timestamp ||= time;
 
     my $config = $self->config;
-    if (!$config) {
-	$self->create_related('config' => {
-	    config       => $config_text,
-	    config_date  => $timestamp,
-	});
+    if ( !$config ) {
+        $self->create_related(
+            'config' => {
+                config      => $config_text,
+                config_date => $timestamp,
+            }
+        );
 
-	return 1;
+        return 1;
     }
 
-    if ($config->config ne $config_text) {
-	$config->prev_config( $config->config );
-	$config->prev_config_date( $config->config_date );
-	$config->config($config_text);
-	$config->config_date( $timestamp );
-	$config->update();
+    if ( $config->config ne $config_text ) {
+        $config->prev_config( $config->config );
+        $config->prev_config_date( $config->config_date );
+        $config->config($config_text);
+        $config->config_date($timestamp);
+        $config->update();
 
-	return 1;
+        return 1;
     }
 
     return;

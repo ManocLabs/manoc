@@ -18,7 +18,6 @@ has 'schema' => (
     required => 1,
 );
 
-
 no Moose;    # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
 

@@ -43,6 +43,5 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key( 'device_id', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->belongs_to( device => 'Manoc::DB::Result::DeletedDevice', 'device_id' );
 
-
 1;
 

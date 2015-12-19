@@ -8,19 +8,21 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/
-				   +Manoc::DB::InflateColumn::IPv4
-				   +Manoc::DB::Helper::Row::TupleArchive
-			       /);
+__PACKAGE__->load_components(
+    qw/
+        +Manoc::DB::InflateColumn::IPv4
+        +Manoc::DB::Helper::Row::TupleArchive
+        /
+);
 
 __PACKAGE__->table('arp');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
     'macaddr' => {
         data_type   => 'varchar',
@@ -40,14 +42,12 @@ __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Arp');
 
-
-
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_arp_mac', fields => ['macaddr'] );
-    $sqlt_schema->add_index( name => 'idx_arp_ip',  fields => ['ipaddr'] );
-    $sqlt_schema->add_index( name => 'idx_arp_ipmac',  fields => ['ipaddr', 'macaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_mac',   fields => ['macaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_ip',    fields => ['ipaddr'] );
+    $sqlt_schema->add_index( name => 'idx_arp_ipmac', fields => [ 'ipaddr', 'macaddr' ] );
 }
 
 1;

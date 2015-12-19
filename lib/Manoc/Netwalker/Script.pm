@@ -16,7 +16,6 @@ use Manoc::Netwalker::Manager;
 use Manoc::Netwalker::Control;
 use Manoc::Netwalker::Scheduler;
 
-
 sub main {
     my $self = shift;
 
@@ -24,13 +23,12 @@ sub main {
 
     # get configuration and store it in a Config object
     my %config_args = %{ $self->config->{Netwalker} };
-    my $config = Manoc::Netwalker::Config->new(%config_args);
+    my $config      = Manoc::Netwalker::Config->new(%config_args);
 
     my $manager = Manoc::Netwalker::Manager->new(
-        config  => $config,
-        schema  => $self->schema,
+        config => $config,
+        schema => $self->schema,
     );
-
 
     my $control = Manoc::Netwalker::Control->new(
         config  => $config,
@@ -44,10 +42,9 @@ sub main {
     );
 
     POE::Kernel->run();
-};
+}
 
-
- # Clean up the namespace.
+# Clean up the namespace.
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

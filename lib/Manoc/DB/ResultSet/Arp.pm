@@ -10,30 +10,30 @@ use warnings;
 
 use Scalar::Util qw(blessed);
 
-__PACKAGE__->load_components(qw/
-				   +Manoc::DB::Helper::ResultSet::TupleArchive
-			       /);
-
+__PACKAGE__->load_components(
+    qw/
+        +Manoc::DB::Helper::ResultSet::TupleArchive
+        /
+);
 
 sub search_by_ipaddress {
-    my ($self, $ipaddress) = @_;
+    my ( $self, $ipaddress ) = @_;
 
-    if ( blessed($ipaddress)
-             &&  $ipaddress->isa('Manoc::IPAddress::IPv4') )
+    if ( blessed($ipaddress) &&
+        $ipaddress->isa('Manoc::IPAddress::IPv4') )
     {
         $ipaddress = $ipaddress->padded;
     }
 
-    return $self->search({ipaddr => $ipaddress});
+    return $self->search( { ipaddr => $ipaddress } );
 }
-
 
 sub search_by_ipaddress_ordered {
     shift->search_by_ipaddress(@_)->search(
-	{},
-	{
-	    order_by => { -desc => [ 'lastseen', 'firstseen' ] }
-	}
+        {},
+        {
+            order_by => { -desc => [ 'lastseen', 'firstseen' ] }
+        }
     );
 }
 
@@ -69,26 +69,22 @@ sub first_last_seen {
     my $self = shift;
 
     $self->search(
-	{ },
-	{
-            select   => [
-		'ipaddr',
-		{ MAX => 'lastseen' },
-		{ MIN => 'firstseen' },
-	    ],
-	    as       => [ 'ip_address', 'lastseen', 'firstseen' ],
-	    group_by => [ 'ipaddr'],
-	}
+        {},
+        {
+            select => [ 'ipaddr', { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
+            as       => [ 'ip_address', 'lastseen', 'firstseen' ],
+            group_by => ['ipaddr'],
+        }
     );
 }
 
 sub register_tuple {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
     my $ipaddr = $params{ipaddr};
     $ipaddr = Manoc::IPAddress::IPv4->new( $params{ipaddr} )
-	unless blessed($params{ipaddr});
+        unless blessed( $params{ipaddr} );
     $params{ipaddr} = $ipaddr->padded;
 
     $self->next::method(%params);

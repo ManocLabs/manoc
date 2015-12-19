@@ -31,28 +31,28 @@ sub form : Private {
     my $form = $self->get_form($c);
 
     $c->stash(
-        form   => $form,
-        action => $c->uri_for($c->action, $c->req->captures),
+        form => $form,
+        action => $c->uri_for( $c->action, $c->req->captures ),
     );
     unless ( $c->stash->{template} ) {
-        $c->stash(template =>  $c->namespace . "/form.tt" );
+        $c->stash( template => $c->namespace . "/form.tt" );
     }
 
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
     my %process_params;
-    $process_params{item}   =  $c->stash->{object};
-    $process_params{params} =  $c->req->parameters;
+    $process_params{item}   = $c->stash->{object};
+    $process_params{params} = $c->req->parameters;
     if ( $c->stash->{form_defaults} ) {
-        $process_params{defaults} = $c->stash->{form_defaults};
+        $process_params{defaults}              = $c->stash->{form_defaults};
         $process_params{use_defaults_over_obj} = 1;
     }
-    return unless $form->process( %process_params );
+    return unless $form->process(%process_params);
 
-    $c->stash(message => $self->object_updated_message );
-    if ($c->stash->{is_xhr}) {
-        $c->stash(no_wrapper => 1);
-        $c->stash(template   => 'dialog/message.tt');
+    $c->stash( message => $self->object_updated_message );
+    if ( $c->stash->{is_xhr} ) {
+        $c->stash( no_wrapper => 1 );
+        $c->stash( template   => 'dialog/message.tt' );
         return;
     }
 
@@ -69,11 +69,11 @@ Create a new form using form_class configuration parameter.
 =cut
 
 sub get_form {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $class = $self->form_class;
     $class or die "Form class not set (use form_class)";
-    return $class->new(ctx => $c);
+    return $class->new( ctx => $c );
 }
 
 =head2 get_form_success_url
@@ -83,8 +83,8 @@ Get the URL to redirect after successful editing.
 =cut
 
 sub get_form_success_url {
-    my ($self, $c) = @_;
-    return $c->uri_for_action($c->namespace . "/list");
+    my ( $self, $c ) = @_;
+    return $c->uri_for_action( $c->namespace . "/list" );
 }
 
 1;

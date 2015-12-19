@@ -9,9 +9,7 @@ use namespace::autoclean;
 use Manoc::Form::MngUrlFormat;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "Manoc::ControllerRole::CommonCRUD" => {
-    -excludes => 'view'
-} ;
+with "Manoc::ControllerRole::CommonCRUD" => { -excludes => 'view' };
 
 =head1 NAME
 
@@ -22,7 +20,6 @@ Manoc::Controller::MngUrl - Catalyst Controller
 Catalyst Controller.
 
 =cut
-
 
 __PACKAGE__->config(
     # define PathPart
@@ -48,7 +45,7 @@ sub delete_object {
 
     my $id = $c->stash->{object_pk};
     if ( $c->model('ManocDB::Device')->search( { mng_url_format => $id } )->count ) {
-	$c->flash( error_msg => 'Format is in use. Cannot be deleted.' );
+        $c->flash( error_msg => 'Format is in use. Cannot be deleted.' );
         return undef;
     }
 
@@ -63,8 +60,7 @@ sub get_delete_failure_url {
     my ( $self, $c ) = @_;
 
     my $action = $c->namespace . "/list";
-    return $c->uri_for_action( $action );
+    return $c->uri_for_action($action);
 }
-
 
 1;

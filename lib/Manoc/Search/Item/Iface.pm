@@ -27,19 +27,18 @@ has 'device_name' => (
     required => 1,
 );
 
-
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
 
     if ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) {
-	my $args = $_[0];
-	my $device = delete $args->{device};
-	if ($device) {
-	    $args->{device_id}   = $device->id;
-	    $args->{device_name} = $device->name;
-	}
-	return $class->$orig($args);
+        my $args   = $_[0];
+        my $device = delete $args->{device};
+        if ($device) {
+            $args->{device_id}   = $device->id;
+            $args->{device_name} = $device->name;
+        }
+        return $class->$orig($args);
     }
 
     return $class->$orig(@_);

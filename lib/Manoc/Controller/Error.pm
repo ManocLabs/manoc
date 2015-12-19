@@ -20,7 +20,6 @@ Catalyst Controller for showing error pages
 
 =cut
 
-
 =head2 http_403
 
 Error page for HTTP 404.

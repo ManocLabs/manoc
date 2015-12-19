@@ -37,22 +37,21 @@ has 'converters' => (
     default => sub { [] },
     traits  => ['Array'],
     handles => {
-         add_converter => 'push',
-     }
+        add_converter => 'push',
+    }
 );
 
-
 sub BUILD {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     $self->_load_converters;
 }
 
 sub _load_converters {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     my $first_converter = $self->from_version;
-    my $last_converter = $self->to_version - 1;
+    my $last_converter  = $self->to_version - 1;
 
     for my $v ( $first_converter .. $last_converter ) {
         my $class_name = "v$v";
@@ -60,18 +59,18 @@ sub _load_converters {
         $class_name = "Manoc::DataDumper::Converter::$class_name";
         Class::Load::load_class($class_name) or return undef;
 
-        my $c = $class_name->new(log => $self->log, schema => $self->schema);
+        my $c = $class_name->new( log => $self->log, schema => $self->schema );
         $self->add_converter($c);
     }
 }
 
 sub get_table_name {
-    my ($self, $source_name) = @_;
+    my ( $self, $source_name ) = @_;
 
     my $method_name = "get_table_name_${source_name}";
 
     # get name from lowest converter
-    foreach my $c (@{$self->converters}) {
+    foreach my $c ( @{ $self->converters } ) {
         next unless $c->can($method_name);
         my $name = $c->$method_name();
         $name and return $name;
@@ -85,20 +84,20 @@ sub upgrade_table {
 
     # use all converters
     $self->log->info("Running converters for $name");
-    foreach my $c (@{$self->converters}) {
+    foreach my $c ( @{ $self->converters } ) {
         next unless $c->can($method_name);
         $c->$method_name($data);
     }
 }
 
 sub after_import_source {
-    my ( $self, $source) = @_;
+    my ( $self, $source ) = @_;
 
     my $source_name = $source->source_name;
     my $method_name = "after_import_${source_name}";
 
     $self->log->info("Running after import callbacks");
-    foreach my $c (@{$self->converters}) {
+    foreach my $c ( @{ $self->converters } ) {
         next unless $c->can($method_name);
         $c->$method_name($source);
     }

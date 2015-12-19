@@ -6,9 +6,9 @@ package Manoc::Search::Widget::Rack;
 use Moose::Role;
 
 sub render {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
-    my $url = $ctx->uri_for_action('/rack/view', [ $self->id ]);
+    my $url = $ctx->uri_for_action( '/rack/view', [ $self->id ] );
     return "<a href=\"$url\">" . $self->name . '</a>';
 }
 

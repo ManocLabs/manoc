@@ -3,7 +3,7 @@ use warnings;
 
 # chdir to the dir the test directory and set config file
 BEGIN {
-    use FindBin     qw/$Bin/;
+    use FindBin qw/$Bin/;
 
     # test script dir
     chdir $Bin if -d $Bin;

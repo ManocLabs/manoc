@@ -5,7 +5,7 @@ BEGIN {
 }
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Manoc', 'Server');
+Catalyst::ScriptRunner->run( 'Manoc', 'Server' );
 
 1;
 

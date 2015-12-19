@@ -47,47 +47,47 @@ Catalyst controller role for Manoc common CRUD implementation.
 =cut
 
 has 'create_page_title' => ( is => 'rw', isa => 'Str' );
-has 'view_page_title' => ( is => 'rw', isa => 'Str' );
+has 'view_page_title'   => ( is => 'rw', isa => 'Str' );
 has 'edit_page_title'   => ( is => 'rw', isa => 'Str' );
 has 'delete_page_title' => ( is => 'rw', isa => 'Str' );
 has 'list_page_title'   => ( is => 'rw', isa => 'Str' );
 
-has 'create_page_template' =>  (
-     is => 'rw',
-     isa => 'Str'
-);
-
-has 'view_page_template' =>  (
-     is => 'rw',
-     isa => 'Str'
-);
-
-has 'edit_page_template'   =>  (
-    is => 'rw',
+has 'create_page_template' => (
+    is  => 'rw',
     isa => 'Str'
 );
 
-has 'delete_page_template' =>  (
-    is => 'rw',
-    isa => 'Str',
+has 'view_page_template' => (
+    is  => 'rw',
+    isa => 'Str'
+);
+
+has 'edit_page_template' => (
+    is  => 'rw',
+    isa => 'Str'
+);
+
+has 'delete_page_template' => (
+    is      => 'rw',
+    isa     => 'Str',
     default => 'generic_delete.tt'
 );
 
-has 'list_page_template'   =>  (
-    is => 'rw',
+has 'list_page_template' => (
+    is  => 'rw',
     isa => 'Str'
 );
 
 has 'object_updated_message' => (
-   is => 'rw',
-   isa => 'Str',
-   default => 'Updated',
+    is      => 'rw',
+    isa     => 'Str',
+    default => 'Updated',
 );
 
 has 'object_deleted_message' => (
-   is => 'rw',
-   isa => 'Str',
-   default => 'Deleted',
+    is      => 'rw',
+    isa     => 'Str',
+    default => 'Deleted',
 );
 
 =head1 ACTIONS
@@ -109,7 +109,6 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     );
     $c->detach('form');
 }
-
 
 =head2 list
 
@@ -168,7 +167,8 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
             $c->flash( message => $self->object_deleted_message );
             $c->res->redirect( $self->get_delete_success_url($c) );
             $c->detach();
-        } else {
+        }
+        else {
             $c->res->redirect( $self->get_delete_failure_url($c) );
             $c->detach();
         }
@@ -180,7 +180,6 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
         template => $self->delete_page_template,
     );
 }
-
 
 =head1 METHODS
 
@@ -196,15 +195,15 @@ sub delete_object {
 
 sub get_delete_failure_url {
     my ( $self, $c ) = @_;
-    
+
     my $action = $c->namespace . "/view";
-    return $c->uri_for_action( $action,[ $c->stash->{object_pk} ] );
+    return $c->uri_for_action( $action, [ $c->stash->{object_pk} ] );
 }
 
 sub get_delete_success_url {
     my ( $self, $c ) = @_;
 
-    return $c->uri_for_action($c->namespace . "/list");
+    return $c->uri_for_action( $c->namespace . "/list" );
 }
 
 1;

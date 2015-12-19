@@ -17,16 +17,16 @@ use Net::Telnet::Cisco;
 use Regexp::Common qw /net/;
 
 has 'session' => (
-    is      => 'ro',
-    isa     => 'Object',
-    writer  => '_set_session',
+    is     => 'ro',
+    isa    => 'Object',
+    writer => '_set_session',
 );
 
 has 'username' => (
     is      => 'ro',
     isa     => 'Str',
-    lazy     => 1,
-    builder  => '_build_username',
+    lazy    => 1,
+    builder => '_build_username',
 );
 
 has 'password' => (
@@ -38,11 +38,11 @@ has 'password' => (
 );
 
 has 'enable_password' => (
-    is       => 'ro',
-    isa      => 'Str',
-    lazy     => 1,
-    builder  => '_build_enable_password',
-); 
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_enable_password',
+);
 
 sub _build_username {
     my $self = shift;
@@ -60,10 +60,9 @@ sub _build_eable_password {
     return $self->credentials->{password2} || '';
 }
 
-
 sub connect {
     my $self = shift;
-    
+
     my $host = self->host;
 
     #Connect and login in enable mode
@@ -73,44 +72,45 @@ sub connect {
             Timeout => 20,
         );
 
-	$session->login( $self->username, $self->password )
-	    or return undef;
-	
-        if ($self->enable_password) {
-            my $enabled = $session->enable($self->enable_password);
-	    if (!$enabled) {
-		$self->log->error("Cannot enable session");
-		return undef;
-	    }
-	}
+        $session->login( $self->username, $self->password ) or
+            return undef;
+
+        if ( $self->enable_password ) {
+            my $enabled = $session->enable( $self->enable_password );
+            if ( !$enabled ) {
+                $self->log->error("Cannot enable session");
+                return undef;
+            }
+        }
         $self->_set_session($session);
         return 1;
-    } catch {
-	$self->log->error("Error connecting to $host: $@");
-	return undef;
+    }
+    catch {
+        $self->log->error("Error connecting to $host: $@");
+        return undef;
     }
 }
 
 sub _build_arp_table {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
 
     my %arp_table;
 
     try {
-	my @data = $self->cmd('show ip arp');
-	chomp @data;
+        my @data = $self->cmd('show ip arp');
+        chomp @data;
 
-	# arp entries use to have this format
-	# Internet  10.1.2.3   11   00aa.bbcc.ddee  ARPA Interface/0.1
-	foreach my $line (@data) {
-	    $line =~ m/^Internet/ or next;
+        # arp entries use to have this format
+        # Internet  10.1.2.3   11   00aa.bbcc.ddee  ARPA Interface/0.1
+        foreach my $line (@data) {
+            $line =~ m/^Internet/ or next;
 
-	    my @fields = split m/\s+/, $line;
-	    $arp_table{$fields[1]} =  $fields[3];
-	};
+            my @fields = split m/\s+/, $line;
+            $arp_table{ $fields[1] } = $fields[3];
+        }
 
-	return \%arp_table;
+        return \%arp_table;
     };
 
     $self->log->error('Error fetching configuration');
@@ -123,10 +123,10 @@ sub _build_configuration {
     my $session = $self->session;
 
     try {
-	my @data = $session->cmd("show running");
-	chomp @data;
+        my @data = $session->cmd("show running");
+        chomp @data;
 
-	return join(@data, '\n')
+        return join( @data, '\n' )
     };
     $self->log->error('Error fetching configuration: $@');
     return undef;
@@ -135,7 +135,6 @@ sub _build_configuration {
 sub close {
     shift->session->close();
 }
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

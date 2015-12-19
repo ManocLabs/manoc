@@ -10,9 +10,9 @@ use warnings;
 
 __PACKAGE__->load_components(
     qw(
-	  +Manoc::DB::InflateColumn::IPv4
-	  +Manoc::DB::Helper::Row::TupleArchive
-  )
+        +Manoc::DB::InflateColumn::IPv4
+        +Manoc::DB::Helper::Row::TupleArchive
+        )
 );
 
 __PACKAGE__->table('win_logon');
@@ -24,10 +24,10 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'ipaddr' => {
-        data_type   => 'char',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'char',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
 );
 
@@ -40,10 +40,14 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::WinLogon');
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_winlogon_user',
-			     fields => ['user'] );
-    $sqlt_schema->add_index( name => 'idx_winlogon_ipaddr',
-			     fields => ['ipaddr'] );
+    $sqlt_schema->add_index(
+        name   => 'idx_winlogon_user',
+        fields => ['user']
+    );
+    $sqlt_schema->add_index(
+        name   => 'idx_winlogon_ipaddr',
+        fields => ['ipaddr']
+    );
 }
 
 1;

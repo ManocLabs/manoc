@@ -46,12 +46,12 @@ sub _build_config {
     my $self = shift;
     my $config;
 
-    if ($ENV{MANOC_CONF} ) {
-        $config = Config::JFDI->open(
-            file => $ENV{MANOC_CONF},
-        );
-    } else {
-        my @config_paths = ( File::Spec->catdir( $FindBin::Bin, File::Spec->updir() ), '/etc', );
+    if ( $ENV{MANOC_CONF} ) {
+        $config = Config::JFDI->open( file => $ENV{MANOC_CONF}, );
+    }
+    else {
+        my @config_paths =
+            ( File::Spec->catdir( $FindBin::Bin, File::Spec->updir() ), '/etc', );
 
         foreach my $path (@config_paths) {
             $config = Config::JFDI->open(

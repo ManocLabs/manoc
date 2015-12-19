@@ -11,10 +11,10 @@ use warnings;
 use Scalar::Util qw(blessed);
 
 sub including_address {
-    my ( $self, $ipaddress) = @_;
+    my ( $self, $ipaddress ) = @_;
 
-    if ( blessed($ipaddress)
-             &&  $ipaddress->isa('Manoc::IPAddress::IPv4') )
+    if ( blessed($ipaddress) &&
+        $ipaddress->isa('Manoc::IPAddress::IPv4') )
     {
         $ipaddress = $ipaddress->padded;
     }
@@ -30,11 +30,8 @@ sub including_address_ordered {
     shift->including_address(@_)->search(
         {},
         {
-	    order_by => [
-		{ -desc => 'from_addr' },
-		{ -asc  => 'to_addr'   }
-	    ]
-	}
+            order_by => [ { -desc => 'from_addr' }, { -asc => 'to_addr' } ]
+        }
     );
 }
 

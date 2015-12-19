@@ -35,32 +35,25 @@ __PACKAGE__->config(
     form_class => 'Manoc::Form::IPBlock',
 );
 
-
 before 'view' => sub {
     my ( $self, $c ) = @_;
 
-    my $block = $c->stash->{object};
+    my $block     = $c->stash->{object};
     my $max_hosts = $block->to_addr->numeric - $block->from_addr->numeric + 1;
 
-    my $query_by_time = {
-        lastseen => { '>=' => time - str2seconds(60, 'd') }
+    my $query_by_time = { lastseen => { '>=' => time - str2seconds( 60, 'd' ) } };
+    my $select_column = {
+        columns  => [qw/ipaddr/],
+        distinct => 1
     };
-    my $select_column =  {
-            columns => [ qw/ipaddr/ ],
-            distinct => 1
-        };
-    my $arp_60days = $block->arp_entries
-        ->search($query_by_time, $select_column)
-        ->count();
-    $c->stash(arp_usage60 => int($arp_60days / $max_hosts * 100 ));
+    my $arp_60days = $block->arp_entries->search( $query_by_time, $select_column )->count();
+    $c->stash( arp_usage60 => int( $arp_60days / $max_hosts * 100 ) );
 
-    my $arp_total = $block->arp_entries
-        ->search({}, $select_column)
-        ->count();
-    $c->stash(arp_usage => int($arp_total / $max_hosts * 100 ));
+    my $arp_total = $block->arp_entries->search( {}, $select_column )->count();
+    $c->stash( arp_usage => int( $arp_total / $max_hosts * 100 ) );
 
     my $hosts = $block->ip_entries;
-    $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
+    $c->stash( hosts_usage => int( $hosts->count() / $max_hosts * 100 ) );
 };
 
 sub arp : Chained('object') {
@@ -69,8 +62,8 @@ sub arp : Chained('object') {
     my $block = $c->stash->{object};
 
     # override default title
-    $c->stash(title => 'ARP activity for block ' . $block->name);
-    
+    $c->stash( title => 'ARP activity for block ' . $block->name );
+
     $c->detach('/arp/list');
 }
 
@@ -78,18 +71,16 @@ sub arp_js : Chained('object') {
     my ( $self, $c ) = @_;
 
     my $block = $c->stash->{object};
-    my $days    = int($c->req->param('days'));
-    
+    my $days  = int( $c->req->param('days') );
+
     my $rs = $block->arp_entries->first_last_seen();
     if ($days) {
-        $rs = $rs->search({ lastseen => time - str2seconds($days, 'd') });
+        $rs = $rs->search( { lastseen => time - str2seconds( $days, 'd' ) } );
     }
-    $c->stash(datatable_resultset => $rs);
+    $c->stash( datatable_resultset => $rs );
 
     $c->detach('/arp/list_js');
 }
-
-
 
 =head1 AUTHOR
 

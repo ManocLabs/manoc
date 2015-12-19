@@ -62,22 +62,25 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     $tmpl_param{uplinks} = join( ", ", map { $_->interface } $device->uplinks->all() );
 
     # CPD
-    my@neighs = $device->neighs( {}, { prefetch=>'to_device_info' } );
-  
+    my @neighs = $device->neighs( {}, { prefetch => 'to_device_info' } );
+
     my @cdp_links;
-    my $time_limit = $c->config->{Device}->{cdp_age} || 3600 * 12; #12 hours
-    foreach my $n (@neighs){
-	push ( @cdp_links, {  
-	    expired      => time - $n->last_seen > $time_limit,
-	    local_iface  => $n->from_interface,
-	    to_device    => $n->to_device,
-	    to_device_info => $n->to_device_info,
-	    remote_id    => $n->remote_id,
-	    remote_type  => $n->remote_type,
-	    date         => $n->last_seen,
-	});
+    my $time_limit = $c->config->{Device}->{cdp_age} || 3600 * 12;    #12 hours
+    foreach my $n (@neighs) {
+        push(
+            @cdp_links,
+            {
+                expired        => time - $n->last_seen > $time_limit,
+                local_iface    => $n->from_interface,
+                to_device      => $n->to_device,
+                to_device_info => $n->to_device_info,
+                remote_id      => $n->remote_id,
+                remote_type    => $n->remote_type,
+                date           => $n->last_seen,
+            }
+        );
     }
-    
+
     #------------------------------------------------------------
     # Interfaces info
     #------------------------------------------------------------
@@ -86,15 +89,14 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my %if_notes = map { $_->interface => 1 } $device->ifnotes;
 
     # prefetch interfaces last activity
-    my ($e, $it);
+    my ( $e, $it );
 
     $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
-
 
     my %if_last_mat;
 
     while ( $e = $it->next ) {
-      $if_last_mat{$e->interface} = $e->get_column('lastseen');
+        $if_last_mat{ $e->interface } = $e->get_column('lastseen');
     }
 
     # fetch ifstatus and build result array
@@ -104,8 +106,8 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         my $lc_if = lc( $r->interface );
 
         push @iface_info, {
-            controller   => $controller,      # for sorting
-            port         => $port,            # for sorting
+            controller   => $controller,                                  # for sorting
+            port         => $port,                                        # for sorting
             interface    => $r->interface,
             speed        => $r->speed || 'n/a',
             up           => $r->up || 'n/a',
@@ -113,12 +115,12 @@ sub view : Chained('object') : PathPart('') : Args(0) {
             duplex       => $r->duplex || '',
             duplex_admin => $r->duplex_admin || '',
             cps_enable   => $r->cps_enable && $r->cps_enable eq 'true',
-            cps_status   => $r->cps_status  || '',
-            cps_count    => $r->cps_count   || '',
+            cps_status   => $r->cps_status || '',
+            cps_count    => $r->cps_count || '',
             description  => $r->description || '',
-            vlan         => $r->vlan        || '',
+            vlan         => $r->vlan || '',
             last_mat     => $if_last_mat{ $r->interface },
-            has_notes => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
+            has_notes    => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
         };
     }
 
@@ -146,7 +148,8 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         vlan    => $_->vlan,
         quality => $_->quality . '/100',
         state   => $_->state,
-    }, $device->dot11clients;
+        },
+        $device->dot11clients;
 
     # prepare template
     $c->stash( template => 'device/view.tt' );
@@ -169,21 +172,21 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id;
 
-    my $config = Manoc::Netwalker::Config->new($c->config->{Netwalker});
-    my $client = Manoc::Netwalker::ControlClient->new(config => $config);
+    my $config = Manoc::Netwalker::Config->new( $c->config->{Netwalker} );
+    my $client = Manoc::Netwalker::ControlClient->new( config => $config );
 
     my $status = $client->enqueue_device($device_id);
 
-    if (!$status) {
+    if ( !$status ) {
         $c->flash( error_msg => "An error occurred while scheduling device refresh" );
-    } else {
-        $c->flash( message => "Device refresh scheduled");
+    }
+    else {
+        $c->flash( message => "Device refresh scheduled" );
     }
 
-    $c->response->redirect(  $c->uri_for_action( '/device/view', [$device_id] ) );
+    $c->response->redirect( $c->uri_for_action( '/device/view', [$device_id] ) );
     $c->detach();
 }
-
 
 =head2 uplinks
 
@@ -193,27 +196,23 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $device = $c->stash->{'object'};
-    my $form = Manoc::Form::Uplink->new({ device => $device, ctx => $c });
+    my $form = Manoc::Form::Uplink->new( { device => $device, ctx => $c } );
 
-    if ($device->ifstatus->count() == 0) {
-        $c->flash(error_msg => 'No known interfaces on this device');
+    if ( $device->ifstatus->count() == 0 ) {
+        $c->flash( error_msg => 'No known interfaces on this device' );
         $c->uri_for_action( 'device/view', [ $device->id ] );
         $c->detach();
     }
     $c->stash(
         form   => $form,
-        action => $c->uri_for($c->action, $c->req->captures),
+        action => $c->uri_for( $c->action, $c->req->captures ),
     );
-    return unless $form->process(
-        params =>  $c->req->parameters,
-    );
+    return
+        unless $form->process( params => $c->req->parameters, );
 
-    $c->response->redirect(
-	$c->uri_for_action( 'device/view', [ $device->id ] )
-    );
+    $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
     $c->detach();
 }
-
 
 =head2 nwinfo
 
@@ -225,20 +224,21 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     my $device_id = $c->stash->{object_pk};
 
     my $nwinfo = $c->model('ManocDB::DeviceNWinfo')->find($device_id);
-    $nwinfo or $nwinfo = $c->model('ManocDB::DeviceNWInfo')->new_result({});
+    $nwinfo or $nwinfo = $c->model('ManocDB::DeviceNWInfo')->new_result( {} );
 
-    my $form = Manoc::Form::DeviceNWInfo->new( {
-        device => $device_id,
-        ctx    => $c,
-    });
-    $c->stash(form => $form);
-    return unless $form->process(
-	params => $c->req->params,
-	item   => $nwinfo );
-
-   $c->response->redirect(
-       $c->uri_for_action( 'device/view', [ $device_id ] )
+    my $form = Manoc::Form::DeviceNWInfo->new(
+        {
+            device => $device_id,
+            ctx    => $c,
+        }
     );
+    $c->stash( form => $form );
+    return unless $form->process(
+        params => $c->req->params,
+        item   => $nwinfo
+    );
+
+    $c->response->redirect( $c->uri_for_action( 'device/view', [$device_id] ) );
     $c->detach();
 }
 
@@ -249,7 +249,7 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
 sub get_object_list {
     my ( $self, $c ) = @_;
 
-    my $rs = $c->stash->{resultset};
+    my $rs      = $c->stash->{resultset};
     my @devices = $rs->search(
         {},
         {
@@ -286,25 +286,23 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
 
     #Prepare template
     $c->stash(
-	config => $config,
-	diff   => $diff,
+        config => $config,
+        diff   => $diff,
     );
     $c->stash( template => 'device/config.tt' );
 
 }
 
-
 =head2 create
 
 =cut
 
-
 before 'create' => sub {
-    my ( $self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $rack_id = $c->req->query_parameters->{'rack'};
     $c->log->debug("new device in $rack_id");
-    $c->stash(form_defaults => { rack => $rack_id });
+    $c->stash( form_defaults => { rack => $rack_id } );
 };
 
 =head1 METHODS
@@ -315,8 +313,8 @@ sub get_object {
     my ( $self, $c, $id ) = @_;
 
     my $object = $c->stash->{resultset}->find($id);
-    if ( !defined($object)) {
-	$object = $c->stash->{resultset}->find({mng_address => $id});
+    if ( !defined($object) ) {
+        $object = $c->stash->{resultset}->find( { mng_address => $id } );
     }
     return $object;
 }
@@ -336,62 +334,61 @@ sub delete_object {
     # 2) move mat for $device to archivedmat for d2
     # 3) $device->delete
     $c->model('ManocDB')->schema->txn_do(
-	sub {
-	    my $del_device = $c->model('ManocDB::DeletedDevice')->create(
+        sub {
+            my $del_device = $c->model('ManocDB::DeletedDevice')->create(
+                {
+                    ipaddr    => $id,
+                    name      => $device->name,
+                    model     => $device->model,
+                    vendor    => $device->vendor,
+                    timestamp => time()
+                }
+            );
+            $it = $c->model('ManocDB::Mat')->search(
+                { device => $id, },
+                {
+                    select => [
+                        'macaddr', 'vlan',
+                        { 'min' => 'firstseen' }, { 'max' => 'lastseen' },
+                    ],
+                    group_by => [qw(macaddr vlan)],
+                    as       => [ 'macaddr', 'vlan', 'min_firstseen', 'max_lastseen' ]
+                }
+            );
+
+            while ( $e = $it->next ) {
+                $del_device->add_to_mat_assocs(
                     {
-                        ipaddr    => $id,
-                        name      => $device->name,
-                        model     => $device->model,
-                        vendor    => $device->vendor,
-                        timestamp => time()
+                        macaddr   => $e->macaddr,
+                        firstseen => $e->get_column('min_firstseen'),
+                        lastseen  => $e->get_column('max_lastseen'),
+                        vlan      => $e->vlan
                     }
                 );
-	    $it = $c->model('ManocDB::Mat')->search(
-		{ device => $id, },
-		{
-                        select => [
-                            'macaddr', 'vlan',
-                            { 'min' => 'firstseen' }, { 'max' => 'lastseen' },
-                        ],
-                        group_by => [qw(macaddr vlan)],
-                        as       => [ 'macaddr', 'vlan', 'min_firstseen', 'max_lastseen' ]
-                    }
-	    );
-
-	    while ( $e = $it->next ) {
-		$del_device->add_to_mat_assocs(
-		    {
-			macaddr   => $e->macaddr,
-			firstseen => $e->get_column('min_firstseen'),
-			lastseen  => $e->get_column('max_lastseen'),
-			vlan      => $e->vlan
-		    }
-		);
-	    }
-	    $device->delete;
-	}
+            }
+            $device->delete;
+        }
     );
 
     if ($@) {
-	$c->flash( error_msg => 'Error deleting device: ' . $@ );
-	return undef;
+        $c->flash( error_msg => 'Error deleting device: ' . $@ );
+        return undef;
     }
     return 1;
 }
-
 
 =head2 prepare_json_object
 
 =cut
 
-sub prepare_json_object  {
-    my ($self, $device) = @_;
+sub prepare_json_object {
+    my ( $self, $device ) = @_;
     return {
-	id   => $device->id,
-	name => $device->name,
-	rack => $device->rack->id,
+        id   => $device->id,
+        name => $device->name,
+        rack => $device->rack->id,
     };
-};
+}
 
 =head1 AUTHOR
 

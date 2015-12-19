@@ -16,18 +16,18 @@ has 'id' => (
 );
 
 has 'name' => (
-    is       => 'ro',
-    isa      => 'Str',
+    is  => 'ro',
+    isa => 'Str',
 );
 
 has 'mng_url' => (
-    is     => 'ro',
-    isa    => 'Maybe[Str]',
+    is  => 'ro',
+    isa => 'Maybe[Str]',
 );
 
 has 'notes' => (
-    is     => 'ro',
-    isa    => 'Maybe[Str]',
+    is       => 'ro',
+    isa      => 'Maybe[Str]',
     required => 0,
 
 );
@@ -40,11 +40,11 @@ around BUILDARGS => sub {
         my $args   = $_[0];
         my $device = $args->{device};
         if ($device) {
-            $args->{id}      = $device->id;
-            $args->{name}    = $device->name || '';
-	    $args->{notes}   = $device->notes;
-            $args->{match}   ||= $device->name;
-	    $args->{mng_url} = $device->get_mng_url;
+            $args->{id}    = $device->id;
+            $args->{name}  = $device->name || '';
+            $args->{notes} = $device->notes;
+            $args->{match} ||= $device->name;
+            $args->{mng_url} = $device->get_mng_url;
 
         }
         return $class->$orig($args);
@@ -54,10 +54,10 @@ around BUILDARGS => sub {
 };
 
 sub render {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
-    my $url = $ctx->uri_for_action('device/view', [ $self->id]);
-    return '<a href="$url">' . $self->name . "</a>"
+    my $url = $ctx->uri_for_action( 'device/view', [ $self->id ] );
+    return '<a href="$url">' . $self->name . "</a>";
 }
 
 no Moose;

@@ -29,35 +29,36 @@ sub search_subnet {
 
     my $filter = { address => $addr };
     $prefix and $filter->{prefix} = $prefix;
-    
+
     my @networks = $schema->resultset('IPRange')->search($filter);
 
     if (@networks) {
-	foreach my $e (@networks) {
-	    my $item = Manoc::Search::Item::IPNetwork->new(
-		{
-		    name    => $e->name,
-		    id      => $e->id,
-		    network => $e->address . "/" . $e->prefix,
-		    match   => $e->name,
-		}
-	    );
-	    $result->add_item($item);
-	}
-    } else {
+        foreach my $e (@networks) {
+            my $item = Manoc::Search::Item::IPNetwork->new(
+                {
+                    name    => $e->name,
+                    id      => $e->id,
+                    network => $e->address . "/" . $e->prefix,
+                    match   => $e->name,
+                }
+            );
+            $result->add_item($item);
+        }
+    }
+    else {
 
-	# no results, use IPCalc
-	$prefix //= 24;
+        # no results, use IPCalc
+        $prefix //= 24;
 
-	my $item = Manoc::Search::Item::IpCalc->new(
-	    {
-		prefix  => $prefix,
-		network => $subnet,
-		match   => "$subnet/$prefix",
-	    }
-	);
-	$result->add_item($item);
-	return;
+        my $item = Manoc::Search::Item::IpCalc->new(
+            {
+                prefix  => $prefix,
+                network => $subnet,
+                match   => "$subnet/$prefix",
+            }
+        );
+        $result->add_item($item);
+        return;
     }
 }
 
@@ -67,19 +68,17 @@ sub search_inventory {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
-    $it = $schema->resultset('IPNetwork')->search(
-        { name => { '-like' => $pattern } },
-        { order_by => 'name' }
-    );
+    $it = $schema->resultset('IPNetwork')
+        ->search( { name => { '-like' => $pattern } }, { order_by => 'name' } );
 
     while ( $e = $it->next ) {
-	my $item = Manoc::Search::Item::IPNetwork->new(
-	    {
-		name    => $e->name,
-		id      => $e->id,
-		network => $e->network->_stringify,
-		match   => $e->name,
-	    }
+        my $item = Manoc::Search::Item::IPNetwork->new(
+            {
+                name    => $e->name,
+                id      => $e->id,
+                network => $e->network->_stringify,
+                match   => $e->name,
+            }
         );
         $result->add_item($item);
     }

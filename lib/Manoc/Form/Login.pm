@@ -13,33 +13,33 @@ with 'Manoc::Form::TraitFor::CSRF';
 has '+name' => ( default => 'login_form' );
 
 has 'login_error_message' => (
-    is => 'ro',
-    isa => 'Str',
+    is       => 'ro',
+    isa      => 'Str',
     required => 1,
-    default => 'Wrong username or password',
+    default  => 'Wrong username or password',
 );
 
-
-has_field 'username' => ( type => 'Text', required => 1 );
+has_field 'username' => ( type => 'Text',     required => 1 );
 has_field 'password' => ( type => 'Password', required => 1 );
 
-has_field 'submit'   => (
-    type => 'Submit',
-    value => 'Login',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
+has_field 'submit' => (
+    type         => 'Submit',
+    value        => 'Login',
+    widget       => 'ButtonTag',
+    element_attr => { class => [ 'btn', 'btn-primary' ] },
 );
 
 sub validate {
     my $self = shift;
 
-    my $username = $self->values->{username};
-    my $password = $self->values->{password};
-    my $auth_info = { username => $username,
-		      password => $password
-		  };
-    unless ($self->ctx->authenticate($auth_info)) {
-        $self->field( 'password' )->add_error( $self->login_error_message );
+    my $username  = $self->values->{username};
+    my $password  = $self->values->{password};
+    my $auth_info = {
+        username => $username,
+        password => $password
+    };
+    unless ( $self->ctx->authenticate($auth_info) ) {
+        $self->field('password')->add_error( $self->login_error_message );
     }
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Manoc', 'Test');
+Catalyst::ScriptRunner->run( 'Manoc', 'Test' );
 
 1;
 

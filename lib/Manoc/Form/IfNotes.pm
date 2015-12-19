@@ -20,32 +20,32 @@ Manoc Form for entering interface notes.
 
 extends 'Manoc::Form::Base';
 
-has '+name' => ( default => 'form-ifnotes' );
+has '+name'        => ( default => 'form-ifnotes' );
 has '+html_prefix' => ( default => 1 );
 
 has 'device' => (
-    is  => 'ro',
-    isa => 'Int',
+    is       => 'ro',
+    isa      => 'Int',
     required => 1,
 );
 
 has 'interface' => (
-    is  => 'ro',
-    isa => 'Str',
+    is       => 'ro',
+    isa      => 'Str',
     required => 1,
 );
 
 has_field 'notes' => (
-    type => 'TextArea',
+    type  => 'TextArea',
     label => 'Notes',
 );
 
 has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
+    type           => 'Submit',
+    widget         => 'ButtonTag',
+    element_attr   => { class => [ 'btn', 'btn-primary' ] },
     widget_wrapper => 'None',
-    value => "Save"
+    value          => "Save"
 );
 
 override 'update_model' => sub {
@@ -53,17 +53,16 @@ override 'update_model' => sub {
     my $values = $self->values;
 
     if ( $values->{notes} =~ /^\s*$/o && $self->item->in_storage ) {
-	$self->item->delete();
-	return 1;
+        $self->item->delete();
+        return 1;
     }
 
-    $values->{device} = $self->{device};
-    $values->{interface} = $self->{interface};#
+    $values->{device}    = $self->{device};
+    $values->{interface} = $self->{interface};    #
     $self->_set_value($values);
 
     super();
 };
-
 
 =head1 AUTHOR
 
@@ -85,5 +84,4 @@ __PACKAGE__->meta->make_immutable;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
 

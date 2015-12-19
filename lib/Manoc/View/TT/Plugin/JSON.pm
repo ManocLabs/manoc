@@ -11,7 +11,6 @@ use Template::Plugin;
 use base 'Template::Plugin';
 use JSON;
 
-
 =head1 NAME
 
 Manoc::View::TT::Plugin::JSON -  JSON Plugin for TT View
@@ -22,11 +21,10 @@ JSON  utilities for Manoc TT View using L<JSON|JSON> module
 
 =cut
 
-
 sub json {
     my $self = shift;
-    my $o = shift;
-    return JSON->new->convert_blessed(1)->encode($o)
+    my $o    = shift;
+    return JSON->new->convert_blessed(1)->encode($o);
 }
 
 =head1 SEE ALSO

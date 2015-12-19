@@ -11,10 +11,9 @@ __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('ip_block');
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPBlock');
 
-
 __PACKAGE__->add_columns(
     id => {
-	data_type         => 'int',
+        data_type         => 'int',
         is_auto_increment => 1,
         is_nullable       => 0
     },
@@ -27,13 +26,13 @@ __PACKAGE__->add_columns(
         data_type    => 'varchar',
         size         => '15',
         is_nullable  => 0,
-	ipv4_address => 1,
+        ipv4_address => 1,
     },
     'to_addr' => {
         data_type    => 'varchar',
         size         => '15',
         is_nullable  => 0,
-	ipv4_address => 1,
+        ipv4_address => 1,
     },
     'description' => {
         data_type   => 'varchar',
@@ -44,16 +43,17 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key(qw(id));
 
-
 sub arp_entries {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('Arp');
     $rs = $rs->search(
-	{
-	    'ipaddr' => {
-		-between => [ $self->from_addr->padded, $self->to_addr->padded ] }
-	});
+        {
+            'ipaddr' => {
+                -between => [ $self->from_addr->padded, $self->to_addr->padded ]
+            }
+        }
+    );
     return wantarray() ? $rs->all() : $rs;
 
 }
@@ -63,23 +63,24 @@ sub ip_entries {
 
     my $rs = $self->result_source->schema->resultset('Ip');
     $rs = $rs->search(
-	{
-	    'ipaddr' => {
-		-between => [ $self->from_addr->padded, $self->to_addr->padded ] }
-	});
+        {
+            'ipaddr' => {
+                -between => [ $self->from_addr->padded, $self->to_addr->padded ]
+            }
+        }
+    );
     return wantarray() ? $rs->all() : $rs;
 }
-
 
 sub contained_networks {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('IPNetwork');
     $rs = $rs->search(
-            {
-                'address'   => { '>=' => $self->from_addr->padded },
-                'broadcast' => { '<=' => $self->to_addr->padded   }
-            }
+        {
+            'address'   => { '>=' => $self->from_addr->padded },
+            'broadcast' => { '<=' => $self->to_addr->padded }
+        }
     );
 
     return wantarray() ? $rs->all() : $rs;
@@ -90,27 +91,24 @@ sub container_network {
 
     my $rs = $self->result_source->schema->resultset('IPNetwork');
     $rs = $rs->search(
-          {
-              'address'   => { '<=' => $self->from_addr->padded },
-              'broadcast' => { '>=' => $self->to_addr->padded   }
-          },
-          {
-              order_by => [
-                  { -asc  => 'address'   },
-                  { -desc => 'broadcast' }
-              ],
-          }
+        {
+            'address'   => { '<=' => $self->from_addr->padded },
+            'broadcast' => { '>=' => $self->to_addr->padded }
+        },
+        {
+            order_by => [ { -asc => 'address' }, { -desc => 'broadcast' } ],
+        }
     );
     return $rs->first;
 }
 
-
-
 sub sqlt_deploy_hook {
-   my ($self, $sqlt_table) = @_;
+    my ( $self, $sqlt_table ) = @_;
 
-   $sqlt_table->add_index(name => 'idx_ipblock_from_to',
-                          fields => ['from_addr', 'to_addr']);
+    $sqlt_table->add_index(
+        name   => 'idx_ipblock_from_to',
+        fields => [ 'from_addr', 'to_addr' ]
+    );
 }
 
 1;

@@ -36,9 +36,9 @@ has 'is_subrequest' => (
 );
 
 has 'snmp_info' => (
-    is      => 'ro',
-    isa     => 'Object',
-    writer  => '_set_snmp_info',
+    is     => 'ro',
+    isa    => 'Object',
+    writer => '_set_snmp_info',
 );
 
 has 'mat_force_vlan' => (
@@ -50,12 +50,12 @@ has 'mat_force_vlan' => (
 sub _build_community {
     my $self = shift;
 
-    return $self->credentials->{snmp_community} || 'public'
+    return $self->credentials->{snmp_community} || 'public';
 }
 
 sub _build_version {
     my $self = shift;
-    my $version =  $self->credentials->{snmp_version} || 2;
+    my $version = $self->credentials->{snmp_version} || 2;
     $version eq '2c' and $version = 2;
 
     return $version;
@@ -67,7 +67,7 @@ sub _build_mat_force_vlan {
 }
 
 sub connect {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $opts = shift || {};
 
     my $info;
@@ -89,12 +89,13 @@ sub connect {
 
     try {
         $info = SNMP::Info->new(%snmp_info_args);
-    } catch {
+    }
+    catch {
         my $msg = "Could not connect to " . $self->host . " .$_";
-        $self->log->error( $msg );
+        $self->log->error($msg);
         return undef;
     };
-    
+
     unless ($info) {
         $self->log->error( "Could not connect to ", $self->host );
         return undef;
@@ -102,7 +103,7 @@ sub connect {
 
     # guessing special devices...
     my $class = _guess_snmp_info_class($info);
-    if (defined($class) ) {
+    if ( defined($class) ) {
         $self->log->debug("ovverriding SNMPInfo class: $class");
 
         eval "require $class";
@@ -137,7 +138,7 @@ sub _guess_snmp_info_class {
         $class = "SNMP::Info::Layer3::C3550";
 
     $desc =~ /Cisco.*?IOS.*?C2960/ and
-      $class = "SNMP::Info::Layer3::C3550";
+        $class = "SNMP::Info::Layer3::C3550";
 
     return unless $class;
 
@@ -169,10 +170,10 @@ sub _build_neighbors {
         my $port = $interfaces->{ $c_if->{$neigh} };
         defined($port) or next;
 
-        my $neigh_ip   = $c_ip->{$neigh}         || "0.0.0.0";
-        my $neigh_port = $c_port->{$neigh}       || "";
-        my $neigh_id   = $c_id->{$neigh}         || "";
-        my $neigh_model= $c_platform->{$neigh}   || "";
+        my $neigh_ip    = $c_ip->{$neigh}       || "0.0.0.0";
+        my $neigh_port  = $c_port->{$neigh}     || "";
+        my $neigh_id    = $c_id->{$neigh}       || "";
+        my $neigh_model = $c_platform->{$neigh} || "";
 
         my $cap = $c_capabilities->{$neigh};
         $self->log->debug("$host/$port connected to $neigh_ip");
@@ -196,11 +197,11 @@ sub _build_mat {
     my $self = shift;
     my $info = $self->snmp_info || croak "SNMP source not initialized!";
 
-    my $interfaces     = $info->interfaces();
-    my $fw_mac         = $info->fw_mac();
-    my $fw_port        = $info->fw_port();
-    my $fw_status      = $info->fw_status();
-    my $bp_index       = $info->bp_index();
+    my $interfaces = $info->interfaces();
+    my $fw_mac     = $info->fw_mac();
+    my $fw_port    = $info->fw_port();
+    my $fw_status  = $info->fw_status();
+    my $bp_index   = $info->bp_index();
 
     my ( $status, $mac, $bp_id, $iid, $port );
     my $mat = {};
@@ -230,17 +231,17 @@ sub _build_mat {
             $vlans{$vlan}++;
         }
 
-        if(defined($self->mat_force_vlan)){
-            if ( ref($self->mat_force_vlan) eq 'ARRAY' ) {
-                foreach my $v (@{$self->mat_force_vlan}){
-	            $v =~  m/^\d+$/o and $vlans{$v}++;     
-                } 
+        if ( defined( $self->mat_force_vlan ) ) {
+            if ( ref( $self->mat_force_vlan ) eq 'ARRAY' ) {
+                foreach my $v ( @{ $self->mat_force_vlan } ) {
+                    $v =~ m/^\d+$/o and $vlans{$v}++;
+                }
             }
             else {
-              $self->mat_force_vlan =~  m/^\d+$/o  and  
-                 $vlans{$self->mat_force_vlan}++;  
-            }   
-	}
+                $self->mat_force_vlan =~ m/^\d+$/o and
+                    $vlans{ $self->mat_force_vlan }++;
+            }
+        }
 
         # For each VLAN: connect, get mat and merge
         while ( my ( $vid, $vlan_name ) = each(%$v_name) ) {
@@ -258,16 +259,16 @@ sub _build_mat {
             }
 
             $self->log->debug(" VLAN: $vlan - $vlan_name");
-	    #prepare credentials with the new community string
-	    my $new_credentials = { 
-		snmp_community => $self->community . '@' . $vlan, 
-		version   => $self->version,
-	    };
+            #prepare credentials with the new community string
+            my $new_credentials = {
+                snmp_community => $self->community . '@' . $vlan,
+                version        => $self->version,
+            };
 
-            my $subreq    = Manoc::Manifold::SNMP->new(
+            my $subreq = Manoc::Manifold::SNMP->new(
                 host          => $self->host,
                 credentials   => $new_credentials,
-	        is_subrequest => 1
+                is_subrequest => 1
             );
             next unless defined($subreq);
             $subreq->connect();
@@ -324,7 +325,6 @@ sub _build_name {
     my $info = $self->snmp_info;
     return $info->name;
 }
-
 
 sub _build_model {
     my $self = shift;

@@ -26,9 +26,9 @@ has schema => (
 );
 
 has scoreboard => (
-    is       => 'ro',
-    isa      => 'HashRef',
-    default  => sub { {} },
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} },
 );
 
 =head2 worker_stdout
@@ -37,7 +37,7 @@ Called when a child prints to STDERR
 
 =cut
 
-sub worker_stderr  {
+sub worker_stderr {
     my ( $self, $stderr_msg ) = @_;
     print STDERR "$stderr_msg\n";
 }
@@ -48,7 +48,7 @@ Called when a child prints to STDOUT
 
 =cut
 
-sub worker_stdout  {
+sub worker_stdout {
     my ( $self, $result ) = @_;
 
     my $device_id = $result->{device_id};
@@ -57,8 +57,8 @@ sub worker_stdout  {
 
     $self->scoreboard->{$device_id} = $status;
 
-    if ($status eq 'DONE' ) {
-        my $report = Manoc::Netwalker::TaskReport->thaw($result->{report});
+    if ( $status eq 'DONE' ) {
+        my $report = Manoc::Netwalker::TaskReport->thaw( $result->{report} );
         my $host   = $report->host;
         # TODO check status
         my $has_errors = $report->has_error();
@@ -72,7 +72,7 @@ Returns the POE::Filter to be used for stdout.
 
 =cut
 
-sub stdout_filter  { POE::Filter::Reference->new }
+sub stdout_filter { POE::Filter::Reference->new }
 
 =head2 stderr_filter
 
@@ -80,57 +80,58 @@ Returns the POE::Filter to be used for stderr.
 
 =cut
 
-sub stderr_filter  { POE::Filter::Line->new }
+sub stderr_filter { POE::Filter::Line->new }
 
 sub visit_device {
-    my ($self, $device_id) = @_;
+    my ( $self, $device_id ) = @_;
 
     my $task_info = {
         device_id => $device_id,
         status    => 'RUNNING',
     };
-    print @{ POE::Filter::Reference->new->put([ $task_info ]) };
+    print @{ POE::Filter::Reference->new->put( [$task_info] ) };
 
     try {
-        my $updater = Manoc::Netwalker::DeviceTask->new({
-            schema     => $self->schema,
-            config     => $self->config,
-            device_id  => $device_id,
-        });
+        my $updater = Manoc::Netwalker::DeviceTask->new(
+            {
+                schema    => $self->schema,
+                config    => $self->config,
+                device_id => $device_id,
+            }
+        );
         $updater->update;
 
         $task_info->{status} = 'DONE';
         $task_info->{report} = $updater->task_report->freeze;
-    } catch {
+    }
+    catch {
         $task_info->{status} = 'ERROR';
     };
-    print @{ POE::Filter::Reference->new->put([ $task_info ]) };
+    print @{ POE::Filter::Reference->new->put( [$task_info] ) };
 }
 
 sub enqueue_device {
-    my ($self, $device_id) = @_;
+    my ( $self, $device_id ) = @_;
 
     my $scoreboard = $self->scoreboard;
 
     # check if it's already scheduled
     my $status = $scoreboard->{$device_id};
-    if (defined($status) && ($status eq 'QUEUED' || $status eq 'RUNNING')) {
+    if ( defined($status) && ( $status eq 'QUEUED' || $status eq 'RUNNING' ) ) {
         $self->log->debug("Device $device_id is $status, skipping");
         return;
     }
 
     $self->scoreboard->{$device_id} = 'QUEUED';
-    $self->enqueue( sub {  $self->visit_device($device_id)  } );
+    $self->enqueue( sub { $self->visit_device($device_id) } );
     $self->log->debug("Enqueued device $device_id");
 }
-
 
 sub BUILD {
     my $self = shift;
 
-    $self->max_workers($self->config->n_procs);
+    $self->max_workers( $self->config->n_procs );
 }
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

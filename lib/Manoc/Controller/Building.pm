@@ -36,10 +36,10 @@ __PACKAGE__->config(
 );
 
 sub get_object_list {
-   my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-   my $rs = $c->stash->{resultset};
-   return  [ $rs->search({}, {prefetch => 'racks'} ) ];
+    my $rs = $c->stash->{resultset};
+    return [ $rs->search( {}, { prefetch => 'racks' } ) ];
 }
 
 sub delete_object {
@@ -51,17 +51,18 @@ sub delete_object {
         return undef;
     }
 
-    return  $building->delete;
+    return $building->delete;
 }
 
 sub prepare_json_object {
-    my ($self, $building) = @_;
+    my ( $self, $building ) = @_;
     return {
-        id      => $building->id,
-        name    => $building->name,
-        description   => $building->description,
-        racks   => [ map +{ id => $_->id, name => $_->name }, $building->racks ],
-       },
+        id          => $building->id,
+        name        => $building->name,
+        description => $building->description,
+        racks       => [ map +{ id => $_->id, name => $_->name }, $building->racks ],
+        },
+        ;
 }
 
 =head1 AUTHOR

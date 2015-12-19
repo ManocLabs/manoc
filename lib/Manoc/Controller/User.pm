@@ -7,9 +7,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with 'Manoc::ControllerRole::CommonCRUD' => {
-    -excludes => 'view',
-    };
+with 'Manoc::ControllerRole::CommonCRUD' => { -excludes => 'view', };
 
 use Manoc::Form::User;
 use Manoc::Form::User::ChangePassword;
@@ -46,16 +44,16 @@ __PACKAGE__->config(
 sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash(object => $c->user);
-    my $form = Manoc::Form::User::ChangePassword->new({ctx => $c});
+    $c->stash( object => $c->user );
+    my $form = Manoc::Form::User::ChangePassword->new( { ctx => $c } );
 
     $c->stash(
         form   => $form,
-        action => $c->uri_for($c->action, $c->req->captures),
+        action => $c->uri_for( $c->action, $c->req->captures ),
     );
     return unless $form->process(
-        item   =>  $c->stash->{object},
-        params =>  $c->req->parameters,
+        item   => $c->stash->{object},
+        params => $c->req->parameters,
     );
     $c->detach();
 }

@@ -39,26 +39,27 @@ Used for registering events in Manoc.
 =cut
 
 sub register_tuple {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
     my $tuple_columns = $self->result_class->tuple_archive_columns;
 
     # check params
     foreach (@$tuple_columns) {
-	croak "No $_ in values" unless $params{$_};
+        croak "No $_ in values" unless $params{$_};
     }
     my $timestamp = $params{timestamp} || time;
     my %tuple = map { $_ => $params{$_} } @$tuple_columns;
 
-    my @entries = $self->search({
-	%tuple,
-	archived => 0,
-    });
+    my @entries = $self->search(
+        {
+            %tuple, archived => 0,
+        }
+    );
 
     if ( scalar(@entries) > 1 ) {
         warn "More than one non archived entry";
-	return;
+        return;
     }
     elsif ( scalar(@entries) == 1 ) {
         my $entry = $entries[0];
@@ -66,12 +67,14 @@ sub register_tuple {
         $entry->update();
     }
     else {
-        $self->create({
-	    %tuple,
-	    firstseen => $timestamp,
-	    lastseen  => $timestamp,
-	    archived  => 0
-	});
+        $self->create(
+            {
+                %tuple,
+                firstseen => $timestamp,
+                lastseen  => $timestamp,
+                archived  => 0
+            }
+        );
     }
 }
 
@@ -83,26 +86,26 @@ Age defaults to one day.
 =cut
 
 sub archive {
-    my ($self, $archive_age) = @_;
+    my ( $self, $archive_age ) = @_;
 
     # default is one day
     $archive_age ||= 3600 * 24;
 
     my $archive_date = time - $archive_age;
-    my $rs = $self->search({
-	'archived'  => 0,
-	'lastseen' => { '<', $archive_date },
-    });
+    my $rs           = $self->search(
+        {
+            'archived' => 0,
+            'lastseen' => { '<', $archive_date },
+        }
+    );
 
     my $count = $rs->count;
-    $rs->update({'archived' => 1});
+    $rs->update( { 'archived' => 1 } );
 
     return $count;
 }
 
-
 1;
-
 
 =head1 AUTHOR
 

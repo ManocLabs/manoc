@@ -59,7 +59,7 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
     my ( $self, $c, $id ) = @_;
 
     $c->stash(
-        object => $self->get_object($c, $id),
+        object    => $self->get_object( $c, $id ),
         object_pk => $id
     );
     if ( !$c->stash->{object} ) {

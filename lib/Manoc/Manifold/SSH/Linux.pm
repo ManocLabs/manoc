@@ -22,7 +22,7 @@ sub _build_boottime {
     my $self = shift;
 
     my $data = $self->cmd('cat /proc/uptime');
-    my ($seconds, undef) = split /\s+/, $data;
+    my ( $seconds, undef ) = split /\s+/, $data;
     return time() - int($seconds);
 
 }
@@ -50,25 +50,22 @@ sub _build_arp_table {
     try {
         @data = $self->cmd('/sbin/arp -n');
 
-    } catch {
-        $self->log->error('Error fetching arp table: ', $self->get_error);
+    }
+    catch {
+        $self->log->error( 'Error fetching arp table: ', $self->get_error );
         return undef;
     };
 
     # parse arp table
     # 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
     foreach my $line (@data) {
-        if ($line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
-            my ($ip, $mac) = ($1, $2);
-            $arp_table{$ip} =  $mac;
+        if ( $line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
+            my ( $ip, $mac ) = ( $1, $2 );
+            $arp_table{$ip} = $mac;
         }
     }
     return \%arp_table;
 }
-
-
-
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -12,9 +12,7 @@ with 'Manoc::Form::TraitFor::Theme';
 with 'Manoc::Form::TraitFor::CSRF';
 
 #required for CSRF
-has '+ctx' => (
-    required => 1,
-);
+has '+ctx' => ( required => 1, );
 
 # with 'HTML::FormHandlerX::Form::JQueryValidator';
 
@@ -23,9 +21,9 @@ has '+ctx' => (
 
 sub html_attributes {
     my ( $self, $field, $type, $attr ) = @_;
-    if ($type eq 'label' && $field->{required}) {
+    if ( $type eq 'label' && $field->{required} ) {
         my $label = $field->{label};
-        if ( $label ) {
+        if ($label) {
             $field->{label} = "$label *" unless $label =~ /\*$/;
         }
     }

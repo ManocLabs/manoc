@@ -19,8 +19,6 @@ my $SERVER_ID   = "dhcpserver";
 my $CONF_FILE   = "/etc/dhcpd.conf";
 my $LEASES_FILE = "/var/lib/dhcpd/dhcpd.leases";
 
-
-
 my $LEASE_RE = qr/
   \s*lease\s((?:\d{1,3}\.){3}\d{1,3})\s*{
   \s*starts\s+\d\s+(\d{4}\/\d{2}\/\d{2}\s\d{2}:\d{2}:\d{2})\s*;
@@ -58,44 +56,42 @@ my $User_agent;
 sub send_to_manoc {
     my $type = shift;
     my $data = shift;
-    
+
     my $server_safe = uri_escape($SERVER_ID);
 
-    my $url= $MANOC_URL;
-    if ($type eq 'leases') {
-	$url .= '/dhcp_leases';
-    } elsif ($type eq 'reservations') {
-	$url .= '/dhcp_reservations';
-    } else {
-	die "Unknown type $type";
+    my $url = $MANOC_URL;
+    if ( $type eq 'leases' ) {
+        $url .= '/dhcp_leases';
+    }
+    elsif ( $type eq 'reservations' ) {
+        $url .= '/dhcp_reservations';
+    }
+    else {
+        die "Unknown type $type";
     }
 
     $url .= "?server=$server_safe";
 
-    my $req = HTTP::Request->new(POST => $url);
+    my $req = HTTP::Request->new( POST => $url );
     $req->content_type('text/plain');
-    
-    $req->content(YAML::Syck::Dump(@$data));
+
+    $req->content( YAML::Syck::Dump(@$data) );
 
     #basic authentication required
-    $User_agent->credentials(
-  	'manoc:443',
-  	'<username>',
-  	'<username>' => '<password>'
+    $User_agent->credentials( 'manoc:443', '<username>', '<username>' => '<password>' );
+
+    $User_agent->cookie_jar(
+        HTTP::Cookies->new(
+            file     => './.manoc_cookies.txt',
+            autosave => 1
+        )
     );
-    
-    $User_agent->cookie_jar(HTTP::Cookies->new( 
-        file => './.manoc_cookies.txt', 
-        autosave => 1 ));
 
-
-    my $res  = $User_agent->request($req);
-
-    
+    my $res = $User_agent->request($req);
 
     ### success: $res->is_success
     ### content: $res->content
-  
+
     #unless($res->is_success){
     # print $res->content,"\n";
     #}
@@ -115,33 +111,34 @@ sub parse_leases {
 
     ### read config file: $LEASES_FILE
     $file_data = '';
-    open($hndl, '<', $LEASES_FILE) or die $!;
+    open( $hndl, '<', $LEASES_FILE ) or die $!;
     while (<$hndl>) {
-	s/^([^#]*).*$/$1/;
-	$file_data .= $_;
-    }   
+        s/^([^#]*).*$/$1/;
+        $file_data .= $_;
+    }
     close $hndl;
 
     ### search lease definitions
     while (1) {
-	$file_data =~ m/$LEASE_RE/mxgo or last;
-	push @leases, {
-		       ipaddr   => $1,
-		       start    => str2time($2, 'UTC'),
-		       end      => str2time($3, 'UTC'), 
-		       status   => $8,
-		       macaddr  => lc($10),
-		       hostname => $13 || '' 
-		      };
+        $file_data =~ m/$LEASE_RE/mxgo or last;
+        push @leases,
+            {
+            ipaddr   => $1,
+            start    => str2time( $2, 'UTC' ),
+            end      => str2time( $3, 'UTC' ),
+            status   => $8,
+            macaddr  => lc($10),
+            hostname => $13 || ''
+            };
     }
- 
+
     return \@leases;
 }
 
 sub do_leases {
     my $leases = parse_leases;
-    send_to_manoc('leases', $leases) or
-      die "Error sending leases";
+    send_to_manoc( 'leases', $leases ) or
+        die "Error sending leases";
 
 }
 
@@ -149,49 +146,50 @@ sub do_leases {
 
 sub parse_reservations {
 
-    my @files_to_parse = ( $CONF_FILE );
+    my @files_to_parse = ($CONF_FILE);
     my @hosts;
 
-    while ( @files_to_parse ) {
+    while (@files_to_parse) {
 
-	my $filename = shift @files_to_parse;
+        my $filename = shift @files_to_parse;
 
-	### read config file: $filename
-	my $conf = '';
-	open(my $hndl, '<', $filename) or die $!;
-	while (<$hndl>) {
-	    s/^([^\#]*).*$/$1/o;
-	    $conf .= $_;
-	}   
-	close $hndl;
+        ### read config file: $filename
+        my $conf = '';
+        open( my $hndl, '<', $filename ) or die $!;
+        while (<$hndl>) {
+            s/^([^\#]*).*$/$1/o;
+            $conf .= $_;
+        }
+        close $hndl;
 
-	### Parsing configuration...
-	PARSE: while (1) {
-	    if ( $conf =~ m/^$RESERVATION_RE/mxgoc ) {
-		push @hosts, { 
-			      name => $1, 
-			      macaddr => lc($2), 
-			      ipaddr => $3, 
-			      hostname => $4 
-			     };
-		next PARSE;
-	    }
-	    if ( $conf =~ m/$INCLUDE_RE/mxgoc ) {
-		my $file = $1;
-	        ### include file: $file
-		push @files_to_parse, $file;
-		next PARSE;
-	    }
-	    last PARSE;
-	}
+        ### Parsing configuration...
+    PARSE: while (1) {
+            if ( $conf =~ m/^$RESERVATION_RE/mxgoc ) {
+                push @hosts,
+                    {
+                    name     => $1,
+                    macaddr  => lc($2),
+                    ipaddr   => $3,
+                    hostname => $4
+                    };
+                next PARSE;
+            }
+            if ( $conf =~ m/$INCLUDE_RE/mxgoc ) {
+                my $file = $1;
+                ### include file: $file
+                push @files_to_parse, $file;
+                next PARSE;
+            }
+            last PARSE;
+        }
     }
     return \@hosts;
 }
 
 sub do_reservations {
     my $r = parse_reservations;
-    send_to_manoc('reservations', $r) or
-      die "Error sending reservations";
+    send_to_manoc( 'reservations', $r ) or
+        die "Error sending reservations";
 
 }
 

@@ -16,10 +16,10 @@ Get an hashref from a row.
 =cut
 
 sub prepare_json_object {
-    my ($self, $row) = @_;
+    my ( $self, $row ) = @_;
 
     my $ret = {};
-    foreach my $name (@{$self->json_columns}) {
+    foreach my $name ( @{ $self->json_columns } ) {
         # default accessor is preferred
         my $val = $row->can($name) ? $row->$name : $row->get_column($name);
         $ret->{$name} = $val;
@@ -34,11 +34,10 @@ sub prepare_json_object {
 sub view_js : Chained('object') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $r = $self->prepare_json_object($c->stash->{object});
-    $c->stash(json_data => $r);
+    my $r = $self->prepare_json_object( $c->stash->{object} );
+    $c->stash( json_data => $r );
     $c->forward('View::JSON');
 }
-
 
 =head2 list_js
 
@@ -47,12 +46,10 @@ sub view_js : Chained('object') : PathPart('js') : Args(0) {
 sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my @r = map { $self->prepare_json_object($_) } @{$c->stash->{object_list}};
-    $c->stash(json_data => \@r);
+    my @r = map { $self->prepare_json_object($_) } @{ $c->stash->{object_list} };
+    $c->stash( json_data => \@r );
     $c->forward('View::JSON');
 }
-
-
 
 1;
 # Local Variables:

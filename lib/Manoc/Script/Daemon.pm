@@ -27,17 +27,15 @@ has cmd_stop => (
     documentation => 'kill the daemon',
 );
 
-has '+foreground' => (
-    writer      => '_set_foreground',
-);
+has '+foreground' => ( writer => '_set_foreground', );
 
 # --status to get info
 has cmd_status => (
-    metaclass   => 'Getopt',
-    cmd_flag    => 'status',
-    isa         => 'Bool',
-    is          => 'ro',
-    default     => sub { 0 },
+    metaclass => 'Getopt',
+    cmd_flag  => 'status',
+    isa       => 'Bool',
+    is        => 'ro',
+    default   => sub { 0 },
 
     documentation => 'get daemon status',
 );
@@ -49,17 +47,19 @@ sub run {
         return $self->main;
     }
 
-    if ($self->cmd_stop) {
+    if ( $self->cmd_stop ) {
         $self->stop;
-    } elsif ($self->cmd_status) {
+    }
+    elsif ( $self->cmd_status ) {
         $self->status;
-    } else {
+    }
+    else {
         $self->debug and $self->_set_foreground(1);
         $self->main;
     }
 
     print $self->status_message, "\n";
-    exit($self->exit_code);
+    exit( $self->exit_code );
 }
 
 after 'start' => sub {
@@ -67,7 +67,7 @@ after 'start' => sub {
     return unless $self->is_daemon;
     $self->main;
 };
- # Clean up the namespace.
+# Clean up the namespace.
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

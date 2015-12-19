@@ -43,26 +43,26 @@ sub stats : Private {
     my $schema = $c->model('ManocDB');
 
     eval { require SNMP::Info };
-    my $snmpinfo_ver = ($@ ? 'n/a' : $SNMP::Info::VERSION);
+    my $snmpinfo_ver = ( $@ ? 'n/a' : $SNMP::Info::VERSION );
 
-    my $stats =  {
-	manoc_ver    => $Manoc::VERSION,
-	db_version   => $Manoc::DB::VERSION,
-	dbi_ver      => $DBI::VERSION,
-	dbic_ver     => $DBIx::Class::VERSION,
-	catalyst_ver => $Catalyst::VERSION,
-	snmpinfo_ver => $snmpinfo_ver,
-	perl_version => $PERL_VERSION,
+    my $stats = {
+        manoc_ver    => $Manoc::VERSION,
+        db_version   => $Manoc::DB::VERSION,
+        dbi_ver      => $DBI::VERSION,
+        dbic_ver     => $DBIx::Class::VERSION,
+        catalyst_ver => $Catalyst::VERSION,
+        snmpinfo_ver => $snmpinfo_ver,
+        perl_version => $PERL_VERSION,
 
-	tot_racks    => $schema->resultset('Rack')->count,
-	tot_devices  => $schema->resultset('Device')->count,
-        tot_ifaces   => $schema->resultset('IfStatus')->count,
-	tot_cdps     => $schema->resultset('CDPNeigh')->count,
-	mat_entries  => $schema->resultset('Mat')->count,
-        arp_entries  => $schema->resultset('Arp')->count
+        tot_racks   => $schema->resultset('Rack')->count,
+        tot_devices => $schema->resultset('Device')->count,
+        tot_ifaces  => $schema->resultset('IfStatus')->count,
+        tot_cdps    => $schema->resultset('CDPNeigh')->count,
+        mat_entries => $schema->resultset('Mat')->count,
+        arp_entries => $schema->resultset('Arp')->count
     };
 
-    $c->stash(stats => $stats);
+    $c->stash( stats => $stats );
 }
 
 =head1 AUTHOR

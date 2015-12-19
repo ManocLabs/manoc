@@ -4,14 +4,13 @@
 # it under the same terms as Perl itself.
 package Manoc::Form::Vlan;
 
-
 use HTML::FormHandler::Moose;
 use Manoc::Form::Types::VlanID;
 
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name' => ( default => 'form-vlan' );
+has '+name'        => ( default => 'form-vlan' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'vlan_range' => (
@@ -22,9 +21,9 @@ has_field 'vlan_range' => (
 );
 
 has_field 'id' => (
-    label => 'VLAN ID',
-    type => 'Integer',
-    apply => [ 'VlanID' ],
+    label    => 'VLAN ID',
+    type     => 'Integer',
+    apply    => ['VlanID'],
     required => 1,
 );
 
@@ -35,7 +34,7 @@ has_field 'name' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
     ]
@@ -55,13 +54,12 @@ override validate_model => sub {
     my $vlan_from = $range->start;
     my $vlan_to   = $range->end;
 
-    if ( $vlan_id < $vlan_from || $vlan_id > $vlan_to) {
-        $self->field('id')->add_error("VLAN id must be within range $vlan_from-$vlan_to")
+    if ( $vlan_id < $vlan_from || $vlan_id > $vlan_to ) {
+        $self->field('id')->add_error("VLAN id must be within range $vlan_from-$vlan_to");
     }
 
     super();
 };
-
 
 sub options_range {
     my $self = shift;

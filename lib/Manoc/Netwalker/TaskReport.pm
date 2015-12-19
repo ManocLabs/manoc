@@ -33,7 +33,7 @@ has 'error' => (
         add_error   => 'push',
         map_error   => 'map',
         error_count => 'count',
-	has_error   => 'count',
+        has_error   => 'count',
         all_errors  => 'elements',
     },
 );
@@ -51,28 +51,27 @@ has 'visited' => (
 );
 
 has 'new_devices' => (
-    is  => 'rw',
-    isa => 'Int',
+    is      => 'rw',
+    isa     => 'Int',
     default => 0,
 );
 
 has 'cdp_entries' => (
-    is  => 'rw',
-    isa => 'Int',
+    is      => 'rw',
+    isa     => 'Int',
     default => 0,
 );
 
 has 'mat_entries' => (
-    is  => 'rw',
-    isa => 'Int',
+    is      => 'rw',
+    isa     => 'Int',
     default => 0,
 );
 
 has 'arp_entries' => (
-    is  => 'rw',
-    isa => 'Int',
+    is      => 'rw',
+    isa     => 'Int',
     default => 0,
 );
-
 
 1;

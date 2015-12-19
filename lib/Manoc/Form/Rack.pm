@@ -10,7 +10,7 @@ use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
 
-has '+name' => ( default => 'form-rack' );
+has '+name'        => ( default => 'form-rack' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (
@@ -20,7 +20,7 @@ has_field 'name' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
     ]
@@ -34,34 +34,35 @@ has_field 'building' => (
 );
 
 has_field 'floor' => (
-    type => 'Integer',
+    type     => 'Integer',
     required => 1,
-    label  => 'Floor',
+    label    => 'Floor',
 );
 has_field 'notes' => (
-    type => 'TextArea',
+    type  => 'TextArea',
     label => 'Notes',
 );
 
 has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
+    type           => 'Submit',
+    widget         => 'ButtonTag',
+    element_attr   => { class => [ 'btn', 'btn-primary' ] },
     widget_wrapper => 'None',
-    value => "Save"
+    value          => "Save"
 );
 
 sub options_building {
     my $self = shift;
     return unless $self->schema;
-    my @buildings = $self->schema->resultset('Building')->search( {}, { order_by => 'name' } )->all();
+    my @buildings =
+        $self->schema->resultset('Building')->search( {}, { order_by => 'name' } )->all();
     my @selections;
     foreach my $b (@buildings) {
-        my $label = $b->name . " (" . $b->description . ")";
+        my $label  = $b->name . " (" . $b->description . ")";
         my $option = {
-	    label => $label,
-	    value => $b->id
-	};
+            label => $label,
+            value => $b->id
+        };
         push @selections, $option;
     }
     return @selections;

@@ -26,10 +26,10 @@ __PACKAGE__->add_columns(
     },
 
     'ipaddr' => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
 
     'name' => {
@@ -47,6 +47,5 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key( 'server', 'ipaddr', 'macaddr' );
-
 
 1;

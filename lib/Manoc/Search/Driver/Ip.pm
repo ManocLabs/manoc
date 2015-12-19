@@ -14,10 +14,8 @@ sub search_note {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
-    my $it = $schema->resultset('Ip')->search(
-        {notes => { '-like' => $pattern }},
-        { order_by => 'notes' },
-    );
+    my $it = $schema->resultset('Ip')
+        ->search( { notes => { '-like' => $pattern } }, { order_by => 'notes' }, );
     while ( my $e = $it->next ) {
         my $item = Manoc::Search::Item::IpAddr->new(
             {
@@ -33,23 +31,24 @@ sub search_note {
 sub search_inventory {
     my ( $self, $query, $result ) = @_;
     my ( $it, $e );
-    my $pattern = $query->sql_pattern;
-    my $schema  = $self->engine->schema;
-    my @ip_infos= qw(description assigned_to phone email);
+    my $pattern  = $query->sql_pattern;
+    my $schema   = $self->engine->schema;
+    my @ip_infos = qw(description assigned_to phone email);
 
-   foreach my $k (@ip_infos) {
-    $it = $schema->resultset('Ip')->search(
-        {$k => { '-like' => $pattern }},
-        { order_by => 'ipaddr' }
-    );
-    while ( $e = $it->next ) {
-        my $item = Manoc::Search::Item::IpAddr->new( { 
-					match => $e->$k,
-                			addr  => $e->ipaddr->address,
-                			text  => $e->$k  } );
-        $result->add_item($item);
+    foreach my $k (@ip_infos) {
+        $it = $schema->resultset('Ip')
+            ->search( { $k => { '-like' => $pattern } }, { order_by => 'ipaddr' } );
+        while ( $e = $it->next ) {
+            my $item = Manoc::Search::Item::IpAddr->new(
+                {
+                    match => $e->$k,
+                    addr  => $e->ipaddr->address,
+                    text  => $e->$k
+                }
+            );
+            $result->add_item($item);
+        }
     }
-   }
 }
 
 no Moose;

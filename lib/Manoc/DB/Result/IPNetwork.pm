@@ -11,9 +11,7 @@ extends 'DBIx::Class::Core';
 
 use Manoc::IPAddress::IPv4Network;
 
-__PACKAGE__->load_components(
-    qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/
-);
+__PACKAGE__->load_components( qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/ );
 
 __PACKAGE__->table('ip_network');
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPNetwork');
@@ -25,8 +23,8 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
     },
     'parent_id' => {
-        data_type         => 'int',
-        is_nullable       => 1,
+        data_type   => 'int',
+        is_nullable => 1,
     },
     'name' => {
         data_type   => 'varchar',
@@ -37,19 +35,19 @@ __PACKAGE__->add_columns(
         data_type    => 'varchar',
         is_nullable  => 0,
         size         => 15,
-	ipv4_address => 1,
+        ipv4_address => 1,
         accessor     => '_address',
     },
     'prefix' => {
-        data_type    => 'int',
-        is_nullable  => 0,
-        accessor     => '_prefix',
+        data_type   => 'int',
+        is_nullable => 0,
+        accessor    => '_prefix',
     },
     'broadcast' => {
         data_type    => 'varchar',
         size         => '15',
         is_nullable  => 0,
-	ipv4_address => 1,
+        ipv4_address => 1,
         accessor     => '_broadcast',
     },
     'description' => {
@@ -65,49 +63,49 @@ __PACKAGE__->add_columns(
 );
 
 has network => (
-    is   => 'rw',
-    isa  => 'Manoc::IPAddress::IPv4Network',
-    lazy => 1,
+    is      => 'rw',
+    isa     => 'Manoc::IPAddress::IPv4Network',
+    lazy    => 1,
     builder => 'build_network',
     trigger => \&on_set_network,
 );
 
 sub build_network {
     my $self = shift;
-    defined ($self->address) or return;
-    defined ($self->prefix)  or return;
-    Manoc::IPAddress::IPv4Network->new($self->address, $self->prefix);
+    defined( $self->address ) or return;
+    defined( $self->prefix )  or return;
+    Manoc::IPAddress::IPv4Network->new( $self->address, $self->prefix );
 }
 
 sub on_set_network {
     my ( $self, $network, $old_network ) = @_;
 
-    $self->_address($network->address);
-    $self->_prefix($network->prefix);
-    $self->_broadcast($network->broadcast);
+    $self->_address( $network->address );
+    $self->_prefix( $network->prefix );
+    $self->_broadcast( $network->broadcast );
 }
 
 sub address {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    if (@_ > 1) {
-        defined($self->prefix) and
-            $self->network(Manoc::IPAddress::IPv4Network->new($value, $self->prefix));
+    if ( @_ > 1 ) {
+        defined( $self->prefix ) and
+            $self->network( Manoc::IPAddress::IPv4Network->new( $value, $self->prefix ) );
         $self->_address($value);
     }
     return $self->_address();
 }
 
 sub prefix {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    if (@_ > 1) {
+    if ( @_ > 1 ) {
 
-        ($value >= 0 && $value <= 32)
-            or die "Bad prefix value $value";
+        ( $value >= 0 && $value <= 32 ) or
+            die "Bad prefix value $value";
 
-        defined($self->address) and
-            $self->network( Manoc::IPAddress::IPv4Network->new($self->address, $value) );
+        defined( $self->address ) and
+            $self->network( Manoc::IPAddress::IPv4Network->new( $self->address, $value ) );
         $self->_prefix($value);
     }
     return $self->_prefix();
@@ -115,36 +113,38 @@ sub prefix {
 
 sub broadcast {
     my $self = shift;
-    
-    if (@_ > 1) {
+
+    if ( @_ > 1 ) {
         die "The broadcast attribute is automatically set from address and prefix";
     }
-    return $self->_broadcast if defined($self->_broadcast);
-    return $self->_broadcast($self->network->broadcast);
+    return $self->_broadcast if defined( $self->_broadcast );
+    return $self->_broadcast( $self->network->broadcast );
 }
 
 # call this method after resizing a network
 sub _rebuild_subtree {
     my $self = shift;
 
-    if ($self->children) {
+    if ( $self->children ) {
         my $outside = $self->children->search(
             [
-                { address   => { '<' => $self->address->padded   } },
+                { address   => { '<' => $self->address->padded } },
                 { broadcast => { '>' => $self->broadcast->padded } },
-            ]);
-        while ( my $child = $outside->next()) {
-            $child->parent($self->parent);
+            ]
+        );
+        while ( my $child = $outside->next() ) {
+            $child->parent( $self->parent );
         }
     }
-    
-    if ($self->siblings) {
+
+    if ( $self->siblings ) {
         my $outside = $self->siblings->search(
             {
-                address   => { '>=' => $self->address->padded   },
+                address   => { '>=' => $self->address->padded },
                 broadcast => { '<=' => $self->broadcast->padded }
-            });
-        while ( my $child = $outside->next()) {
+            }
+        );
+        while ( my $child = $outside->next() ) {
             $child->parent($self);
         }
     }
@@ -154,50 +154,51 @@ sub insert {
     my $self = shift;
 
     my $parent = $self->parent;
-    if ( ! $parent ) {
+    if ( !$parent ) {
         my $supernets = $self->result_source->resultset->search(
             {
-                address  =>  { '<=' => $self->address->padded   },
+                address   => { '<=' => $self->address->padded },
                 broadcast => { '>=' => $self->broadcast->padded },
             },
             {
-                order_by => [
-                    { -desc => 'me.address' },
-                    { -asc => 'me.broadcast' }
-                ]
-            });
+                order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ]
+            }
+        );
         $parent = $supernets->first();
 
         #bypass dbic::tree
-        $parent and $self->_parent( $parent );
+        $parent and $self->_parent($parent);
     }
 
-    $self->next::method( @_ );
+    $self->next::method(@_);
 
     my $new_children;
     if ($parent) {
         $new_children = $self->siblings->search(
             {
-                address   => { '>=' => $self->address->padded   },
+                address   => { '>=' => $self->address->padded },
                 broadcast => { '<=' => $self->broadcast->padded }
-            });
-    } else {
+            }
+        );
+    }
+    else {
         $new_children = $self->result_source->resultset->search(
             {
-                parent_id => { '='  => undef                    },
-                id        => { '!=' => $self->id                },
-                address   => { '>=' => $self->address->padded   },
+                parent_id => { '='  => undef },
+                id        => { '!=' => $self->id },
+                address   => { '>=' => $self->address->padded },
                 broadcast => { '<=' => $self->broadcast->padded }
-            });
+            }
+        );
     }
-    while ( my $child = $new_children->next()) {
+    while ( my $child = $new_children->next() ) {
         $child->parent($self);
     }
 }
 
 sub is_outside_parent {
     my $self = shift;
-    
+
     $self->parent or return;
     return $self->address < $self->parent->address ||
         $self->broadcast > $self->parent->broadcast;
@@ -205,12 +206,14 @@ sub is_outside_parent {
 
 sub is_inside_children {
     my $self = shift;
-    
+
     $self->children or return;
-    return $self->children->search([
-        {  address   => { '<=' => $self->address->padded   } },
-        {  broadcast => { '>=' => $self->broadcast->padded } },
-    ])->count() > 1;
+    return $self->children->search(
+        [
+            { address   => { '<=' => $self->address->padded } },
+            { broadcast => { '>=' => $self->broadcast->padded } },
+        ]
+    )->count() > 1;
 }
 
 sub update {
@@ -228,18 +231,20 @@ sub update {
 
         $self->_rebuild_subtree();
     }
-    $self->next::method( @_ );
+    $self->next::method(@_);
 }
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint( [ 'name' ] );
+__PACKAGE__->add_unique_constraint( ['name'] );
 __PACKAGE__->add_unique_constraint( [ 'prefix', 'address' ] );
 
 __PACKAGE__->parent_column('parent_id');
 
-__PACKAGE__->belongs_to( vlan => 'Manoc::DB::Result::Vlan',
-                         'vlan_id',
-                         { join_type => 'LEFT' });
+__PACKAGE__->belongs_to(
+    vlan => 'Manoc::DB::Result::Vlan',
+    'vlan_id',
+    { join_type => 'LEFT' }
+);
 
 __PACKAGE__->add_relationship(
     'supernets' => 'IPNetwork',
@@ -247,10 +252,10 @@ __PACKAGE__->add_relationship(
         my $args = shift;
 
         return {
-            "$args->{foreign_alias}.address"     => {
+            "$args->{foreign_alias}.address" => {
                 '<=' => { -ident => "$args->{self_alias}.address" },
             },
-            "$args->{foreign_alias}.broadcast"   => {
+            "$args->{foreign_alias}.broadcast" => {
                 '>=' => { -ident => "$args->{self_alias}.broadcast" },
             },
             "$args->{foreign_alias}.id" => {
@@ -269,10 +274,10 @@ __PACKAGE__->add_relationship(
         my $args = shift;
 
         return {
-            "$args->{foreign_alias}.address"     => {
+            "$args->{foreign_alias}.address" => {
                 '>=' => { -ident => "$args->{self_alias}.address" },
             },
-            "$args->{foreign_alias}.broadcast"   => {
+            "$args->{foreign_alias}.broadcast" => {
                 '<=' => { -ident => "$args->{self_alias}.broadcast" },
             },
             "$args->{foreign_alias}.id" => {
@@ -282,16 +287,17 @@ __PACKAGE__->add_relationship(
     }
 );
 
-
 sub arp_entries {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('Arp');
     $rs = $rs->search(
-	{
-	    'ipaddr' => {
-		-between => [ $self->address->padded, $self->broadcast->padded ] }
-	});
+        {
+            'ipaddr' => {
+                -between => [ $self->address->padded, $self->broadcast->padded ]
+            }
+        }
+    );
 
     return wantarray() ? $rs->all() : $rs;
 }
@@ -301,10 +307,12 @@ sub ip_entries {
 
     my $rs = $self->result_source->schema->resultset('Ip');
     $rs = $rs->search(
-	{
-	    'ipaddr' => {
-		-between => [ $self->address->padded, $self->broadcast->padded ] }
-	});
+        {
+            'ipaddr' => {
+                -between => [ $self->address->padded, $self->broadcast->padded ]
+            }
+        }
+    );
     return wantarray() ? $rs->all() : $rs;
 }
 
@@ -313,10 +321,10 @@ sub ipblock_entries {
 
     my $rs = $self->result_source->schema->resultset('IPBlock');
     $rs = $rs->search(
-            {
-                'from_addr' => { '>=' => $self->address->padded   },
-                'to_addr'   => { '<=' => $self->broadcast->padded }
-            }
+        {
+            'from_addr' => { '>=' => $self->address->padded },
+            'to_addr'   => { '<=' => $self->broadcast->padded }
+        }
     );
 
     return wantarray() ? $rs->all() : $rs;
@@ -324,28 +332,25 @@ sub ipblock_entries {
 
 sub supernets {
     my $self = shift;
-    my $rs = $self->search_related('supernets');
+    my $rs   = $self->search_related('supernets');
     return wantarray() ? $rs->all : $rs;
 }
 
-
 sub supernets_ordered {
     my $self = shift;
-    my $rs = $self->supernets->search(
+    my $rs   = $self->supernets->search(
         {},
         {
-            order_by => [
-                { -asc => 'me.address' },
-                { -desc => 'me.broadcast' }
-            ]
-        });
+            order_by => [ { -asc => 'me.address' }, { -desc => 'me.broadcast' } ]
+        }
+    );
 
     return wantarray ? $rs->all : $rs;
 }
 
 sub subnets {
     my $self = shift;
-    my $rs = $self->search_related('subnets');
+    my $rs   = $self->search_related('subnets');
     return wantarray() ? $rs->all : $rs;
 }
 
@@ -356,21 +361,23 @@ sub first_supernet {
 
 sub children_ordered {
     my $self = shift;
-    my $rs = $self->children->search({}, { order_by => { -asc => 'address' }});
+    my $rs = $self->children->search( {}, { order_by => { -asc => 'address' } } );
 
     return wantarray ? $rs->all : $rs;
 }
 
-
 sub sqlt_deploy_hook {
-   my ($self, $sqlt_table) = @_;
+    my ( $self, $sqlt_table ) = @_;
 
-   $sqlt_table->add_index(name => 'idx_ipnet_address_broadcast',
-                          fields => ['address', 'broadcast']);
-   $sqlt_table->add_index(name => 'idx_ipnet_address_prefix',
-                          fields => ['address', 'prefix']);
+    $sqlt_table->add_index(
+        name   => 'idx_ipnet_address_broadcast',
+        fields => [ 'address', 'broadcast' ]
+    );
+    $sqlt_table->add_index(
+        name   => 'idx_ipnet_address_prefix',
+        fields => [ 'address', 'prefix' ]
+    );
 }
-
 
 1;
 # Local Variables:

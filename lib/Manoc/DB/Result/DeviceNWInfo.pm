@@ -19,13 +19,13 @@ __PACKAGE__->add_columns(
     },
 
     manifold => {
-        data_type     => 'varchar',
-        size          => 64,
-        is_nullable   => 0,
+        data_type   => 'varchar',
+        size        => 64,
+        is_nullable => 0,
     },
 
     manifold_args => {
-	data_type     => 'varchar',
+        data_type     => 'varchar',
         size          => 255,
         default_value => 'NULL',
         is_nullable   => 1,
@@ -62,7 +62,7 @@ __PACKAGE__->add_columns(
     },
 
     netwalker_status => {
-	data_type     => 'varchar',
+        data_type     => 'varchar',
         size          => 255,
         default_value => 'NULL',
         is_nullable   => 1,
@@ -117,8 +117,7 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan' );
-__PACKAGE__->belongs_to( arp_vlan => 'Manoc::DB::Result::Vlan' );
-
+__PACKAGE__->belongs_to( arp_vlan        => 'Manoc::DB::Result::Vlan' );
 
 =head1 NAME
 

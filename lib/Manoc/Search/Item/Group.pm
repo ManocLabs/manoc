@@ -31,8 +31,8 @@ sub sort_items {
 override load_widgets => sub {
     my $self = shift;
 
-    foreach my $i (@{$self->items}) {
-	$i->load_widgets;
+    foreach my $i ( @{ $self->items } ) {
+        $i->load_widgets;
     }
     super();
 };

@@ -42,16 +42,16 @@ has 'text' => (
 sub _build_key { $_[0]->match }
 
 has widget => (
-    is       => 'ro',
-    isa      => 'Str',
-    lazy     => 1,
-    default  => sub { [ split( /::/, ref( $_[0]) ) ]->[-1] }
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub { [ split( /::/, ref( $_[0] ) ) ]->[-1] }
 );
 
 sub load_widgets {
     my $self = shift;
 
-    $self->apply_widget_role($self, $self->widget);
+    $self->apply_widget_role( $self, $self->widget );
 }
 
 no Moose;

@@ -4,7 +4,6 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Ip;
 
-
 use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
@@ -15,10 +14,10 @@ __PACKAGE__->table('ip');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
     'description' => {
         data_type   => 'text',
@@ -28,15 +27,15 @@ __PACKAGE__->add_columns(
         data_type   => 'varchar',
         size        => 45,
         is_nullable => 1,
-    }, 
+    },
     'phone' => {
         data_type   => 'varchar',
         size        => 30,
-	is_nullable => 1,
+        is_nullable => 1,
     },
     'email' => {
-     data_type   => 'varchar',
-     is_nullable =>  45,
+        data_type   => 'varchar',
+        is_nullable => 45,
     },
     'notes' => {
         data_type   => 'text',
@@ -45,6 +44,5 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('ipaddr');
-
 
 1;

@@ -33,10 +33,10 @@ label_class to 'col-sm-2'
 sub build_form_tags {
     {
         'layout_classes' => {
-            element_wrapper_class => [ 'col-sm-10' ],
-            label_class           => [ 'col-sm-2'  ],
+            element_wrapper_class => ['col-sm-10'],
+            label_class           => ['col-sm-2'],
         }
-    }
+    };
 }
 
 =head1 SEE ALSO

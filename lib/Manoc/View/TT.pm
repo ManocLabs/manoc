@@ -15,9 +15,9 @@ __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     INCLUDE_PATH       => [
         Manoc->path_to( 'root', 'src' ),
-        Manoc->path_to( 'root', 'src', 'include' ),
-        Manoc->path_to( 'root', 'src', 'pages' ),
-        Manoc->path_to( 'lib', 'Manoc', 'Plugin'),
+        Manoc->path_to( 'root', 'src',   'include' ),
+        Manoc->path_to( 'root', 'src',   'pages' ),
+        Manoc->path_to( 'lib',  'Manoc', 'Plugin' ),
     ],
     PRE_PROCESS => 'init.tt',
     WRAPPER     => 'wrapper.tt',

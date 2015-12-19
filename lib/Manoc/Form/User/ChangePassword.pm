@@ -9,15 +9,15 @@ extends 'Manoc::Form::Base';
 
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name' => ( default => 'form-user' );
+has '+name'        => ( default => 'form-user' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'old_password' => (
-    type      => 'Password',
-    label     => 'Old password',
-    required  => 1,
+    type     => 'Password',
+    label    => 'Old password',
+    required => 1,
 );
-    
+
 has_field 'password' => (
     type      => 'Password',
     label     => 'Password',
@@ -26,8 +26,8 @@ has_field 'password' => (
 );
 
 has_field 'password2' => (
-    type     => 'PasswordConf',
-    label    => 'Confirm Password',
+    type  => 'PasswordConf',
+    label => 'Confirm Password',
 );
 
 has '+success_message' => ( default => 'Password updated.' );
@@ -36,8 +36,8 @@ sub validate_model {
     my $self = shift;
     my $item = $self->item;
 
-    $item->check_password($self->field('old_password')->value)
-        or $self->field('old_password')->add_error("Old password not valid");
+    $item->check_password( $self->field('old_password')->value ) or
+        $self->field('old_password')->add_error("Old password not valid");
 }
 
 1;

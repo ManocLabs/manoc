@@ -81,7 +81,6 @@ has os_ver => (
 );
 sub _build_os_ver { undef }
 
-
 has 'boottime' => (
     is      => 'ro',
     isa     => 'Maybe[Int]',
@@ -90,15 +89,13 @@ has 'boottime' => (
 );
 sub _build_boottime { undef }
 
-
 has 'configuration' => (
     is      => 'ro',
     isa     => 'Maybe[Str]',
     lazy    => 1,
     builder => '_build_configuration',
 );
-sub _build_configuration {}
-
+sub _build_configuration { }
 
 has 'ifstatus_table' => (
     is      => 'ro',
@@ -138,7 +135,7 @@ has vtp_database => (
     lazy    => 1,
     builder => '_build_vtp_database'
 );
-sub _build_vtp_database {}
+sub _build_vtp_database { }
 
 no Moose::Role;
 1;

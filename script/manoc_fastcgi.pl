@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Manoc', 'FastCGI');
+Catalyst::ScriptRunner->run( 'Manoc', 'FastCGI' );
 
 1;
 

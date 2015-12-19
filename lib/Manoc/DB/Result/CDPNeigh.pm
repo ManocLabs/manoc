@@ -10,7 +10,6 @@ use warnings;
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
-
 __PACKAGE__->table('cdp_neigh');
 __PACKAGE__->add_columns(
     'from_device' => {
@@ -24,10 +23,10 @@ __PACKAGE__->add_columns(
         size        => 64
     },
     'to_device' => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
     'to_interface' => {
         data_type   => 'varchar',
@@ -63,9 +62,8 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
     to_device_info => 'Manoc::DB::Result::Device',
     { 'foreign.mng_address' => 'self.to_device' },
-    { join_type => 'LEFT' },
+    { join_type             => 'LEFT' },
 );
-
 
 =head1 NAME
 

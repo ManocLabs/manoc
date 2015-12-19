@@ -86,12 +86,11 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             };
     }
 
-
     $c->stash(
         disable_pagination => 1,
         vlan_table         => \@vlan_table,
-#        db_stats           => \@db_stats,
-        template           => 'query/stats.tt',
+        #        db_stats           => \@db_stats,
+        template => 'query/stats.tt',
     );
 }
 
@@ -101,11 +100,11 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     my ( $r, $rs );
 
     my @conflicts =
-        map { ipaddr => unpadded_ipaddr($_->get_column('ipaddr')), count => $_->get_column('count'), },
-        $schema->resultset('Arp')->search_conflicts;
+        map {
+        ipaddr    => unpadded_ipaddr( $_->get_column('ipaddr') ),
+            count => $_->get_column('count'),
+        }, $schema->resultset('Arp')->search_conflicts;
 
-    
-    
     my @multihomed =
         map { macaddr => $_->get_column('macaddr'), count => $_->get_column('count'), },
         $schema->resultset('Arp')->search_multihomed;
@@ -124,7 +123,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
 
     my @multihost_ifaces;
 
-#    $rs = $schema->resultset('Mat')->search_multihost;
+    #    $rs = $schema->resultset('Mat')->search_multihost;
 
     $rs = $schema->search(
         { 'archived' => 0 },
@@ -134,7 +133,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
                 { count => { distinct => 'macaddr' } }, 'ifstatus.description',
             ],
 
-            as       => [ 'device', 'interface', 'count', 'description', ],
+            as       => [ 'device',    'interface', 'count', 'description', ],
             group_by => [ 'me.device', 'me.interface' ],
             having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
             order_by => [ 'me.device', 'me.interface' ],
@@ -151,7 +150,6 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
             ]
         }
     );
-
 
     while ( $r = $rs->next() ) {
         my $id          = $r->get_column('device');
@@ -279,7 +277,7 @@ sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
             rack     => $_->rack->id,
             floor    => $_->rack->floor,
             building => $_->rack->building->description,
-	    serial   => $_->serial || 'n/a',
+            serial => $_->serial || 'n/a',
     }, @rs;
 
     $c->stash( table => \@table, template => 'query/device_list.tt' );
@@ -294,15 +292,15 @@ sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
         {
             join     => 'building',
             prefetch => 'building',
-            order_by => ['me.name' ],
+            order_by => ['me.name'],
         }
     );
     my @table = map {
-            id          => $_->name,
-            build_id    => $_->building->name,
-            build_name  => $_->building->description,
-            floor       => $_->floor,
-            notes       => $_->notes,
+        id             => $_->name,
+            build_id   => $_->building->name,
+            build_name => $_->building->description,
+            floor      => $_->floor,
+            notes      => $_->notes,
     }, @rs;
 
     $c->stash( table => \@table, template => 'query/rack_list.tt' );
@@ -368,7 +366,6 @@ sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
     $c->stash( multimacs => \@multimacs, template => 'query/multi_mac.tt' );
 }
 
-
 ####################################################################
 
 sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
@@ -377,37 +374,38 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     my @results;
     my $e;
     my @multimacs;
-    my $days       = clean_string( $c->req->param('days') ) || "" ;
+    my $days = clean_string( $c->req->param('days') ) || "";
     $days =~ /^\d+$/ or $days = "";
-    
+
     if ($days) {
-        my $query_time = time - str2seconds($days . "d");
-        
+        my $query_time = time - str2seconds( $days . "d" );
+
         @results = $schema->resultset('Mat')->search(
-            { },
+            {},
             {
-                select   => [ 'macaddr', 'device', 'interface', 'firstseen',{ min => 'firstseen' } ],
-                as       => [ 'macaddr', 'device', 'interface', 'firstseen','fs'],
+                select =>
+                    [ 'macaddr', 'device', 'interface', 'firstseen', { min => 'firstseen' } ],
+                as       => [ 'macaddr', 'device', 'interface', 'firstseen', 'fs' ],
                 group_by => ['macaddr'],
-                having   => { 'MIN(firstseen)' => { '>', $query_time } },
+                having => { 'MIN(firstseen)' => { '>', $query_time } },
             }
-           );
-        
+        );
+
         my @new_devices = map +{
-            macaddr      => $_->macaddr,
-            device       => $_->device_entry,
-            iface        => $_->interface,
-            from         => $_->firstseen,
+            macaddr => $_->macaddr,
+            device  => $_->device_entry,
+            iface   => $_->interface,
+            from    => $_->firstseen,
         }, @results;
 
         $c->stash( new_devs => \@new_devices );
     }
 
-    $c->stash(days     => $days,
-              template => 'query/new_devices.tt' 
-             );
+    $c->stash(
+        days     => $days,
+        template => 'query/new_devices.tt'
+    );
 }
-
 
 =head1 AUTHOR
 

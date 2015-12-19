@@ -12,68 +12,64 @@ with 'Manoc::Form::TraitFor::SaveButton';
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name' => ( default => 'form-ipnetwork' );
+has '+name'        => ( default => 'form-ipnetwork' );
 has '+html_prefix' => ( default => 1 );
 
-has '+item_class' => (
-    default => 'IPBlock'
-);
+has '+item_class' => ( default => 'IPBlock' );
 
 sub build_render_list {
-    [
-        'name', 'range_block', 'description', 'save',
-        'csrf_token',
-    ]
+    [ 'name', 'range_block', 'description', 'save', 'csrf_token', ];
 }
 
 has_block 'range_block' => (
-    render_list => ['from_addr', 'to_addr'],
-    tag => 'div',
-    class => [ 'form-group' ],
+    render_list => [ 'from_addr', 'to_addr' ],
+    tag         => 'div',
+    class       => ['form-group'],
 );
 
 has_field 'from_addr' => (
-    apply => [ IPAddress ],
-    size => 15,
+    apply    => [IPAddress],
+    size     => 15,
     required => 1,
-    label => 'From',
+    label    => 'From',
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-4">' , after_element => '</div>'
+        before_element => '<div class="col-sm-4">',
+        after_element  => '</div>'
     },
-    label_class =>  [ 'col-sm-2' ],
+    label_class  => ['col-sm-2'],
     element_attr => { placeholder => 'IP Address' }
 );
 
 has_field 'to_addr' => (
-    apply => [ IPAddress ],
-    size => 15,
+    apply    => [IPAddress],
+    size     => 15,
     required => 1,
-    label => 'To',
+    label    => 'To',
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-4">' , after_element => '</div>'
+        before_element => '<div class="col-sm-4">',
+        after_element  => '</div>'
     },
-    label_class =>  [ 'col-sm-2' ],
+    label_class  => ['col-sm-2'],
     element_attr => { placeholder => 'IP Address' }
 );
 
 has_field 'name' => (
-    type => 'Text',
-    required => 1,
-    label => 'Name',
+    type         => 'Text',
+    required     => 1,
+    label        => 'Name',
     element_attr => { placeholder => 'Block name' }
 );
 
 has_field 'description' => (
-    type => 'TextArea',
+    type  => 'TextArea',
     label => 'Description',
 );
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

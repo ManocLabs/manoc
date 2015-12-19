@@ -17,7 +17,6 @@ with 'Manoc::ControllerRole::CommonCRUD';
 use Manoc::Form::IPNetwork;
 use Manoc::Utils::Datetime qw/str2seconds/;
 
-
 =head1 NAME
 
 Manoc::Controller::IPNetwork - Catalyst Controller
@@ -44,44 +43,39 @@ __PACKAGE__->config(
 =cut
 
 sub get_object_list {
-   my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-   my $rs = $c->stash->{resultset};
-   return [
-       $rs->search(
-           {},
-           {
-               prefetch => 'vlan',
-               order_by => { -asc => 'address' }
-           } )
-   ];
-};
+    my $rs = $c->stash->{resultset};
+    return [
+        $rs->search(
+            {},
+            {
+                prefetch => 'vlan',
+                order_by => { -asc => 'address' }
+            }
+        )
+    ];
+}
 
 before 'view' => sub {
     my ( $self, $c ) = @_;
 
-    my $network = $c->stash->{object};
+    my $network   = $c->stash->{object};
     my $max_hosts = $network->network->num_hosts;
 
-    my $query_by_time = {
-        lastseen => { '>=' => time - str2seconds(60, 'd') }
+    my $query_by_time = { lastseen => { '>=' => time - str2seconds( 60, 'd' ) } };
+    my $select_column = {
+        columns  => [qw/ipaddr/],
+        distinct => 1
     };
-    my $select_column =  {
-            columns => [ qw/ipaddr/ ],
-            distinct => 1
-        };
-    my $arp_60days = $network->arp_entries
-        ->search($query_by_time, $select_column)
-        ->count();
-    $c->stash(arp_usage60 => int($arp_60days / $max_hosts * 100 ));
+    my $arp_60days = $network->arp_entries->search( $query_by_time, $select_column )->count();
+    $c->stash( arp_usage60 => int( $arp_60days / $max_hosts * 100 ) );
 
-    my $arp_total = $network->arp_entries
-        ->search({}, $select_column)
-        ->count();
-    $c->stash(arp_usage => int($arp_total / $max_hosts * 100 ));
+    my $arp_total = $network->arp_entries->search( {}, $select_column )->count();
+    $c->stash( arp_usage => int( $arp_total / $max_hosts * 100 ) );
 
     my $hosts = $network->ip_entries;
-    $c->stash(hosts_usage => int( $hosts->count() / $max_hosts * 100));
+    $c->stash( hosts_usage => int( $hosts->count() / $max_hosts * 100 ) );
 };
 
 sub arp : Chained('object') {
@@ -90,8 +84,8 @@ sub arp : Chained('object') {
     my $network = $c->stash->{object};
 
     # override default title
-    $c->stash(title => 'ARP activity for Network ' . $network->name);
-    
+    $c->stash( title => 'ARP activity for Network ' . $network->name );
+
     $c->detach('/arp/list');
 }
 
@@ -99,30 +93,30 @@ sub arp_js : Chained('object') {
     my ( $self, $c ) = @_;
 
     my $network = $c->stash->{object};
-    my $days    = int($c->req->param('days'));
-    
+    my $days    = int( $c->req->param('days') );
+
     my $rs = $network->arp_entries->first_last_seen();
     if ($days) {
-        $rs = $rs->search({ lastseen => time - str2seconds($days, 'd') });
+        $rs = $rs->search( { lastseen => time - str2seconds( $days, 'd' ) } );
     }
-    $c->stash(datatable_resultset => $rs);
+    $c->stash( datatable_resultset => $rs );
 
     $c->detach('/arp/list_js');
 }
 
-
 sub root : Chained('base') {
     my ( $self, $c ) = @_;
-    
+
     my $rs = $c->stash->{resultset};
 
     my $n_roots = $rs->get_root_networks->count();
-    if ($n_roots == 1) {
+    if ( $n_roots == 1 ) {
         my $root = $rs->get_root_networks->first;
 
-        $c->stash(root_network => $root);
+        $c->stash( root_network => $root );
         $rs = $root->children;
-    } else {
+    }
+    else {
         $rs = $rs->get_root_networks;
     }
 
@@ -131,15 +125,15 @@ sub root : Chained('base') {
         {
             prefetch => [ 'vlan', 'children' ],
             order_by => [
-                { -asc  =>  'me.address'        },
-                { -desc => 'me.broadcast'       },
-                { -asc  => 'children.address'   },
+                { -asc  => 'me.address' },
+                { -desc => 'me.broadcast' },
+                { -asc  => 'children.address' },
                 { -desc => 'children.broadcast' },
             ]
-        });
-    $c->stash( networks => \@networks);
+        }
+    );
+    $c->stash( networks => \@networks );
 }
-
 
 =head1 AUTHOR
 

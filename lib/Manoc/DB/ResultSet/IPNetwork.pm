@@ -12,7 +12,7 @@ use warnings;
 sub get_root_networks {
     my ($self) = @_;
 
-    my $rs = $self->search({ 'me.parent_id' => undef });
+    my $rs = $self->search( { 'me.parent_id' => undef } );
     return wantarray() ? $rs->all : $rs;
 }
 
@@ -30,27 +30,24 @@ sub rebuild_tree {
 }
 
 sub including_address {
-    my ( $self, $ipaddress) = @_;
+    my ( $self, $ipaddress ) = @_;
 
-    if ( blessed($ipaddress)
-             &&  $ipaddress->isa('Manoc::IPAddress::IPv4') )
+    if ( blessed($ipaddress) &&
+        $ipaddress->isa('Manoc::IPAddress::IPv4') )
     {
         $ipaddress = $ipaddress->padded;
     }
-    
+
     return $self->search(
         {
-            'address'    => { '<=' => $ipaddress },
-            'broadcast'  => { '>=' => $ipaddress },
+            'address'   => { '<=' => $ipaddress },
+            'broadcast' => { '>=' => $ipaddress },
         }
     );
 }
 
 sub including_address_ordered {
-    shift->including_address(@_)->search(
-        {},
-        { order_by => { -desc => 'address' }}
-    );
+    shift->including_address(@_)->search( {}, { order_by => { -desc => 'address' } } );
 }
 
 1;

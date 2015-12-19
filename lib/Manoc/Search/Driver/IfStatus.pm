@@ -15,24 +15,24 @@ sub search_note {
     my $schema  = $self->engine->schema;
 
     my $rs = $schema->resultset('IfStatus')->search(
-	{
-	    description => { '-like' => $pattern }
-	},
-	{
-	    order_by => 'description',
-	    prefetch   => 'device_info',
-	},
+        {
+            description => { '-like' => $pattern }
+        },
+        {
+            order_by => 'description',
+            prefetch => 'device_info',
+        },
     );
     while ( my $e = $rs->next ) {
-	my $item = Manoc::Search::Item::Iface->new(
-	    {
-		device      => $e->device_info,
-		interface   => $e->interface,
-		text        => $e->description,
-		match       => $e->device_info->name,
-	    }
-	);
-	$result->add_item($item);
+        my $item = Manoc::Search::Item::Iface->new(
+            {
+                device    => $e->device_info,
+                interface => $e->interface,
+                text      => $e->description,
+                match     => $e->device_info->name,
+            }
+        );
+        $result->add_item($item);
     }
 }
 

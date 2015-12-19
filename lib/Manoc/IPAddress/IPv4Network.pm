@@ -11,15 +11,13 @@ use Moose::Util::TypeConstraints;
 use Manoc::Utils::IPAddress qw(check_addr netmask2prefix prefix2netmask_i);
 use Manoc::IPAddress::IPv4;
 
-use overload (
-    '""'   =>   sub { shift->_stringify() },
-);
+use overload ( '""' => sub { shift->_stringify() }, );
 
 has 'address' => (
     is       => 'ro',
     isa      => 'Manoc::IPAddress::IPv4',
     required => 1,
-    writer => '_set_address',
+    writer   => '_set_address',
 );
 
 sub _address_i {
@@ -28,7 +26,7 @@ sub _address_i {
 
 has 'prefix' => (
     is       => 'ro',
-    isa      => subtype( 'Int' => where { $_ >= 0 && $_ <= 32  } ),
+    isa      => subtype( 'Int' => where { $_ >= 0 && $_ <= 32 } ),
     required => 1,
 );
 
@@ -41,7 +39,7 @@ has '_netmask_i' => (
 );
 
 sub _build_netmask_i {
-    prefix2netmask_i($_[0]->prefix)
+    prefix2netmask_i( $_[0]->prefix );
 }
 
 has 'netmask' => (
@@ -53,7 +51,7 @@ has 'netmask' => (
 );
 
 sub _build_netmask {
-    Manoc::IPAddress::IPv4->new(numeric => $_[0]->_netmask_i);
+    Manoc::IPAddress::IPv4->new( numeric => $_[0]->_netmask_i );
 }
 
 has '_broadcast_i' => (
@@ -65,7 +63,7 @@ has '_broadcast_i' => (
 );
 
 sub _build_broadcast_i {
-    $_[0]->_address_i | ~ $_[0]->_netmask_i;
+    $_[0]->_address_i | ~$_[0]->_netmask_i;
 }
 
 has 'broadcast' => (
@@ -77,7 +75,7 @@ has 'broadcast' => (
 );
 
 sub _build_broadcast {
-    Manoc::IPAddress::IPv4->new(numeric => $_[0]->_broadcast_i);
+    Manoc::IPAddress::IPv4->new( numeric => $_[0]->_broadcast_i );
 }
 
 has _first_host_i => (
@@ -101,7 +99,7 @@ has first_host => (
 );
 
 sub _build_first_host {
-    Manoc::IPAddress::IPv4->new(numeric => $_[0]->_first_host_i);
+    Manoc::IPAddress::IPv4->new( numeric => $_[0]->_first_host_i );
 }
 
 has _last_host_i => (
@@ -125,7 +123,7 @@ has last_host => (
 );
 
 sub _build_last_host {
-    Manoc::IPAddress::IPv4->new(numeric => $_[0]->_last_host_i);
+    Manoc::IPAddress::IPv4->new( numeric => $_[0]->_last_host_i );
 }
 
 has wildcard => (
@@ -137,10 +135,10 @@ has wildcard => (
 );
 
 sub _build_wildcard {
-    my $self = shift;
+    my $self   = shift;
     my $prefix = $self->prefix;
-    my $addr =  $prefix ? ( ( 1 << ( 32 - $prefix ) ) - 1 ) : 0xFFFFFFFF;
-    return Manoc::IPAddress::IPv4->new(numeric => $addr);
+    my $addr   = $prefix ? ( ( 1 << ( 32 - $prefix ) ) - 1 ) : 0xFFFFFFFF;
+    return Manoc::IPAddress::IPv4->new( numeric => $addr );
 }
 
 has num_hosts => (
@@ -159,24 +157,24 @@ around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
 
-    if ( @_ == 2) {
-	my $address = shift;
-	if (!ref($address)) {
-	    check_addr($address) and
-		$address = Manoc::IPAddress::IPv4->new($address);
-	}
-	my $prefix = shift;
-	if (blessed($prefix) && $prefix->isa('Manoc::IPAddress::IPv4')) {
-	    $prefix = $prefix->padded;
-	}
-	check_addr($prefix) and $prefix = netmask2prefix($prefix);
-	return $class->$orig(
+    if ( @_ == 2 ) {
+        my $address = shift;
+        if ( !ref($address) ) {
+            check_addr($address) and
+                $address = Manoc::IPAddress::IPv4->new($address);
+        }
+        my $prefix = shift;
+        if ( blessed($prefix) && $prefix->isa('Manoc::IPAddress::IPv4') ) {
+            $prefix = $prefix->padded;
+        }
+        check_addr($prefix) and $prefix = netmask2prefix($prefix);
+        return $class->$orig(
             address => $address,
-	    prefix  => $prefix,
-	);
+            prefix  => $prefix,
+        );
     }
     else {
-	return $class->$orig(@_);
+        return $class->$orig(@_);
     }
 };
 
@@ -187,9 +185,9 @@ sub BUILD {
     my $prefix     = $self->prefix;
     my $wildcard_i = $prefix ? ( ( 1 << ( 32 - $prefix ) ) - 1 ) : 0xFFFFFFFF;
 
-    if (($address_i & $wildcard_i) != 0) {
+    if ( ( $address_i & $wildcard_i ) != 0 ) {
         my $new_address_i = $address_i & prefix2netmask_i($prefix);
-        $self->_set_address(Manoc::IPAddress::IPv4->new(numeric => $new_address_i));
+        $self->_set_address( Manoc::IPAddress::IPv4->new( numeric => $new_address_i ) );
     }
 }
 
@@ -197,10 +195,8 @@ sub _stringify {
     return $_[0]->address->unpadded . "/" . $_[0]->prefix;
 }
 
-
 __PACKAGE__->meta->make_immutable;
 1;
-
 
 # Local Variables:
 # mode: cperl

@@ -38,26 +38,27 @@ sub index : Path : Args(0) {
 
 sub login : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
-    
+
     my $login_redirect = $c->req->params()->{login_redirect};
-    my $redirect = $login_redirect
-	? $c->base . '/' . $login_redirect
-	: $c->uri_for('/search');
+    my $redirect =
+        $login_redirect ? $c->base . '/' . $login_redirect :
+        $c->uri_for('/search');
 
     my $form = Manoc::Form::Login->new( ctx => $c );
     my $success = $form->process(
-	posted => ($c->req->method eq 'POST'),
-	params => $c->req->params );
+        posted => ( $c->req->method eq 'POST' ),
+        params => $c->req->params
+    );
 
-    if ( $success ) {
-	my $username = $c->user->username;
-	$c->log->info( 'User ' . $username . ' logged');
-	$c->response->redirect($redirect);
+    if ($success) {
+        my $username = $c->user->username;
+        $c->log->info( 'User ' . $username . ' logged' );
+        $c->response->redirect($redirect);
     }
 
     $c->stash(
-	form => $form,
-	template => 'auth/login.tt',
+        form     => $form,
+        template => 'auth/login.tt',
     );
 }
 
@@ -69,7 +70,7 @@ sub logout : Local : CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->logout();
     $c->delete_session();
-    $c->response->redirect($c->uri_for('/auth/login'));
+    $c->response->redirect( $c->uri_for('/auth/login') );
 }
 
 =head1 AUTHOR

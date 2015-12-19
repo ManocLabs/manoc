@@ -14,17 +14,15 @@ sub search_note {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
-    $it = $schema->resultset('IfNotes')->search(
-        {notes => { '-like' => $pattern }},
-        { order_by => 'notes' }
-    );
+    $it = $schema->resultset('IfNotes')
+        ->search( { notes => { '-like' => $pattern } }, { order_by => 'notes' } );
     while ( $e = $it->next ) {
         my $item = Manoc::Search::Item::Iface->new(
             {
-	     device    => $e->device,
-	     interface => $e->interface,
-	     text      => $e->notes,
-	     match     => $e->device->address,
+                device    => $e->device,
+                interface => $e->interface,
+                text      => $e->notes,
+                match     => $e->device->address,
             }
         );
         $result->add_item($item);

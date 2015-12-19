@@ -74,7 +74,7 @@ sub _build_metadata {
 }
 
 sub _build_tmpdir {
-    return tempdir( "manocdumpXXXXXX", TMPDIR=>1, CLEANUP => 1 );
+    return tempdir( "manocdumpXXXXXX", TMPDIR => 1, CLEANUP => 1 );
 }
 
 sub load {
@@ -84,17 +84,17 @@ sub load {
 
     -f $filename or return undef;
     try {
-       $tar = Archive::Tar->new($filename);
+        $tar = Archive::Tar->new($filename);
     };
     $tar or return undef;
 
-    my $obj=  $self->new(
+    my $obj = $self->new(
         {
             filename => $filename,
             tar      => $tar
         }
     );
-    $obj->filelist([ grep(!/_metadata/, $obj->tar->list_files) ]);
+    $obj->filelist( [ grep( !/_metadata/, $obj->tar->list_files ) ] );
     return $obj;
 }
 
@@ -125,17 +125,17 @@ sub init {
 
 sub add_file {
     my ( $self, $filename, $array_ref ) = @_;
-    return unless(defined($array_ref) and scalar(@{$array_ref}));
+    return unless ( defined($array_ref) and scalar( @{$array_ref} ) );
 
     # build filename inside tmpdir
-    $filename = File::Spec->catfile($self->tmpdir, $filename);
+    $filename = File::Spec->catfile( $self->tmpdir, $filename );
 
     my $fh;
     open $fh, ">", $filename;
-    print $fh YAML::Syck::Dump( @{ $array_ref } );
+    print $fh YAML::Syck::Dump( @{$array_ref} );
 
     #register filename in filelist
-    push @{$self->filelist}, $filename;
+    push @{ $self->filelist }, $filename;
 
     #free resources
     close $fh;
@@ -146,16 +146,15 @@ sub save {
 
     # before finalizing create the metadata inside the tar
     exists $self->metadata->{version} or die "Missing version in metadata";
-    $self->add_file("_metadata", [$self->metadata]);
+    $self->add_file( "_metadata", [ $self->metadata ] );
 
     #finally create the file .tar.gz with file included in @filelist
-    Manoc::Utils::tar($self->filename, $self->tmpdir, $self->filelist);
+    Manoc::Utils::tar( $self->filename, $self->tmpdir, $self->filelist );
 }
 
 no Moose;
 # Clean up the namespace.
 __PACKAGE__->meta->make_immutable();
-
 
 1;
 

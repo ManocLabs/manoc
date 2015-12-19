@@ -88,21 +88,18 @@ __PACKAGE__->add_columns(
     },
 );
 
-
-
 __PACKAGE__->add_relationship(
-    mat_entry =>
-      'Manoc::DB::Result::Mat',
-    { 
-	'foreign.device' => 'self.device',
-	'foreign.interface' => 'self.interface'
+    mat_entry => 'Manoc::DB::Result::Mat',
+    {
+        'foreign.device'    => 'self.device',
+        'foreign.interface' => 'self.interface'
     },
     {
-        accessor => 'single',
-        join_type => 'LEFT',
-	is_foreign_key_constraint => 0,
+        accessor                  => 'single',
+        join_type                 => 'LEFT',
+        is_foreign_key_constraint => 0,
     },
-   );
+);
 
 __PACKAGE__->belongs_to( device_info => 'Manoc::DB::Result::Device', 'device' );
 __PACKAGE__->set_primary_key( 'device', 'interface' );

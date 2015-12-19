@@ -11,7 +11,7 @@ extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
 with 'Manoc::Form::TraitFor::Horizontal';
 
-has '+name' => ( default => 'form-vlanrange' );
+has '+name'        => ( default => 'form-vlanrange' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (
@@ -21,23 +21,23 @@ has_field 'name' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
     ],
 );
 
 has_field 'start' => (
-    label => 'From VLAN',
-    type => 'Integer',
-    apply => [ 'VlanID' ],
+    label    => 'From VLAN',
+    type     => 'Integer',
+    apply    => ['VlanID'],
     required => 1,
 );
 
 has_field 'end' => (
-    label => 'To VLAN',
-    type => 'Integer',
-    apply => [ 'VlanID' ],
+    label    => 'To VLAN',
+    type     => 'Integer',
+    apply    => ['VlanID'],
     required => 1,
 );
 
@@ -46,12 +46,11 @@ has_field 'description' => (
     type  => 'TextArea',
 );
 
-
 sub validate {
     my $self = shift;
 
     $self->field('end')->value < $self->field('start')->value and
-	$self->field('end')->add_error('Not a valid range');
+        $self->field('end')->add_error('Not a valid range');
 }
 
 override validate_model => sub {
@@ -67,18 +66,21 @@ override validate_model => sub {
     my $overlap = $rs->get_overlap_ranges( $start, $end );
     $overlap = $overlap->search( id => { '<>' => $self->item->id } )
         if $item->in_storage;
-    $overlap->count() > 0
-        and $self->add_form_error('Overlaps with existing range');
+    $overlap->count() > 0 and
+        $self->add_form_error('Overlaps with existing range');
 
     # check for vlans outside boundaries
-    if ($item->in_storage) {
-        $item->vlans->search( { id => { '<' => $start } } )->count() > 0
-            and $self->field('start')->add_error('There are associated vlans which will be below the lower end of the range');
-        $item->vlans->search( { id => { '>' => $end } } )->count() > 0
-            and $self->field('end')->add_error('There are associated vlans which will be above the upper end of the range');
+    if ( $item->in_storage ) {
+        $item->vlans->search( { id => { '<' => $start } } )->count() > 0 and
+            $self->field('start')
+            ->add_error(
+            'There are associated vlans which will be below the lower end of the range');
+        $item->vlans->search( { id => { '>' => $end } } )->count() > 0 and
+            $self->field('end')
+            ->add_error(
+            'There are associated vlans which will be above the upper end of the range');
     }
 };
-
 
 =head1 LICENSE
 

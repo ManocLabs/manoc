@@ -12,69 +12,66 @@ with 'Manoc::Form::TraitFor::Horizontal';
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name' => ( default => 'form-ipnetwork' );
+has '+name'        => ( default => 'form-ipnetwork' );
 has '+html_prefix' => ( default => 1 );
 
-has '+item_class' => (
-    default => 'IPNetwork'
-);
+has '+item_class' => ( default => 'IPNetwork' );
 
 sub build_render_list {
-    [
-        'network_block', 'name', 'vlan_id', 'description', 'save',
-        'csrf_token'
-    ]
+    [ 'network_block', 'name', 'vlan_id', 'description', 'save', 'csrf_token' ];
 }
 
 has_block 'network_block' => (
-    render_list => ['address', 'prefix'],
-    tag => 'div',
-    class => [ 'form-group' ],
+    render_list => [ 'address', 'prefix' ],
+    tag         => 'div',
+    class       => ['form-group'],
 );
 
 has_field 'address' => (
-    apply => [ IPAddress ],
-    size => 15,
-    required => 1,
-    label    => 'Address',
+    apply      => [IPAddress],
+    size       => 15,
+    required   => 1,
+    label      => 'Address',
     do_wrapper => 0,
 
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-6">' , after_element => '</div>'
+        before_element => '<div class="col-sm-6">',
+        after_element  => '</div>'
     },
-    label_class =>  [ 'col-sm-2' ],
+    label_class  => ['col-sm-2'],
     element_attr => { placeholder => 'IP Address' }
 );
 
 has_field 'prefix' => (
-    type => 'Integer',
-    required => 1,
-    size     => 2,
-    label    => 'Prefix',
+    type       => 'Integer',
+    required   => 1,
+    size       => 2,
+    label      => 'Prefix',
     do_wrapper => 0,
-    tags => {
-        before_element => '<div class="col-sm-2">' , after_element => '</div>'
+    tags       => {
+        before_element => '<div class="col-sm-2">',
+        after_element  => '</div>'
     },
-    label_class =>  [ 'col-sm-2' ],
+    label_class  => ['col-sm-2'],
     element_attr => { placeholder => '24' }
 );
 
 has_field 'name' => (
-    type => 'Text',
-    required => 1,
-    label => 'Name',
+    type         => 'Text',
+    required     => 1,
+    label        => 'Name',
     element_attr => { placeholder => 'Network name' }
 );
 
 has_field 'vlan_id' => (
-    type => 'Select',
-    label => 'Vlan',
+    type         => 'Select',
+    label        => 'Vlan',
     empty_select => '---Choose a VLAN---',
 );
 
 has_field 'description' => (
-    type => 'TextArea',
+    type  => 'TextArea',
     label => 'Description',
 );
 
@@ -86,7 +83,6 @@ sub options_vlan_id {
     return map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 }
 
-
 override validate_model => sub {
     my $self   = shift;
     my $item   = $self->item;
@@ -94,9 +90,9 @@ override validate_model => sub {
 
     super();
 
-    if ($item->in_storage) {
+    if ( $item->in_storage ) {
 
-        my $saved_prefix = $item->prefix;
+        my $saved_prefix  = $item->prefix;
         my $saved_address = $item->address;
 
         $item->address( $values->{address} );
@@ -104,13 +100,14 @@ override validate_model => sub {
 
         if ( $item->is_outside_parent ) {
             $self->add_form_error('Network would be outside its parent');
-        } else {
+        }
+        else {
             $item->is_inside_children and
                 $self->add_form_error('Network would be inside a child');
         }
 
-        $item->prefix( $saved_prefix );
-        $item->address( $saved_address );
+        $item->prefix($saved_prefix);
+        $item->address($saved_address);
     }
 
 };

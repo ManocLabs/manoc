@@ -21,7 +21,7 @@ has 'search_string' => (
     required => 1,
 );
 
-enum 'QueryMatch' => [ qw(begin end exact partial) ];
+enum 'QueryMatch' => [qw(begin end exact partial)];
 has 'match'       => (
     is     => 'ro',
     isa    => 'QueryMatch',
@@ -29,8 +29,8 @@ has 'match'       => (
 );
 
 has 'query_type' => (
-    is  => 'rw',
-#    isa => 'QueryType',
+    is => 'rw',
+    #    isa => 'QueryType',
 );
 
 # in seconds
@@ -87,7 +87,7 @@ sub parse {
     my @TYPES = @Manoc::Search::QueryType::TYPES;
 
     # TODO!
-    # scalar(Manoc::Search->_plugin_types) and 
+    # scalar(Manoc::Search->_plugin_types) and
     #  push @TYPES,  Manoc::Search->_plugin_types;
 
     my $types_re = '(?:' . join( '|', @TYPES ) . ')';
@@ -220,8 +220,8 @@ sub _guess_query {
     }
 
     if ( check_partial_addr($text) ) {
-      $self->query_type('ipaddr');
-      return;
+        $self->query_type('ipaddr');
+        return;
     }
 }
 
@@ -229,11 +229,11 @@ sub _build_sql_pattern {
     my $self = shift;
     my $pattern = join( ' ', @{ $self->words } );
     return $pattern if ( !$pattern );
-    
-    if( check_partial_addr($pattern) ){
-      $pattern = padded_ipaddr($pattern);
+
+    if ( check_partial_addr($pattern) ) {
+        $pattern = padded_ipaddr($pattern);
     }
-    
+
     $self->match eq 'begin'   and $pattern = "$pattern%";
     $self->match eq 'end'     and $pattern = "%$pattern";
     $self->match eq 'partial' and $pattern = "%$pattern%";

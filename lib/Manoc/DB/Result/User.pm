@@ -8,7 +8,7 @@ use parent 'DBIx::Class::Core';
 
 use strict;
 use warnings;
-use Digest::MD5 qw(md5_base64); # for old password
+use Digest::MD5 qw(md5_base64);    # for old password
 use Try::Tiny;
 
 __PACKAGE__->load_components(qw(PK::Auto EncodedColumn Core));
@@ -29,8 +29,8 @@ __PACKAGE__->add_columns(
         data_type           => 'varchar',
         size                => 255,
         encode_column       => 1,
-	encode_class        => 'Crypt::Eksblowfish::Bcrypt',
-	encode_args         => { key_nul => 0, cost => 8 },
+        encode_class        => 'Crypt::Eksblowfish::Bcrypt',
+        encode_args         => { key_nul => 0, cost => 8 },
         encode_check_method => 'check_password_bcrypt',
     },
     fullname => {
@@ -69,17 +69,17 @@ application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
 =cut
 
 sub check_password {
-    my ($self, $attempt) = @_;
+    my ( $self, $attempt ) = @_;
 
     if ( md5_base64($attempt) eq $self->password ) {
-	$self->password($attempt);
-	$self->update();
-	return 1;
+        $self->password($attempt);
+        $self->update();
+        return 1;
     }
 
     my $ret = 0;
     try {
-	$ret =  $self->check_password_bcrypt($attempt);
+        $ret = $self->check_password_bcrypt($attempt);
     };
     return $ret;
 }

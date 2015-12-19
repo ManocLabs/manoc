@@ -47,7 +47,6 @@ has 'force' => (
     default  => 0
 );
 
-
 has 'skip_notempty' => (
     is       => 'rw',
     isa      => 'Bool',
@@ -77,7 +76,6 @@ has 'exclude' => (
     default => sub { [] },
 );
 
-
 sub run_save {
     my ($self) = @_;
 
@@ -85,13 +83,13 @@ sub run_save {
 
     my $datadumper = Manoc::DataDumper->new(
         {
-            filename    => $self->save,
-            schema      => $self->schema,
-            log         => $self->log,
-            include     => $self->include,
-            exclude     => $self->exclude,
-	    config      => $self->config,
-	}
+            filename => $self->save,
+            schema   => $self->schema,
+            log      => $self->log,
+            include  => $self->include,
+            exclude  => $self->exclude,
+            config   => $self->config,
+        }
     );
 
     $datadumper->save;
@@ -106,12 +104,12 @@ sub run_load {
 
     my $datadumper = Manoc::DataDumper->new(
         {
-            filename => $self->load,
-            schema   => $self->schema,
-            log      => $self->log,
-            include  => $self->include,
-            exclude  => $self->exclude,
-	    config   => $self->config,
+            filename      => $self->load,
+            schema        => $self->schema,
+            log           => $self->log,
+            include       => $self->include,
+            exclude       => $self->exclude,
+            config        => $self->config,
             skip_notempty => $self->skip_notempty,
         }
     );

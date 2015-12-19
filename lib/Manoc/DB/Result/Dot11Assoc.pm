@@ -24,10 +24,10 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'ipaddr' => {
-        data_type   => 'varchar',
-        size        => 15,
-        is_nullable => 1,
-	ipv4_address => 1,
+        data_type    => 'varchar',
+        size         => 15,
+        is_nullable  => 1,
+        ipv4_address => 1,
     },
     'macaddr' => {
         data_type   => 'varchar',

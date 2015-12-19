@@ -32,8 +32,8 @@ has 'password' => (
 );
 
 has 'session' => (
-    is      => 'rw',
-    isa     => 'Object'
+    is  => 'rw',
+    isa => 'Object'
 );
 
 sub _build_username {
@@ -54,11 +54,10 @@ sub _build_password {
 }
 
 sub cmd {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
     return $session->capture(@_);
 }
-
 
 sub connect {
     my $self = shift;
@@ -70,17 +69,17 @@ sub connect {
     my %opts;
     $opts{user} = $self->username;
     if ( $self->key_path ) {
-	$opts{key_path} = $self->key_path;
-    } else {
-	$opts{password} = $self->password;
+        $opts{key_path} = $self->key_path;
+    }
+    else {
+        $opts{password} = $self->password;
     }
     # Disables querying the user for password and passphrases.
     $opts{batch_mode} = 1;
 
-
-    my $ssh = Net::OpenSSH->new($host, %opts);
+    my $ssh = Net::OpenSSH->new( $host, %opts );
     if ( $ssh->error ) {
-	$self->log->error( "Could not connect to $host: " . $ssh->error );
+        $self->log->error( "Could not connect to $host: " . $ssh->error );
         return undef;
     }
     $self->session($ssh);
@@ -98,7 +97,6 @@ sub close {
 
     $self->session(undef);
 }
-
 
 no Moose::Role;
 1;

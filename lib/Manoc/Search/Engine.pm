@@ -23,11 +23,10 @@ has schema => (
 );
 
 has query_types => (
-    is       => 'rw',
-    isa      => 'ArrayRef[Str]',
-    default  =>  sub { \@Manoc::Search::QueryType::TYPES },
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
+    default => sub { \@Manoc::Search::QueryType::TYPES },
 );
-
 
 sub BUILD {
     my $self = shift;
@@ -42,32 +41,31 @@ sub _find_drivers {
 
     my $locator = Module::Pluggable::Object->new( search_path => ['Manoc::Search::Driver'], );
     foreach my $class ( $locator->plugins ) {
-	$self->_load_driver($class);
+        $self->_load_driver($class);
     }
 
     # TODO plugin namespace
 }
 
-
 sub _load_driver {
-    my ($self, $class) = @_;
-    
+    my ( $self, $class ) = @_;
+
     # hack stolen from catalyst:
     # don't overwrite $@ if the load did not generate an error
     my $error;
     {
-	local $@;
-	my $file = $class . '.pm';
-	$file =~ s{::}{/}g;
-	eval { CORE::require($file) };
-	$error = $@;
+        local $@;
+        my $file = $class . '.pm';
+        $file =~ s{::}{/}g;
+        eval { CORE::require($file) };
+        $error = $@;
     }
     die $error if $error;
-    
+
     my $o = $class->new( { engine => $self } );
-    foreach my $type (@{$self->query_types}) {
-	$o->can("search_$type") and
-	    $self->_register_driver( $type, $o );
+    foreach my $type ( @{ $self->query_types } ) {
+        $o->can("search_$type") and
+            $self->_register_driver( $type, $o );
     }
 }
 

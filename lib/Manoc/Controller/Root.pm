@@ -32,7 +32,7 @@ The root page (/), redirect to search page.
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->redirect($c->uri_for_action('/search/index'));
+    $c->response->redirect( $c->uri_for_action('/search/index') );
     $c->detach();
 }
 
@@ -46,34 +46,39 @@ sub auto : Private {
     my ( $self, $c ) = @_;
 
     # CSRF protection
-    if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf}) {
+    if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf} ) {
         $c->log->debug("POST method, token validation required");
         $c->require_valid_token();
     }
 
     ##  XHR detection ##
-    if (my $req_with =  $c->req->header('X-Requested-With')) {
+    if ( my $req_with = $c->req->header('X-Requested-With') ) {
         $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
-    } else {
+    }
+    else {
         $c->stash->{is_xhr} = 0;
     }
 
     ## output format selection ##
     if ( my $fmt = $c->req->param('format') ) {
-        $fmt eq 'fragment' and $c->stash(no_wrapper => 1);
+        $fmt eq 'fragment' and $c->stash( no_wrapper => 1 );
         delete $c->req->params->{'format'};
     }
 
     ## check authentication ##
-    if (! $self->check_auth($c) ) {
+    if ( !$self->check_auth($c) ) {
 
         if ( $c->stash->{is_xhr} ) {
             $self->forward('error/http_403');
-        } else {
+        }
+        else {
             $c->response->redirect(
-                $c->uri_for_action('/auth/login', {
-                    login_redirect => $c->request->path
-                })
+                $c->uri_for_action(
+                    '/auth/login',
+                    {
+                        login_redirect => $c->request->path
+                    }
+                )
             );
         }
         return 0;
@@ -83,16 +88,16 @@ sub auto : Private {
 }
 
 sub check_auth {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
-    $c->config->{demo_mode}
-        and return 1;
+    $c->config->{demo_mode} and
+        return 1;
 
-    $c->controller eq $c->controller('Auth')
-        and return 1;
+    $c->controller eq $c->controller('Auth') and
+        return 1;
 
-    $c->controller eq $c->controller('Wapi')
-        and return 1;
+    $c->controller eq $c->controller('Wapi') and
+        return 1;
 
     return $c->user_exists;
 }

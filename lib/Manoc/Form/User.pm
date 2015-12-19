@@ -9,7 +9,7 @@ extends 'Manoc::Form::Base';
 
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name' => ( default => 'form-user' );
+has '+name'        => ( default => 'form-user' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'username' => (
@@ -19,7 +19,7 @@ has_field 'username' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /^\w[\w-]*$/ },
+            check   => sub { $_[0] =~ /^\w[\w-]*$/ },
             message => 'Invalid Username'
         },
     ]
@@ -33,8 +33,8 @@ has_field 'password' => (
 );
 
 has_field 'password2' => (
-    type     => 'PasswordConf',
-    label    => 'Confirm Password',
+    type  => 'PasswordConf',
+    label => 'Confirm Password',
 );
 
 has_field 'email' => (
@@ -57,7 +57,6 @@ has_field 'active' => (
     label => 'Active',
     type  => 'Boolean',
 );
-
 
 1;
 # Local Variables:

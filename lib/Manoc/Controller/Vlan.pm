@@ -7,11 +7,8 @@ use Moose;
 use namespace::autoclean;
 use Manoc::Form::Vlan;
 
-
 BEGIN { extends 'Catalyst::Controller'; }
-with 'Manoc::ControllerRole::CommonCRUD' => {
-    -excludes => 'list'
-};
+with 'Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' };
 # TODO
 with "Manoc::ControllerRole::JSONView";
 
@@ -45,7 +42,7 @@ __PACKAGE__->config(
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->res->redirect( $c->uri_for_action('vlanrange/list'));
+    $c->res->redirect( $c->uri_for_action('vlanrange/list') );
 }
 
 =head2 create
@@ -53,10 +50,10 @@ sub index : Path : Args(0) {
 =cut
 
 before 'create' => sub {
-    my ( $self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $range_id = $c->req->query_parameters->{'range'};
-    $c->stash(form_defaults => { vlan_range => $range_id });
+    $c->stash( form_defaults => { vlan_range => $range_id } );
 };
 
 =head2 get_object_list
@@ -66,7 +63,7 @@ before 'create' => sub {
 sub get_object_list {
     my ( $self, $c ) = @_;
 
-    my $rs = $c->stash->{resultset};
+    my $rs      = $c->stash->{resultset};
     my @objects = $rs->search(
         {},
         {
@@ -84,9 +81,9 @@ sub object_delete {
     my ( $self, $c ) = @_;
     my $vlan = $c->stash->{'object'};
 
-    if ( $vlan->ip_ranges->count )  {
-	$c->flash( error_msg => 'There are subnets in this vlan');
-	return undef;
+    if ( $vlan->ip_ranges->count ) {
+        $c->flash( error_msg => 'There are subnets in this vlan' );
+        return undef;
     }
 
     $vlan->delete;

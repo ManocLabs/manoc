@@ -13,12 +13,12 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use Manoc::Manifold;
 
-has '+name' => ( default => 'form-devicenwinfo' );
+has '+name'        => ( default => 'form-devicenwinfo' );
 has '+html_prefix' => ( default => 1 );
 
 has 'device' => (
-    is  => 'ro',
-    isa => 'Int',
+    is       => 'ro',
+    isa      => 'Int',
     required => 1,
 );
 
@@ -36,8 +36,8 @@ has_field 'config_manifold' => (
 #Retrieved Info
 
 has_field 'get_config' => (
-    type     => 'Checkbox',
-    label    => 'Get configuration',
+    type  => 'Checkbox',
+    label => 'Get configuration',
 );
 
 has_field 'get_arp' => (
@@ -65,7 +65,6 @@ has_field 'get_dot11' => (
     type  => 'Checkbox',
     label => 'Get Dot11 informations'
 );
-
 
 has_field 'get_vtp' => (
     type           => 'Checkbox',
@@ -97,7 +96,7 @@ has_field 'password2' => (
 );
 
 has_field 'key_path' => (
-    type => 'Text',
+    type  => 'Text',
     label => 'Path to SSH key',
 );
 
@@ -113,21 +112,20 @@ has_field 'snmp_version' => (
 );
 
 has_field 'snmp_community' => (
-    type => 'Text',
+    type  => 'Text',
     label => 'SNMP Community String'
 );
 
 has_field 'snmp_user' => (
-    type => 'Text',
+    type  => 'Text',
     label => 'SNMP user'
 );
 
 has_field 'snmp_password' => (
-    type      => 'Text',
-    label     => 'SNMP password',
-    widget    => 'Password',
+    type   => 'Text',
+    label  => 'SNMP password',
+    widget => 'Password',
 );
-
 
 sub options_manifold {
     return shift->_manifold_list;
@@ -137,13 +135,11 @@ sub options_config_manifold {
     return shift->_manifold_list;
 }
 
-
 sub _manifold_list {
     Manoc::Manifold->load_namespace;
     my @manifolds = Manoc::Manifold->manifolds;
-    return  map +{ value => $_, label => $_ }, sort(@manifolds);
+    return map +{ value => $_, label => $_ }, sort(@manifolds);
 }
-
 
 sub options_mat_native_vlan {
     shift->_get_vlan_list;
@@ -154,23 +150,22 @@ sub options_arp_vlan {
 }
 
 has _vlan_list => (
-    is   => 'rw',
-    isa  => 'ArrayRef',
+    is  => 'rw',
+    isa => 'ArrayRef',
 );
 
 sub _get_vlan_list {
     my $self = shift;
     return unless $self->schema;
-    
+
     return @{ $self->_vlan_list } if $self->_vlan_list;
 
     my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
     my @list = map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
-    
-    $self->_vlan_list(\@list);
+
+    $self->_vlan_list( \@list );
     return @list;
 }
-
 
 override 'update_model' => sub {
     my $self   = shift;

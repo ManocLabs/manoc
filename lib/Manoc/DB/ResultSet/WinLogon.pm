@@ -10,19 +10,19 @@ use warnings;
 
 use Scalar::Util qw(blessed);
 
-__PACKAGE__->load_components(qw/
-				   +Manoc::DB::Helper::ResultSet::TupleArchive
-			       /);
-
-
+__PACKAGE__->load_components(
+    qw/
+        +Manoc::DB::Helper::ResultSet::TupleArchive
+        /
+);
 
 sub register_tuple {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
     my $ipaddr = $params{ipaddr};
     $ipaddr = Manoc::IPAddress::IPv4->new( $params{ipaddr} )
-	unless blessed($params{ipaddr});
+        unless blessed( $params{ipaddr} );
     $params{ipaddr} = $ipaddr->padded;
 
     $self->next::method(%params);

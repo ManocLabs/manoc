@@ -11,7 +11,6 @@ BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::ResultSet';
 with 'Manoc::ControllerRole::ObjectList';
 
-
 =head1 NAME
 
 Manoc::Controller::VTP - Catalyst Controller
@@ -21,7 +20,6 @@ Manoc::Controller::VTP - Catalyst Controller
 Catalyst Controller for showing VTP entries.
 
 =cut
-
 
 __PACKAGE__->config(
     # define PathPart
@@ -50,49 +48,49 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
 sub compare : Chained('base') : PathPart('compare') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $vtp_rs = $c->stash->{resultset};
+    my $vtp_rs  = $c->stash->{resultset};
     my $vlan_rs = $c->model('ManocDB::Vlan');
 
     my @diff;
 
     # search vtp entries with missing or mismatched vlan
     my @vtp_entries = $vtp_rs->search(
-	[
-	    { 'vlan.id' => undef },
-	    { 'vlan.name' => { '!=' => { -ident => 'me.name' } } }
-	],
+        [ { 'vlan.id' => undef }, { 'vlan.name' => { '!=' => { -ident => 'me.name' } } } ],
         {
             prefetch => 'vlan'
         }
     );
     foreach my $vtp (@vtp_entries) {
-	push @diff,  {
-	    id        => $vtp->id,
-	    vlan_name => $vtp->vlan ? $vtp->vlan->name : '',
-	    vtp_name  => $vtp->name,
-	};
+        push @diff,
+            {
+            id        => $vtp->id,
+            vlan_name => $vtp->vlan ? $vtp->vlan->name : '',
+            vtp_name  => $vtp->name,
+            };
     }
 
     # search vlans with missing vtp
     my @vlan_entries = $vlan_rs->search(
-	{
-	    'vtp_entry.id' => undef,
-	},
-	{
-	    prefetch => 'vtp_entry',
-	});
+        {
+            'vtp_entry.id' => undef,
+        },
+        {
+            prefetch => 'vtp_entry',
+        }
+    );
     foreach my $vlan (@vlan_entries) {
-	push @diff,  {
-	    id        => $vlan->id,
-	    vlan_name => $vlan->name,
-	    vtp_name  => '',
-	};
+        push @diff,
+            {
+            id        => $vlan->id,
+            vlan_name => $vlan->name,
+            vtp_name  => '',
+            };
     }
-    
+
     # sort diff entries by id
     @diff = sort { $a->{id} <=> $a->{id} } @diff;
 
-    $c->stash(diff => \@diff);
+    $c->stash( diff => \@diff );
 }
 
 =head2 get_object_list
@@ -102,7 +100,7 @@ sub compare : Chained('base') : PathPart('compare') : Args(0) {
 sub get_object_list {
     my ( $self, $c ) = @_;
 
-    my $rs = $c->stash->{resultset};
+    my $rs      = $c->stash->{resultset};
     my @objects = $rs->search(
         {},
         {

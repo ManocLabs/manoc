@@ -6,7 +6,7 @@ package Manoc::Search::Widget::Group;
 use Moose::Role;
 
 sub render {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
     my $ret = $self->render_heading($ctx);
     $ret .= $self->render_items($ctx);
@@ -14,16 +14,16 @@ sub render {
 }
 
 sub render_heading {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
     return $self->match();
 }
 
 sub render_items {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
     my $ret = '<ul>';
     foreach ( @{ $self->items } ) {
-	$ret .= '<li>' . $_->render($ctx) . '</li>';
+        $ret .= '<li>' . $_->render($ctx) . '</li>';
     }
     $ret .= '</ul>';
 

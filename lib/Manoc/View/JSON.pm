@@ -19,27 +19,23 @@ See L<Manoc>
 
 =cut
 
-__PACKAGE__->config(
-   'expose_stash' => 'json_data',
-);
-
+__PACKAGE__->config( 'expose_stash' => 'json_data', );
 
 sub encode_json($) {
-    my($self, $c, $data) = @_;
+    my ( $self, $c, $data ) = @_;
 
-    if (not defined ($data) ) {
-      $c->response->status(403);
-      $c->detach();
-      return undef;
+    if ( not defined($data) ) {
+        $c->response->status(403);
+        $c->detach();
+        return undef;
     }
 
-    # HACK we use latin1 to avoid a double uft8 encoding 
+    # HACK we use latin1 to avoid a double uft8 encoding
     my $encoder = JSON->new->latin1();
     $encoder->allow_blessed(1);
     $encoder->convert_blessed(1);
     return $encoder->encode($data);
 }
-
 
 =head1 DESCRIPTION
 

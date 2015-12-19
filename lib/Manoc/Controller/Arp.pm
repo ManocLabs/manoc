@@ -30,31 +30,30 @@ Catalyst Controller.
 
 sub list : Private {
     my ( $self, $c ) = @_;
-    $c->stash(template => 'arp/list.tt');
+    $c->stash( template => 'arp/list.tt' );
 }
 
 sub list_js : Private {
     my ( $self, $c ) = @_;
-    
+
     my $row_callback = sub {
-        my ($ctx, $row) = @_;
-        my $address = Manoc::IPAddress::IPv4->new($row->get_column('ip_address'));
+        my ( $ctx, $row ) = @_;
+        my $address = Manoc::IPAddress::IPv4->new( $row->get_column('ip_address') );
         return [
             "$address",
-            print_timestamp($row->get_column('firstseen')),
-            print_timestamp($row->get_column('lastseen')),
-        ]
+            print_timestamp( $row->get_column('firstseen') ),
+            print_timestamp( $row->get_column('lastseen') ),
+        ];
     };
 
     $c->stash(
         datatable_row_callback   => $row_callback,
-        datatable_search_columns => [ qw/ipaddr/ ],
-        datatable_columns        => [ qw/ipaddr firstseen lastseen/],
+        datatable_search_columns => [qw/ipaddr/],
+        datatable_columns        => [qw/ipaddr firstseen lastseen/],
     );
 
     $c->detach('datatable_response');
 }
-
 
 =encoding utf8
 

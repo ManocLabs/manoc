@@ -12,7 +12,7 @@ use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name' => ( default => 'form-device' );
+has '+name'        => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'mng_address' => (
@@ -20,21 +20,21 @@ has_field 'mng_address' => (
     label    => 'IP Address',
     required => 1,
     apply    => [
-	'Str',
-	{
-	    check   => sub { check_addr( $_[0] ) },
-	    message => 'Invalid Ip Address'
-	},
+        'Str',
+        {
+            check   => sub { check_addr( $_[0] ) },
+            message => 'Invalid Ip Address'
+        },
     ]
 );
 
 has_field 'name' => (
-    type  => 'Text',
+    type     => 'Text',
     required => 1,
-    apply => [
+    apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
     ]
@@ -45,7 +45,7 @@ has_field 'model' => (
     apply => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Model Name'
         },
     ]

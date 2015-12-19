@@ -35,16 +35,16 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(2) {
     my ( $self, $c, $device_id, $iface ) = @_;
 
     my $object_pk = {
-	device    => $device_id,
-	interface => $iface,
+        device    => $device_id,
+        interface => $iface,
     };
 
-    $c->stash(object => $c->stash->{resultset}->find($object_pk));
+    $c->stash( object => $c->stash->{resultset}->find($object_pk) );
     if ( !$c->stash->{object} ) {
         $c->detach('/error/http_404');
     }
 
-    $c->stash(object_pk => $object_pk);
+    $c->stash( object_pk => $object_pk );
 }
 
 =head2 view
@@ -53,16 +53,15 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(2) {
 
 sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
-    my $object = $c->stash->{'object'};
+    my $object    = $c->stash->{'object'};
     my $object_pk = $c->stash->{object_pk};
-    
+
     my $note = $c->model('ManocDB::IfNotes')->find($object_pk);
     $c->stash( notes => defined($note) ? $note->notes : '' );
 
     #MAT related results
-    my @mat_rs = $c->model('ManocDB::Mat')->search($object_pk,
-        { order_by => 'lastseen DESC, firstseen DESC', }
-    );
+    my @mat_rs = $c->model('ManocDB::Mat')
+        ->search( $object_pk, { order_by => 'lastseen DESC, firstseen DESC', } );
     my @mat_results = map +{
         macaddr   => $_->macaddr,
         vlan      => $_->vlan,
@@ -70,7 +69,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         lastseen  => $_->lastseen
     }, @mat_rs;
 
-    $c->stash(mat_history => \@mat_results);
+    $c->stash( mat_history => \@mat_results );
 }
 
 =head2 edit_notes
@@ -83,17 +82,17 @@ sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
     my $object_pk = $c->stash->{object_pk};
 
     my $ifnotes = $c->model('ManocDB::IfNotes')->find($object_pk);
-    $ifnotes or $ifnotes = $c->model('ManocDB::IfNotes')->new_result( {});
+    $ifnotes or $ifnotes = $c->model('ManocDB::IfNotes')->new_result( {} );
 
     my $form = Manoc::Form::IfNotes->new( { %$object_pk, ctx => $c } );
-    $c->stash(form => $form);
+    $c->stash( form => $form );
     return unless $form->process(
-	params => $c->req->params,
-	item   => $ifnotes );
+        params => $c->req->params,
+        item   => $ifnotes
+    );
 
-    my $dest_url = $c->uri_for_action( 'interface/view',
-				       [ @$object_pk{'device', 'interface'} ]
-				   );
+    my $dest_url =
+        $c->uri_for_action( 'interface/view', [ @$object_pk{ 'device', 'interface' } ] );
     $c->res->redirect($dest_url);
 }
 
@@ -105,13 +104,11 @@ sub delete_notes : Chained('object') : PathPart('delete_notes') : Args(0) {
     my ( $self, $c ) = @_;
     my $object_pk = $c->stash->{object_pk};
 
-    my $dest_url = $c->uri_for_action(
-        'interface/view',
-        [ @$object_pk{'device', 'interface'} ]
-    );
+    my $dest_url =
+        $c->uri_for_action( 'interface/view', [ @$object_pk{ 'device', 'interface' } ] );
 
     my $item = $c->model('ManocDB::IfNotes')->find($object_pk);
-    if (!$item) {
+    if ( !$item ) {
         $c->detach('/error/http_404');
     }
 

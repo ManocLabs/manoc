@@ -8,20 +8,21 @@ sub connection {
     my $self = shift;
 
     my $db_file = ':memory:';
-    my $dsn = "dbi:SQLite:$db_file";
+    my $dsn     = "dbi:SQLite:$db_file";
 
     my $schema = $self->next::method(
-	$dsn, '', '',
-	{ AutoCommit => 1,
-	  on_connect_do => sub {
-	      my $storage = shift;
-	      my $dbh = $storage->_get_dbh;
+        $dsn, '', '',
+        {
+            AutoCommit    => 1,
+            on_connect_do => sub {
+                my $storage = shift;
+                my $dbh     = $storage->_get_dbh;
 
-	      # no fsync on commit
-	      $dbh->do ('PRAGMA synchronous = OFF');
-	  }
-      });
-
+                # no fsync on commit
+                $dbh->do('PRAGMA synchronous = OFF');
+            }
+        }
+    );
 
     my $dbh = $schema->storage->dbh;
     $schema->deploy();
@@ -32,17 +33,14 @@ sub connection {
 }
 
 sub load_fixtures {
-    my $self = shift;
+    my $self   = shift;
     my $schema = shift;
-    
-    local $schema->storage->{debug}
-	if ($ENV{TRAVIS}||'') eq 'true';
 
-    $schema->populate('Role', [
-	[ qw/id role/ ],
-	[ qw/1 admin / ],
-    ]);
-    
+    local $schema->storage->{debug}
+        if ( $ENV{TRAVIS} || '' ) eq 'true';
+
+    $schema->populate( 'Role', [ [qw/id role/], [qw/1 admin /], ] );
+
     # admin_user
     $schema->resultset('User')->update_or_create(
         {
@@ -52,15 +50,10 @@ sub load_fixtures {
             password => 'password',
         }
     );
-    $schema->populate('UserRole', [
-		      [ qw/role_id user_id/ ],
-		      [ qw/1 1/ ]
-		  ] );
-    
-    $schema->populate('Building', [
-	[qw/id name description/],
-	[qw/1  B01/,  "Building 1"],
-    ]);
+    $schema->populate( 'UserRole', [ [qw/role_id user_id/], [qw/1 1/] ] );
+
+    $schema->populate( 'Building',
+        [ [qw/id name description/], [ qw/1  B01/, "Building 1" ], ] );
 
 }
 

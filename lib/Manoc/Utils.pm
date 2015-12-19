@@ -10,10 +10,9 @@ use warnings;
 
 BEGIN {
     use Exporter 'import';
-    our @EXPORT_OK = qw/clean_string 
-			check_mac_addr/;
-};
-
+    our @EXPORT_OK = qw/clean_string
+        check_mac_addr/;
+}
 
 use FindBin;
 use File::Spec;
@@ -49,13 +48,11 @@ sub get_manoc_home {
     return $Manoc_Home;
 }
 
-
 ########################################################################
 #                                                                      #
 #                    S t r i n g    F u n c t i o n s                  #
 #                                                                      #
 ########################################################################
-
 
 sub check_mac_addr {
     my $addr = shift;
@@ -69,8 +66,6 @@ sub clean_string {
     $s =~ s/\s+$//o;
     return lc($s);
 }
-
-
 
 ########################################################################
 #                                                                      #
@@ -105,35 +100,35 @@ sub decode_bitset {
 ########################################################################
 
 sub tar {
-    my ($tarname, $basedir, $filelist_ref )  = @_;
+    my ( $tarname, $basedir, $filelist_ref ) = @_;
     my $command = "tar";
-    
+
     #check the existence of tar command
-    #running tar --version 
+    #running tar --version
     `$command --version 2>&1`;
-    if($? == 0){
-	#use system tar
-	#remove leading path from filelist to avoid creating tar with 
-	#file that have complete path e.g. /tmp/device.yaml
-	my @sanitized;
-	foreach my $file (@$filelist_ref) {
-	    $file =~ s/^$basedir\/?//o;
-	    push @sanitized, $file;
-	}
-	`$command -zcf $tarname -C $basedir/ @sanitized 2>&1`;
-	return $?;
-    } else {
-	#use Archive::Tar    
-	my $tar = Archive::Tar->new;
-	my @obj_list = $tar->add_files( @$filelist_ref );
-	
-	#remove prefix
-	foreach my $o (@obj_list){
-	    $o->prefix('');
-	}
-	return $tar->write( $tarname, 1  );
+    if ( $? == 0 ) {
+        #use system tar
+        #remove leading path from filelist to avoid creating tar with
+        #file that have complete path e.g. /tmp/device.yaml
+        my @sanitized;
+        foreach my $file (@$filelist_ref) {
+            $file =~ s/^$basedir\/?//o;
+            push @sanitized, $file;
+        }
+        `$command -zcf $tarname -C $basedir/ @sanitized 2>&1`;
+        return $?;
+    }
+    else {
+        #use Archive::Tar
+        my $tar      = Archive::Tar->new;
+        my @obj_list = $tar->add_files(@$filelist_ref);
+
+        #remove prefix
+        foreach my $o (@obj_list) {
+            $o->prefix('');
+        }
+        return $tar->write( $tarname, 1 );
     }
 }
-
 
 1;

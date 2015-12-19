@@ -9,23 +9,21 @@ use strict;
 use warnings;
 
 sub get_overlap_ranges {
-    my ($self, $start, $end) = @_;
+    my ( $self, $start, $end ) = @_;
 
-    my $conditions =
-        [
-            {
-                start => { '<=' => $start },
-                end   => { '>=' => $start } ,
-            },
-            {
-                start => { '<=' => $end },
-                end   => { '>=' => $end } ,
-            },
-        ];
+    my $conditions = [
+        {
+            start => { '<=' => $start },
+            end   => { '>=' => $start },
+        },
+        {
+            start => { '<=' => $end },
+            end   => { '>=' => $end },
+        },
+    ];
 
     return $self->search($conditions);
 }
-
 
 1;
 # Local Variables:

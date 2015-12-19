@@ -42,9 +42,6 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.device' }
 );
 
-
-
-
 =head1 NAME
 
 Manoc::DB::Result::DeviceConfig - A model object to mantain the devices configuration backup.

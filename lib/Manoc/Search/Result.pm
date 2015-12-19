@@ -82,7 +82,7 @@ sub load_widgets {
     my $self = shift;
 
     foreach my $group ( values %{ $self->item_by_match } ) {
-	$group->load_widgets(@_);
+        $group->load_widgets(@_);
     }
 }
 

@@ -33,44 +33,44 @@ has 'config' => (
 );
 
 has 'device_entry' => (
-    is       => 'ro',
-    isa      => 'Maybe[Object]',
-    lazy     => 1,
-    builder  => '_build_device_entry',
+    is      => 'ro',
+    isa     => 'Maybe[Object]',
+    lazy    => 1,
+    builder => '_build_device_entry',
 );
 
 has 'nwinfo' => (
-    is       => 'ro',
-    isa      => 'Object',
-    lazy     => 1,
-    builder  => '_build_nwinfo',
+    is      => 'ro',
+    isa     => 'Object',
+    lazy    => 1,
+    builder => '_build_nwinfo',
 );
 
 has 'credentials' => (
-    is       => 'ro',
-    isa      => 'HashRef',
-    lazy     => 1,
-    builder  => '_build_credentials',
+    is      => 'ro',
+    isa     => 'HashRef',
+    lazy    => 1,
+    builder => '_build_credentials',
 );
 
 has 'timestamp' => (
-    is       => 'ro',
-    isa      => 'Int',
-    default  => sub { time },
+    is      => 'ro',
+    isa     => 'Int',
+    default => sub { time },
 );
 
 # a set of all mng_address known to Manoc
 # used to to discover neighbors and uplinks
 has 'device_set' => (
-    is       => 'ro',
-    isa      => 'HashRef',
+    is      => 'ro',
+    isa     => 'HashRef',
     builder => '_build_device_set',
 );
 
 # the source for information about the device
 has 'source' => (
     is      => 'ro',
-    does     => 'Manoc::ManifoldRold::Base',
+    does    => 'Manoc::ManifoldRold::Base',
     lazy    => 1,
     builder => '_build_source',
 );
@@ -81,7 +81,6 @@ has 'config_source' => (
     lazy    => 1,
     builder => '_build_source',
 );
-
 
 has 'task_report' => (
     is       => 'ro',
@@ -107,19 +106,17 @@ has 'arp_vlan' => (
     builder => '_build_arp_vlan',
 );
 
-
 #----------------------------------------------------------------------#
 #                                                                      #
 #              A t t r i b u t e s   B u i l d e r                     #
 #                                                                      #
 #----------------------------------------------------------------------#
 
-
 sub _build_arp_vlan {
     my $self = shift;
 
-    my $vlan = $self->nwinfo->arp_vlan->id
-        || $self->config->default_vlan;
+    my $vlan = $self->nwinfo->arp_vlan->id ||
+        $self->config->default_vlan;
     return defined($vlan) ? $vlan : 1;
 }
 
@@ -134,10 +131,10 @@ sub _build_credentials {
 }
 
 sub _build_device_entry {
-    my $self = shift;
+    my $self      = shift;
     my $device_id = $self->device_id;
-    
-    return $self->schema->resultset('Device')->find($self->device_id);
+
+    return $self->schema->resultset('Device')->find( $self->device_id );
 }
 
 sub _build_device_set {
@@ -145,18 +142,15 @@ sub _build_device_set {
 
     # columns are not inflated
     my @addresses = $self->schema->resultset('Device')->get_column('mng_address')->all;
-    my %addr_set = map {
-        Manoc::IPAddress::IPv4->new($_)->unpadded => 1
-    } @addresses;
+    my %addr_set = map { Manoc::IPAddress::IPv4->new($_)->unpadded => 1 } @addresses;
     return \%addr_set;
 }
-
 
 sub _build_native_vlan {
     my $self = shift;
 
-    my $vlan = $self->nwinfo->mat_native_vlan->id
-        || $self->config->default_vlan;
+    my $vlan = $self->nwinfo->mat_native_vlan->id ||
+        $self->config->default_vlan;
     return defined($vlan) ? $vlan : 1;
 }
 
@@ -166,15 +160,15 @@ sub _build_nwinfo {
     return $self->device_entry->netwalker_info;
 }
 
-
 sub _create_manifold {
-    my $self = shift;
+    my $self          = shift;
     my $manifold_name = shift;
-    my %params = @_;
+    my %params        = @_;
 
     try {
-        return Manoc::Manifold->new_manifold($manifold_name, %params);
-    } catch {
+        return Manoc::Manifold->new_manifold( $manifold_name, %params );
+    }
+    catch {
         my $error = "Error while creating manifold $manifold_name: $_";
         $self->debug->($error);
     };
@@ -182,24 +176,24 @@ sub _create_manifold {
 }
 
 sub _build_config_source {
-    my $self = shift;
+    my $self   = shift;
     my $entry  = $self->device_entry;
     my $nwinfo = $self->nwinfo;
 
     my $manifold_name = $nwinfo->config_manifold;
-    if (!defined($manifold_name) || $manifold_name eq $nwinfo->manifold) {
+    if ( !defined($manifold_name) || $manifold_name eq $nwinfo->manifold ) {
         $self->log->debug("Using common Manifold for config");
         return $self->source;
     }
 
     $self->log->debug("Using Manifold $manifold_name for config");
-    my $host   = $entry->mng_address->unpadded;
+    my $host = $entry->mng_address->unpadded;
 
     my %params = (
-        host         => $host,
-        credentials  => $self->credentials
+        host        => $host,
+        credentials => $self->credentials
     );
-    my $source = $self->_create_manifold($manifold_name, %params);
+    my $source = $self->_create_manifold( $manifold_name, %params );
 
     if ( !$source ) {
         my $error = "Cannot create config manifold $manifold_name";
@@ -209,7 +203,7 @@ sub _build_config_source {
     }
 
     # auto connect
-    if ( ! $source->connect() ) {
+    if ( !$source->connect() ) {
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
@@ -218,14 +212,13 @@ sub _build_config_source {
     return $source;
 }
 
-
 sub _build_source {
     my $self = shift;
 
     my $entry  = $self->device_entry;
     my $nwinfo = $self->nwinfo;
 
-    my $host   = $entry->mng_address->unpadded;
+    my $host = $entry->mng_address->unpadded;
 
     my $manifold_name = $nwinfo->manifold;
     $self->log->debug("Using Manifold $manifold_name");
@@ -238,7 +231,7 @@ sub _build_source {
         }
     );
 
-    my $source = $self->_create_manifold($manifold_name,  %params);
+    my $source = $self->_create_manifold( $manifold_name, %params );
 
     if ( !$source ) {
         my $error = "Cannot create manifold $manifold_name";
@@ -247,8 +240,8 @@ sub _build_source {
         return undef;
     }
 
-    # auto connect 
-    if ( ! $source->connect() ) {
+    # auto connect
+    if ( !$source->connect() ) {
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
@@ -256,7 +249,6 @@ sub _build_source {
     }
     return $source;
 }
-
 
 sub _build_task_report {
     my $self = shift;
@@ -300,8 +292,6 @@ sub _build_uplinks {
     return \%uplinks;
 }
 
-
-
 #----------------------------------------------------------------------#
 #                                                                      #
 #                       D a t a   u p d a t e                          #
@@ -312,39 +302,39 @@ sub update {
     my $self = shift;
 
     # check if there is a device object in the DB
-    my $entry  = $self->device_entry;
-    unless($entry){
-        $self->log->error("Cannot find device id ", $self->device_id);
+    my $entry = $self->device_entry;
+    unless ($entry) {
+        $self->log->error( "Cannot find device id ", $self->device_id );
         return undef;
     }
 
     # load netwalker info from DB
     my $nwinfo = $self->nwinfo;
-    unless($nwinfo){
-        $self->log->error("No netwalker info for device", $entry->name);
+    unless ($nwinfo) {
+        $self->log->error( "No netwalker info for device", $entry->name );
         return undef;
     }
-    
+
     # try to connect and update nwinfo accordingly
     $self->log->info( "Connecting to device ", $entry->name, " ", $entry->mng_address );
-    if ( ! $self->source ) {
+    if ( !$self->source ) {
         # TODO update nwinfo with connection messages
         $self->nwinfo->offline(1);
         return undef;
     }
-    $nwinfo->last_visited($self->timestamp);
+    $nwinfo->last_visited( $self->timestamp );
     $nwinfo->offline(0);
 
     $self->update_device_info;
-    
+
     # if full_update_interval is elapsed update interface table
     my $full_update_interval = $self->config->full_update_interval;
     my $elapsed_full_update  = $self->timestamp - $nwinfo->last_full_update;
-    if ($elapsed_full_update >= $full_update_interval) {
+    if ( $elapsed_full_update >= $full_update_interval ) {
         $self->update_if_table;
 
         # update nwinfo
-        $nwinfo->last_full_update($self->timestamp);
+        $nwinfo->last_full_update( $self->timestamp );
     }
 
     # always update CPD info
@@ -357,15 +347,13 @@ sub update {
     $nwinfo->get_dot11 and $self->update_dot11;
 
     $nwinfo->get_config and $self->update_config;
-    
+
     # TODO update nwinfo
     $nwinfo->update();
     return 1;
 }
 
-
 #----------------------------------------------------------------------#
-
 
 sub update_device_info {
     my $self = shift;
@@ -376,7 +364,7 @@ sub update_device_info {
     my $name  = $source->name;
     my $model = $source->model;
 
-    if ( !defined($entry->name) or $entry->name eq "" ) {
+    if ( !defined( $entry->name ) or $entry->name eq "" ) {
         $entry->name($name);
     }
     elsif ( defined($name) && $name ne $entry->name ) {
@@ -385,7 +373,7 @@ sub update_device_info {
         $self->task_report->add_warning($msg);
     }
 
-    if ( !defined($entry->model) or $entry->model eq "" ) {
+    if ( !defined( $entry->model ) or $entry->model eq "" ) {
         $entry->model($model);
     }
     elsif ( $model ne $entry->model ) {
@@ -400,7 +388,7 @@ sub update_device_info {
     $entry->serial( $source->serial );
 
     $entry->vtp_domain( $source->vtp_domain );
-    $entry->boottime( $source->boottime || 0);
+    $entry->boottime( $source->boottime || 0 );
 
     $entry->update;
 }
@@ -410,17 +398,17 @@ sub update_device_info {
 sub update_cdp_neighbors {
     my $self = shift;
 
-    my $source = $self->source;
-    my $entry  = $self->device_entry;
-    my $schema = $self->schema;
-    my $neighbors = $source->neighbors;
+    my $source      = $self->source;
+    my $entry       = $self->device_entry;
+    my $schema      = $self->schema;
+    my $neighbors   = $source->neighbors;
     my $new_dev     = 0;
     my $cdp_entries = 0;
 
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
             my $from_dev_id = $entry->id;
-            my $to_dev_obj   = Manoc::IPAddress::IPv4->new($s->{addr});
+            my $to_dev_obj  = Manoc::IPAddress::IPv4->new( $s->{addr} );
 
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
@@ -442,16 +430,17 @@ sub update_cdp_neighbors {
                         remote_type    => $s->{remote_type},
                         last_seen      => $self->timestamp,
                     }
-                ); 
+                );
                 $new_dev++;
-                $cdp_entries++; 
-                $self->task_report->add_warning("New neighbor ".$s->{addr}." at ".$entry->name);
+                $cdp_entries++;
+                $self->task_report->add_warning(
+                    "New neighbor " . $s->{addr} . " at " . $entry->name );
                 next;
             }
             my $link = $cdp_entries[0];
-            $link->last_seen($self->timestamp);
+            $link->last_seen( $self->timestamp );
             $link->update;
-            $cdp_entries++; 
+            $cdp_entries++;
         }
     }
     $self->task_report->cdp_entries($cdp_entries);
@@ -492,10 +481,10 @@ sub update_mat {
     my $source = $self->source;
     my $entry  = $self->device_entry;
     my $schema = $self->schema;
-    
+
     my $uplinks = $self->uplinks;
     $self->log->debug( "device uplinks: ", join( ",", keys %$uplinks ) );
- 
+
     my $timestamp = $self->timestamp;
     my $device_id = $self->device_id;
 
@@ -508,7 +497,7 @@ sub update_mat {
     while ( my ( $vlan, $entries ) = each(%$mat) ) {
         $self->log->debug("updating mat vlan $vlan");
 
-        if( $vlan eq 'default' ) {
+        if ( $vlan eq 'default' ) {
             $vlan = $self->native_vlan;
         }
         while ( my ( $m, $p ) = each %$entries ) {
@@ -559,9 +548,8 @@ sub update_vtp_database {
             }
         );
     }
-    my $vtp_last_update =
-      $self->schema->resultset('System')->find("netwalker.vtp_update");
-    $vtp_last_update->value($self->timestamp);
+    my $vtp_last_update = $self->schema->resultset('System')->find("netwalker.vtp_update");
+    $vtp_last_update->value( $self->timestamp );
     $vtp_last_update->update();
 
 }
@@ -574,23 +562,22 @@ sub update_arp_table {
     my $timestamp = $self->timestamp;
     my $vlan      = $self->arp_vlan;
 
-
     $self->log->debug("Fetching arp table ");
     my $arp_table = $source->arp_table;
 
     # TODO log error
     $arp_table or return;
-    
+
     my $arp_count = 0;
-    my ($ip_addr, $mac_addr);
-    while (($ip_addr, $mac_addr) = each(%$arp_table)) {
-        $self->log->debug(sprintf("Arp table: %15s at %17s\n", $ip_addr, $mac_addr));
+    my ( $ip_addr, $mac_addr );
+    while ( ( $ip_addr, $mac_addr ) = each(%$arp_table) ) {
+        $self->log->debug( sprintf( "Arp table: %15s at %17s\n", $ip_addr, $mac_addr ) );
 
         $self->schema->resultset('Arp')->register_tuple(
-	    ipaddr	=> $ip_addr,
-	    macaddr	=> $mac_addr,
-	    vlan	=> $vlan,
-            timestamp   => $timestamp,
+            ipaddr    => $ip_addr,
+            macaddr   => $mac_addr,
+            vlan      => $vlan,
+            timestamp => $timestamp,
         );
         $arp_count++;
     }
@@ -601,24 +588,24 @@ sub update_arp_table {
 sub update_config {
     my $self = shift;
 
-    my $device_entry = $self->device_entry;
-    my $config_date  = $device_entry->get_config_date;
+    my $device_entry    = $self->device_entry;
+    my $config_date     = $device_entry->get_config_date;
     my $update_interval = $self->config->config_update_interval;
-    my $timestamp    = $self->timestamp;
-    
+    my $timestamp       = $self->timestamp;
+
     if ( !defined($config_date) || $timestamp > $config_date + $update_interval ) {
-        $self->logger->info("Fetching configuration from ", $device_entry->mng_address );
+        $self->logger->info( "Fetching configuration from ", $device_entry->mng_address );
         my $config_text = $self->config_source->get_config();
 
-        if (! defined($config_text)) {
-            $self->logger->error("Cannot fetch configuration from ", $device_entry->mng_address );
+        if ( !defined($config_text) ) {
+            $self->logger->error( "Cannot fetch configuration from ",
+                $device_entry->mng_address );
             return;
         }
 
-        $self->device_entry->update_config($config_text, $timestamp);
+        $self->device_entry->update_config( $config_text, $timestamp );
     }
 }
-
 
 1;
 

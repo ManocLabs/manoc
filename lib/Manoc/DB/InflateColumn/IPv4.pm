@@ -10,7 +10,7 @@ use Manoc::IPAddress::IPv4;
 
 sub register_column {
     my $self = shift;
-    my ($column, $info, $args) = @_;
+    my ( $column, $info, $args ) = @_;
     $self->next::method(@_);
 
     return unless $info->{'ipv4_address'};
@@ -21,18 +21,17 @@ sub register_column {
             deflate => \&deflate_ipv4_column,
         }
     );
-};
+}
 
 sub inflate_ipv4_column {
-    my ($value, $obj) = @_;
-    return Manoc::IPAddress::IPv4->new( $value ) if defined($value);
+    my ( $value, $obj ) = @_;
+    return Manoc::IPAddress::IPv4->new($value) if defined($value);
 }
 
 sub deflate_ipv4_column {
-    my ($value, $obj) = @_;
+    my ( $value, $obj ) = @_;
     return $value->padded if defined($value);
 }
-
 
 =head1 NAME
 

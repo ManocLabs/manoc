@@ -6,9 +6,9 @@ package Manoc::Search::Widget::VlanRange;
 use Moose::Role;
 
 sub render {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
-    my $url = $ctx->uri_for_action('/vlanrange/view', [ $self->id ]);
+    my $url = $ctx->uri_for_action( '/vlanrange/view', [ $self->id ] );
     return "VLAN range <a href=\"$url\">" . $self->name . '</a>';
 }
 

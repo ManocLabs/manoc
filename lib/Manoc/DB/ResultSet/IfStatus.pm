@@ -17,8 +17,8 @@ sub search_unused {
     $self->search(
         $conditions,
         {
-	 alias => 'me',
-	 join     => 'mat_entry',
+            alias => 'me',
+            join  => 'mat_entry',
         }
     );
 }
@@ -32,11 +32,11 @@ sub search_mat_last_activity {
     $self->search(
         $conditions,
         {
-            alias => 'me',
-	    group_by => [qw(me.device me.interface)],
+            alias    => 'me',
+            group_by => [qw(me.device me.interface)],
             select   => [ 'me.interface', { max => 'mat_entry.lastseen' }, ],
             as       => [qw(interface lastseen)],
-	    join     => 'mat_entry',
+            join     => 'mat_entry',
         }
     );
 }

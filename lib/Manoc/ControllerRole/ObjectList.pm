@@ -59,7 +59,6 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
     $c->stash( object_list => $self->get_object_list($c) );
 }
 
-
 =head1 METHODS
 
 =head2 get_object_list
@@ -67,10 +66,10 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
 =cut
 
 sub get_object_list : Private {
-   my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-   my $rs = $c->stash->{resultset};
-   return [ $rs->search( {} ) ];
+    my $rs = $c->stash->{resultset};
+    return [ $rs->search( {} ) ];
 }
 
 1;

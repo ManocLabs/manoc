@@ -8,9 +8,11 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/
-				   +Manoc::DB::Helper::Row::TupleArchive
-			       /);
+__PACKAGE__->load_components(
+    qw/
+        +Manoc::DB::Helper::Row::TupleArchive
+        /
+);
 
 __PACKAGE__->table('mat');
 
@@ -31,7 +33,7 @@ __PACKAGE__->add_columns(
         size        => 64,
     },
     # firstseen, lastseen, archived added by TupleArchive
-    
+
     'vlan' => {
         data_type     => 'int',
         default_value => 1,
@@ -40,16 +42,13 @@ __PACKAGE__->add_columns(
     },
 );
 
-__PACKAGE__->set_tuple_archive_columns('macaddr', 'device', 'interface', 'vlan');
+__PACKAGE__->set_tuple_archive_columns( 'macaddr', 'device', 'interface', 'vlan' );
 
 __PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'vlan' );
-
-
 
 __PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Mat');
-
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

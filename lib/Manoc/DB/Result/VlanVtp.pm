@@ -24,13 +24,12 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-
 __PACKAGE__->belongs_to(
     vlan => 'Manoc::DB::Result::Vlan',
     { 'foreign.id' => 'self.id' },
     {
-	join_type => 'LEFT',
-    	is_foreign_key_constraint => 0,
+        join_type                 => 'LEFT',
+        is_foreign_key_constraint => 0,
     }
 );
 

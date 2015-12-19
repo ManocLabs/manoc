@@ -10,7 +10,7 @@ use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
 
-has '+name' => ( default => 'form-building' );
+has '+name'        => ( default => 'form-building' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (
@@ -20,26 +20,25 @@ has_field 'name' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /\w/ },
+            check   => sub { $_[0] =~ /\w/ },
             message => 'Invalid Name'
         },
     ]
 );
 has_field 'description' => (
-    label => 'Description',
-    type  => 'TextArea',
+    label    => 'Description',
+    type     => 'TextArea',
     required => 1
 );
 has_field 'notes' => ( type => 'TextArea' );
 
 has_field 'save' => (
-    type => 'Submit',
-    widget => 'ButtonTag',
-    element_attr => { class => ['btn', 'btn-primary'] },
+    type           => 'Submit',
+    widget         => 'ButtonTag',
+    element_attr   => { class => [ 'btn', 'btn-primary' ] },
     widget_wrapper => 'None',
-    value => "Save"
+    value          => "Save"
 );
-
 
 =head1 AUTHOR
 

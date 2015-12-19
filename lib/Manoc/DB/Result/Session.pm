@@ -8,7 +8,6 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-
 __PACKAGE__->table('sessions');
 __PACKAGE__->add_columns(
     'id' => {

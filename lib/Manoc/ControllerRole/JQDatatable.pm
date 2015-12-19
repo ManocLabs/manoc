@@ -19,17 +19,16 @@ See L<http://datatables.net/examples/data_sources/server_side.html>
 
 =cut
 
-
 has datatable_search_columns => (
-    is  => 'rw',
-    isa => 'ArrayRef[Str]',
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
     lazy    => 1,
     builder => '_build_datatable_search_columns'
 );
 
 has datatable_columns => (
-    is   => 'rw',
-    isa  => 'ArrayRef[Str]',
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
 );
 
 # used add options if needed (JOIN, PREFETCH, ...)
@@ -39,61 +38,59 @@ has datatable_search_options => (
     default => sub { {} },
 );
 
-has datatable_row_callback => (
-    is      => 'rw',
-);
+has datatable_row_callback => ( is => 'rw', );
 
 sub _build_datatable_search_columns {
     my $self = shift;
     $self->datatable_columns or return [];
-    return [  @{ $self->datatable_columns } ];
+    return [ @{ $self->datatable_columns } ];
 }
 
 sub get_datatable_resultset {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     return $c->stash->{'resultset'};
 }
 
 sub datatable_response : Private {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $start  = $c->request->param('start') || 0;
     my $length = $c->request->param('length');
     my $draw   = $c->request->param('draw') || 0;
     my $search = $c->request->param("search[value]");
 
-    my $rs = $c->stash->{'datatable_resultset'}
-        || $self->get_datatable_resultset($c);
+    my $rs = $c->stash->{'datatable_resultset'} ||
+        $self->get_datatable_resultset($c);
 
-    my $col_names = $c->stash->{'datatable_columns'}
-        || $self->datatable_columns;
+    my $col_names = $c->stash->{'datatable_columns'} ||
+        $self->datatable_columns;
 
-    my $search_columns = $c->stash->{'datatable_search_columns'} 
-        || $self->datatable_search_columns;
+    my $search_columns = $c->stash->{'datatable_search_columns'} ||
+        $self->datatable_search_columns;
 
-    my $row_callback = $c->stash->{'datatable_row_callback'}
-        || $self->datatable_row_callback;
-    
+    my $row_callback = $c->stash->{'datatable_row_callback'} ||
+        $self->datatable_row_callback;
+
     # create  search filter (WHERE clause)
     my $search_filter = {};
     if ($search) {
         $search_filter = [];
 
         foreach my $col (@$search_columns) {
-            push @$search_filter, { $col =>  { -like =>  "%$search%" } };
+            push @$search_filter, { $col => { -like => "%$search%" } };
             $c->log->debug("$col like $search");
         }
     }
 
-    my $search_attrs = { %{$self->datatable_search_options} };
+    my $search_attrs = { %{ $self->datatable_search_options } };
 
     my $total_rows = $rs->count();
-    my $filtered_rows = $rs->search($search_filter, $search_attrs)->count();
+    my $filtered_rows = $rs->search( $search_filter, $search_attrs )->count();
 
     # paging (LIMIT clause)
     if ($length) {
-        my $page = $length > 0 ? ($start+1) / $length : 1;
+        my $page = $length > 0 ? ( $start + 1 ) / $length : 1;
         $page == int($page) or $page = int($page) + 1;
 
         $search_attrs->{page} = $page;
@@ -102,7 +99,7 @@ sub datatable_response : Private {
     }
 
     my $sort_column_i = $c->request->param('order[0][column]');
-    if (defined($sort_column_i)) {
+    if ( defined($sort_column_i) ) {
         my $column = $col_names->[$sort_column_i];
         my $dir = $c->request->param("order[0][dir]") eq 'desc' ? '-desc' : '-asc';
 
@@ -111,14 +108,15 @@ sub datatable_response : Private {
 
     # search
     my @rows;
-    my $search_rs =  $rs->search($search_filter, $search_attrs);
-    while (my $item = $search_rs->next) {
+    my $search_rs = $rs->search( $search_filter, $search_attrs );
+    while ( my $item = $search_rs->next ) {
         my $row;
         if ($row_callback) {
-            $row = $row_callback->($c, $item);
-        } else {
+            $row = $row_callback->( $c, $item );
+        }
+        else {
             $row = [];
-            
+
             foreach my $name (@$col_names) {
                 # default accessor is preferred
                 my $v = $item->can($name) ? $item->$name : $item->get_column($name);
@@ -129,13 +127,13 @@ sub datatable_response : Private {
     }
 
     my $data = {
-        draw => int($draw),
-        data => \@rows,
-        recordsTotal => $total_rows,
+        draw            => int($draw),
+        data            => \@rows,
+        recordsTotal    => $total_rows,
         recordsFiltered => $filtered_rows,
     };
 
-    $c->stash('json_data' => $data);
+    $c->stash( 'json_data' => $data );
     $c->forward('View::JSON');
 }
 

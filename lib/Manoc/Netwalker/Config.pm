@@ -9,22 +9,19 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use Manoc::Utils::Datetime qw(str2seconds);
 
-subtype 'TimeInterval',
-    as 'Int',
-      where { $_ > 0 },
-      message { "The number you provided, $_, was not a positive number" };
+subtype 'TimeInterval', as 'Int',
+    where { $_ > 0 },
+    message { "The number you provided, $_, was not a positive number" };
 
-coerce 'TimeInterval',
-      from 'Str',
-      via { str2seconds($_) };
+coerce 'TimeInterval', from 'Str', via { str2seconds($_) };
 
-has n_procs  => (
+has n_procs => (
     is      => 'rw',
     isa     => 'Int',
     default => 1,
 );
 
-has default_vlan  => (
+has default_vlan => (
     is      => 'rw',
     isa     => 'Int',
     default => 1,
@@ -85,7 +82,6 @@ has refresh_interval => (
     default => '10m',
 );
 
-
 has full_update_interval => (
     is      => 'rw',
     isa     => 'TimeInterval',
@@ -93,14 +89,12 @@ has full_update_interval => (
     default => '1h'
 );
 
-
 has config_update_interval => (
     is      => 'rw',
     isa     => 'TimeInterval',
     coerce  => 1,
     default => '1d',
 );
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

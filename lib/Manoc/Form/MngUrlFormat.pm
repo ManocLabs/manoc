@@ -11,7 +11,7 @@ use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name' => ( default => 'form-mngurlformat' );
+has '+name'        => ( default => 'form-mngurlformat' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (
@@ -20,7 +20,7 @@ has_field 'name' => (
     apply    => [
         'Str',
         {
-            check => sub { $_[0] =~ /^\w+$/ },
+            check   => sub { $_[0] =~ /^\w+$/ },
             message => 'Invalid Name'
         },
     ]

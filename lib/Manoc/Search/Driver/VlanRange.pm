@@ -14,10 +14,8 @@ sub search_inventory {
     my $pattern = $query->sql_pattern;
     my $schema  = $self->engine->schema;
 
-    $it = $schema->resultset('VlanRange')->search(
-        {name => { '-like' => $pattern }},
-        { order_by => 'id' }
-    );
+    $it = $schema->resultset('VlanRange')
+        ->search( { name => { '-like' => $pattern } }, { order_by => 'id' } );
 
     while ( $e = $it->next ) {
 

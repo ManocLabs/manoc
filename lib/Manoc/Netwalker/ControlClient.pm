@@ -18,21 +18,21 @@ has config => (
 );
 
 has socket => (
-    isa      => 'Maybe[Object]',
-    is       => 'ro',
-    lazy     => 1,
-    builder  => '_build_socket',
+    isa     => 'Maybe[Object]',
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_socket',
 );
 
 has status => (
-    is       => 'rw',
-    isa      => 'Maybe[Str]',
-    isa      => enum([qw[ new connected connection_error protocol_error ]]),
-    default  => 'new'
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    isa     => enum( [qw[ new connected connection_error protocol_error ]] ),
+    default => 'new'
 );
 
 sub check_response {
-    my ($self, $response) = @_;
+    my ( $self, $response ) = @_;
 
     $response =~ /^OK\s/o  and return 1;
     $response =~ /^ERR\s/o and return 0;
@@ -51,11 +51,12 @@ sub _build_socket {
     if ( $port =~ m|^/| ) {
         # looks like a path, create a UNIX socket
         $handle = IO::Socket::UNIX->new(
-            Peer  => $port,
-            Type  => SOCK_STREAM(),
+            Peer => $port,
+            Type => SOCK_STREAM(),
 
         );
-    } else {
+    }
+    else {
         # TCP socket
         $handle = IO::Socket::INET->new(
             PeerAddr => $self->config->remote_control,
@@ -63,22 +64,22 @@ sub _build_socket {
             Proto    => 'tcp',
         );
     }
-    
-    if ( ! $handle ) {
+
+    if ( !$handle ) {
         $self->log->error("Can't connect to netwalker control port");
         $self->status("connection_error");
         return;
     }
 
     my $line = <$handle>;
-    if (! defined($line) ) {
+    if ( !defined($line) ) {
         $self->log->error("Protocol error after connecting netwalker");
         return undef;
     }
 
-    chomp ($line);
+    chomp($line);
     $self->log->debug("Hello from netwalker: $line");
-    if (! $self->check_response($line) ) {
+    if ( !$self->check_response($line) ) {
         $self->log->error("Protocol error after connecting netwalker");
         return undef;
     }
@@ -88,7 +89,7 @@ sub _build_socket {
 }
 
 sub enqueue_device {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     my $handle = $self->socket;
     $handle or return undef;

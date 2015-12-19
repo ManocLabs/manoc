@@ -5,14 +5,12 @@
 package Manoc::Search::Widget::MacAddr;
 
 use Moose::Role;
-with 'Manoc::Search::Widget::Group' => {
-    -exclude => [ 'render_heading' ]
-};
+with 'Manoc::Search::Widget::Group' => { -exclude => ['render_heading'] };
 
 sub render_heading {
-    my ($self, $ctx) = @_;
+    my ( $self, $ctx ) = @_;
 
-    my $url = $ctx->uri_for_action('/mac/view', [ $self->addr ]);
+    my $url = $ctx->uri_for_action( '/mac/view', [ $self->addr ] );
     return "<a href=\"$url\">" . $self->addr . '</a>';
 }
 
