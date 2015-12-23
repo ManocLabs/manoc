@@ -9,5 +9,5 @@ BEGIN {
 }
 
 
-$Mech->get_ok( 'http://localhost/login' );
+$Mech->get_ok( '/auth/login' );
 done_testing();
