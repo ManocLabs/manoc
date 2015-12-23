@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use namespace::clean;
 use base qw(Class::Accessor::Grouped);
+use Carp qw(croak);
 
 use Module::Pluggable
     sub_name    => '_plugins',
@@ -45,11 +46,10 @@ sub new_manifold {
         $self->load_namespace;
 
     my $mapped = $self->name_mappings->{$name};
-    $mapped and $name = $mapped;
-    $mapped or return undef;
+    $mapped or croak "Unknown manifold $name";
 
-    load_class $name;
-    return $name->new(@_);
+    load_class $mapped;
+    return $mapped->new(@_);
 }
 
 sub connect {

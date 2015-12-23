@@ -79,7 +79,8 @@ has 'source' => (
 has 'config_source' => (
     is      => 'ro',
     lazy    => 1,
-    builder => '_build_source',
+    does    => 'Manoc::ManifoldRold::Base',
+    builder => '_build_config_source',
 );
 
 has 'task_report' => (
@@ -165,14 +166,18 @@ sub _create_manifold {
     my $manifold_name = shift;
     my %params        = @_;
 
+    my $manifold;
     try {
-        return Manoc::Manifold->new_manifold( $manifold_name, %params );
+        $manifold = Manoc::Manifold->new_manifold( $manifold_name, %params );
     }
     catch {
-        my $error = "Error while creating manifold $manifold_name: $_";
-        $self->debug->($error);
+        my $error = "Internal error while creating manifold $manifold_name: $_";
+        $self->log->debug($error);
+        return undef;
     };
-    return undef;
+
+    $manifold or $self->log->debug("Manifold constructor returned undef");
+    return $manifold;
 }
 
 sub _build_config_source {
@@ -196,7 +201,7 @@ sub _build_config_source {
     my $source = $self->_create_manifold( $manifold_name, %params );
 
     if ( !$source ) {
-        my $error = "Cannot create config manifold $manifold_name";
+        my $error = "Cannot create config source with manifold $manifold_name";
         $self->log->error($error);
         $self->task_report->add_error($error);
         return undef;
@@ -234,7 +239,7 @@ sub _build_source {
     my $source = $self->_create_manifold( $manifold_name, %params );
 
     if ( !$source ) {
-        my $error = "Cannot create manifold $manifold_name";
+        my $error = "Cannot create source with manifold $manifold_name";
         $self->log->error($error);
         $self->task_report->add_error($error);
         return undef;
