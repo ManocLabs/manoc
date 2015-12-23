@@ -103,8 +103,8 @@ sub visit_device {
 
         $task_info->{status} = 'DONE';
         $task_info->{report} = $updater->task_report->freeze;
-    }
-    catch {
+    } catch {
+        $self->log->error("caught error in device updater: $_");
         $task_info->{status} = 'ERROR';
     };
     print @{ POE::Filter::Reference->new->put( [$task_info] ) };
