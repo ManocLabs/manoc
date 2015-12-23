@@ -171,6 +171,14 @@ override 'update_model' => sub {
     my $self   = shift;
     my $values = $self->values;
 
+    # do not overwrite  passwords when are not edited
+    foreach my $k (qw/password password2/) {
+        exists $values->{password} or next;
+
+        defined($values->{password}) or
+            delete $values->{password};
+    }
+
     $values->{device} = $self->{device};
     $self->_set_value($values);
 
