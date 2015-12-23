@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-use Manoc::Utils::Validate qw(validate);
+use Manoc::Utils::Validate;
 
 =head1 NAME
 
@@ -100,10 +100,10 @@ sub validate : Private {
     my $data  = $c->stash->{req_data};
     my $rules = $c->stash->{api_validate};
 
-    my $result = validate( $data, $rules );
+    my $result = Manoc::Utils::Validate::validate( $data, $rules );
     if ( !$result->{valid} ) {
         $c->stash( field_errors => $result->{errors} );
-        return 0;
+        $c->detach();
     }
     return 1;
 }

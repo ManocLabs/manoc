@@ -33,7 +33,7 @@ POST api/v1/dhcp/lease
 
 =cut
 
-sub lease_post : Chained('deserialize') Args(0) POST {
+sub lease_post : Chained('lease_base') Args(0) POST {
     my ( $self, $c ) = @_;
 
     $c->stash(
@@ -49,6 +49,7 @@ sub lease_post : Chained('deserialize') Args(0) POST {
             },
         }
     );
+    $c->forward('validate') or return;
 
     my $req_data = $c->stash->{request_data};
 

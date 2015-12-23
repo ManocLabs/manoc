@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Manoc::Controller::APIv1' }
 
-sub ping : Chained('deserialize') PathPart('') {
+sub ping : Chained('deserialize') PathPart('ping') {
     my ( $self, $c ) = @_;
 
     my $data = {

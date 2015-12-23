@@ -35,7 +35,7 @@ POST api/v1/dhcp/reservation
 
 =cut
 
-sub lease_post : Chained('deserialize') Args(0) POST {
+sub reservation_post : Chained('reservation_base') Args(0) POST {
     my ( $self, $c ) = @_;
 
     $c->stash(
@@ -64,7 +64,7 @@ sub lease_post : Chained('deserialize') Args(0) POST {
         my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
         my $status  = $r->{server};
         my $hostname = $r->{hostname};
-        my $hostname = $r->{name};
+        my $name     = $r->{name};
 
         $rs->update_or_create(
             {
