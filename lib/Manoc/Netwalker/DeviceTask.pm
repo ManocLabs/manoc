@@ -70,8 +70,8 @@ has 'device_set' => (
 # the source for information about the device
 has 'source' => (
     is      => 'ro',
-    does    => 'Manoc::ManifoldRold::Base',
     lazy    => 1,
+    does    => 'Manoc::ManifoldRole::Base',
     builder => '_build_source',
 );
 
@@ -79,7 +79,7 @@ has 'source' => (
 has 'config_source' => (
     is      => 'ro',
     lazy    => 1,
-    does    => 'Manoc::ManifoldRold::Base',
+    does    => 'Manoc::ManifoldRole::Base',
     builder => '_build_config_source',
 );
 
