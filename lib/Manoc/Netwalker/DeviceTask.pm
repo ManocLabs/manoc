@@ -71,7 +71,6 @@ has 'device_set' => (
 has 'source' => (
     is      => 'ro',
     lazy    => 1,
-    does    => 'Maybe[Manoc::ManifoldRole::Base]',
     builder => '_build_source',
 );
 
@@ -79,7 +78,6 @@ has 'source' => (
 has 'config_source' => (
     is      => 'ro',
     lazy    => 1,
-    does    => 'Maybe[Manoc::ManifoldRole::Base]',
     builder => '_build_config_source',
 );
 
