@@ -28,6 +28,9 @@ echo "cpanm options: $PERL_CPANM_OPT"
 
 ( cd "$MANOC_DIR" && cpanm --installdeps . 2>&1 )
 
+echo "-----> Installing devel modules"
+cpanm Catalyst::Devel
+
 echo "-----> Installing MIBS"
 MIBS_DIR="$INSTALL_DIR/netdisco-mibs"
 MIBS_TAR="$INSTALL_DIR/mibs.tar.gz"
