@@ -10,6 +10,8 @@ use Try::Tiny;
 
 with 'Manoc::ManifoldRole::SSH';
 
+use File::Temp qw/ tempfile  /;
+
 around '_build_username' => sub {
     my $orig = shift;
     my $self = shift;
@@ -86,6 +88,19 @@ sub _build_arp_table {
     return \%arp_table;
 }
 
+sub _build_configuration {
+    my $self = shift;
+    my ($fh, $filename, $config);
+    my $session = $self->session;
+
+   ($fh, $filename) = tempfile();
+    try {
+        $session->scp_get("sys_config","$filename");
+        while(<$fh>){$config .= $_;}
+    };
+    $self->log->error('Error fetching configuration: $@');
+    return $config;
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

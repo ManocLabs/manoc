@@ -597,11 +597,10 @@ sub update_config {
     my $timestamp       = $self->timestamp;
 
     if ( !defined($config_date) || $timestamp > $config_date + $update_interval ) {
-        $self->logger->info( "Fetching configuration from ", $device_entry->mng_address );
-        my $config_text = $self->config_source->get_config();
-
+        $self->log->info( "Fetching configuration from ", $device_entry->mng_address );
+        my $config_text = $self->config_source->configuration;
         if ( !defined($config_text) ) {
-            $self->logger->error( "Cannot fetch configuration from ",
+            $self->log->error( "Cannot fetch configuration from ",
                 $device_entry->mng_address );
             return;
         }
