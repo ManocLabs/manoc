@@ -15,7 +15,7 @@
   <div class="row">
    <dl class="dl-horizontal">
     <dt>Last Backup:</dt><dd>[%  date.format(config.config_date) %]</dd>
-    <dt>Configuration:</dt><dd><pre>[%  config.config %]</pre></dd>
+    <dt>Configuration:</dt><dd><pre>[%  config.config | html %]</pre></dd>
   </div><!-- row -->
  </div>
 
@@ -23,7 +23,7 @@
   <div class="row">
    <dl class="dl-horizontal">
     <dt>Backup date:</dt><dd>[%  date.format(config.prev_config_date) %]</dd>
-    <dt>Configuration:</dt><dd><pre>[% config.prev_config %]</pre></dd>
+    <dt>Configuration:</dt><dd><pre>[% config.prev_config | html %]</pre></dd>
   </div><!-- row -->
  </div> <!-- panel -->
 
