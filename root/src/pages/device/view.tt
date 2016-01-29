@@ -55,7 +55,7 @@ page.subsection = 'Device'
 	<dt>Name</dt><dd>[% object.name %]</dd>
 
 	<dt>Management Address</dt>
-	<dd><a href="[% object.get_mng_url %]">[% object.get_mng_url %]</a></dd>
+	<dd><a href="[% object.get_mng_url %]">[% object.mng_address %]</a></dd>
 
 	<dt>Building</dt>
 	<dd>[% print_building(object.rack.building) %]</dd>

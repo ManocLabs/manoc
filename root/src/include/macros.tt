@@ -2,7 +2,11 @@
 [%#                            Device                                 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_device(device) BLOCK -%]
+[% IF device.name -%]
 <a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.name|html%]</a>
+[% ELSE -%]
+<a href="[% c.uri_for_action('device/view',[device.id]) %]">[%device.mng_address|html%]</a>
+[%END-%]
 [% IF device.get_mng_url -%]
 <a href="[%device.get_mng_url%]"><span class="sr-only">Open</span>[% bootstrap_icon('share') %]</a>
 [%- END-%]
