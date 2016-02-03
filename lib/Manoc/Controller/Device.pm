@@ -289,7 +289,7 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
         config => $config,
         diff   => $diff,
     );
-    $c->stash( template => 'device/config.tt' );
+    $c->stash( template => 'device/show_run.tt' );
 
 }
 

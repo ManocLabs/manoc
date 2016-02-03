@@ -1,8 +1,11 @@
-[% title='Uplinks for ' _ object.name
+[%  title='Uplinks for ' _ object.name
    subsection='Device'
    section='Asset'
 -%]
-<form name="[% form.name %]" method="POST">
+
+[% action -%]
+
+<form name="[% form.name %]" method="POST" >
   <table class="table">
     <th>Uplink</th><th>Interface</th>
     [%- FOREACH f IN form.field('interfaces').sorted_fields -%]

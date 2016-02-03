@@ -30,7 +30,7 @@ has_field 'mng_address' => (
 
 has_field 'name' => (
     type     => 'Text',
-    required => 1,
+    required => 0,
     apply    => [
         'Str',
         {

@@ -1,61 +1,37 @@
-[% META title='View Configuration'
-   subsection='Device'
-   section='Asset' -%]
-<h3> Back to device info [% print_device(object) %] </h3>
-   
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+[% page.title   = 'View Configuration ' _ object.name
+   page.section = 'Asset'
+   page.subsection = 'Device'
+-%]
 
-<div id="tabs">	 
-  <ul>
-    <li><a href="#tabs-1">Current</a></li>
-    <li><a href="#tabs-2">Previous</a></li>
-    <li><a href="#tabs-3">Diff</a></li>
-  </ul>
-  
-  
-  <div id="tabs-1">
-    <table>
-      <tr>
-        <th valign=top align=left width=220>Configuration backup date: </th>
-        <td>[% curr_config_date %]</td>
-      </tr>
-      <tr>
-        <th valign=top align=left>Configuration: </th>
-        <td><pre>[% curr_config %]</pre></td>
-      </tr>
-    </table>
-  </div>
-  
-  <div id="tabs-2">
-  [% IF has_prev_config %]
-  <table>
-    <tr>
-      <th valign=top align=left width=220>Configuration backup date: </th>
-      <td>[% prev_config_date %]</td>
-    </tr>
-    <tr>
-      <th valign=top align=left>Configuration: </th>
-      <td><pre>[% prev_config %]</pre></td>
-    </tr>
-  </table>        
-  [% END %]
-  </div>
-  
-  <div id="tabs-3">
-    [% IF has_prev_config %]
-    <table>
-      <tr>
-	<td><b>Previous configuration backup:</b></td>
-	<td>[% prev_config_date %] </td>
-      </tr>
-      <tr>
-	<td><b>Current configuration backup:</b></td>
-      <td>[% curr_config_date %]</td>
-      </tr>
-    </table>
+<ul class="nav nav-tabs" role="tablist">
+  [% bootstrap_nav_tab("current", "Current", 1) -%]
+  [% bootstrap_nav_tab("previous", "Previous", 0) -%]
+  [% bootstrap_nav_tab("diff", "Diff", 0) -%]
+</ul>
+
+<div class="tab-content">	 
+ <div role="tabpanel" class="tab-pane active" id="current">
+  <div class="row">
+   <dl class="dl-horizontal">
+    <dt>Last Backup:</dt><dd>[%  date.format(config.config_date) %]</dd>
+    <dt>Configuration:</dt><dd><pre>[%  config.config | html %]</pre></dd>
+  </div><!-- row -->
+ </div>
+
+ <div role="tabpanel" class="tab-pane" id="previous">
+  <div class="row">
+   <dl class="dl-horizontal">
+    <dt>Backup date:</dt><dd>[%  date.format(config.prev_config_date) %]</dd>
+    <dt>Configuration:</dt><dd><pre>[% config.prev_config | html %]</pre></dd>
+  </div><!-- row -->
+ </div> <!-- panel -->
+
+ <div role="tabpanel" class="tab-pane" id="diff">
     <pre>  
       [% diff %]
     </pre>
-    [% END %]
-  </div>
+ </div> <!-- panel -->
+
 </div>
 
