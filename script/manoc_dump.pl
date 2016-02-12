@@ -7,9 +7,9 @@ use lib "$FindBin::Bin/../lib";
 use Manoc::Support;
 
 package main;
-use Manoc::Dumper::Script;
+use Manoc::DataDumper::Script;
 
-my $app = Manoc::Dumper::Script->new_with_options();
+my $app = Manoc::DataDumper::Script->new_with_options();
 $app->run();
 
 # Local Variables:

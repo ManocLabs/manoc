@@ -40,6 +40,8 @@ requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Plack::Middleware::ReverseProxy';
 requires 'POE';
 requires 'Digest::SHA1';
+requires 'Archive::Tar';
+
 
 on 'test' => sub {
   requires 'Test::More';
