@@ -167,19 +167,11 @@ sub handle_arp_packets {
 
     my $type = $eth->{type};
     my $data = $eth->{data};
-    my $vlan;
-
-    if ( $type == 0x8100 ) {
-        my $tci;
-        ( $tci, $type, $data ) = unpack( 'nna*', $data );
-        $vlan = $tci & 0x0fff;
-    }
-    else {
-        $vlan = $self->default_vlan;
-    }
 
     # check packet type
     return unless $type == ETH_TYPE_ARP();
+    # get vlan id   
+    my $vlan = $eth->{vid} || $self->default_vlan;
 
     # use vlan filter
     return if $self->vlan_filter->{$vlan};

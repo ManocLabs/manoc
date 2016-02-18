@@ -55,7 +55,7 @@ on 'develop' => sub {
 
 feature 'arpsniffer', 'ARP sniffer support' => sub {
   requires 'Net::Pcap';
-  requires 'NetPacket';
+  requires 'NetPacket', '1.2.0';
 };
 
 feature 'snmp', 'SNMP support' => sub {
