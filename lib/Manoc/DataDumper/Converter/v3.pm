@@ -19,7 +19,8 @@ has 'device_id_map' => (
 
 has 'device_id_counter' => (
     isa => 'Int',
-    is  => 'rw'
+    is  => 'rw',
+    default => 1
 );
 
 has 'network_id_counter' => (
