@@ -43,6 +43,8 @@ has cmd_status => (
 sub run {
     my $self = shift;
 
+    # when in foreground mode do not run Daemonize stuff
+    # just call the main method
     if ( $self->foreground ) {
         return $self->main;
     }
@@ -54,8 +56,10 @@ sub run {
         $self->status;
     }
     else {
+        # when in debug mode do not fork
         $self->debug and $self->_set_foreground(1);
-        $self->main;
+
+        $self->start;
     }
 
     print $self->status_message, "\n";
