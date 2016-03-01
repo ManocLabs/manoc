@@ -31,8 +31,8 @@
 [%#                           Interface                               -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_iface(device, iface, options) BLOCK -%]
- <a href="[% c.uri_for_action('interface/view',[device , iface]) %]">
- [%- IF options.show_device %][% device | html %]/[% END -%]
+ <a href="[% c.uri_for_action('interface/view',[device.id , iface]) %]">
+ [%- IF options.show_device %][% device.name | html %]/[% END -%]
  [% iface | html -%]
   </a>
 [%- END -%]
