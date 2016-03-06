@@ -46,7 +46,7 @@ sub auto : Private {
     my ( $self, $c ) = @_;
 
     # CSRF protection
-    $c->log->debug( "skip CSRF = ", $c->stash->{skip_csrf} );
+    $c->log->debug( "skip CSRF = " . ( $c->stash->{skip_csrf} || 'undef' ));
     if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf} ) {
         $c->log->debug("POST method, token validation required");
         $c->require_valid_token();
