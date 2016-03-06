@@ -9,13 +9,11 @@ install_script "script/manoc_archiver.pl";
 install_script "script/manoc_arpsniffer.pl";
 install_script "script/manoc_cgi.pl";
 install_script "script/manoc_create_ddl.pl";
-install_script "script/manoc_dhcp_agent.pl";
 install_script "script/manoc_dump.pl";
 install_script "script/manoc_fastcgi.pl";
 install_script "script/manoc_initdb.pl";
 install_script "script/manoc_netwalker.pl";
 install_script "script/manoc_server.pl";
-install_script "script/manoc_snarewin_agent.pl";
 
 resources
   homepage => 'http://manoc.info/',
