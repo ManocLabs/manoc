@@ -10,4 +10,8 @@ BEGIN {
 
 
 $Mech->get_ok( '/auth/login' );
+$Mech->get_ok( 'auth/login?login_redirect=about' );
+
+
+
 done_testing();
