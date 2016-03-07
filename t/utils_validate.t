@@ -83,27 +83,33 @@ BEGIN { use_ok 'Manoc::Utils::Validate' };
 	}
     };
 
-     my $data = {
-	 param1  => 'scalar1',
-	 param2  => 'not array',
+    my $data = {
+        param1  => 'scalar1',
+        param2  => 'not array',
 	 param3  => 'not a hash',
-     };
-     my $have = Manoc::Utils::Validate::validate($data, $rule);
-     my $want = {
-	 'errors' => [
-	     {
-		 'error' => 'Expected array',
-		 'field' => 'param2'
-	     },
-	     {
-		 'error' => 'Expected hash',
-		 'field' => 'param3'
-	     }
-	 ],
-	 'valid' => 0
-     };
+    };
+    my $have = Manoc::Utils::Validate::validate($data, $rule);
+    my $want = {
+        'errors' => [
+            {
+                'error' => 'Expected array',
+                'field' => 'param2'
+            },
+            {
+                'error' => 'Expected hash',
+                'field' => 'param3'
+            }
+        ],
+        'valid' => 0
+    };
 
-     is_deeply($have, $want, "Validate hash items, type mismatch") or diag explain $have;
+    # sort hash to help is_deeply
+    if ($have->{errors} ) {
+        my @sorted_errors =  sort { $a->{field} cmp $b->{field} } @{$have->{errors}};
+        $have->{errors} = \@sorted_errors;
+    }
+
+    is_deeply($have, $want, "Validate hash items, type mismatch") or diag explain $have;
 }
 
 {
@@ -143,7 +149,13 @@ BEGIN { use_ok 'Manoc::Utils::Validate' };
 	 'valid' => 0
      };
 
-     is_deeply($have, $want, "Validate hash items, array recursion") or diag explain $have;
+    # sort hash to help is_deeply
+    if ($have->{errors} ) {
+        my @sorted_errors =  sort { $a->{field} cmp $b->{field} } @{$have->{errors}};
+        $have->{errors} = \@sorted_errors;
+    }
+
+    is_deeply($have, $want, "Validate hash items, array recursion") or diag explain $have;
 }
 
 {
