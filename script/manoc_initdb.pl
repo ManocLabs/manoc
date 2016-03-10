@@ -50,10 +50,11 @@ sub do_reset_admin {
     $self->log->info('Creating admin user.');
     my $admin_user = $schema->resultset('User')->update_or_create(
         {
-            username => 'admin',
-            fullname => 'Administrator',
-            active   => 1,
-            password => 'admin',
+            username   => 'admin',
+            fullname   => 'Administrator',
+            active     => 1,
+            password   => 'admin',
+            superadmin => 1,
         }
     );
     $self->log->info('Adding admin role to the admin user (password: admin)... done.');
