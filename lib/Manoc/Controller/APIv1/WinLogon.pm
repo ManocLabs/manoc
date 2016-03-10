@@ -56,22 +56,23 @@ sub winlogon_post : Chained('winlogon_base') Args(0) POST {
     my $ipaddr = $req_data->{ipaddr};
 
     if ( !check_addr($ipaddr) ) {
-        $c->stash( api_field_errors => [ { ipaddr =>  "Not a valid address" } ] );
+        $c->stash( api_field_errors => [ { ipaddr => "Not a valid address" } ] );
         return;
     }
     $ipaddr = Manoc::IPAddress::IPv4->new($ipaddr);
 
     my $rs;
     if ( $user =~ /([^\$]+)\$$/ ) {
-        $user    = $1;
-        $rs      = $c->model('ManocDB::WinHostname');
-    } else {
-        $rs      = $c->model('ManocDB::WinLogon');
+        $user = $1;
+        $rs   = $c->model('ManocDB::WinHostname');
+    }
+    else {
+        $rs = $c->model('ManocDB::WinLogon');
     }
 
     $rs->register_tuple(
-        user     => lc($user),
-        ipaddr   => $ipaddr,
+        user   => lc($user),
+        ipaddr => $ipaddr,
     );
     my $data = { message => "entry registered", };
     $c->stash( api_response_data => $data );

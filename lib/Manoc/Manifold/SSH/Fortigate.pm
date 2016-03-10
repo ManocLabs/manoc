@@ -33,15 +33,17 @@ sub _build_status {
 
 sub _build_boottime {
     my $self = shift;
-    my ($days,$hours,$min);
+    my ( $days, $hours, $min );
     my $seconds_hour = 60 * 60;
     my $seconds_day  = 24 * $seconds_hour;
 
     my $data = $self->cmd('get system performance status');
-    $data =~ m/.*Uptime:\s+(\d+) days,\s+(\d+) hours,\s+(\d+) minutes/ and 
-    ($days,$hours,$min) = ($1,$2,$3);
-    if(defined $days and defined $hours and defined $min) {
-        my $uptime_seconds = time() - int(($days * $seconds_day) + ($hours * $seconds_hour) + ($min * 60));
+    $data =~ m/.*Uptime:\s+(\d+) days,\s+(\d+) hours,\s+(\d+) minutes/ and
+        ( $days, $hours, $min ) = ( $1, $2, $3 );
+    if ( defined $days and defined $hours and defined $min ) {
+        my $uptime_seconds =
+            time() -
+            int( ( $days * $seconds_day ) + ( $hours * $seconds_hour ) + ( $min * 60 ) );
         #$self->log->debug("Uptime in seconds: $uptime_seconds");
         return $uptime_seconds;
     }
@@ -72,17 +74,18 @@ sub _build_arp_table {
     my @data;
     try {
         @data = $self->cmd('get system arp');
-    } catch {
-        $self->log->error('Error fetching arp table: ', $self->get_error);
+    }
+    catch {
+        $self->log->error( 'Error fetching arp table: ', $self->get_error );
         return undef;
     };
 
     # parse arp table
     # 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
     foreach my $line (@data) {
-        if ($line =~ /([0-9\.]+)\s+\d+\s+([a-f0-9:]+)/ ) {
-            my ($ip, $mac) = ($1, $2);
-            $arp_table{$ip} =  $mac;
+        if ( $line =~ /([0-9\.]+)\s+\d+\s+([a-f0-9:]+)/ ) {
+            my ( $ip, $mac ) = ( $1, $2 );
+            $arp_table{$ip} = $mac;
         }
     }
     return \%arp_table;
@@ -90,13 +93,13 @@ sub _build_arp_table {
 
 sub _build_configuration {
     my $self = shift;
-    my ($fh, $filename, $config);
+    my ( $fh, $filename, $config );
     my $session = $self->session;
 
-   ($fh, $filename) = tempfile();
+    ( $fh, $filename ) = tempfile();
     try {
-        $session->scp_get("sys_config","$filename");
-        while(<$fh>){$config .= $_;}
+        $session->scp_get( "sys_config", "$filename" );
+        while (<$fh>) { $config .= $_; }
     };
     $self->log->error('Error fetching configuration: $@');
     return $config;

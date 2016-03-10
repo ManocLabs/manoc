@@ -41,7 +41,7 @@ sub login : Local : CaptureArgs(0) {
 
     my $login_redirect = $c->req->params()->{login_redirect};
     my $redirect =
-        $login_redirect ? $c->req->base .  $login_redirect :
+        $login_redirect ? $c->req->base . $login_redirect :
         $c->uri_for('/search');
 
     my $form = Manoc::Form::Login->new( ctx => $c );

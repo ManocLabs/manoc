@@ -600,8 +600,7 @@ sub update_config {
         $self->log->info( "Fetching configuration from ", $device_entry->mng_address );
         my $config_text = $self->config_source->configuration;
         if ( !defined($config_text) ) {
-            $self->log->error( "Cannot fetch configuration from ",
-                $device_entry->mng_address );
+            $self->log->error( "Cannot fetch configuration from ", $device_entry->mng_address );
             return;
         }
 
