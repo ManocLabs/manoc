@@ -19,14 +19,17 @@ use Catalyst::Runtime 5.90;
 
 use Catalyst qw/
     ConfigLoader
+
     Static::Simple
+
     Authentication
     Authorization::Roles
-    Authorization::ACL
+
     Session
     Session::Store::DBI
     Session::State::Cookie
     +Manoc::CatalystPlugin::RequestToken
+
     StackTrace
     /;
 
@@ -150,28 +153,6 @@ sub _add_plugin {
 ########################################################################
 
 after setup_finalize => sub {
-
-    #default admin ACL for full CRUD resources
-    my @CRUD        = qw/create edit delete/;
-    my @controllers = qw/device building rack ipnetwork vlan vlanrange mngurlformat user/;
-
-    foreach my $ctrl (@controllers) {
-        foreach (@CRUD) {
-            __PACKAGE__->deny_access_unless( "$ctrl/$_", [qw/admin/] );
-        }
-    }
-
-    #Additional acl for admin privileges
-    my @add_acl = qw{
-        device/uplinks device/refresh
-        vlanrange/split vlanrange/merge
-        interface/edit_notes interface/delete_notes
-        ip/edit ip/delete
-    };
-    foreach my $acl (@add_acl) {
-        __PACKAGE__->deny_access_unless( $acl, [qw/admin/] );
-    }
-
     #Load Search Plugins
     __PACKAGE__->load_plugins;
 
