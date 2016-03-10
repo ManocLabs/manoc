@@ -58,6 +58,12 @@ has_field 'active' => (
     type  => 'Boolean',
 );
 
+has_field 'superadmin' => (
+    label => 'Active',
+    type  => 'Boolean',
+);
+
+
 1;
 # Local Variables:
 # mode: cperl

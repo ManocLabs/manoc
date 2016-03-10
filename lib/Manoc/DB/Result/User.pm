@@ -48,13 +48,44 @@ __PACKAGE__->add_columns(
         size          => 1,
         is_nullable   => 0,
         default_value => 1,
-    }
+    },
+    superadmin => {
+        data_type     => 'int',
+        size          => 1,
+        is_nullable   => 0,
+        default_value => 0,
+    },
 );
 __PACKAGE__->set_primary_key(qw(id));
 __PACKAGE__->add_unique_constraint( ['username'] );
 
 __PACKAGE__->has_many( map_user_role => 'Manoc::DB::Result::UserRole', 'user_id' );
-__PACKAGE__->many_to_many( roles => 'map_user_role', 'role' );
+__PACKAGE__->many_to_many( user_roles => 'map_user_role', 'role' );
+
+__PACKAGE__->has_many( map_user_group => 'Manoc::DB::Result::UserGroup', 'user_id' );
+__PACKAGE__->many_to_many( groups => 'map_user_group', 'group' );
+
+# Just add this accessor, the map function does the expansion:
+sub all_group_roles {
+    my $self = shift;
+    my $roles = {};
+    foreach my $group ($self->groups) {
+	foreach my $role ($group->roles) {
+	    $roles->{$role} = 1;
+	}
+    }
+    return $roles;
+ }
+
+sub roles {
+    my $self = shift;
+
+    my $roles = $self->all_group_roles();
+    foreach my $role ($self->user_roles) {
+	$roles->{$role} = 1;
+    }
+    return $roles;
+}
 
 =head1 NAME
 
