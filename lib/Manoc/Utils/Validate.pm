@@ -188,7 +188,7 @@ sub _validate_hash {
 
         # check for unknown items
         if ( !$rule->{ignore_extra_items} ) {
-            for my $k ( keys($data) ) {
+            for my $k ( keys(%$data) ) {
 
                 next if exists( $item_rules->{$k} );
 
