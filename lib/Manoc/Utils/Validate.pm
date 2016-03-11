@@ -155,7 +155,7 @@ sub _validate_hash {
     if ( my $item_rules = $rule->{items} ) {
 
     ITEM:
-        while ( my ( $field, $item_rule ) = each($item_rules) ) {
+        while ( my ( $field, $item_rule ) = each(%$item_rules) ) {
             if ( !exists $data->{$field} ) {
                 # give error if it is required
                 if ( $item_rule->{required} ) {
