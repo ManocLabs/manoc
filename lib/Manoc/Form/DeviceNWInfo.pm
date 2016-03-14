@@ -175,7 +175,7 @@ override 'update_model' => sub {
     foreach my $k (qw/password password2/) {
         exists $values->{password} or next;
 
-        defined($values->{password}) or
+        defined( $values->{password} ) or
             delete $values->{password};
     }
 

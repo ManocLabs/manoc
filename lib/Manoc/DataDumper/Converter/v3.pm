@@ -18,8 +18,8 @@ has 'device_id_map' => (
 );
 
 has 'device_id_counter' => (
-    isa => 'Int',
-    is  => 'rw',
+    isa     => 'Int',
+    is      => 'rw',
     default => 1
 );
 

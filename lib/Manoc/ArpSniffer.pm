@@ -170,7 +170,7 @@ sub handle_arp_packets {
 
     # check packet type
     return unless $type == ETH_TYPE_ARP();
-    # get vlan id   
+    # get vlan id
     my $vlan = $eth->{vid} || $self->default_vlan;
 
     # use vlan filter

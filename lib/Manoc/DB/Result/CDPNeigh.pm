@@ -62,8 +62,10 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
     to_device_info => 'Manoc::DB::Result::Device',
     { 'foreign.mng_address' => 'self.to_device' },
-    { join_type             => 'LEFT',
-      is_foreign_key_constraint => 0 },
+    {
+        join_type                 => 'LEFT',
+        is_foreign_key_constraint => 0
+    },
 );
 
 =head1 NAME
