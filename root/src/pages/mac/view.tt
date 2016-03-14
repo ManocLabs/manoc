@@ -60,7 +60,7 @@
         <tr>
 	  [%- IF r.device_entry %]
  	  <td>[% print_device(r.device_entry) %]</td>
- 	  <td>[% print_iface(r.device_entry, r.interface) %]</td>
+ 	  <td>[% print_iface(r.device_entry.id, r.interface) %]</td>
 	  [% ELSE %]
  	  <td>[% r.device.name | html %]</td>
 	  <td>-</td>
