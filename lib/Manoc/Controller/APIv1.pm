@@ -34,7 +34,7 @@ has use_json_boolean => (
 
 sub begin : Private {
     my ( $self, $c ) = @_;
-    $c->stash( skip_csrf => 1 );
+    $c->stash( is_api => 1 );
 }
 
 sub base : Chained('/') PathPart('api/v1') CaptureArgs(0) {
@@ -45,12 +45,14 @@ sub base : Chained('/') PathPart('api/v1') CaptureArgs(0) {
         $c->authenticate( {}, 'agent' );
 }
 
-sub deserialize : Chained('base') : CaptureArgs(0) : PathPart('') {
+sub deserialize : Chained('base') CaptureArgs(0) PathPart('') {
     my ( $self, $c ) = @_;
-    my $req_params;
 
     if ( $c->req->body_data && scalar( keys %{ $c->req->body_data } ) ) {
+        $c->log->debug('Deserializing body data for API input');
         $c->stash( api_request_data => $c->req->body_data );
+    } else {
+        $c->log->debug('No body data for API input');
     }
 }
 
@@ -73,12 +75,13 @@ sub end : Private {
     }
 
     if ( $c->res->status == 200 ) {
+        $c->log->debug("Building response");
         my $data = $c->stash->{api_response_data};
         $c->stash->{$expose_stash} = $data;
     }
     else {
         # build the response data using error message
-
+        $c->log->debug("Building error response");
         my $data          = {};
         my $field_errors  = $c->stash->{api_field_errors};
         my $error_message = $c->stash->{api_error_message} ||
@@ -97,13 +100,13 @@ sub end : Private {
 sub validate : Private {
     my ( $self, $c ) = @_;
 
-    my $data  = $c->stash->{req_data};
+    my $data  = $c->stash->{api_request_data};
     my $rules = $c->stash->{api_validate};
 
     my $result = Manoc::Utils::Validate::validate( $data, $rules );
     if ( !$result->{valid} ) {
-        $c->stash( field_errors => $result->{errors} );
-        $c->detach();
+        $c->stash(api_field_errors => $result->{errors});
+        return 0;
     }
     return 1;
 }
