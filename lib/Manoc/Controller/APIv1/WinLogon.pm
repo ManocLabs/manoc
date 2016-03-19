@@ -22,7 +22,7 @@ BEGIN { extends 'Manoc::Controller::APIv1' }
 
 =cut
 
-sub winlogon_base : Chained('deserialize') PathPart('winlogon') {
+sub winlogon_base : Chained('deserialize') PathPart('winlogon') CaptureArgs(0) {
     return;
 }
 
@@ -32,25 +32,27 @@ POST api/v1/winlogon
 
 =cut
 
-sub winlogon_post : Chained('winlogon_base') Args(0) POST {
+sub winlogon_post : Chained('winlogon_base') PathPart('') Args(0) POST {
     my ( $self, $c ) = @_;
 
     $c->stash(
         api_validate => {
-            user => {
-                type     => 'scalar',
-                required => 1,
-            },
-
-            ipaddr => {
-                type     => 'scalar',
-                required => 1,
-            },
+            type => 'hash',
+            items => {
+                user => {
+                    type     => 'scalar',
+                    required => 1,
+                },
+                ipaddr => {
+                    type     => 'scalar',
+                    required => 1,
+                },
+            }
         }
     );
     $c->forward('validate') or return;
 
-    my $req_data = $c->stash->{request_data};
+    my $req_data = $c->stash->{api_request_data};
 
     my $user   = $req_data->{user};
     my $ipaddr = $req_data->{ipaddr};

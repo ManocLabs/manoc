@@ -38,15 +38,21 @@ sub index : Path : Args(0) {
 
 =head2 auto
 
-Perform CSRF checks for POST requests, sets is_xhr for async request, check authentication.
+Perform CSRF checks for POST requests, sets is_xhr for async request,
+check authentication.
 
 =cut
 
 sub auto : Private {
     my ( $self, $c ) = @_;
 
+    # Do not use csrf protection for APIs
+    $c->stash->{is_api} and
+        $c->stash->{skip_csrf} = 1;
+
     # CSRF protection
-    $c->log->debug( "skip CSRF = " . ( $c->stash->{skip_csrf} || 'undef' ) );
+    $c->stash->{skip_csrf} //= 0;
+    $c->log->debug( "Manoc root: skip CSRF = ", $c->stash->{skip_csrf} );
     if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf} ) {
         $c->log->debug("POST method, token validation required");
         $c->require_valid_token();
@@ -59,6 +65,7 @@ sub auto : Private {
     else {
         $c->stash->{is_xhr} = 0;
     }
+    $c->log->debug( "is_xhr = ", $c->stash->{is_xhr} );
 
     ## output format selection ##
     if ( my $fmt = $c->req->param('format') ) {
@@ -68,8 +75,9 @@ sub auto : Private {
 
     ## check authentication ##
     if ( !$self->check_auth($c) ) {
+        $c->log->debug("Not authenticated");
 
-        if ( $c->stash->{is_xhr} ) {
+        if ( $c->stash->{is_api} || $c->stash->{is_xhr} ) {
             $self->forward('error/http_403');
         }
         else {
@@ -84,7 +92,6 @@ sub auto : Private {
         }
         return 0;
     }
-
     return 1;
 }
 
@@ -97,7 +104,7 @@ sub check_auth {
     $c->controller eq $c->controller('Auth') and
         return 1;
 
-    $c->controller->isa('Manoc::Controller::APIv1') and
+    $c->stash->{is_api} and
         return 1;
 
     return $c->user_exists;
@@ -145,6 +152,7 @@ Shows 403 error page for Manoc using Error controller
 
 sub access_denied : Private {
     my ( $self, $c, $action ) = @_;
+    $c->log->debug("Error 403");
     $c->detach('error/http_403');
 }
 

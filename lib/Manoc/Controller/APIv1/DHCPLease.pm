@@ -22,7 +22,7 @@ BEGIN { extends 'Manoc::Controller::APIv1' }
 
 =cut
 
-sub lease_base : Chained('deserialize') PathPart('dhcp/lease') {
+sub lease_base : Chained('deserialize') PathPart('dhcp/lease') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->stash( resultset => $c->model('ManocDB::DHCPLease') );
 }
@@ -33,25 +33,27 @@ POST api/v1/dhcp/lease
 
 =cut
 
-sub lease_post : Chained('lease_base') Args(0) POST {
+sub lease_post : Chained('lease_base') PathPart('') POST {
     my ( $self, $c ) = @_;
 
     $c->stash(
         api_validate => {
-            server => {
-                type     => 'scalar',
-                required => 1,
-            },
-
-            leases => {
-                type     => 'array',
-                required => 1,
+            type => 'hash',
+            items => {
+                server => {
+                    type     => 'scalar',
+                    required => 1,
+                },
+                leases => {
+                    type     => 'array',
+                    required => 1,
+                },
             },
         }
     );
     $c->forward('validate') or return;
 
-    my $req_data = $c->stash->{request_data};
+    my $req_data = $c->stash->{api_request_data};
 
     my $server  = $req_data->{server};
     my $records = $req_data->{leases};

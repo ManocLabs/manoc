@@ -24,9 +24,10 @@ BEGIN { extends 'Manoc::Controller::APIv1' }
 
 =cut
 
-sub reservation_base : Chained('deserialize') PathPart('dhcp/reservation') {
+sub reservation_base : Chained('deserialize') PathPart('dhcp/reservation') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->stash( resultset => $c->model('ManocDB::DHCPReservation') );
+    $c->log->debug("I was here");
 }
 
 =head2 reservation_post
@@ -35,28 +36,30 @@ POST api/v1/dhcp/reservation
 
 =cut
 
-sub reservation_post : Chained('reservation_base') Args(0) POST {
+sub reservation_post : Chained('reservation_base') PathPart('') POST {
     my ( $self, $c ) = @_;
 
     $c->stash(
         api_validate => {
-            server => {
-                type     => 'scalar',
-                required => 1,
-            },
-
-            reservations => {
-                type     => 'array',
-                required => 1,
-            },
+            type => 'hash',
+            items => {
+                server => {
+                    type     => 'scalar',
+                    required => 1,
+                },
+                reservations => {
+                    type     => 'array',
+                    required => 1,
+                },
+            }
         }
     );
     $c->forward('validate') or return;
 
-    my $req_data = $c->stash->{request_data};
+    my $req_data = $c->stash->{api_request_data};
     my $server   = $req_data->{server};
 
-    my $records   = $req_data->{leases};
+    my $records   = $req_data->{reservations};
     my $n_created = 0;
     my $rs        = $c->stash->{resultset};
     foreach my $r (@$records) {

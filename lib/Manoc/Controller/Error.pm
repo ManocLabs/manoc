@@ -22,7 +22,7 @@ Catalyst Controller for showing error pages
 
 =head2 http_403
 
-Error page for HTTP 404.
+Error page for HTTP 403.
 
 =cut
 
@@ -30,7 +30,6 @@ sub http_403 : Private {
     my ( $self, $c ) = @_;
     $c->response->status(403);
     $c->stash( template => 'error_403.tt' );
-    $c->response->status(404);
 }
 
 =head2 http_404
