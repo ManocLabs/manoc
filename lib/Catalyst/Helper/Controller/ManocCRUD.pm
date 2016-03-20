@@ -14,7 +14,7 @@ use FindBin;
 use lib "$FindBin::Bin:../lib";
 
 use File::Spec::Functions qw(catdir catfile canonpath);
-use HTML::FormHandler::Generator::DBIC;
+use Catalyst::Helper::Controller::ManocCRUD::Form;
 
 =head1 NAME
 
@@ -100,7 +100,7 @@ sub mk_compclass {
         push @{ $params->{columns} }, $col;
     }
 
-    my $form_generator = HTML::FormHandler::Generator::DBIC->new(
+    my $form_generator = Catalyst::Helper::Controller::ManocCRUD::Form->new(
         schema       => $schema,
         rs_name      => $model_name,
         class_prefix => 'Manoc::Form',
