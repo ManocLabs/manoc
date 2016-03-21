@@ -61,11 +61,10 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
     my $n_created = 0;
     my $rs        = $c->stash->{resultset};
     foreach my $r (@$records) {
-        my $macaddr = $r->{macaddr}                               or next;
-        my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
-        my $status  = $r->{server};
-        my $hostname = $r->{hostname};
-        my $name     = $r->{name};
+        my $macaddr  = $r->[0]                               or next;
+        my $ipaddr   = Manoc::IPAddress::IPv4->new( $r->[1]) or next;
+        my $hostname = $r->[2];
+        my $name     = $r->[3];
 
         $rs->update_or_create(
             {
