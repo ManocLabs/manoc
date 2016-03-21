@@ -57,17 +57,15 @@ sub lease_post : Chained('lease_base') PathPart('') POST {
 
     my $server  = $req_data->{server};
     my $records = $req_data->{leases};
-
     my $n_created = 0;
     my $rs        = $c->stash->{resultset};
     foreach my $r (@$records) {
-        my $macaddr = $r->{macaddr}                               or next;
-        my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
-        my $start   = $r->{start}                                 or next;
-        my $end     = $r->{end}                                   or next;
-
-        my $hostname = $r->{hostname};
-        my $status   = $r->{status};
+        my $macaddr  = $r->[0]                                 or next;
+        my $ipaddr   = Manoc::IPAddress::IPv4->new( $r->[1] )  or next;
+        my $start    = $r->[2]                                 or next;
+        my $end      = $r->[3]                                 or next;
+        my $hostname = $r->[4];
+        my $status   = $r->[5];
 
         $rs->update_or_create(
             {
