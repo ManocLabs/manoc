@@ -6,8 +6,6 @@ package Manoc::Controller::APIv1::DHCPReservation;
 use Moose;
 use namespace::autoclean;
 
-with 'Manoc::ControllerRole::ResultSet';
-
 =head1 NAME
 
 Manoc::Controller::APIv1::DHCP - Catalyst Controller for DHCP APIs
