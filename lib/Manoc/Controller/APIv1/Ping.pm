@@ -12,7 +12,7 @@ sub ping : Chained('deserialize') PathPart('ping') Args(0) GET {
     my ( $self, $c ) = @_;
 
     my $data = {
-        request   => $c->stash->{request_data},
+        request   => $c->stash->{api_request_data},
         timestamp => time,
     };
 
