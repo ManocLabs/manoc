@@ -37,7 +37,7 @@ sub winlogon_post : Chained('winlogon_base') PathPart('') Args(0) POST {
 
     $c->stash(
         api_validate => {
-            type => 'hash',
+            type  => 'hash',
             items => {
                 user => {
                     type     => 'scalar',

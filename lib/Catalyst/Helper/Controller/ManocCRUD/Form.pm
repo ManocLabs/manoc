@@ -6,7 +6,7 @@ use Moose;
 extends 'HTML::FormHandler::Generator::DBIC';
 
 sub _build_schema {
-    my $self = shift;
+    my $self        = shift;
     my $schema_name = $self->schema_name;
     eval "require $schema_name";
     die $@ if $@;

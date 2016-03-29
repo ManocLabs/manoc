@@ -39,7 +39,7 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
 
     $c->stash(
         api_validate => {
-            type => 'hash',
+            type  => 'hash',
             items => {
                 server => {
                     type     => 'scalar',
