@@ -28,7 +28,7 @@ Catalyst controller role for Manoc common CRUD implementation.
   extends "Catalyst::Controller";
   with "Manoc::ControllerRole::CommonCRUD";
 
-  __PACKAGE__->config( 
+  __PACKAGE__->config(
       # define PathPart
       action => {
           setup => {
@@ -90,6 +90,16 @@ has 'object_deleted_message' => (
     default => 'Deleted',
 );
 
+has 'create_form_class' => (
+    is  => 'rw',
+    isa => 'ClassName'
+);
+
+has 'edit_form_class' => (
+    is  => 'rw',
+    isa => 'ClassName'
+);
+
 =head1 ACTIONS
 
 =head2 create
@@ -103,9 +113,10 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
 
     my $object = $c->stash->{resultset}->new_result( {} );
     $c->stash(
-        object   => $object,
-        title    => $self->create_page_title,
-        template => $self->create_page_template,
+        object     => $object,
+        title      => $self->create_page_title,
+        template   => $self->create_page_template,
+        form_class => $self->create_form_class,
     );
     $c->detach('form');
 }
@@ -149,8 +160,9 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(
-        title    => $self->edit_page_title,
-        template => $self->edit_page_template,
+        title      => $self->edit_page_title,
+        template   => $self->edit_page_template,
+        form_class => $self->edit_form_class,
     );
     $c->detach('form');
 }

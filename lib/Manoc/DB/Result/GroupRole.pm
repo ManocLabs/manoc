@@ -25,7 +25,7 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key(qw/group_id role_id/);
 
 __PACKAGE__->belongs_to( group => 'Manoc::DB::Result::Group', 'group_id' );
-__PACKAGE__->belongs_to( role => 'Manoc::DB::Result::Role', 'role_id' );
+__PACKAGE__->belongs_to( role  => 'Manoc::DB::Result::Role',  'role_id' );
 
 =head1 NAME
 

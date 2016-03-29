@@ -1,0 +1,20 @@
+[%
+   page.title='View Group'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('group/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('group/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>description</dt>
+  <dd>[% object.description | html %]</dd>
+</dl>

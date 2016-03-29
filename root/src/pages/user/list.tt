@@ -1,7 +1,7 @@
-[% 
+[%
    page.section='Config'
    page.subsection='Users'
-   page.title='List'   
+   page.title='List'
 -%]
 <div id='user_create'>
   <a href="[% c.uri_for_action('/user/create') %]" class="btn btn-sm btn-default">
@@ -9,40 +9,48 @@
 </div>
 
 <table class="table">
-  <thead>  
+  <thead>
     <tr>
       <th>Name</th>
       <th>Full Name</th>
       <th>Email</th>
-      <th>Roles</th>
+      <th>Administrator</th>
       <th>Active</th>
       <th></th>
     </tr>
-  </thead>  
+  </thead>
   <tbody>
     [% FOREACH user IN object_list  %]
     <tr>
       <td>[% user.username | html %]</td>
       <td>[% user.fullname | html %]</td>
       <td>[% user.email | html %]</td>
-      <td>[% FOREACH role IN user.roles %][% role.role %] [% END %]</td>
+      <td>
+	[% IF user.admin -%]
+      [% bootstrap_icon('ok') %]<span class="sr-only">Admin</span>
+    [% ELSE %]
+	  [% bootstrap_icon('minus') %]<span class="sr-only">Not admin</span>
+	[% END -%]
+      </td>
       <td>
 	[% IF user.active -%]
-	[% bootstrap_icon('ok') %]<span class="sr-only">Active</span>
-        [% ELSE %]
-	[% bootstrap_icon('minus') %]<span class="sr-only">Not active</span>
+	  [% bootstrap_icon('ok') %]<span class="sr-only">Active</span>
+    [% ELSE %]
+	  [% bootstrap_icon('minus') %]<span class="sr-only">Not active</span>
 	[% END -%]
       </td>
       <td>
 	<a href="[% c.uri_for_action('user/edit',[user.id])%]">[% bootstrap_icon('pencil') %]
 	  <span class="sr-only">Edit</span>
-	</a>  
+	</a>
+    <a href="[% c.uri_for_action('user/admin_password',[user.id])%]">[% bootstrap_icon('lock') %]
+	  <span class="sr-only">Change password</span>
+	</a>
 	<a href="[% c.uri_for_action('user/delete',[user.id])%]">[% bootstrap_icon('trash') %]
 	  <span class="sr-only">Delete</span>
 	</a>
-      </td>          
+      </td>
     </tr>
     [% END %]
   </tbody>
 </table>
-

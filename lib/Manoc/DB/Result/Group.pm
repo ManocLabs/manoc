@@ -9,7 +9,6 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-
 __PACKAGE__->load_components(qw(PK::Auto Core));
 
 __PACKAGE__->table('groups');
@@ -25,8 +24,8 @@ __PACKAGE__->add_columns(
         is_nullable => 0
     },
     description => {
-	data_type   => 'text',
-	is_nullable => 1,
+        data_type   => 'text',
+        is_nullable => 1,
     },
 );
 __PACKAGE__->set_primary_key(qw(id));
@@ -36,8 +35,7 @@ __PACKAGE__->has_many( map_user_role => 'Manoc::DB::Result::GroupRole', 'group_i
 __PACKAGE__->many_to_many( roles => 'map_user_role', 'role' );
 
 __PACKAGE__->has_many( map_user_group => 'Manoc::DB::Result::UserGroup', 'group_id' );
-__PACKAGE__->many_to_many( users => 'map_user_group', 'group' );
-
+__PACKAGE__->many_to_many( users => 'map_user_group', 'user' );
 
 =head1 NAME
 

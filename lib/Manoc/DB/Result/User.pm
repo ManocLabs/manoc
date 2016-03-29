@@ -67,22 +67,22 @@ __PACKAGE__->many_to_many( groups => 'map_user_group', 'group' );
 
 # Just add this accessor, the map function does the expansion:
 sub all_group_roles {
-    my $self = shift;
+    my $self  = shift;
     my $roles = {};
-    foreach my $group ($self->groups) {
-	foreach my $role ($group->roles) {
-	    $roles->{$role} = 1;
-	}
+    foreach my $group ( $self->groups ) {
+        foreach my $role ( $group->roles ) {
+            $roles->{$role} = 1;
+        }
     }
     return $roles;
- }
+}
 
 sub roles {
     my $self = shift;
 
     my $roles = $self->all_group_roles();
-    foreach my $role ($self->user_roles) {
-	$roles->{$role} = 1;
+    foreach my $role ( $self->user_roles ) {
+        $roles->{$role} = 1;
     }
     return $roles;
 }
