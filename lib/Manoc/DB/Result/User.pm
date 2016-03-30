@@ -55,6 +55,12 @@ __PACKAGE__->add_columns(
         is_nullable   => 0,
         default_value => 0,
     },
+    agent => {
+        data_type     => 'int',
+        size          => 1,
+        is_nullable   => 0,
+        default_value => 0,
+    },
 );
 __PACKAGE__->set_primary_key(qw(id));
 __PACKAGE__->add_unique_constraint( ['username'] );
