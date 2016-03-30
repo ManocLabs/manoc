@@ -40,7 +40,7 @@ requires 'Plack::Middleware::ReverseProxy';
 requires 'POE';
 requires 'Digest::SHA1';
 requires 'Archive::Tar';
-
+requires 'Set::Object';
 
 on 'test' => sub {
   requires 'Test::More';

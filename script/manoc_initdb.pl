@@ -13,6 +13,9 @@ use Moose;
 use Manoc::Logger;
 use Manoc::IPAddress::IPv4;
 
+use Manoc::CatalystPlugin::Permission;
+use Catalyst::Utils;
+
 extends 'Manoc::Script';
 with 'MooseX::Getopt::Dashes';
 
@@ -36,16 +39,13 @@ sub run {
     $self->init_vlan;
     $self->init_ipnetwork;
     $self->init_management_url;
+    $self->init_roles;
 }
 
 sub do_reset_admin {
     my ($self) = @_;
 
     my $schema = $self->schema;
-    $self->log->info('Creating admin role.');
-    my $admin_role = $schema->resultset('Role')->update_or_create( { role => 'admin', } );
-    $self->log->info('Creating user role.');
-    $schema->resultset('Role')->update_or_create( { role => 'user', } );
 
     $self->log->info('Creating admin user.');
     my $admin_user = $schema->resultset('User')->update_or_create(
@@ -55,13 +55,9 @@ sub do_reset_admin {
             active     => 1,
             password   => 'admin',
             superadmin => 1,
+            agent      => 0,
         }
     );
-    $self->log->info('Adding admin role to the admin user (password: admin)... done.');
-
-    if ( $admin_user->roles->search( { role => 'admin' } )->count == 0 ) {
-        $admin_user->add_to_roles($admin_role);
-    }
 }
 
 sub init_vlan {
@@ -88,9 +84,13 @@ sub init_vlan {
 sub init_ipnetwork {
     my ($self) = @_;
 
-    $self->log->info('Creating some sample networks');
     my $schema = $self->schema;
     my $rs     = $schema->resultset('IPNetwork');
+
+    $rs->count() > 0 and return;
+
+    $self->log->info('Creating some sample networks');
+
     $rs->update_or_create(
         {
             address => Manoc::IPAddress::IPv4->new("10.10.0.0"),
@@ -133,6 +133,24 @@ sub init_ipnetwork {
             name    => 'Workstations'
         }
     );
+}
+
+sub init_roles {
+    my ($self) = @_;
+
+    my $schema = $self->schema;
+    my $rs     = $schema->resultset('Role');
+    $self->log->info('Creating configured roles');
+
+    my $default_roles = \%Manoc::CatalystPlugin::Permission::DEFAULT_ROLES;
+    my $conf_roles = $self->config->{'Manoc::Permission'}->{roles};
+
+    my $roles = Catalyst::Utils::merge_hashes($default_roles, $conf_roles );
+
+    foreach my $role (keys %$roles) {
+        $rs->update_or_create( { role  => $role} );
+    }
+
 }
 
 sub init_management_url {

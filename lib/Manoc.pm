@@ -29,6 +29,7 @@ use Catalyst qw/
     Session::Store::DBI
     Session::State::Cookie
     +Manoc::CatalystPlugin::RequestToken
+    +Manoc::CatalystPlugin::Permission
 
     StackTrace
     /;
