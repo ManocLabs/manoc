@@ -38,7 +38,7 @@ sub lease_post : Chained('lease_base') PathPart('') POST {
 
     $c->stash(
         api_validate => {
-            type => 'hash',
+            type  => 'hash',
             items => {
                 server => {
                     type     => 'scalar',

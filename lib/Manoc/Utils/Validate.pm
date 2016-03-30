@@ -6,6 +6,7 @@ package Manoc::Utils::Validate;
 use strict;
 use warnings;
 use Carp 'croak';
+
 BEGIN {
     use Exporter 'import';
     our @EXPORT_OK = qw/
@@ -81,7 +82,7 @@ sub validate {
         };
     }
 
-    if (!exists($rule->{type}) and $rule->{arrayof}) {
+    if ( !exists( $rule->{type} ) and $rule->{arrayof} ) {
         $rule->{type} = 'array';
     }
 
@@ -94,7 +95,8 @@ sub validate {
                 error => "Expected $expected_type",
             };
         }
-    } else {
+    }
+    else {
         croak 'type rule is required';
     }
 

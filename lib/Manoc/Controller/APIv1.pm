@@ -51,7 +51,8 @@ sub deserialize : Chained('base') CaptureArgs(0) PathPart('') {
     if ( $c->req->body_data && scalar( keys %{ $c->req->body_data } ) ) {
         $c->log->debug('Deserializing body data for API input');
         $c->stash( api_request_data => $c->req->body_data );
-    } else {
+    }
+    else {
         $c->log->debug('No body data for API input');
     }
 }
@@ -105,7 +106,7 @@ sub validate : Private {
 
     my $result = Manoc::Utils::Validate::validate( $data, $rules );
     if ( !$result->{valid} ) {
-        $c->stash(api_field_errors => $result->{errors});
+        $c->stash( api_field_errors => $result->{errors} );
         return 0;
     }
     return 1;
