@@ -71,6 +71,13 @@ sub setup_permissions {
     $app->_permission_to_role( $permission_to_role );
 }
 
+sub require_permission {
+    my $c = shift;
+
+    $c->check_permission(@_) or
+        detach('access_denied');
+}
+
 sub check_permission {
     my ($c, $object, $operation, $maybe_user) = @_;
 
