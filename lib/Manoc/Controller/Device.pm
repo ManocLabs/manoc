@@ -42,6 +42,9 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::Device',
     form_class => 'Manoc::Form::Device',
+    enable_permission_check => 1,
+    view_object_perm => undef,
+
 );
 
 =head1 ACTIONS

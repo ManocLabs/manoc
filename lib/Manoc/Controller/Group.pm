@@ -31,6 +31,7 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::Group',
     form_class => 'Manoc::Form::Group',
+    enable_permission_check => 1,
 );
 
 =head1 AUTHOR

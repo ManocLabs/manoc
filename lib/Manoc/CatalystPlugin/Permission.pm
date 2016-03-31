@@ -71,11 +71,15 @@ sub setup_permissions {
     $app->_permission_to_role( $permission_to_role );
 }
 
+sub get_roles_for_perm {
+    return shift->_permission_to_role->{shift};
+}
+
 sub require_permission {
     my $c = shift;
 
     $c->check_permission(@_) or
-        detach('access_denied');
+        $c->detach('/access_denied');
 }
 
 sub check_permission {
@@ -98,6 +102,7 @@ sub check_permission {
          unless $user->supports(qw/roles/);
 
     if ($user->superadmin) {
+        $c->log->debug("Skipping permission check for superadmin") if $c->debug;
         return 1;
     }
 
@@ -112,8 +117,11 @@ sub check_permission {
 
         if ($object->isa("DBIx::Class::ResultSource")) {
             $class_name = $object->source_name;
+        } elsif ($object->isa("DBIx::Class::ResultSet") ||
+                $object->isa("DBIx::Class::Row")) {
+            $class_name = $object->result_source->source_name;
         } else {
-            Catalyst::Exception->throw("Object isn't a resultset");
+            Catalyst::Exception->throw("Cannot guess object source_name");
         }
 
     } else {

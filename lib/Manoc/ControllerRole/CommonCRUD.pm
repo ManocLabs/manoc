@@ -110,25 +110,25 @@ has 'enable_permission_check' => (
 
 has 'view_object_perm' => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => 'Maybe[Str]',
     default => 'view',
 );
 
 has 'create_object_perm' => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => 'Maybe[Str]',
     default => 'create',
 );
 
 has 'edit_object_perm' => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => 'Maybe[Str]',
     default => 'edit',
 );
 
 has 'delete_object_perm' => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => 'Maybe[Str]',
     default => 'delete',
 );
 
@@ -145,8 +145,8 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
 
     my $object = $c->stash->{resultset}->new_result( {} );
 
-    if ( $c->enable_permission_check && $c->create_object_perm ) {
-        $c->require_permission($object, $c->create_object_perm);
+    if ( $self->enable_permission_check && $self->create_object_perm ) {
+        $c->require_permission($object, $self->create_object_perm);
     }
 
     $c->stash(
@@ -169,8 +169,8 @@ Display a list of items.
 sub list : Chained('object_list') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
 
-    if ( $c->enable_permission_check && $c->view_object_perm ) {
-        $c->require_permission($c->stash->{resultset}, $c->view_object_perm);
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission($c->stash->{resultset}, $self->view_object_perm);
     }
 
     $c->stash(
@@ -189,8 +189,8 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $object = $c->stash->{object};
-    if ( $c->enable_permission_check && $c->view_object_perm ) {
-        $c->require_permission($object, $c->view_object_perm);
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission($object, $self->view_object_perm);
     }
 
     $c->stash(
@@ -209,8 +209,8 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $object = $c->stash->{object};
-    if ( $c->enable_permission_check && $c->edit_object_perm ) {
-        $c->require_permission($object, $c->edit_object_perm);
+    if ( $self->enable_permission_check && $self->edit_object_perm ) {
+        $c->require_permission($object, $self->edit_object_perm);
     }
 
     $c->stash(
@@ -229,8 +229,8 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $object = $c->stash->{object};
-    if ( $c->enable_permission_check && $c->delete_object_perm ) {
-        $c->require_permission($object, $c->delete_object_perm);
+    if ( $self->enable_permission_check && $self->delete_object_perm ) {
+        $c->require_permission($object, $self->delete_object_perm);
     }
 
     if ( $c->req->method eq 'POST' ) {
