@@ -84,8 +84,7 @@ __PACKAGE__->config(
                 store => {
                     class         => 'DBIx::Class',
                     user_model    => 'ManocDB::User',
-                    role_relation => 'roles',
-                    role_field    => 'role',
+                    role_column   => 'roles',
                 },
             },
             agent => {
@@ -98,8 +97,7 @@ __PACKAGE__->config(
                 store => {
                     class         => 'DBIx::Class',
                     user_model    => 'ManocDB::User',
-                    role_relation => 'roles',
-                    role_field    => 'role',
+                    role_column   => 'roles',
                 }
             },
         },
