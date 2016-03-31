@@ -120,18 +120,21 @@ sub check_permission {
         $class_name = $object;
     }
 
+    # construct permission symbolic name
     my $permission = lc($class_name);
     my $star_permission;
-
     if ($operation) {
         $star_permission = "$permission.*";
         $permission .= '.' . lc($operation);
     }
+    $c->log->debug("Checking permission $permission") if $c->debug;
 
+    # get roles which grant the permission
     my $need = Set::Object->new( $c->get_roles_for_perm($permission) );
     $star_permission and
         $need->insert( $c->get_roles_for_perm($star_permission));
 
+    # user role set
     my $have = Set::Object->new( $user->roles );
 
     if ( $have->intersection($need)->size > 0 ) {
