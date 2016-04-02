@@ -1,3 +1,5 @@
 [% META title='Access Denied' %]
 
+[% IF ! c.user %]
 <p><a href="[% c.uri_for_action('/auth/login') %]">Try to log in before...</a></p>
+[% END %]
