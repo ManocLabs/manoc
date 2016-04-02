@@ -30,11 +30,16 @@ our %DEFAULT_ROLES = (
         'device.*',
         'building.*',
         'rack.*',
+        'uplink.*',
     ],
     'NetworkManager' => [
+        'ifnotes.*',
+        'ip.*',
+        'ipblock.*',
+        'ipnetwork.*',
+        'uplink.*',
         'vlan.*',
         'vlanrange.*',
-        'ipnetwork.*',
     ],
 );
 

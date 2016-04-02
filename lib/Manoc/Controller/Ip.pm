@@ -97,9 +97,12 @@ sub edit : Chained('base') PathPart('edit') Args(0) {
 
     my $item      = $c->stash->{object};
     my $ipaddress = $c->stash->{ipaddress};
-    if ( !$item ) {
+    if ( $item ) {
+        $c->require_permission($item, 'edit');
+    } else {
         $item = $c->model('ManocDB::Ip')->new_result( {} );
         $item->ipaddr($ipaddress);
+        $c->require_permission($item, 'create');
     }
 
     my $form = Manoc::Form::Ip->new( ipaddr => $ipaddress->address );
