@@ -18,7 +18,6 @@ requires 'Catalyst::Plugin::StackTrace';
 requires 'Catalyst::Plugin::Session';
 requires 'Catalyst::Plugin::Session::Store::DBI';
 requires 'Catalyst::Plugin::Session::State::Cookie';
-requires 'Catalyst::Plugin::Authorization::Roles';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::View::TT';
 requires 'Catalyst::View::JSON';
@@ -40,7 +39,6 @@ requires 'Plack::Middleware::ReverseProxy';
 requires 'POE';
 requires 'Digest::SHA1';
 requires 'Archive::Tar';
-requires 'Set::Object';
 
 on 'test' => sub {
   requires 'Test::More';

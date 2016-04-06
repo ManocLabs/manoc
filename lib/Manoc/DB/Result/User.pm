@@ -72,25 +72,29 @@ __PACKAGE__->has_many( map_user_group => 'Manoc::DB::Result::UserGroup', 'user_i
 __PACKAGE__->many_to_many( groups => 'map_user_group', 'group' );
 
 # Just add this accessor, the map function does the expansion:
-sub all_group_roles {
+sub group_roleset {
     my $self  = shift;
     my $roles = {};
     foreach my $group ( $self->groups ) {
         foreach my $role ( $group->roles ) {
-            $roles->{$role} = 1;
+            $roles->{$role->role} = 1;
         }
     }
     return $roles;
 }
 
-sub roles {
+sub roleset {
     my $self = shift;
 
-    my $roles = $self->all_group_roles();
+    my $roles = $self->group_roleset();
     foreach my $role ( $self->user_roles ) {
-        $roles->{$role} = 1;
+        $roles->{$role->role} = 1;
     }
     return $roles;
+}
+
+sub roles {
+    return join(",", keys(shift->roleset));
 }
 
 =head1 NAME

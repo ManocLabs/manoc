@@ -8,6 +8,7 @@ use Moose;
 with 'Catalyst::ClassData';
 
 use MRO::Compat;
+
 use Catalyst::Exception ();
 use Carp;
 use Catalyst::Utils;
@@ -16,7 +17,8 @@ use Scalar::Util;
 
 use namespace::clean -except => 'meta';
 
-__PACKAGE__->mk_classdata( "_permission_to_role" );
+__PACKAGE__->mk_classdata( "_permission_roles_map" );
+
 
 
 our %DEFAULT_ROLES = (
@@ -43,11 +45,11 @@ our %DEFAULT_ROLES = (
     ],
 );
 
-
 sub _permission_plugin_config {
     my $c = shift;
     return $c->config->{'Manoc::Permission'} ||= {};
 }
+
 
 sub setup {
     my $app = shift;
@@ -60,25 +62,38 @@ sub setup {
 
 sub setup_permissions {
     my $app = shift;
-    my $permission_to_role = {};
-
     my $cfg = $app->_permission_plugin_config;
     my $roles_config = $cfg->{'roles'};
 
     my $roles = Catalyst::Utils::merge_hashes(\%DEFAULT_ROLES, $roles_config );
-
-    while ( my ($role, $perms) = each(%$roles) ) {
-        foreach my $perm (@$perms) {
-            push @{$permission_to_role->{$perm}}, $role;
-        }
-    }
-
-    $app->_permission_to_role( $permission_to_role );
+    $app->_permission_roles_map($roles);
 }
 
-sub get_roles_for_perm {
+sub _get_roles_for_perm {
     return shift->_permission_to_role->{shift};
 }
+
+sub _check_permission_cache {
+    my ($c, $user, $permission) = @_;
+
+    my $roles2perm = $c->_permission_roles_map;
+    my $cache = $c->session->{permission_cache};
+
+    if (!defined($cache)) {
+        $cache = {};
+
+        foreach my $role ( $user->roles ) {
+            $c->log->debug( "User role: $role") if $c->debug;
+            foreach my $p (@{$roles2perm->{$role}} ) {
+                $c->log->debug( "User $p granted by $role") if $c->debug;
+                $cache->{$p} = 1;
+            }
+        }
+        $c->session->{permission_cache} = $cache;
+    }
+    return $cache->{$permission};
+}
+
 
 sub require_permission {
     my $c = shift;
@@ -92,8 +107,7 @@ sub check_permission {
 
     my $user;
     if ( Scalar::Util::blessed( $maybe_user )
-           && $maybe_user->isa("Catalyst::Authentication::User") )
-    {
+           && $maybe_user->isa("Catalyst::Authentication::User") )  {
            $user = $maybe_user;
     }
     $user ||= $c->user;
@@ -132,29 +146,28 @@ sub check_permission {
     } else {
         $class_name = $object;
     }
-
     # construct permission symbolic name
     my $permission = lc($class_name);
     my $star_permission;
     if ($operation) {
-        $star_permission = "$permission.*";
         $permission .= '.' . lc($operation);
+        $star_permission = "$permission.*";
+    } elsif ($permission =~ /([^\.]+)\.([^\.]+)/o) {
+        $star_permission = "$1.*";
     }
+
     $c->log->debug("Checking permission $permission") if $c->debug;
-
-    # get roles which grant the permission
-    my $need = Set::Object->new( $c->get_roles_for_perm($permission) );
-    $star_permission and
-        $need->insert( $c->get_roles_for_perm($star_permission));
-
-    # user role set
-    my $have = Set::Object->new( $user->roles );
-
-    if ( $have->intersection($need)->size > 0 ) {
+    if ($c->_check_permission_cache($user, $permission)) {
         $c->log->debug("Permission $permission granted") if $c->debug;
         return 1;
     }
 
+    if ($c->_check_permission_cache($user, $star_permission)) {
+        $c->log->debug("Permission $permission granted by $star_permission") if $c->debug;
+        return 1;
+    }
+
+    $c->log->debug("Permission $permission denied") if $c->debug;
     return 0;
 }
 
