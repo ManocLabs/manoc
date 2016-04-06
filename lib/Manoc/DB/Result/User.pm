@@ -94,7 +94,7 @@ sub roleset {
 }
 
 sub roles {
-    return join(",", keys(shift->roleset));
+    return join(",", keys(%{shift->roleset}));
 }
 
 =head1 NAME

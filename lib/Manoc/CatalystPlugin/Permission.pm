@@ -12,7 +12,6 @@ use MRO::Compat;
 use Catalyst::Exception ();
 use Carp;
 use Catalyst::Utils;
-use Set::Object;
 use Scalar::Util;
 
 use namespace::clean -except => 'meta';
