@@ -2,12 +2,19 @@
    page.title='Network ' _ object.name
 -%]
 [% PROCESS 'ipnetwork/_common.tt' -%]
+[%-  IF c.has_permission(object, 'edit') || c.has_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK -%]
 <div>
-  <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
+ [%-  IF c.has_permission(object, 'edit') -%]
+ <a class="btn btn-default" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
+ [%- END -%]
+ &nbsp;
+ [%-  IF c.has_permission(object, 'delete') -%]
+  <a class="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
+ [%- END -%]
 </div>
-[% END %]
+[%- END -%]
+[%- END -%]
 
 <div class="col-sm-8">
   <div class="panel panel-default">
@@ -18,7 +25,7 @@
 	<dt>Description</dt>
 	<dd>[% object.description | html %]</dd>
 	<dt>VLAN</dt>
-	<dd>[% print_vlan(object.vlan) %]</dd>	    
+	<dd>[% print_vlan(object.vlan) %]</dd>
 	<dt>Netmask</dt>
 	<dd>[% object.network.netmask | html %]</dd>
 	<dt>Broadcast</dt>
@@ -26,7 +33,7 @@
 	<dt>Wild card</dt>
 	<dd>[% object.network.wildcard | html %]</dd>
 	<dt>Max hosts</dt>
-	<dd>[% object.network.num_hosts | html %]</dd>	    
+	<dd>[% object.network.num_hosts | html %]</dd>
 	<dt>First host</dt>
 	<dd>[% object.network.first_host | html %]</dd>
 	<dt>Last host</dt>
@@ -37,15 +44,15 @@
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
 	</dd>
-	<dt>Blocks</td>	
+	<dt>Blocks</td>
 	<dd>[% FOREACH block IN object.ipblock_entries %]
 	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
       </dl>
-    </div><!-- end of content -->	
+    </div><!-- end of content -->
   </div><!-- end of panel -->
-</div><!-- end of row -->	
+</div><!-- end of row -->
 
 <div class="col-sm-4">
   <div class="panel panel-default">
@@ -69,7 +76,7 @@
 	<tr>
 	  <th>Network</th>
 	  <th>Broadcast</th>
-	<th>Name</th>	  
+	<th>Name</th>
 	</tr>
       </thead>
     <tbody>
@@ -77,7 +84,7 @@
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>
-	<td>[% print_ipnetwork(network) %]</td>	  
+	<td>[% print_ipnetwork(network) %]</td>
       </tr>
       [% END -%]
     </tbody>

@@ -3,12 +3,22 @@ page.section = 'Asset'
 page.subsection = 'Rack'
 page.title = 'Rack ' _ object.name
 -%]
+[%- IF c.has_permission(object, 'delete') || c.has_permission(object, 'edit') || c.has_permission('rack.create') -%]
 [% page.toolbar = BLOCK -%]
-  <a class="btn btn-primary" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
-  <a class="btn btn-danger" href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
-  <a class="btn  btn-default" href="[% c.uri_for_action('device/create', { rack => object.id}) %]">[% bootstrap_icon('plus') %] Add Device</a>
-[% END -%]
-
+  [%- IF c.has_permission(object, 'edit') -%]
+    <a class="btn btn-primary" href="[% c.uri_for_action('rack/edit',[object.id]) %]">
+    [% bootstrap_icon('pencil') %] Edit</a>
+  [%- END -%]
+  [%- IF c.has_permission(object, 'delete') -%]
+    <a class="btn btn-danger" href="[%c.uri_for_action('rack/delete',[object.id]) %]">
+    [% bootstrap_icon('trash') %] Delete</a>
+  [%- END -%]
+  [%- IF  c.has_permission('rack.create') -%]
+    <a class="btn  btn-default" href="[% c.uri_for_action('device/create', { rack => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add Device</a>
+  [%- END -%]
+[%- END -%]
+[%- END -%]
 <div class="row">
   <div class="panel panel-default">
     <div class="panel-body">
@@ -26,12 +36,12 @@ page.title = 'Rack ' _ object.name
 <div class="row">
 [% IF object.devices -%]
   <table class="table table-condensed" id="device_list">
-    <thead>  
+    <thead>
       <tr>
  	<th class="col-md-2">Level</th>
  	<th>Device</th>
       </tr>
-    </thead>  
+    </thead>
     <tbody>
       [% FOREACH d IN object.devices -%]
       <tr>

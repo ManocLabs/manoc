@@ -4,11 +4,17 @@ page.subsection = 'Building'
 page.title = 'Building ' _ object.name
 -%]
 [% page.toolbar = BLOCK %]
+[% IF c.has_permission(object, 'edit') -%]
   <a class="btn btn-primary" href=[%c.uri_for_action('building/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+[%- END -%]
+[%- IF c.has_permission(object, 'delete') -%]
   <a class="btn btn-danger" href=[% c.uri_for_action('building/delete', [object.id]) %]>
     [% bootstrap_icon('trash') %] Delete</a>
+[%- END -%]
+[%- IF c.has_permission('building.create') -%]
   <a class="btn btn-default" href="[% c.uri_for('/rack/create', { building => object.id}) %]">
     [% bootstrap_icon('plus') %] Add Rack</a>
+[% END %]
 [% END %]
 <div class="row">
 <div class="panel panel-default">
@@ -24,12 +30,12 @@ page.title = 'Building ' _ object.name
 <div class="row">
 [% IF object.racks -%]
   <table class="table table-condensed" id="rack_list">
-    <thead>  
+    <thead>
       <tr>
  	<th class="col-md-2">Floor</th>
  	<th>Racks</th>
       </tr>
-    </thead>  
+    </thead>
     <tbody>
 [% FOREACH r IN object.racks -%]
       <tr>

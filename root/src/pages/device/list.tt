@@ -10,8 +10,10 @@ page.section = 'Asset'
 <div id="device_create">
   <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-[%- END -%]
 [% init_table('device_list', { toolbar="device_create" }) %]
+[%- ELSE -%]
+[% init_table('device_list') %]
+[%- END -%]
  <table class="table" id="device_list">
        <thead>
 	 <tr>
