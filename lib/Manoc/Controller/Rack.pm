@@ -22,6 +22,8 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::Rack',
     form_class => 'Manoc::Form::Rack',
+    enable_permission_check => 1,
+    view_object_perm => undef,
 );
 
 =head1 NAME

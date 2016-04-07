@@ -71,7 +71,7 @@ Create a new form using form_class configuration parameter.
 sub get_form {
     my ( $self, $c ) = @_;
 
-    my $class = $self->form_class;
+    my $class = $c->stash->{form_class} || $self->form_class;
     $class or die "Form class not set (use form_class)";
     return $class->new( ctx => $c );
 }

@@ -1,56 +1,4 @@
-[%-
-  navbar_items = [
-		{
-		     name = 'Asset',
-		     subsections = [
-  	       	     {
-			name = 'Device', 
-		        path = c.uri_for_action('/device/list'),
-	             },
-	             {
-		         name = 'Building',
-		         path = c.uri_for_action('/building/list'),
-	  	     },
-		     {
-		         name = 'Rack',
-		         path = c.uri_for_action('/rack/list'),
-		     },		     
-		     ]
-		},
-		{
-		     name = 'Network',
-                     subsections = [
-			{
-				name = 'IP Address Plan',
-				path = c.uri_for_action('/ipnetwork/list'),
-			},
-  	       		{
-	        	     name = 'VLAN', 
-		     	     path = c.uri_for_action('/vlanrange/list'),
-			},
-			{
-				name = 'SSid',
-				path = '#',
-			},	     
-		     ],
-
-		},		     
-		{
-		     name = 'Config',
-     		     path = c.uri_for_action('/user/list'),
-		     subsections = [		     
-  	       	     {
-			name = 'Users', 
-		     	path = c.uri_for_action('/user/list'),
-	       	     },
-	     	     {
-		        name = 'Management Urls',
-		        path = c.uri_for_action('/mngurlformat/list'),
-		     },
-		     ]
- 		 }
-	]
--%]
+[%- USE Menu -%]
 [% MACRO navbar BLOCK -%]
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
@@ -64,20 +12,20 @@
           <a class="navbar-brand" href="[% c.uri_for('/about') %]">Manoc</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-[%- UNLESS page.empty_navbar %]	
+[%- UNLESS page.empty_navbar %]
           <ul class="nav navbar-nav navbar-right">
-	    [%- FOREACH s IN navbar_items %]
+[%- FOREACH s IN Menu.menu %]
             <li>
 	      <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% s.name | html  %]
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-		[%- FOREACH i IN s.subsections %]
+[%- FOREACH i IN s.items %]
 		<li><a href="[% i.path %]">[% i.name | html %]</a></li>
-		[%- END %]
+[%- END %]
 	      </ul>
 	    </li>
-	    [%- END %]
+[%- END %]
 	    [%- IF c.user %]
             <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">[% bootstrap_icon("user") %]</a>
                 <ul class="dropdown-menu">
@@ -85,7 +33,7 @@
 		  <li><a href="[% c.uri_for('/user/change_password') %]">Change password</a></li>
 	          <li><a href="[% c.uri_for('/auth/logout') %]">Logout</a></li>
 		</ul>
-	    </li>	    
+	    </li>
 	    [%- END %]
           </ul>
 [%- UNLESS page.disable_search %]
@@ -99,14 +47,14 @@
     </nav>
 [%- END %]
 [% MACRO sidebar BLOCK -%]
-<div class="sidebar-menu">  
+<div class="sidebar-menu">
   <div class="sidebar-menu-list">
      <ul id="sidebar-menu-content" class="sidebar-menu-content">
 [% FOREACH i IN page.sidebar_items -%]
       [% active = c.action == i.action -%]
       <li [% IF active %]class="active"[% END %]>
          <a href="[% c.uri_for_action(i.action) %]">[% i.name %][% IF active %] <span class="sr-only">(current)</span>[% END %]</a>
-      </li>      
+      </li>
 [% END -%]
     </ul>
   </div>

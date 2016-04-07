@@ -1,39 +1,47 @@
-[% META 
+[% META
    use_table = 1
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
-[%   
+[%
 page.title   = 'Device ' _ object.name
 page.section = 'Asset'
 page.subsection = 'Device'
 -%]
 [% page.toolbar = BLOCK -%]
 <div>
+[%- IF c.has_permission(object, 'edit') || c.has_permission(object, 'delete') ||  c.has_permission(object, 'edit_nwinfo')  -%]
   <div class="btn-group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Action <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
+[%- IF c.has_permission(object, 'edit') -%]
       <li>
 	<a  href="[% c.uri_for_action('/device/edit',[object.id]) %]">
 	[% bootstrap_icon('pencil') %] Edit device</a>
-      </li>   
-      <li>      
+      </li>
+      <li>
 	<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
 	  [% bootstrap_icon('link') %] Set uplink</a>
       </li>
-      <li>      
+[%- END -%]
+[%- IF c.has_permission(object, 'edit_nwinfo')  -%]
+      <li>
 	<a href="[% c.uri_for_action('/device/nwinfo', [object.id]) %]">
 	  [% bootstrap_icon('cog') %] Netwalker config</a>
       </li>
-      <li role="separator" class="divider"></li>   
+[%- END -%]
+[%- IF c.has_permission(object, 'delete')  -%]
+      <li role="separator" class="divider"></li>
       <li>
 	<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">
 	  [% bootstrap_icon('trash') %] Delete</a>
       </li>
+[%- END  -%]
     </ul>
-  </div>
-  <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]"> 
+  </div><!-- end btn group -->
+[%- END  -%]
+  <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]">
     [% bootstrap_icon('refresh') %] Refresh Info</a>
 </div>
 [% END -%]
@@ -106,16 +114,16 @@ page.subsection = 'Device'
 	  [% ELSE %]
 	  No backup found
 	  [% END %]
-	</dd>	
+	</dd>
 	<dt>Uplinks</dt><dd>[% object.uplinks %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- row -->
   </div>
-  
+
   <div role="tabpanel" class="tab-pane" id="cdp">
     <table class="table">
-      <thead>  
+      <thead>
 	<tr>
 	  <th>Local Interface</th>
           <th>Neigh Address</th>
@@ -144,11 +152,11 @@ page.subsection = 'Device'
 	[% END -%]
       </tbody>
     </table>
-  </div> <!-- cdp --> 
-  
+  </div> <!-- cdp -->
+
   <div role="tabpanel" class="tab-pane" id="ifstatus">
     <table class="table">
-      <thead>  
+      <thead>
 	<tr>
           <th>Interface</th>
 	  <th>Connected</th>
@@ -159,7 +167,7 @@ page.subsection = 'Device'
 	  <th>Port Security</th>
 	  <th>Description</th>
 	</tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH if IN iface_info %]
 	[% row_class = if.up == 'up' ? 'active' : 'warning' %]
@@ -193,9 +201,9 @@ page.subsection = 'Device'
 	  <th>Vlan</th>
 	  <th>Description</th>
 	</tr>
-      </thead>  
+      </thead>
       <tbody>
-	[% FOREACH if IN iface_info %]      
+	[% FOREACH if IN iface_info %]
 	<tr>
 	  <td>
 	    [% print_iface(object.id,if.interface) %]
@@ -217,7 +225,7 @@ page.subsection = 'Device'
 	  <th>Interface</th>
 	  <th>Description</th>
 	</tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH if IN unused_ifaces %]
 	<tr>
@@ -238,16 +246,16 @@ page.subsection = 'Device'
           <th>Broadcast</th>
           <th>Channel</th>
 	</tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH s IN ssid_list %]
 	<tr>
-          <td><a href="[% c.uri_for_action('interface/view', 
+          <td><a href="[% c.uri_for_action('interface/view',
 		       [s.ipaddr, s.interface]) %]"> [% s.interface %]</a>
           </td>
           <td><a href="#"> [% s.ssid %]</a></td>
           <td>[% s.broadcast %]</td>
-          <td>[% s.channel %]</td>	   
+          <td>[% s.channel %]</td>
 	</tr>
 	[% END %]
       </tbody>
@@ -265,7 +273,7 @@ page.subsection = 'Device'
 	  <th>State</th>
 	  <th>Quality</th>
 	</tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH s IN dot11_clients %]
 	<tr>

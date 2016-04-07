@@ -33,6 +33,9 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::IPBlock',
     form_class => 'Manoc::Form::IPBlock',
+    enable_permission_check => 1,
+    view_object_perm => undef,
+
 );
 
 before 'view' => sub {

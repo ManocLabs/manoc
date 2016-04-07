@@ -30,11 +30,16 @@ Catalyst Controller.
 
 sub list : Private {
     my ( $self, $c ) = @_;
+
+    $c->require_permission('arp', 'view');
+
     $c->stash( template => 'arp/list.tt' );
 }
 
 sub list_js : Private {
     my ( $self, $c ) = @_;
+
+    $c->require_permission('arp', 'view');
 
     my $row_callback = sub {
         my ( $ctx, $row ) = @_;

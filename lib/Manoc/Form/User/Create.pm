@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::User;
+package Manoc::Form::User::Create;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
@@ -54,6 +54,12 @@ has_field 'roles' => (
 );
 
 has_field 'active' => (
+    label   => 'Active',
+    type    => 'Boolean',
+    default => 1,
+);
+
+has_field 'superadmin' => (
     label => 'Active',
     type  => 'Boolean',
 );

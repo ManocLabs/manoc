@@ -1,4 +1,4 @@
-[% META 
+[% META
    use_table=1
 -%]
 [%
@@ -6,12 +6,14 @@ page.title = 'Devices'
 page.subsection = 'Device'
 page.section = 'Asset'
 %]
-
+[%- IF c.has_permission('device.create') -%]
 <div id="device_create">
   <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-
 [% init_table('device_list', { toolbar="device_create" }) %]
+[%- ELSE -%]
+[% init_table('device_list') %]
+[%- END -%]
  <table class="table" id="device_list">
        <thead>
 	 <tr>
@@ -24,7 +26,7 @@ page.section = 'Asset'
            <th>Serial</th>
 	   <th>Model</th>
          </tr>
-       </thead>  
+       </thead>
        <tbody>
 [% FOREACH d IN object_list %]
          <tr>

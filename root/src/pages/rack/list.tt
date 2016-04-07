@@ -1,24 +1,28 @@
-[% META 
+[% META
    use_table=1
 -%]
 [%
 page.title='Racks'
 page.subsection='Rack'
-page.section='Asset'	
+page.section='Asset'
 -%]
-[% init_table('rack_list', { toolbar="rack_create" })%] 
+[%- IF c.has_permission('rack.create') -%]
+[%-  init_table('rack_list', { toolbar="rack_create" }) -%]
 <div id="rack_create">
      <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
+[%- ELSE -%]
+[%-   init_table('rack_list') -%]
+[%- END -%]
  <table class="table" id="rack_list">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Rack</th>
  	 <th>Building</th>
  	 <th>Floor</th>
 	 <th>Notes</th>
          </tr>
-       </thead>  
+       </thead>
   <tbody>
 [% FOREACH r IN object_list %]
          <tr>

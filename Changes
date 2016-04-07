@@ -1,23 +1,24 @@
-2.0200 Not Released
+3.0
 
   [ UI ]
-  
-  - restyled UI
+
+  - restyled UI with Bootstrap
   - controller/device: replaced popups with ajax dialogs
-  - controller/device: optional loading of SNMP::Info
   - views added JSON view and JSONView Controller Role
   - cleaned Manoc.pm configuration
   - protection against CSRF
-  
+  - new permission model
+
   [ DB ]
-  
+
   - changed device primary key from ip address to integer
   - updated users table with support for bcrypt password
   - changed schema numbering
 
   [ OTHER ]
-  
+
   - Manoc requires Perl 5.10
+  - New netwalker implementation with pluggable Manifolds
   - updated to support latest CPAN packages, including Moose and SNMPInfo
   - new datadumper implementation
 

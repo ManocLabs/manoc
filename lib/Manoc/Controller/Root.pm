@@ -75,10 +75,10 @@ sub auto : Private {
 
     ## check authentication ##
     if ( !$self->check_auth($c) ) {
-        $c->log->debug("Not authenticated");
+        $c->log->debug("Not authenticated") if $c->debug;
 
         if ( $c->stash->{is_api} || $c->stash->{is_xhr} ) {
-            $self->forward('error/http_403');
+            $self->detach('access_denied');
         }
         else {
             $c->response->redirect(
@@ -104,10 +104,17 @@ sub check_auth {
     $c->controller eq $c->controller('Auth') and
         return 1;
 
+    # already authenticated by API controller
     $c->stash->{is_api} and
         return 1;
 
-    return $c->user_exists;
+    # user must be authenticated
+    return 0 unless $c->user_exists;
+
+    # users with agent flag can only access API controller
+    return 0 if $c->user->agent;
+
+    return 1;
 }
 
 =head2 default

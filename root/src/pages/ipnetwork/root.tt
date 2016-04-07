@@ -2,10 +2,12 @@
    page.title='Top level IP networks'
 -%]
 [% PROCESS 'ipnetwork/_common.tt' -%]
+[%- IF c.has_permission('ipnetwork', 'create') -%]
 [% page.toolbar = BLOCK %]
 <div id="IPNetwork_create">
 <a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
+[% END -%]
 [% END -%]
 
 [% IF root_network -%]
@@ -24,14 +26,14 @@
    </thead>
    [% FOREACH object IN networks %]
    <tbody>
-     <tr[% UNLESS object.children %] class="leafrow"[% END %]>       
+     <tr[% UNLESS object.children %] class="leafrow"[% END %]>
        <td>
 	 <a [% IF object.children.size -%]
             role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%object.id %]" aria-expanded="false" aria-controls="children[object.id %]"
 	   [% ELSE -%]
 	   href="[% c.uri_for_action('ipnetwork/view', [object.id]) %]"
 	   [% END %]>
-	   [% object.name | html %]</a></td>    
+	   [% object.name | html %]</a></td>
        <td data-sort="[% object.network.address.padded  %]">[% object.network | html %]</td>
        <td>[% print_vlan(object.vlan) %]</td>
      </tr>
@@ -44,7 +46,7 @@
        <td data-sort="[% child.network.address.padded  %]">[% child.network | html %]</td>
        <td>[% print_vlan(child.vlan) %]</td>
      </tr>   <!-- end of childrens -->
-     [% END -%] 
+     [% END -%]
    </tbody>
    [% END -%]
    [% END -%]

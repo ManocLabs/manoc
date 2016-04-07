@@ -28,7 +28,7 @@ Catalyst controller role for Manoc common CRUD implementation.
   extends "Catalyst::Controller";
   with "Manoc::ControllerRole::CommonCRUD";
 
-  __PACKAGE__->config( 
+  __PACKAGE__->config(
       # define PathPart
       action => {
           setup => {
@@ -90,6 +90,48 @@ has 'object_deleted_message' => (
     default => 'Deleted',
 );
 
+# can override form_class during object creation
+has 'create_form_class' => (
+    is  => 'rw',
+    isa => 'ClassName'
+);
+
+# can override form_class during object editing
+has 'edit_form_class' => (
+    is  => 'rw',
+    isa => 'ClassName'
+);
+
+has 'enable_permission_check' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has 'view_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'view',
+);
+
+has 'create_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'create',
+);
+
+has 'edit_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'edit',
+);
+
+has 'delete_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'delete',
+);
+
 =head1 ACTIONS
 
 =head2 create
@@ -102,11 +144,19 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $object = $c->stash->{resultset}->new_result( {} );
+
+    if ( $self->enable_permission_check && $self->create_object_perm ) {
+        $c->require_permission($object, $self->create_object_perm);
+    }
+
     $c->stash(
-        object   => $object,
-        title    => $self->create_page_title,
-        template => $self->create_page_template,
+        object     => $object,
+        title      => $self->create_page_title,
+        template   => $self->create_page_template,
     );
+
+    $self->create_form_class and
+        $c->stash(form_class => $self->create_form_class);
     $c->detach('form');
 }
 
@@ -118,6 +168,11 @@ Display a list of items.
 
 sub list : Chained('object_list') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
+
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission($c->stash->{resultset}, $self->view_object_perm);
+    }
+
     $c->stash(
         title    => $self->list_page_title,
         template => $self->list_page_template
@@ -132,6 +187,11 @@ Display a single items.
 
 sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission($object, $self->view_object_perm);
+    }
 
     $c->stash(
         title    => $self->view_page_title,
@@ -148,9 +208,15 @@ Use a form to edit a row.
 sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
+    my $object = $c->stash->{object};
+    if ( $self->enable_permission_check && $self->edit_object_perm ) {
+        $c->require_permission($object, $self->edit_object_perm);
+    }
+
     $c->stash(
-        title    => $self->edit_page_title,
-        template => $self->edit_page_template,
+        title      => $self->edit_page_title,
+        template   => $self->edit_page_template,
+        form_class => $self->edit_form_class,
     );
     $c->detach('form');
 }
@@ -161,6 +227,11 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
 
 sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    if ( $self->enable_permission_check && $self->delete_object_perm ) {
+        $c->require_permission($object, $self->delete_object_perm);
+    }
 
     if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {

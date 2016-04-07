@@ -1,15 +1,18 @@
 [%
-   page.title='List Networks'  
+   page.title='List Networks'
 -%]
 [% PROCESS 'ipnetwork/_common.tt' -%]
 [% META
   use_table = 1
 -%]
+[%- IF c.has_permission('ipnetwork', 'create') -%]
 <div id="ipnetwork_create">
 <a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
-
 [% init_table("network_list", { toolbar="ipnetwork_create" }) -%]
+[%- ELSE -%]
+[% init_table("network_list") -%]
+[%- END -%]
 <div class="col-md-12">
  <table class="table" id="network_list">
    <thead>

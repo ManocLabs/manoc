@@ -79,6 +79,8 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
     my ( $self, $c ) = @_;
 
+    $c->require_permission($c->stash->{object}, 'edit');
+
     my $object_pk = $c->stash->{object_pk};
 
     my $ifnotes = $c->model('ManocDB::IfNotes')->find($object_pk);
@@ -102,6 +104,9 @@ sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
 
 sub delete_notes : Chained('object') : PathPart('delete_notes') : Args(0) {
     my ( $self, $c ) = @_;
+
+    $c->require_permission($c->stash->{object}, 'delete');
+
     my $object_pk = $c->stash->{object_pk};
 
     my $dest_url =

@@ -9,8 +9,11 @@ use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD' => { -excludes => 'view', };
 
-use Manoc::Form::User;
+use Manoc::Form::User::Create;
+use Manoc::Form::User::Edit;
 use Manoc::Form::User::ChangePassword;
+use Manoc::Form::User::SetPassword;
+
 
 =head1 NAME
 
@@ -29,11 +32,40 @@ __PACKAGE__->config(
             PathPart => 'user',
         }
     },
-    class      => 'ManocDB::User',
-    form_class => 'Manoc::Form::User',
+    class             => 'ManocDB::User',
+    create_form_class => 'Manoc::Form::User::Create',
+    edit_form_class   => 'Manoc::Form::User::Edit',
+    enable_permission_check => 1,
 );
 
 =head1 METHODS
+
+=cut
+
+=head2 admin_password
+
+Used by admin to set password on other users
+
+=cut
+
+sub admin_password : Chained('object') : PathPart('password') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission($c->stash->{object}, 'edit');
+
+    my $form = Manoc::Form::User::SetPassword->new( { ctx => $c } );
+
+    $c->stash(
+        form   => $form,
+        action => $c->uri_for( $c->action, $c->req->captures ),
+    );
+    if ( $form->process(item   => $c->stash->{object},
+                        params => $c->req->parameters) )
+    {
+        $c->log->debug("password changed") if $c->debug;
+        $c->res->redirect( $c->uri_for_action('user/list'));
+    }
+}
 
 =cut
 
@@ -41,9 +73,10 @@ __PACKAGE__->config(
 
 =cut
 
-sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
+sub change_password : Chained('base') : PathPart('password') : Args(0) {
     my ( $self, $c ) = @_;
 
+    # no permission required
     $c->stash( object => $c->user );
     my $form = Manoc::Form::User::ChangePassword->new( { ctx => $c } );
 
@@ -52,10 +85,9 @@ sub change_password : Chained('base') : PathPart('change_password') : Args(0) {
         action => $c->uri_for( $c->action, $c->req->captures ),
     );
     return unless $form->process(
-        item   => $c->stash->{object},
-        params => $c->req->parameters,
-    );
-    $c->detach();
+            item   => $c->stash->{object},
+            params => $c->req->parameters,
+            );
 }
 
 =head1 AUTHOR

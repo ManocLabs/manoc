@@ -42,6 +42,9 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::Device',
     form_class => 'Manoc::Form::Device',
+    enable_permission_check => 1,
+    view_object_perm => undef,
+
 );
 
 =head1 ACTIONS
@@ -196,6 +199,8 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $device = $c->stash->{'object'};
+    $c->require_permission($device, 'edit');
+
     my $form = Manoc::Form::Uplink->new( { device => $device, ctx => $c } );
 
     if ( $device->ifstatus->count() == 0 ) {
@@ -220,6 +225,8 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
 
 sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     my ( $self, $c ) = @_;
+
+    $c->require_permission($c->stash->{object}, 'netwalker_config');
 
     my $device_id = $c->stash->{object_pk};
 
@@ -269,6 +276,8 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $device = $c->stash->{object};
+    $c->require_permission($device, 'show_config');
+
     my $config = $device->config;
 
     my $prev_config = $config->prev_config;

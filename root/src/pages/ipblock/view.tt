@@ -2,15 +2,19 @@
    page.title='IP block ' _ object.name
 -%]
 [% PROCESS 'ipblock/_common.tt' -%]
+[%- IF c.has_permission(object, 'edit') ||  c.has_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK -%]
 <div>
- <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
-    </div>
+  [%- IF c.has_permission(object, 'edit') -%]
+  <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
+  &nbsp;
+  [%- END -%]
+  [%- IF c.has_permission(object, 'delete') -%]
+  <a class="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
+  [%- END -%]
+</div>
 [% END %]
-<dl class='dl-horizontal'>
-  
-</dl>
+[% END %]
 
 <div class="col-sm-8">
   <div class="panel panel-default">
@@ -32,9 +36,9 @@
 	  [% END -%]
 	</dd>
       </dl>
-    </div><!-- end of content -->	
+    </div><!-- end of content -->
   </div><!-- end of panel -->
-</div><!-- end of row -->	
+</div><!-- end of row -->
 
 <div class="col-sm-4">
   <div class="panel panel-default">
@@ -58,7 +62,7 @@
 	<tr>
 	  <th>Network</th>
 	  <th>Broadcast</th>
-	<th>Name</th>	  
+	<th>Name</th>
 	</tr>
       </thead>
     <tbody>
@@ -66,7 +70,7 @@
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>
-	<td>[% print_ipnetwork(network) %]</td>	  
+	<td>[% print_ipnetwork(network) %]</td>
       </tr>
       [% END -%]
     </tbody>

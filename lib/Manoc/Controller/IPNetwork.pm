@@ -36,6 +36,8 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::IPNetwork',
     form_class => 'Manoc::Form::IPNetwork',
+    enable_permission_check => 1,
+    view_object_perm => undef,
 );
 
 =head1 METHODS
