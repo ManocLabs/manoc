@@ -281,8 +281,8 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
     $diff =~ s/@@[^@]*@@/<hr>/g;
 
     #Insert HTML "font" tag to color "+" and "-" rows
-    $diff =~ s/^\+(.*)$/<font color=green> $1<\/font>/mg;
-    $diff =~ s/^\-(.*)$/<font color=red> $1<\/font>/mg;
+    $diff =~ s/^\+(.*)$/<font color=\"green\"> $1<\/font>/mg;
+    $diff =~ s/^\-(.*)$/<font color=\"red\"> $1<\/font>/mg;
 
     #Prepare template
     $c->stash(
@@ -301,7 +301,7 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $rack_id = $c->req->query_parameters->{'rack'};
-    $c->log->debug("new device in $rack_id");
+    $c->log->debug("new device in $rack_id") if $c->debug;
     $c->stash( form_defaults => { rack => $rack_id } );
 };
 
