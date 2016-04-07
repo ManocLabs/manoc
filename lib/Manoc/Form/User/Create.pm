@@ -60,7 +60,7 @@ has_field 'active' => (
 );
 
 has_field 'superadmin' => (
-    label => 'Active',
+    label => 'Superadmin',
     type  => 'Boolean',
 );
 
