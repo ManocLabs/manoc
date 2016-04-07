@@ -49,8 +49,9 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-  recommends 'Devel::NYTProf';
-  recommends 'Catalyst::Devel', '5.90077';
+  requires 'Devel::NYTProf';
+  requires 'Catalyst::Devel';
+  requires 'Git::Wrapper';
 };
 
 feature 'arpsniffer', 'ARP sniffer support' => sub {
