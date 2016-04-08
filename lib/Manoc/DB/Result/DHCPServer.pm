@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::Result::DHCPNetwork;
+package Manoc::DB::Result::DHCPServer;
 
 use Moose;
 
@@ -27,13 +27,33 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         size        => 64,
     },
-
-
-
+    'domain_name' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'domain_nameserver' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'ntp_server' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'default_lease_time' => {
+        data_type   => 'int',
+        is_nullable => 1,
+    },
+    'max-lease-time' => {
+        data_type   => 'int',
+        is_nullable => 1,
+    },
 );
 
 
-__PACKAGE__->have_many( network => 'Manoc::DB::Result::IPNetwork' );
+__PACKAGE__->have_many( dhcp_network => 'Manoc::DB::Result::DHCPNetwork' );
 
 
 
