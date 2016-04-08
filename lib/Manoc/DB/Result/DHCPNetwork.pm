@@ -27,14 +27,48 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         size        => 64,
     },
+    'domain_name' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'domain_nameserver' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'ntp_server' => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 64,
+    },
+    'default_lease_time' => {
+        data_type   => 'int',
+        is_nullable => 1,
+    },
+    'max-lease-time' => {
+        data_type   => 'int',
+        is_nullable => 1,
+    },
+    'dhcp_server' => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    'network' => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
 );
 
-
-__PACKAGE__->belongs_to( network => 'Manoc::DB::Result::IPNetwork' );
+__PACKAGE__->belongs_to( dhcp_server => 'Manoc::DB::Result::DHCPServer');
+__PACKAGE__->belongs_to( network     => 'Manoc::DB::Result::IPNetwork' );
 
 __PACKAGE__->might_have(
-    IPBlock => 'Manoc::DB::Result::IPBlock', 
+    range => 'Manoc::DB::Result::IPBlock', 
     { 'foreign.dhcp_range' => 'self.id' },
-  );
+    { cascade_delete => 1 } 
+);
 
 
