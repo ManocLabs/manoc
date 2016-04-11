@@ -2,23 +2,14 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::CatalystPlugin::Permission;
+package Manoc::CatalystRole::Permission;
 
-use Moose;
-with 'Catalyst::ClassData';
-
-use MRO::Compat;
+use namespace::autoclean;
+use Moose::Role;
 
 use Catalyst::Exception ();
-use Carp;
 use Catalyst::Utils;
 use Scalar::Util;
-
-use namespace::clean -except => 'meta';
-
-__PACKAGE__->mk_classdata( "_permission_roles_map" );
-
-
 
 our %DEFAULT_ROLES = (
     'DHCPAgent' => [
@@ -44,32 +35,30 @@ our %DEFAULT_ROLES = (
     ],
 );
 
+after setup_finalize => sub {
+    my $app = shift;
+    my $cfg = $app->_permission_plugin_config;
+    my $roles_config = $cfg->{'roles'};
+
+    my $role_map = Catalyst::Utils::merge_hashes(\%DEFAULT_ROLES, $roles_config );
+
+    $app->_permission_roles_map($role_map);
+};
+
+
 sub _permission_plugin_config {
     my $c = shift;
     return $c->config->{'Manoc::Permission'} ||= {};
 }
 
+sub _permission_roles_map {
+    my $c = shift;
+    my $value = shift;
 
-sub setup {
-    my $app = shift;
-
-    $app->maybe::next::method(@_);
-    $app->setup_permissions;
-
-    return $app;
-}
-
-sub setup_permissions {
-    my $app = shift;
-    my $cfg = $app->_permission_plugin_config;
-    my $roles_config = $cfg->{'roles'};
-
-    my $roles = Catalyst::Utils::merge_hashes(\%DEFAULT_ROLES, $roles_config );
-    $app->_permission_roles_map($roles);
-}
-
-sub _get_roles_for_perm {
-    return shift->_permission_to_role->{shift};
+    if ($value) {
+        $c->_permission_plugin_config->{_roles_map} = $value;
+    }
+    return $c->_permission_plugin_config->{_roles_map} ||= {};
 }
 
 sub _check_permission_cache {
@@ -171,7 +160,7 @@ sub check_permission {
 }
 
 
-no Moose;
+no Moose::Role;
 1;
 
 # Local Variables:
