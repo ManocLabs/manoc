@@ -26,7 +26,7 @@
       <td>[% user.fullname | html %]</td>
       <td>[% user.email | html %]</td>
       <td>
-	[% IF user.admin -%]
+	[% IF user.superadmin -%]
       [% bootstrap_icon('ok') %]<span class="sr-only">Admin</span>
     [% ELSE %]
 	  [% bootstrap_icon('minus') %]<span class="sr-only">Not admin</span>

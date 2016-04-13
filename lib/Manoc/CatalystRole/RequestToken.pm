@@ -2,14 +2,11 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::CatalystPlugin::RequestToken;
+package Manoc::CatalystRole::RequestToken;
 
-use Moose;
-use MRO::Compat;
-use namespace::clean -except => 'meta';
+use Moose::Role;
 use namespace::autoclean;
 
-use Catalyst::Exception;
 use Digest::SHA1;
 
 has [qw/ token_session_name token_request_name /] => (
@@ -24,28 +21,6 @@ has token_length => (
 );
 
 =head1 METHODS
-
-=cut
-
-sub setup {
-    my $c = shift;
-
-    $c->next::method(@_);
-    $c->check_request_token_plugin_requirements();
-}
-
-sub check_request_token_plugin_requirements {
-    my $c = shift;
-
-    unless ( $c->isa("Catalyst::Plugin::Session") ) {
-        my $err = "The Session plugin is required.";
-
-        $c->log->fatal($err);
-        Catalyst::Exception->throw($err);
-    }
-}
-
-=cut
 
 =head2 get_token
 
@@ -136,4 +111,3 @@ no Moose;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
