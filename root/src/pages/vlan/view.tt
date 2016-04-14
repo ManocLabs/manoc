@@ -9,14 +9,14 @@
   page.layout = 'with_sidebar';
   page.load_section_file = 1
 -%]
-[%- IF c.has_permission(object, 'edit') || c.has_permission(object, 'delete') -%]
+[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK %]
 <div id="toolbar">
-  [%- IF c.has_permission(object, 'edit') || c.has_permission(object, 'delete') -%]
+  [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
     <a class="btn btn-default" href="[%c.uri_for_action('vlan/edit',[object.id]) %]">
     [% bootstrap_icon('pencil') %]Edit</a>
   [%- END -%]
-  [%- IF c.has_permission(object, 'delete') -%]
+  [%- IF c.check_permission(object, 'delete') -%]
     <a class="btn btn-default" href="[%c.uri_for_action('vlan/delete',[object.id])%]">
     [% bootstrap_icon('trash') %]Delete</a>
   [%- END -%]

@@ -3,7 +3,7 @@
 -%]
 [% PROCESS 'ipblock/_common.tt' -%]
 [% META use_table = 1 %]
-[% IF c.has_permission('ipblock', 'create') %]
+[% IF c.check_permission('ipblock', 'create') %]
 <div id="ipblock_create">
 <a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>

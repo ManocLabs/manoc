@@ -6,7 +6,7 @@ page.section='Asset'
 page.subsection='Building'
 page.title='Buildings'
 %]
-[%- IF c.has_permission('building.create') -%]
+[%- IF c.check_permission('building.create') -%]
 [% init_table('building_list',{ toolbar="building_create" } ) %]
 <div id="building_create">
 <a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>

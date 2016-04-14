@@ -9,13 +9,13 @@ page.subsection = 'Device'
 -%]
 [% page.toolbar = BLOCK -%]
 <div>
-[%- IF c.has_permission(object, 'edit') || c.has_permission(object, 'delete') ||  c.has_permission(object, 'edit_nwinfo')  -%]
+[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') ||  c.check_permission(object, 'edit_nwinfo')  -%]
   <div class="btn-group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Action <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-[%- IF c.has_permission(object, 'edit') -%]
+[%- IF c.check_permission(object, 'edit') -%]
       <li>
 	<a  href="[% c.uri_for_action('/device/edit',[object.id]) %]">
 	[% bootstrap_icon('pencil') %] Edit device</a>
@@ -25,13 +25,13 @@ page.subsection = 'Device'
 	  [% bootstrap_icon('link') %] Set uplink</a>
       </li>
 [%- END -%]
-[%- IF c.has_permission(object, 'edit_nwinfo')  -%]
+[%- IF c.check_permission(object, 'edit_nwinfo')  -%]
       <li>
 	<a href="[% c.uri_for_action('/device/nwinfo', [object.id]) %]">
 	  [% bootstrap_icon('cog') %] Netwalker config</a>
       </li>
 [%- END -%]
-[%- IF c.has_permission(object, 'delete')  -%]
+[%- IF c.check_permission(object, 'delete')  -%]
       <li role="separator" class="divider"></li>
       <li>
 	<a href="[%  c.uri_for_action('/device/delete', [object.id]) %]">

@@ -3,17 +3,17 @@ page.section = 'Asset'
 page.subsection = 'Rack'
 page.title = 'Rack ' _ object.name
 -%]
-[%- IF c.has_permission(object, 'delete') || c.has_permission(object, 'edit') || c.has_permission('rack.create') -%]
+[%- IF c.check_permission(object, 'delete') || c.check_permission(object, 'edit') || c.check_permission('rack.create') -%]
 [% page.toolbar = BLOCK -%]
-  [%- IF c.has_permission(object, 'edit') -%]
+  [%- IF c.check_permission(object, 'edit') -%]
     <a class="btn btn-primary" href="[% c.uri_for_action('rack/edit',[object.id]) %]">
     [% bootstrap_icon('pencil') %] Edit</a>
   [%- END -%]
-  [%- IF c.has_permission(object, 'delete') -%]
+  [%- IF c.check_permission(object, 'delete') -%]
     <a class="btn btn-danger" href="[%c.uri_for_action('rack/delete',[object.id]) %]">
     [% bootstrap_icon('trash') %] Delete</a>
   [%- END -%]
-  [%- IF  c.has_permission('rack.create') -%]
+  [%- IF  c.check_permission('rack.create') -%]
     <a class="btn  btn-default" href="[% c.uri_for_action('device/create', { rack => object.id}) %]">
     [% bootstrap_icon('plus') %] Add Device</a>
   [%- END -%]

@@ -2,14 +2,14 @@
    page.title='IP block ' _ object.name
 -%]
 [% PROCESS 'ipblock/_common.tt' -%]
-[%- IF c.has_permission(object, 'edit') ||  c.has_permission(object, 'delete') -%]
+[%- IF c.check_permission(object, 'edit') ||  c.check_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK -%]
 <div>
-  [%- IF c.has_permission(object, 'edit') -%]
+  [%- IF c.check_permission(object, 'edit') -%]
   <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
   &nbsp;
   [%- END -%]
-  [%- IF c.has_permission(object, 'delete') -%]
+  [%- IF c.check_permission(object, 'delete') -%]
   <a class="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
   [%- END -%]
 </div>

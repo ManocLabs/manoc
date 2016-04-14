@@ -61,7 +61,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
     #MAT related results
     my @mat_rs = $c->model('ManocDB::Mat')
-        ->search( $object_pk, { order_by => 'lastseen DESC, firstseen DESC', } );
+        ->search( $object_pk, {order_by => { -desc => [ 'lastseen', 'firstseen' ] }} );
     my @mat_results = map +{
         macaddr   => $_->macaddr,
         vlan      => $_->vlan,
