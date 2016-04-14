@@ -13,7 +13,7 @@ use Moose;
 use Manoc::Logger;
 use Manoc::IPAddress::IPv4;
 
-use Manoc::CatalystPlugin::Permission;
+use Manoc::CatalystRole::Permission;
 use Catalyst::Utils;
 
 extends 'Manoc::Script';
@@ -142,7 +142,7 @@ sub init_roles {
     my $rs     = $schema->resultset('Role');
     $self->log->info('Creating configured roles');
 
-    my $default_roles = \%Manoc::CatalystPlugin::Permission::DEFAULT_ROLES;
+    my $default_roles = \%Manoc::CatalystRole::Permission::DEFAULT_ROLES;
     my $conf_roles = $self->config->{'Manoc::Permission'}->{roles};
 
     my $roles = Catalyst::Utils::merge_hashes($default_roles, $conf_roles );
