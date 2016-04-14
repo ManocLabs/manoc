@@ -66,7 +66,7 @@ sub view : Chained('base') : PathPart('') : Args(0) {
         hostnames => [
             $c->model('ManocDB::WinHostname')->search(
                 { ipaddr   => $ipaddress->padded },
-                { order_by => 'lastseen DESC, firstseen DESC' }
+		{order_by  => { -desc => [ 'lastseen', 'firstseen' ] }}
             )
         ],
     );
