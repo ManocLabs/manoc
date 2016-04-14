@@ -6,7 +6,7 @@
   page.layout = 'with_sidebar';
   page.load_section_file = 1
 -%]
-[%- IF c.has_permission('vlanrange', 'create') -%]
+[%- IF c.check_permission('vlanrange', 'create') -%]
 [%- page.toolbar = BLOCK %]
 <div id="vlanrange_create">
   <a href="[% c.uri_for_action('/vlanrange/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add new range</a>
@@ -33,35 +33,35 @@
       <td>[%range.end | html %]</td>
       <td>[%range.description | html %]</td>
       <td>
- [%- IF c.has_permission('vlan.create') ||  c.has_permission(range, 'edit') || c.has_permission(range, 'delete') -%]
+ [%- IF c.check_permission('vlan.create') ||  c.check_permission(range, 'edit') || c.check_permission(range, 'delete') -%]
 	<div class="btn-group" role="group">
 	  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 	    Actions
 	    <span class="caret"></span>
 	  </button>
 	  <ul class="dropdown-menu dropdown-menu-right">
-        [%- IF c.has_permission('vlan.create') -%]
+        [%- IF c.check_permission('vlan.create') -%]
 	    <li>
 	      <a href="[% c.uri_for_action('vlan/create', {range => range.id })%]">[%bootstrap_icon('plus')%] Add VLAN</a>
 	    </li>
 	    <li role="separator" class="divider"></li>
         [%- END -%]
-        [%- IF c.has_permission(range, 'edit') -%]
+        [%- IF c.check_permission(range, 'edit') -%]
 	    <li>
 	      <a href="[% c.uri_for_action('vlanrange/edit',[range.id])%]">[% bootstrap_icon('pencil') %] Edit</a>
 	    </li>
         [%- END -%]
-        [%- IF c.has_permission(range, 'delete') -%]
+        [%- IF c.check_permission(range, 'delete') -%]
 	    <li>
 	      <a href="[% c.uri_for_action('vlanrange/delete',[range.id])%]">[% bootstrap_icon('trash') %] Delete</a>
 	    </li>
         [%- END -%]
-        [%- IF c.has_permission(range, 'edit') -%]
+        [%- IF c.check_permission(range, 'edit') -%]
 	    <li>
 	      <a href="[% c.uri_for_action('vlanrange/split',[range.id])%]">[% bootstrap_icon('resize-full') %] Split</a>
 	    </li>
         [%- END -%]
-        [%- IF c.has_permission(range, 'edit') -%]
+        [%- IF c.check_permission(range, 'edit') -%]
 	    <li>
 	      <a href="[% c.uri_for_action('vlanrange/merge',[range.id])%]">[% bootstrap_icon('resize-small') %] Merge</a>
 	    </li>
@@ -80,10 +80,10 @@
       <td colspan="2">[% vlan.id | html %]</td>
       <td>[% vlan.description | truncate(40) | html %]</td>
       <td>
-      [% IF c.has_permission(vlan, 'edit') -%]
+      [% IF c.check_permission(vlan, 'edit') -%]
 	<a href="[% c.uri_for_action('vlan/edit',[vlan.id] )%]">[% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span></a>
       [%- END -%]
-      [%- IF c.has_permission(vlan, 'delete') -%]
+      [%- IF c.check_permission(vlan, 'delete') -%]
 	<a href="[% c.uri_for_action('vlan/delete',[vlan.id] )%]">[% bootstrap_icon('trash')%]<span class="sr-only">Delete</span></a>
       [%- END -%]
       </td>

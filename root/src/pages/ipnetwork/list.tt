@@ -5,7 +5,7 @@
 [% META
   use_table = 1
 -%]
-[%- IF c.has_permission('ipnetwork', 'create') -%]
+[%- IF c.check_permission('ipnetwork', 'create') -%]
 <div id="ipnetwork_create">
 <a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>

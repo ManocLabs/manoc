@@ -6,7 +6,7 @@ page.title='Racks'
 page.subsection='Rack'
 page.section='Asset'
 -%]
-[%- IF c.has_permission('rack.create') -%]
+[%- IF c.check_permission('rack.create') -%]
 [%-  init_table('rack_list', { toolbar="rack_create" }) -%]
 <div id="rack_create">
      <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
