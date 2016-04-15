@@ -34,10 +34,10 @@ __PACKAGE__->config(
             PathPart => 'ipnetwork',
         }
     },
-    class      => 'ManocDB::IPNetwork',
-    form_class => 'Manoc::Form::IPNetwork',
+    class                   => 'ManocDB::IPNetwork',
+    form_class              => 'Manoc::Form::IPNetwork',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 );
 
 =head1 METHODS

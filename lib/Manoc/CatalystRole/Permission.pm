@@ -12,39 +12,24 @@ use Catalyst::Utils;
 use Scalar::Util;
 
 our %DEFAULT_ROLES = (
-    'DHCPAgent' => [
-        'api:dhcp.*',
-    ],
-    'WinlogonAgent' => [
-        'api:winlogon.*',
-    ],
-    'AssetManager' => [
-        'device.*',
-        'building.*',
-        'rack.*',
-        'uplink.*',
-    ],
+    'DHCPAgent'      => [ 'api:dhcp.*', ],
+    'WinlogonAgent'  => [ 'api:winlogon.*', ],
+    'AssetManager'   => [ 'device.*', 'building.*', 'rack.*', 'uplink.*', ],
     'NetworkManager' => [
-        'ifnotes.*',
-        'ip.*',
-        'ipblock.*',
-        'ipnetwork.*',
-        'uplink.*',
-        'vlan.*',
-        'vlanrange.*',
+        'ifnotes.*', 'ip.*',   'ipblock.*', 'ipnetwork.*',
+        'uplink.*',  'vlan.*', 'vlanrange.*',
     ],
 );
 
 after setup_finalize => sub {
-    my $app = shift;
-    my $cfg = $app->_permission_plugin_config;
+    my $app          = shift;
+    my $cfg          = $app->_permission_plugin_config;
     my $roles_config = $cfg->{'roles'};
 
-    my $role_map = Catalyst::Utils::merge_hashes(\%DEFAULT_ROLES, $roles_config );
+    my $role_map = Catalyst::Utils::merge_hashes( \%DEFAULT_ROLES, $roles_config );
 
     $app->_permission_roles_map($role_map);
 };
-
 
 sub _permission_plugin_config {
     my $c = shift;
@@ -52,7 +37,7 @@ sub _permission_plugin_config {
 }
 
 sub _permission_roles_map {
-    my $c = shift;
+    my $c     = shift;
     my $value = shift;
 
     if ($value) {
@@ -62,18 +47,18 @@ sub _permission_roles_map {
 }
 
 sub _check_permission_cache {
-    my ($c, $user, $permission) = @_;
+    my ( $c, $user, $permission ) = @_;
 
     my $roles2perm = $c->_permission_roles_map;
-    my $cache = $c->session->{permission_cache};
+    my $cache      = $c->session->{permission_cache};
 
-    if (!defined($cache)) {
+    if ( !defined($cache) ) {
         $cache = {};
 
         foreach my $role ( $user->roles ) {
-            $c->log->debug( "User role: $role") if $c->debug;
-            foreach my $p (@{$roles2perm->{$role}} ) {
-                $c->log->debug( "User $p granted by $role") if $c->debug;
+            $c->log->debug("User role: $role") if $c->debug;
+            foreach my $p ( @{ $roles2perm->{$role} } ) {
+                $c->log->debug("User $p granted by $role") if $c->debug;
                 $cache->{$p} = 1;
             }
         }
@@ -81,7 +66,6 @@ sub _check_permission_cache {
     }
     return $cache->{$permission};
 }
-
 
 sub require_permission {
     my $c = shift;
@@ -91,24 +75,24 @@ sub require_permission {
 }
 
 sub check_permission {
-    my ($c, $object, $operation, $maybe_user) = @_;
+    my ( $c, $object, $operation, $maybe_user ) = @_;
 
     my $user;
-    if ( Scalar::Util::blessed( $maybe_user )
-           && $maybe_user->isa("Catalyst::Authentication::User") )  {
-           $user = $maybe_user;
+    if ( Scalar::Util::blessed($maybe_user) &&
+        $maybe_user->isa("Catalyst::Authentication::User") )
+    {
+        $user = $maybe_user;
     }
     $user ||= $c->user;
 
     # check user object
-    unless ( $user ) {
-        Catalyst::Exception->throw(
-            "No logged in user, and none supplied as argument");
+    unless ($user) {
+        Catalyst::Exception->throw("No logged in user, and none supplied as argument");
     }
     Catalyst::Exception->throw("User does not support roles")
-         unless $user->supports(qw/roles/);
+        unless $user->supports(qw/roles/);
 
-    if ($user->superadmin) {
+    if ( $user->superadmin ) {
         $c->log->debug("Skipping permission check for superadmin") if $c->debug;
         return 1;
     }
@@ -118,20 +102,24 @@ sub check_permission {
     if ( Scalar::Util::blessed($object) ) {
 
         # check if object has a specific check_permission method
-        if ($object->can('check_permission')) {
-            return $object->check_permission($user, $operation);
+        if ( $object->can('check_permission') ) {
+            return $object->check_permission( $user, $operation );
         }
 
-        if ($object->isa("DBIx::Class::ResultSource")) {
+        if ( $object->isa("DBIx::Class::ResultSource") ) {
             $class_name = $object->source_name;
-        } elsif ($object->isa("DBIx::Class::ResultSet") ||
-                $object->isa("DBIx::Class::Row")) {
+        }
+        elsif ( $object->isa("DBIx::Class::ResultSet") ||
+            $object->isa("DBIx::Class::Row") )
+        {
             $class_name = $object->result_source->source_name;
-        } else {
+        }
+        else {
             Catalyst::Exception->throw("Cannot guess object source_name");
         }
 
-    } else {
+    }
+    else {
         $class_name = $object;
     }
     # construct permission symbolic name
@@ -140,17 +128,18 @@ sub check_permission {
     if ($operation) {
         $permission .= '.' . lc($operation);
         $star_permission = "$permission.*";
-    } elsif ($permission =~ /([^\.]+)\.([^\.]+)/o) {
+    }
+    elsif ( $permission =~ /([^\.]+)\.([^\.]+)/o ) {
         $star_permission = "$1.*";
     }
 
     $c->log->debug("Checking permission $permission") if $c->debug;
-    if ($c->_check_permission_cache($user, $permission)) {
+    if ( $c->_check_permission_cache( $user, $permission ) ) {
         $c->log->debug("Permission $permission granted") if $c->debug;
         return 1;
     }
 
-    if ($c->_check_permission_cache($user, $star_permission)) {
+    if ( $c->_check_permission_cache( $user, $star_permission ) ) {
         $c->log->debug("Permission $permission granted by $star_permission") if $c->debug;
         return 1;
     }
@@ -158,7 +147,6 @@ sub check_permission {
     $c->log->debug("Permission $permission denied") if $c->debug;
     return 0;
 }
-
 
 no Moose::Role;
 1;

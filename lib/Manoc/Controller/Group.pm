@@ -29,8 +29,8 @@ __PACKAGE__->config(
             PathPart => 'group',
         }
     },
-    class      => 'ManocDB::Group',
-    form_class => 'Manoc::Form::Group',
+    class                   => 'ManocDB::Group',
+    form_class              => 'Manoc::Form::Group',
     enable_permission_check => 1,
 );
 

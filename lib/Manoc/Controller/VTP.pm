@@ -28,9 +28,9 @@ __PACKAGE__->config(
             PathPart => 'vtp',
         }
     },
-    class => 'ManocDB::VlanVtp',
+    class                   => 'ManocDB::VlanVtp',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 );
 
 =head1 METHODS

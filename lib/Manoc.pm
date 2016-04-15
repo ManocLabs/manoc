@@ -82,9 +82,9 @@ __PACKAGE__->config(
                     password_type  => 'self_check',
                 },
                 store => {
-                    class         => 'DBIx::Class',
-                    user_model    => 'ManocDB::User',
-                    role_column   => 'roles',
+                    class       => 'DBIx::Class',
+                    user_model  => 'ManocDB::User',
+                    role_column => 'roles',
                 },
             },
             agent => {
@@ -95,9 +95,9 @@ __PACKAGE__->config(
                     password_type  => 'self_check',
                 },
                 store => {
-                    class         => 'DBIx::Class',
-                    user_model    => 'ManocDB::User',
-                    role_column   => 'roles',
+                    class       => 'DBIx::Class',
+                    user_model  => 'ManocDB::User',
+                    role_column => 'roles',
                 }
             },
         },

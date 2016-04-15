@@ -31,10 +31,10 @@ __PACKAGE__->config(
             PathPart => 'building',
         }
     },
-    class      => 'ManocDB::Building',
-    form_class => 'Manoc::Form::Building',
+    class                   => 'ManocDB::Building',
+    form_class              => 'Manoc::Form::Building',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 );
 
 sub get_object_list {

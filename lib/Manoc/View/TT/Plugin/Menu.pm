@@ -22,31 +22,31 @@ Manoc TT plugin to generate application navigation menu
 
 my @DEFAULT_MENU_ITEMS = (
     {
-        name => 'Asset',
+        name  => 'Asset',
         items => [
             {
-                name => 'Device',
-                action =>'/device/list',
+                name   => 'Device',
+                action => '/device/list',
             },
             {
-                name => 'Building',
-                action =>'/building/list',
+                name   => 'Building',
+                action => '/building/list',
             },
             {
-                name => 'Rack',
-                action =>'/rack/list',
+                name   => 'Rack',
+                action => '/rack/list',
             },
         ]
     },
     {
-        name => 'Network',
+        name  => 'Network',
         items => [
             {
-                name => 'IP Address Plan',
+                name   => 'IP Address Plan',
                 action => '/ipnetwork/list',
             },
             {
-                name => 'VLAN',
+                name   => 'VLAN',
                 action => '/vlanrange/list',
             },
             {
@@ -56,21 +56,21 @@ my @DEFAULT_MENU_ITEMS = (
         ],
     },
     {
-        name => 'Config',
+        name  => 'Config',
         items => [
             {
-                name => 'Users',
-                action =>'/user/list',
+                name       => 'Users',
+                action     => '/user/list',
                 permission => 'user.view',
             },
             {
-                name => 'Groups',
-                action =>'/group/list',
+                name       => 'Groups',
+                action     => '/group/list',
                 permission => 'group.view',
             },
             {
-                name => 'Management Urls',
-                action =>'/mngurlformat/list',
+                name       => 'Management Urls',
+                action     => '/mngurlformat/list',
                 permission => 'mngurlformat.view',
             },
         ]
@@ -78,16 +78,14 @@ my @DEFAULT_MENU_ITEMS = (
 );
 
 sub new {
-    my ($class, $context, $params) = @_;
+    my ( $class, $context, $params ) = @_;
 
-    bless {
-        _CONTEXT => $context,
-    }, $class;
+    bless { _CONTEXT => $context, }, $class;
 }
 
 sub menu {
     my $self = shift;
-    my $ctx = $self->{_CONTEXT};
+    my $ctx  = $self->{_CONTEXT};
 
     # get Catalyst app
     my $c = $ctx->stash->get('c');
@@ -96,12 +94,11 @@ sub menu {
     foreach my $item (@DEFAULT_MENU_ITEMS) {
 
         my $subitems = $item->{items};
-        if (defined($subitems)) {
+        if ( defined($subitems) ) {
 
-            my @new_subitems = 
-                map { _expand_item($c, $_) }
-                grep { _permission_check($c, $_) }
-                @$subitems;
+            my @new_subitems =
+                map { _expand_item( $c, $_ ) }
+                grep { _permission_check( $c, $_ ) } @$subitems;
 
             # do not add empty items
             next unless scalar(@new_subitems);
@@ -109,25 +106,25 @@ sub menu {
             $item->{items} = \@new_subitems;
 
         }
-        _expand_item($c, $item);
+        _expand_item( $c, $item );
         push @menu, $item;
     }
     return @menu;
 }
 
 sub _permission_check {
-    my ($c, $item) = @_;
+    my ( $c, $item ) = @_;
 
     $item->{permission} or return 1;
 
-    return $c->check_permission($item->{permission});
+    return $c->check_permission( $item->{permission} );
 }
 
 sub _expand_item {
-    my ($c, $item) = @_;
+    my ( $c, $item ) = @_;
 
     $item->{action} and
-        $item->{path} = $c->uri_for_action($item->{action});
+        $item->{path} = $c->uri_for_action( $item->{action} );
 
     return $item;
 }

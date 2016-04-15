@@ -20,7 +20,7 @@ sub connection {
 
                 # no fsync on commit
                 $dbh->do('PRAGMA synchronous = OFF');
-            }
+                }
         }
     );
 

@@ -66,7 +66,7 @@ sub view : Chained('base') : PathPart('') : Args(0) {
         hostnames => [
             $c->model('ManocDB::WinHostname')->search(
                 { ipaddr   => $ipaddress->padded },
-		{order_by  => { -desc => [ 'lastseen', 'firstseen' ] }}
+                { order_by => { -desc => [ 'lastseen', 'firstseen' ] } }
             )
         ],
     );
@@ -97,12 +97,13 @@ sub edit : Chained('base') PathPart('edit') Args(0) {
 
     my $item      = $c->stash->{object};
     my $ipaddress = $c->stash->{ipaddress};
-    if ( $item ) {
-        $c->require_permission($item, 'edit');
-    } else {
+    if ($item) {
+        $c->require_permission( $item, 'edit' );
+    }
+    else {
         $item = $c->model('ManocDB::Ip')->new_result( {} );
         $item->ipaddr($ipaddress);
-        $c->require_permission($item, 'create');
+        $c->require_permission( $item, 'create' );
     }
 
     my $form = Manoc::Form::Ip->new( ipaddr => $ipaddress->address );

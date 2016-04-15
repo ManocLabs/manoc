@@ -126,7 +126,7 @@ sub _build_configuration {
         my @data = $session->cmd("show running");
         chomp @data;
 
-        return join( @data, '\n' )
+        return join( @data, '\n' );
     };
     $self->log->error('Error fetching configuration: $@');
     return undef;

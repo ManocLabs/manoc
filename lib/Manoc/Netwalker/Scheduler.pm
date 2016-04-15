@@ -27,11 +27,7 @@ has session => (
     required => 1,
     lazy     => 1,
     default  => sub {
-        POE::Session->create(
-            object_states => [
-                $_[0] => [qw (_start tick )]
-            ]
-        );
+        POE::Session->create( object_states => [ $_[0] => [qw (_start tick )] ] );
     }
 );
 

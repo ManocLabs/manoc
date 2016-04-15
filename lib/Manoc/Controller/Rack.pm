@@ -20,10 +20,10 @@ __PACKAGE__->config(
             PathPart => 'rack',
         }
     },
-    class      => 'ManocDB::Rack',
-    form_class => 'Manoc::Form::Rack',
+    class                   => 'ManocDB::Rack',
+    form_class              => 'Manoc::Form::Rack',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 );
 
 =head1 NAME

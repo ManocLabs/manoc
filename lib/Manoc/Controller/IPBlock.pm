@@ -31,10 +31,10 @@ __PACKAGE__->config(
             PathPart => 'ipblock',
         }
     },
-    class      => 'ManocDB::IPBlock',
-    form_class => 'Manoc::Form::IPBlock',
+    class                   => 'ManocDB::IPBlock',
+    form_class              => 'Manoc::Form::IPBlock',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 
 );
 

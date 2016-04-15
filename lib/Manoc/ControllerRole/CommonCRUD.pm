@@ -146,17 +146,17 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     my $object = $c->stash->{resultset}->new_result( {} );
 
     if ( $self->enable_permission_check && $self->create_object_perm ) {
-        $c->require_permission($object, $self->create_object_perm);
+        $c->require_permission( $object, $self->create_object_perm );
     }
 
     $c->stash(
-        object     => $object,
-        title      => $self->create_page_title,
-        template   => $self->create_page_template,
+        object   => $object,
+        title    => $self->create_page_title,
+        template => $self->create_page_template,
     );
 
     $self->create_form_class and
-        $c->stash(form_class => $self->create_form_class);
+        $c->stash( form_class => $self->create_form_class );
     $c->detach('form');
 }
 
@@ -170,7 +170,7 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
 
     if ( $self->enable_permission_check && $self->view_object_perm ) {
-        $c->require_permission($c->stash->{resultset}, $self->view_object_perm);
+        $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
     }
 
     $c->stash(
@@ -190,7 +190,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
     my $object = $c->stash->{object};
     if ( $self->enable_permission_check && $self->view_object_perm ) {
-        $c->require_permission($object, $self->view_object_perm);
+        $c->require_permission( $object, $self->view_object_perm );
     }
 
     $c->stash(
@@ -210,7 +210,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
 
     my $object = $c->stash->{object};
     if ( $self->enable_permission_check && $self->edit_object_perm ) {
-        $c->require_permission($object, $self->edit_object_perm);
+        $c->require_permission( $object, $self->edit_object_perm );
     }
 
     $c->stash(
@@ -230,7 +230,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
     my $object = $c->stash->{object};
     if ( $self->enable_permission_check && $self->delete_object_perm ) {
-        $c->require_permission($object, $self->delete_object_perm);
+        $c->require_permission( $object, $self->delete_object_perm );
     }
 
     if ( $c->req->method eq 'POST' ) {

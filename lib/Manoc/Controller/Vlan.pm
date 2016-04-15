@@ -29,11 +29,11 @@ __PACKAGE__->config(
             PathPart => 'vlan',
         }
     },
-    class        => 'ManocDB::Vlan',
-    form_class   => 'Manoc::Form::Vlan',
-    json_columns => [ 'id', 'name', 'description' ],
+    class                   => 'ManocDB::Vlan',
+    form_class              => 'Manoc::Form::Vlan',
+    json_columns            => [ 'id', 'name', 'description' ],
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 );
 
 =head1 METHODS

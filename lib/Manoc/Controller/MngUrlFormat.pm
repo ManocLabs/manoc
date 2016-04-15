@@ -28,10 +28,10 @@ __PACKAGE__->config(
             PathPart => 'mngurlformat',
         }
     },
-    class      => 'ManocDB::MngUrlFormat',
-    form_class => 'Manoc::Form::MngUrlFormat',
+    class                   => 'ManocDB::MngUrlFormat',
+    form_class              => 'Manoc::Form::MngUrlFormat',
     enable_permission_check => 1,
-    view_object_perm => undef,
+    view_object_perm        => undef,
 
 );
 

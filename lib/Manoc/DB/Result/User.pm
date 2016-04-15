@@ -77,7 +77,7 @@ sub group_roleset {
     my $roles = {};
     foreach my $group ( $self->groups ) {
         foreach my $role ( $group->roles ) {
-            $roles->{$role->role} = 1;
+            $roles->{ $role->role } = 1;
         }
     }
     return $roles;
@@ -88,13 +88,13 @@ sub roleset {
 
     my $roles = $self->group_roleset();
     foreach my $role ( $self->user_roles ) {
-        $roles->{$role->role} = 1;
+        $roles->{ $role->role } = 1;
     }
     return $roles;
 }
 
 sub roles {
-    return join(",", keys(%{shift->roleset}));
+    return join( ",", keys( %{ shift->roleset } ) );
 }
 
 =head1 NAME

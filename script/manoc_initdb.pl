@@ -143,12 +143,12 @@ sub init_roles {
     $self->log->info('Creating configured roles');
 
     my $default_roles = \%Manoc::CatalystRole::Permission::DEFAULT_ROLES;
-    my $conf_roles = $self->config->{'Manoc::Permission'}->{roles};
+    my $conf_roles    = $self->config->{'Manoc::Permission'}->{roles};
 
-    my $roles = Catalyst::Utils::merge_hashes($default_roles, $conf_roles );
+    my $roles = Catalyst::Utils::merge_hashes( $default_roles, $conf_roles );
 
-    foreach my $role (keys %$roles) {
-        $rs->update_or_create( { role  => $role} );
+    foreach my $role ( keys %$roles ) {
+        $rs->update_or_create( { role => $role } );
     }
 
 }

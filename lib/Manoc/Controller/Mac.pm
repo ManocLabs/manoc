@@ -65,7 +65,7 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                 },
                 {
                     order_by => { -desc => [ 'lastseen', 'firstseen' ] }
-		}
+                }
             )
         ],
 
