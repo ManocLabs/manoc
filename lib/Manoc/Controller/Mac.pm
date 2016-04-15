@@ -64,8 +64,8 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                     macaddr => $macaddr
                 },
                 {
-                    order_by => 'lastseen DESC, firstseen DESC'
-                }
+                    order_by => { -desc => [ 'lastseen', 'firstseen' ] }
+		}
             )
         ],
 
