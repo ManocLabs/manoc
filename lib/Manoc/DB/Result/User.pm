@@ -69,7 +69,7 @@ __PACKAGE__->has_many( map_user_role => 'Manoc::DB::Result::UserRole', 'user_id'
 __PACKAGE__->many_to_many( user_roles => 'map_user_role', 'role' );
 
 __PACKAGE__->has_many( map_user_group => 'Manoc::DB::Result::UserGroup', 'user_id' );
-__PACKAGE__->many_to_many( groups => 'map_user_group', 'group' );
+__PACKAGE__->many_to_many( groups => 'map_user_group', 'user_group' );
 
 # Just add this accessor, the map function does the expansion:
 sub group_roleset {
