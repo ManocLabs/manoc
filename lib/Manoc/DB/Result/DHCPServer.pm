@@ -14,7 +14,6 @@ use Manoc::IPAddress::IPv4Network;
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('dhcp_server');
-__PACKAGE__->resultset_class('Manoc::DB::ResultSet::DHCPServer');
 
 __PACKAGE__->add_columns(
     'id' => {
@@ -46,15 +45,15 @@ __PACKAGE__->add_columns(
         data_type   => 'int',
         is_nullable => 1,
     },
-    'max-lease-time' => {
+    'max_lease_time' => {
         data_type   => 'int',
         is_nullable => 1,
     },
 );
+__PACKAGE__->set_primary_key('id');
+__PACKAGE__->add_unique_constraint( [qw/name/] );
 
+__PACKAGE__->has_many( dhcp_network => 'Manoc::DB::Result::DHCPNetwork' );
 
-__PACKAGE__->have_many( dhcp_network => 'Manoc::DB::Result::DHCPNetwork' );
-
-
-
+1;
 
