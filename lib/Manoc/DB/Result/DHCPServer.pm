@@ -49,11 +49,16 @@ __PACKAGE__->add_columns(
         data_type   => 'int',
         is_nullable => 1,
     },
+    
+
 );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
-__PACKAGE__->has_many( dhcp_network => 'Manoc::DB::Result::DHCPNetwork' );
+__PACKAGE__->has_many( 
+    'dhcp_network' => 'Manoc::DB::Result::DHCPNetwork',
+     { 'foreign.dhcp_server' => 'self.id' },
+);
 
 1;
 

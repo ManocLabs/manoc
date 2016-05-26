@@ -1,0 +1,34 @@
+[%
+   page.title='View DHCPNetwork'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('dhcpnetwork/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpnetwork/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>domain_name</dt>
+  <dd>[% object.domain_name | html %]</dd>
+  <dt>domain_nameserver</dt>
+  <dd>[% object.domain_nameserver | html %]</dd>
+  <dt>ntp_server</dt>
+  <dd>[% object.ntp_server | html %]</dd>
+  <dt>default_lease_time</dt>
+  <dd>[% object.default_lease_time | html %]</dd>
+  <dt>max_lease_time</dt>
+  <dd>[% object.max_lease_time | html %]</dd>
+  <dt>range_from</dt>
+  <dd>[% object.range_from | html %]</dd>
+  <dt>range_to</dt>
+  <dd>[% object.range_to | html %]</dd>
+  <dt>dhcp_server</dt>
+  <dd>[% object.dhcp_server | html %]</dd>
+</dl>
