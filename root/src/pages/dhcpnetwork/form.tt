@@ -1,0 +1,5 @@
+[%
+  page.section='Section'
+  page.subsection='Subsection'
+%]
+[% form.render %]

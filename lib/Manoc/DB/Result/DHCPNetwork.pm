@@ -70,7 +70,10 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
-__PACKAGE__->belongs_to( dhcp_server => 'Manoc::DB::Result::DHCPServer' );
+__PACKAGE__->belongs_to( 
+    dhcp_server => 'Manoc::DB::Result::DHCPServer',
+    { 'foreign.id' => 'self.dhcp_server' },
+);
 
 __PACKAGE__->has_one(
     network =>

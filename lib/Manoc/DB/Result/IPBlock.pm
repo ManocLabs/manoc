@@ -39,19 +39,11 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
         size        => 255
     },
-    'dhcp_range' => {
-        data_type      => 'int',
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
 );
 
 __PACKAGE__->set_primary_key(qw(id));
 
-__PACKAGE__->belongs_to(
-    dhcp_range => 'Manoc::DB::Result::DHCPNetwork',
-    { 'foreign.id' => 'self.device' }
-);
+
 sub arp_entries {
     my $self = shift;
 
