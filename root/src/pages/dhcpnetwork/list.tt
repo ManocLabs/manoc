@@ -9,32 +9,59 @@
  <table class="table" id="dhcpnetwork_list">
    <thead>
      <tr>
-        <th>id</th>
         <th>name</th>
+        <th>range_from</th>
+        <th>range_to</th>
+        <th>dhcp_server</th>
         <th>domain_name</th>
         <th>domain_nameserver</th>
         <th>ntp_server</th>
         <th>default_lease_time</th>
         <th>max_lease_time</th>
-        <th>range_from</th>
-        <th>range_to</th>
-        <th>dhcp_server</th>
         <th></th>
      </tr>
    </thead>
    <tbody>
 [% FOREACH object IN object_list %]
          <tr>
- 	 <td>[% object.id | html %]</td>
  	 <td>[% object.name | html %]</td>
- 	 <td>[% object.domain_name | html %]</td>
- 	 <td>[% object.domain_nameserver | html %]</td>
- 	 <td>[% object.ntp_server | html %]</td>
- 	 <td>[% object.default_lease_time | html %]</td>
- 	 <td>[% object.max_lease_time | html %]</td>
  	 <td>[% object.range_from | html %]</td>
  	 <td>[% object.range_to | html %]</td>
- 	 <td>[% object.dhcp_server | html %]</td>
+ 	 <td>[% object.dhcp_server.name | html %]</td>
+	 <td>
+     	     [%IF object.domain_name -%]
+  	     [% object.domain_name | html %]
+      	     [%ELSE -%]
+      	     [% object.dhcp_server.domain_name | html %] 
+      	     [%END -%]
+	 </td>
+ 	 <td>
+     	     [%IF object.domain_nameserver -%]
+  	     [% object.domain_nameserver | html %]
+      	     [%ELSE -%]
+      	     [% object.dhcp_server.domain_nameserver | html %] 
+      	     [%END -%]
+	 </td>
+ 	 <td>
+     	     [%IF object.ntp_server -%]
+  	     [% object.ntp_server | html %]
+      	     [%ELSE -%]
+      	     [% object.dhcp_server.ntp_server | html %] 
+      	     [%END -%]
+ 	 <td>
+     	     [%IF object.default_lease_time -%]
+  	     [% object.default_lease_time | html %]
+      	     [%ELSE -%]
+      	     [% object.dhcp_server.default_lease_time | html %] 
+      	     [%END -%]
+        </td>
+ 	 <td>
+ 	     [%IF object.max_lease_time -%]
+  	     [% object.max_lease_time | html %]
+      	     [%ELSE -%]
+      	     [% object.dhcp_server.max_lease_time | html %] 
+      	     [%END -%]
+   	</td>
      	 <td><a href=[% c.uri_for_action('dhcpnetwork/view', [object.id]) %]>View</a></td>
          </tr>
 [% END %]

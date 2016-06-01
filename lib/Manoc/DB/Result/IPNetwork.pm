@@ -60,11 +60,6 @@ __PACKAGE__->add_columns(
         is_nullable    => 1,
         is_foreign_key => 1,
     },
-    dhcpnet_id => {
-        data_type      => 'int',
-        is_foreign_key => 1,
-        is_nullable    => 1,
-    },
 );
 
 has network => (
@@ -251,12 +246,11 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
-__PACKAGE__->belongs_to(
-    dhcp_network => 'Manoc::DB::Result::DHCPNetwork',
-    'dhcpnet_id',
-    { join_type => 'LEFT' }
-);
-
+__PACKAGE__->might_have(
+    dhcp_network =>
+    'Manoc::DB::Result::DHCPNetwork',
+    { 'foreign.network_id' => 'self.id' },
+ );
 
 __PACKAGE__->add_relationship(
     'supernets' => 'IPNetwork',
