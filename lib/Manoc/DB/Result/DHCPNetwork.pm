@@ -32,33 +32,35 @@ __PACKAGE__->add_columns(
         size        => 64,
     },
     'domain_nameserver' => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 64,
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+        ipv4_address => 1,
     },
     'ntp_server' => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 64,
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+        ipv4_address => 1,
     },
     'default_lease_time' => {
         data_type   => 'int',
         is_nullable => 1,
     },
     'max_lease_time' => {
-        data_type   => 'int',
-        is_nullable => 1,
+        data_type    => 'int',
+        is_nullable  => 1,
     },
     'range_from' => {
         data_type    => 'varchar',
         size         => '15',
-        is_nullable  => 0,
+        is_nullable  => 1,
         ipv4_address => 1,
     },
     'range_to' => {
         data_type    => 'varchar',
         size         => '15',
-        is_nullable  => 0,
+        is_nullable  => 1,
         ipv4_address => 1,
     },
     'dhcp_server' => {
@@ -66,6 +68,12 @@ __PACKAGE__->add_columns(
         is_foreign_key => 1,
         is_nullable    => 0,
     },
+    network_id => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+
 );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
@@ -75,11 +83,11 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.dhcp_server' },
 );
 
-__PACKAGE__->has_one(
-    network =>
-    'Manoc::DB::Result::IPNetwork',
-    { 'foreign.dhcpnet_id' => 'self.id' },
-  );
+__PACKAGE__->belongs_to(
+    network => 'Manoc::DB::Result::IPNetwork',
+    'network_id',
+);
+
 
 __PACKAGE__->has_many(
     leases =>
@@ -92,6 +100,7 @@ __PACKAGE__->has_many(
     'Manoc::DB::Result::DHCPReservation',
     { 'foreign.dhcpnet_id' => 'self.id' },
   );
+
 
 1;
 

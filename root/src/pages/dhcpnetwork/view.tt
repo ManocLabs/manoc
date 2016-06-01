@@ -11,24 +11,93 @@
     </div>
 [% END %]
 <dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
+
+</dl>
+
+
+
+
+<div class="row">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
   <dt>name</dt>
   <dd>[% object.name | html %]</dd>
-  <dt>domain_name</dt>
-  <dd>[% object.domain_name | html %]</dd>
-  <dt>domain_nameserver</dt>
-  <dd>[% object.domain_nameserver | html %]</dd>
-  <dt>ntp_server</dt>
-  <dd>[% object.ntp_server | html %]</dd>
-  <dt>default_lease_time</dt>
-  <dd>[% object.default_lease_time | html %]</dd>
-  <dt>max_lease_time</dt>
-  <dd>[% object.max_lease_time | html %]</dd>
+  <dt>dhcp_server</dt>
+  <dd>[% object.dhcp_server.name | html %]</dd>
   <dt>range_from</dt>
   <dd>[% object.range_from | html %]</dd>
   <dt>range_to</dt>
   <dd>[% object.range_to | html %]</dd>
-  <dt>dhcp_server</dt>
-  <dd>[% object.dhcp_server | html %]</dd>
-</dl>
+  <dt>domain_name</dt>
+  <dd>
+      [%IF object.domain_name -%]
+  	   [% object.domain_name | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.domain_name | html %] 
+      [%END -%]  
+  </dd>
+  <dt>domain_nameserver</dt>
+  <dd>
+      [%IF object.domain_nameserver -%]
+  	   [% object.domain_nameserver | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.domain_nameserver | html %] 
+      [%END -%]  
+  </dd>
+  <dt>ntp_server</dt>
+  <dd>
+      [%IF object.ntp_server -%]
+  	   [% object.ntp_server | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.ntp_server | html %] 
+      [%END -%]
+  </dd>
+  <dt>default_lease_time</dt>
+  <dd>
+      [%IF object.default_lease_time  -%]
+  	   [% object.default_lease_time | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.default_lease_time | html %] 
+      [%END -%]
+  </dd>
+  <dt>max_lease_time</dt>
+  <dd>
+      [%IF object.max_lease_time  -%]
+  	   [% object.max_lease_time | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.max_lease_time | html %] 
+      [%END -%]
+  </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="row">
+[% IF object.reservations -%]
+  <table class="table table-condensed" id="device_list">
+    <thead>  
+      <tr>
+ 	<th>Mac Address</th>
+ 	<th>IP Address</th>
+ 	<th>Name</th>
+ 	<th>Hostname</th>
+
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH r IN object.reservations -%]
+      <tr>
+	<td>[% print_mac(r.macaddr) %]</td>
+	<td>[% print_ip(r.ipaddr) %]</td>
+	<td>[% r.name %]</td>
+	<td>[% r.hostname %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>

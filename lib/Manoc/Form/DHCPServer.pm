@@ -20,7 +20,7 @@ has_field 'name' => (
 
 has_field 'max_lease_time' => ( 
     type => 'Integer', 
-    label => 'Max lease time', 
+    label => 'Default maximum lease time', 
 );
 has_field 'default_lease_time' => ( 
     type => 'Integer', 
@@ -28,15 +28,15 @@ has_field 'default_lease_time' => (
 );
 has_field 'ntp_server' => ( 
     type => 'Text', 
-    label => 'NTP Server', 
+    label => 'Default NTP Server', 
 );
 has_field 'domain_nameserver' => ( 
     type => 'Text', 
-    label => 'Domain Nameserver', 
+    label => 'Default Domain Nameserver', 
 );
 has_field 'domain_name' => ( 
     type => 'Text', 
-    label => 'Domain Name', 
+    label => 'Default Domain Name', 
 );
 
 

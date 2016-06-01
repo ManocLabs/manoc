@@ -10,19 +10,26 @@
   &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a>
     </div>
 [% END %]
-<dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
-  <dt>name</dt>
-  <dd>[% object.name | html %]</dd>
-  <dt>domain_name</dt>
-  <dd>[% object.domain_name | html %]</dd>
-  <dt>domain_nameserver</dt>
-  <dd>[% object.domain_nameserver | html %]</dd>
-  <dt>ntp_server</dt>
-  <dd>[% object.ntp_server | html %]</dd>
-  <dt>default_lease_time</dt>
-  <dd>[% object.default_lease_time | html %]</dd>
-  <dt>max_lease_time</dt>
-  <dd>[% object.max_lease_time | html %]</dd>
-</dl>
+   <div class="row">
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <dl class="dl-horizontal">
+	<dt>Name</dt>
+  	<dd>[% object.name | html %]</dd>
+  	<dt>Domain Name</dt>
+  	<dd>[% object.domain_name | html %]</dd>
+  	<dt>Domain Nameserver</dt>
+  	<dd>[% object.domain_nameserver | html %]</dd>
+  	<dt>Ntp Server</dt>
+  	<dd>[% object.ntp_server | html %]</dd>
+  	<dt>Default Lease Time</dt>
+  	<dd>[% object.default_lease_time | html %]</dd>
+  	<dt>Maximum Lease Time</dt>
+  	<dd>[% object.max_lease_time | html %]</dd>
+  	</dl>
+
+    </div>
+  </div>
+</div>
+
