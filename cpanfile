@@ -48,6 +48,7 @@ on 'test' => sub {
 on 'develop' => sub {
   requires 'Devel::NYTProf';
   requires 'Catalyst::Devel';
+  requires 'Perl::Tidy';
   requires 'Git::Wrapper';
 };
 
