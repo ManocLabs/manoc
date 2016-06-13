@@ -4,17 +4,17 @@
 # it under the same terms as Perl itself.
 use strict;
 
-package Manoc::Controller::DHCPNetwork;
+package Manoc::Controller::DHCPSubnet;
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
 
-use Manoc::Form::DHCPNetwork;
+use Manoc::Form::DHCPSubnet;
 
 =head1 NAME
 
-Manoc::Controller::DHCPNetwork - Catalyst Controller
+Manoc::Controller::DHCPSubnet - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -26,11 +26,11 @@ __PACKAGE__->config(
     # define PathPart
     action => {
         setup => {
-            PathPart => 'dhcpnetwork',
+            PathPart => 'dhcpsubnet',
         }
     },
-    class      => 'ManocDB::DHCPNetwork',
-    form_class => 'Manoc::Form::DHCPNetwork',
+    class      => 'ManocDB::DHCPSubnet',
+    form_class => 'Manoc::Form::DHCPSubnet',
 );
 
 

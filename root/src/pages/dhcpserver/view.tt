@@ -34,7 +34,7 @@
 </div>
 
 <div class="row">
-[% IF object.dhcp_network -%]
+[% IF object.dhcp_subnet -%]
   <table class="table table-condensed" id="net_list">
     <thead>  
       <tr>
@@ -45,9 +45,9 @@
       </tr>
     </thead>  
     <tbody>
-      [% FOREACH n IN object.dhcp_network -%]
+      [% FOREACH n IN object.dhcp_subnet -%]
       <tr>
-	<td>[% print_dhcpnetwork(n)  %]</td>
+	<td>[% print_dhcpsubnet(n)  %]</td>
 	<td>[% n.network.address %]/
 	    [% n.network.prefix %]</td>
 	<td>[% n.range_from %] - [% n.range_to %]</td>

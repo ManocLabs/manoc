@@ -1,4 +1,4 @@
-package Manoc::Form::DHCPNetwork;
+package Manoc::Form::DHCPSubnet;
 
 use HTML::FormHandler::Moose;
 
@@ -9,10 +9,10 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-dhcpnetwork' );
+has '+name'        => ( default => 'form-dhcpsubnet' );
 has '+html_prefix' => ( default => 1 );
 
-has '+item_class' => ( default => 'DHCPNetwork' );
+has '+item_class' => ( default => 'DHCPSubnet' );
 
 has_field 'name' => ( 
     type => 'Text', 
@@ -87,7 +87,7 @@ sub options_network {
     my $self = shift;
 
     return unless $self->schema;
-    my $rs = $self->schema->resultset('IPNetwork')->search( { 'dhcp_network.id' => undef }, {  join => 'dhcp_network' , prefetch => 'dhcp_network', order_by => 'address'} );
+    my $rs = $self->schema->resultset('IPNetwork')->search( { 'dhcp_subnet.id' => undef }, {  join => 'dhcp_subnet' , prefetch => 'dhcp_subnet', order_by => 'address'} );
 
     return map +{ value => $_->id, label => $_->name . " ( ".
     $_->address . "/". $_->prefix . " )" }, $rs->all();

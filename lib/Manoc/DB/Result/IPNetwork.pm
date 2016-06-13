@@ -247,8 +247,8 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->might_have(
-    dhcp_network =>
-    'Manoc::DB::Result::DHCPNetwork',
+    dhcp_subnet =>
+    'Manoc::DB::Result::DHCPSubnet',
     { 'foreign.network_id' => 'self.id' },
  );
 

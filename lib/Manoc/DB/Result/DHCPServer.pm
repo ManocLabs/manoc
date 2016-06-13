@@ -56,7 +56,7 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
 __PACKAGE__->has_many( 
-    'dhcp_network' => 'Manoc::DB::Result::DHCPNetwork',
+    'dhcp_subnet' => 'Manoc::DB::Result::DHCPSubnet',
      { 'foreign.dhcp_server' => 'self.id' },
 );
 

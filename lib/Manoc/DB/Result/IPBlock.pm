@@ -45,7 +45,7 @@ __PACKAGE__->set_primary_key(qw(id));
 
 __PACKAGE__->might_have(
     dhcp_range =>
-    'Manoc::DB::Result::DHCPNetwork',
+    'Manoc::DB::Result::DHCPSubnet',
     { 'foreign.range_id' => 'self.id' },
  );
 

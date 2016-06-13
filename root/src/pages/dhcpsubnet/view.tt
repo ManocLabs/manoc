@@ -1,13 +1,13 @@
 [%
-   page.title='View DHCPNetwork'
+   page.title='View DHCPSubnet'
    page.section='Section'
    page.subsection='Subsection'
    use_table=1
 -%]
 [% page.toolbar = BLOCK -%]
 <div>
- <a class="btn btn-default" href=[%c.uri_for_action('dhcpnetwork/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpnetwork/delete', [object.id]) %]>Delete</a>
+ <a class="btn btn-default" href=[%c.uri_for_action('dhcpsubnet/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpsubnet/delete', [object.id]) %]>Delete</a>
     </div>
 [% END %]
 <dl>

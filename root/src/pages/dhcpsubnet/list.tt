@@ -1,12 +1,12 @@
 [%
-   page.title='List DHCPNetwork'
+   page.title='List DHCPSubnet'
    page.section='Section'
    page.subsection='Subsection'
 -%]
-<div id="dhcpnetwork_create">
-<a href="[% c.uri_for_action('dhcpnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<div id="dhcpsubnet_create">
+<a href="[% c.uri_for_action('dhcpsubnet/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
- <table class="table" id="dhcpnetwork_list">
+ <table class="table" id="dhcpsubnet_list">
    <thead>
      <tr>
         <th>Name</th>
@@ -65,7 +65,7 @@
       	     [% object.dhcp_server.max_lease_time | html %] 
       	     [%END -%]
    	</td>
-     	 <td><a href=[% c.uri_for_action('dhcpnetwork/view', [object.id]) %]>View</a></td>
+     	 <td><a href=[% c.uri_for_action('dhcpsubnet/view', [object.id]) %]>View</a></td>
          </tr>
 [% END %]
    </tbody>
