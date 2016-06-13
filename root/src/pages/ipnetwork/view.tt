@@ -12,6 +12,11 @@
  [%-  IF c.check_permission(object, 'delete') -%]
   <a class="btn btn-danger" href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
  [%- END -%]
+ &nbsp;
+ [%-  IF c.check_permission(object, 'create') -%]
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpnetwork/create', { network_id => object.id}) %]">
+  [% bootstrap_icon('plus') %] Add DHCP subnet </a>
+ [%- END -%]
 </div>
 [%- END -%]
 [%- END -%]

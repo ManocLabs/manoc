@@ -23,7 +23,6 @@ __PACKAGE__->add_columns(
     },
     'name' => {
         data_type   => 'varchar',
-        is_nullable => 0,
         size        => 64,
     },
     'domain_name' => {
@@ -51,18 +50,6 @@ __PACKAGE__->add_columns(
         data_type    => 'int',
         is_nullable  => 1,
     },
-    'range_from' => {
-        data_type    => 'varchar',
-        size         => '15',
-        is_nullable  => 1,
-        ipv4_address => 1,
-    },
-    'range_to' => {
-        data_type    => 'varchar',
-        size         => '15',
-        is_nullable  => 1,
-        ipv4_address => 1,
-    },
     'dhcp_server' => {
         data_type      => 'int',
         is_foreign_key => 1,
@@ -72,6 +59,11 @@ __PACKAGE__->add_columns(
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
+    },
+    range_id => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 1,
     },
 
 );
@@ -88,6 +80,10 @@ __PACKAGE__->belongs_to(
     'network_id',
 );
 
+__PACKAGE__->belongs_to(
+    range => 'Manoc::DB::Result::IPBlock',
+    'range_id',
+);
 
 __PACKAGE__->has_many(
     leases =>

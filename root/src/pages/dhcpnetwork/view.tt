@@ -21,15 +21,18 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <dl class="dl-horizontal">
-  <dt>name</dt>
+  <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
-  <dt>dhcp_server</dt>
+  <dt>DHCP Server</dt>
   <dd>[% object.dhcp_server.name | html %]</dd>
-  <dt>range_from</dt>
-  <dd>[% object.range_from | html %]</dd>
-  <dt>range_to</dt>
-  <dd>[% object.range_to | html %]</dd>
-  <dt>domain_name</dt>
+  <dt>Network</dt>
+  <dd>[% object.network.address | html %]/
+      [% object.network.prefix  | html %]</dd>
+    <dt>IP Pool from</dt>
+  <dd>[% object.range.from_addr | html %]</dd>
+  <dt>Ip Pool to </dt>
+  <dd>[% object.range.to_addr | html %]</dd>
+  <dt>Domain</dt>
   <dd>
       [%IF object.domain_name -%]
   	   [% object.domain_name | html %]
@@ -37,7 +40,7 @@
       	   [% object.dhcp_server.domain_name | html %] 
       [%END -%]  
   </dd>
-  <dt>domain_nameserver</dt>
+  <dt>DNS</dt>
   <dd>
       [%IF object.domain_nameserver -%]
   	   [% object.domain_nameserver | html %]
@@ -45,7 +48,7 @@
       	   [% object.dhcp_server.domain_nameserver | html %] 
       [%END -%]  
   </dd>
-  <dt>ntp_server</dt>
+  <dt>NTP</dt>
   <dd>
       [%IF object.ntp_server -%]
   	   [% object.ntp_server | html %]
@@ -53,7 +56,7 @@
       	   [% object.dhcp_server.ntp_server | html %] 
       [%END -%]
   </dd>
-  <dt>default_lease_time</dt>
+  <dt>Lease Time</dt>
   <dd>
       [%IF object.default_lease_time  -%]
   	   [% object.default_lease_time | html %]
@@ -61,7 +64,7 @@
       	   [% object.dhcp_server.default_lease_time | html %] 
       [%END -%]
   </dd>
-  <dt>max_lease_time</dt>
+  <dt>Maximum Lease Time</dt>
   <dd>
       [%IF object.max_lease_time  -%]
   	   [% object.max_lease_time | html %]

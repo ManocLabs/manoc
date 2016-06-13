@@ -33,6 +33,20 @@ __PACKAGE__->config(
     form_class => 'Manoc::Form::DHCPNetwork',
 );
 
+
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    my $net_id = $c->req->query_parameters->{'network_id'};
+    $c->log->debug("new network $net_id in dhcp form");
+    $c->stash( form_defaults => { network => $net_id } );
+};
+
+
 =head1 AUTHOR
 
 The Manoc Team

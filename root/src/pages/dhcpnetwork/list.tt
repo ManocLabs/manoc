@@ -9,15 +9,16 @@
  <table class="table" id="dhcpnetwork_list">
    <thead>
      <tr>
-        <th>name</th>
-        <th>range_from</th>
-        <th>range_to</th>
-        <th>dhcp_server</th>
-        <th>domain_name</th>
-        <th>domain_nameserver</th>
-        <th>ntp_server</th>
-        <th>default_lease_time</th>
-        <th>max_lease_time</th>
+        <th>Name</th>
+	<th>Network</th>
+        <th>IP Pool from</th>
+        <th>IP Pool to</th>
+        <th>DHCP server</th>
+        <th>Domain Name</th>
+        <th>DNS</th>
+        <th>NTP</th>
+        <th>Lease Time</th>
+        <th>Max Lease Time</th>
         <th></th>
      </tr>
    </thead>
@@ -25,8 +26,10 @@
 [% FOREACH object IN object_list %]
          <tr>
  	 <td>[% object.name | html %]</td>
- 	 <td>[% object.range_from | html %]</td>
- 	 <td>[% object.range_to | html %]</td>
+	 <td>[% object.network.address | html %]/
+	     [% object.network.prefix | html %]</td>
+ 	 <td>[% object.range.from_addr | html %]</td>
+ 	 <td>[% object.range.to_addr | html %]</td>
  	 <td>[% object.dhcp_server.name | html %]</td>
 	 <td>
      	     [%IF object.domain_name -%]

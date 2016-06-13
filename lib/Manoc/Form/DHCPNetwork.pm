@@ -1,4 +1,5 @@
 package Manoc::Form::DHCPNetwork;
+
 use HTML::FormHandler::Moose;
 
 use namespace::autoclean;
@@ -8,6 +9,8 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use HTML::FormHandler::Types ('IPAddress');
 
+has '+name'        => ( default => 'form-dhcpnetwork' );
+has '+html_prefix' => ( default => 1 );
 
 has '+item_class' => ( default => 'DHCPNetwork' );
 
@@ -15,11 +18,13 @@ has_field 'name' => (
     type => 'Text', 
     required => 1, 
     label => 'Name', 
-);
-
-has_field 'network' => ( 
-    type => 'Select', 
-    label => 'Network', 
+    apply    => [
+        'Str',
+        {
+            check   => sub { $_[0] =~ /\w/ },
+            message => 'Invalid Name'
+        },
+    ]
 );
 
 has_field 'dhcp_server' => ( 
@@ -27,18 +32,14 @@ has_field 'dhcp_server' => (
     label => 'DHCP Server', 
 );
 
-has_field 'range_from' => ( 
-    type => 'Text', 
-    size => 15, 
-    apply      => [IPAddress],
-    label => 'Range from', 
+has_field 'network' => ( 
+    type => 'Select', 
+    label => 'Network', 
 );
 
-has_field 'range_to' => ( 
-    type => 'Text', 
-    size => 15, 
-    apply      => [IPAddress],
-    label => 'Range to', 
+has_field 'range' => ( 
+    type => 'Select', 
+    label => 'IP Pool', 
 );
 
 has_field 'max_lease_time' => ( 
