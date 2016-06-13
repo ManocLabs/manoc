@@ -37,12 +37,7 @@ has_field 'domain_nameserver' => (
 has_field 'domain_name' => ( 
     type => 'Text', 
     label => 'Default Domain Name', 
-);
-
-
-
-#has_field 'dhcp_network' => ( type => '+Manoc::Form::DHCPNetworkField', );
-
+    );
 
 
 __PACKAGE__->meta->make_immutable;
@@ -50,25 +45,4 @@ no HTML::FormHandler::Moose;
 
 
 
-#{
-#    package Manoc::Form::DHCPNetworkField;
-#    use HTML::FormHandler::Moose;
-#    extends 'HTML::FormHandler::Field::Compound';
-#    use namespace::autoclean;
-#
-#    has_field 'range_to' => ( type => 'Text', size => 15, required => 1, label => 'range_to', );
-#    has_field 'range_from' => ( type => 'Text', size => 15, required => 1, label => 'range_from', );
-#    has_field 'max_lease_time' => ( type => 'Integer', label => 'max_lease_time', );
-#    has_field 'default_lease_time' => ( type => 'Integer', label => 'default_lease_time', );
-#    has_field 'ntp_server' => ( type => 'TextArea', label => 'ntp_server', );
-#    has_field 'domain_nameserver' => ( type => 'TextArea', label => 'domain_nameserver', );
-#    has_field 'domain_name' => ( type => 'TextArea', label => 'domain_name', );
-#    has_field 'name' => ( type => 'TextArea', required => 1, label => 'name', );
-#    has_field 'network' => ( type => 'Select', label => 'network', );
-#    has_field 'dhcp_server' => ( type => 'Select', label => 'dhcp_server', );
-#    
-#    __PACKAGE__->meta->make_immutable;
-#    no HTML::FormHandler::Moose;
-#}
-#
-#
+

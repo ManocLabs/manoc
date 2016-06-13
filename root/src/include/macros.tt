@@ -84,3 +84,9 @@
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
  [% END -%]
 [% END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                            IP DHCP Network                        -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_dhcpnetwork(network) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpnetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
+[%- END -%]
