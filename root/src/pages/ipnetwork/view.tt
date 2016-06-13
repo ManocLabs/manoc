@@ -14,7 +14,7 @@
  [%- END -%]
  &nbsp;
  [%-  IF c.check_permission(object, 'create') -%]
-  <a class="btn btn-default" href="[% c.uri_for('/dhcpnetwork/create', { network_id => object.id}) %]">
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpsubnet/create', { network_id => object.id}) %]">
   [% bootstrap_icon('plus') %] Add DHCP subnet </a>
  [%- END -%]
 </div>

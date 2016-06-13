@@ -87,6 +87,6 @@
 [%# ----------------------------------------------------------------- -%]
 [%#                            IP DHCP Network                        -%]
 [%# ----------------------------------------------------------------- -%]
-[% MACRO print_dhcpnetwork(network) BLOCK -%]
-<a href=[% c.uri_for_action('dhcpnetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
+[% MACRO print_dhcpsubnet(network) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
 [%- END -%]

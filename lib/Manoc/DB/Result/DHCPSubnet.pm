@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::Result::DHCPNetwork;
+package Manoc::DB::Result::DHCPSubnet;
 
 use Moose;
 
@@ -13,7 +13,7 @@ use Manoc::IPAddress::IPv4Network;
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
-__PACKAGE__->table('dhcp_network');
+__PACKAGE__->table('dhcp_subnet');
 
 __PACKAGE__->add_columns(
     'id' => {

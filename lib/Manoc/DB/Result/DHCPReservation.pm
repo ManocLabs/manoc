@@ -52,7 +52,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->belongs_to( 
-    'dhcp_network' => 'Manoc::DB::Result::DHCPNetwork',
+    'dhcp_subnet' => 'Manoc::DB::Result::DHCPSubnet',
     { 'foreign.id' => 'self.dhcpnet_id' }, 
 );
 
