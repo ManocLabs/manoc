@@ -7,7 +7,11 @@
 [% page.toolbar = BLOCK -%]
 <div>
  <a class="btn btn-default" href=[%c.uri_for_action('dhcpserver/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a>&nbsp;
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpsubnet/create', { server_id => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add a DHCP subnet </a>&nbsp;
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpsharedsubnet/create', { server_id => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add a DHCP shared subnet </a>
     </div>
 [% END %]
    <div class="row">

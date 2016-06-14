@@ -1,4 +1,4 @@
-package Manoc::Form::DHCPSubnet;
+package Manoc::Form::DHCPSharedSubnet;
 
 use HTML::FormHandler::Moose;
 
@@ -9,10 +9,10 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-dhcpsubnet' );
+has '+name'        => ( default => 'form-dhcpsharedsubnet' );
 has '+html_prefix' => ( default => 1 );
 
-has '+item_class' => ( default => 'DHCPSubnet' );
+has '+item_class' => ( default => 'DHCPSharedSubnet' );
 
 has_field 'name' => ( 
     type => 'Text', 
@@ -32,19 +32,9 @@ has_field 'dhcp_server' => (
     label => 'DHCP Server', 
 );
 
-has_field 'shared_subnet' => ( 
-    type => 'Select', 
-    label => 'Shared Subnet', 
-);
-
-has_field 'network' => ( 
-    type => 'Select', 
-    label => 'Network', 
-);
-
-has_field 'range' => ( 
-    type => 'Select', 
-    label => 'IP Pool', 
+has_field 'dhcp_subnet' => ( 
+    type => 'Multiple', 
+    label => 'DHCP Subnet', 
 );
 
 has_field 'max_lease_time' => ( 
@@ -76,27 +66,17 @@ has_field 'domain_name' => (
     label => 'Domain Name', 
 );
 
-override validate_model => sub {
-    my $self   = shift;
-    my $item   = $self->item;
-    my $values = $self->values;
 
-    super();
-    
-   #TODO contollo che gli indirizzi from e to ricadino nella subnet associata
- 
 
-};
+# sub options_dhcp_subnet {
+#     my $self = shift;
 
-sub options_network {
-    my $self = shift;
+#     return unless $self->schema;
+#     my $rs = $self->schema->resultset('DHCPSubnet')->search( { 'dhcp_shared_subnet.id' => undef }, {  join => 'dhcp_subnet' , prefetch => 'dhcp_subnet', order_by => 'address'} );
 
-    return unless $self->schema;
-    my $rs = $self->schema->resultset('IPNetwork')->search( { 'dhcp_subnet.id' => undef }, {  join => 'dhcp_subnet' , prefetch => 'dhcp_subnet', order_by => 'address'} );
-
-    return map +{ value => $_->id, label => $_->name . " ( ".
-    $_->address . "/". $_->prefix . " )" }, $rs->all();
-}
+#     return map +{ value => $_->id, label => $_->name . " ( ".
+#     $_->address . "/". $_->prefix . " )" }, $rs->all();
+# }
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
