@@ -50,7 +50,7 @@ __PACKAGE__->add_columns(
         data_type    => 'int',
         is_nullable  => 1,
     },
-    'dhcp_server' => {
+    'dhcp_server_id' => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -65,14 +65,18 @@ __PACKAGE__->add_columns(
         is_foreign_key => 1,
         is_nullable    => 1,
     },
-
+    'dhcp_shared_id' => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 1,
+    },
 );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
 __PACKAGE__->belongs_to( 
     dhcp_server => 'Manoc::DB::Result::DHCPServer',
-    { 'foreign.id' => 'self.dhcp_server' },
+    { 'foreign.id' => 'self.dhcp_server_id' },
 );
 
 __PACKAGE__->belongs_to(
@@ -83,6 +87,11 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
     range => 'Manoc::DB::Result::IPBlock',
     'range_id',
+);
+
+__PACKAGE__->belongs_to( 
+    dhcp_shared_subnet => 'Manoc::DB::Result::DHCPSharedSubnet',
+    { 'foreign.id' => 'self.dhcp_shared_id' },
 );
 
 __PACKAGE__->has_many(
