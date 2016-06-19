@@ -12,7 +12,7 @@ __PACKAGE__->load_components(qw'+Manoc::DB::Helper::NetwalkerCredentials');
 
 __PACKAGE__->table('device_nwinfo');
 __PACKAGE__->add_columns(
-    device => {
+    device_id => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -109,11 +109,11 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->make_credentials_columns;
 
-__PACKAGE__->set_primary_key("device");
+__PACKAGE__->set_primary_key("device_id");
 
 __PACKAGE__->belongs_to(
     device => 'Manoc::DB::Result::Device',
-    { 'foreign.id' => 'self.device' }
+    { 'foreign.id' => 'self.device_id' }
 );
 
 __PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan' );

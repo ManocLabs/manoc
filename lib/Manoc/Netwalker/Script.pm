@@ -11,10 +11,10 @@ extends 'Manoc::Script::Daemon';
 use POE;
 
 use Manoc::Netwalker::Config;
-
-use Manoc::Netwalker::Manager;
 use Manoc::Netwalker::Control;
 use Manoc::Netwalker::Scheduler;
+use Manoc::Netwalker::Manager::Discover;
+use Manoc::Netwalker::Manager::Device;
 
 sub main {
     my $self = shift;
@@ -22,23 +22,31 @@ sub main {
     $self->log->info("Starting netwalker");
 
     # get configuration and store it in a Config object
-    my %config_args = %{ $self->config->{Netwalker} };
+    my %config_args = %{ $self->config->{Netwalker} || {} };
     my $config      = Manoc::Netwalker::Config->new(%config_args);
 
-    my $manager = Manoc::Netwalker::Manager->new(
+    my $device_manager = Manoc::Netwalker::Manager::Device->new(
         config => $config,
         schema => $self->schema,
     );
 
-    my $control = Manoc::Netwalker::Control->new(
-        config  => $config,
-        manager => $manager,
+    my $discover_manager = Manoc::Netwalker::Manager::Discover->new(
+        config => $config,
+        schema => $self->schema,
     );
 
     my $scheduler = Manoc::Netwalker::Scheduler->new(
-        config  => $config,
-        manager => $manager,
-        schema  => $self->schema,
+        config            => $config,
+        schema            => $self->schema,
+    );
+    $scheduler->add_workers_manager($device_manager);
+    $scheduler->add_workers_manager($discover_manager);
+
+
+    my $control = Manoc::Netwalker::Control->new(
+        config            => $config,
+        device_manager    => $device_manager,
+        discover_manager  => $discover_manager,
     );
 
     POE::Kernel->run();

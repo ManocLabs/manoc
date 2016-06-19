@@ -130,7 +130,7 @@ __PACKAGE__->might_have(
 
 __PACKAGE__->might_have(
     netwalker_info => 'Manoc::DB::Result::DeviceNWInfo',
-    { 'foreign.device' => 'self.id' },
+    { 'foreign.device_id' => 'self.id' },
     {
         cascade_delete => 1,
         cascade_copy   => 1,

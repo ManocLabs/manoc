@@ -30,6 +30,7 @@ requires 'MooseX::Daemonize';
 requires 'MooseX::Workers';
 requires 'MooseX::Getopt';
 requires 'Net::OpenSSH';
+requires 'Net::NBName';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';

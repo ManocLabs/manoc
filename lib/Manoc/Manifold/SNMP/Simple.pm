@@ -213,14 +213,13 @@ sub _build_boottime {
 
 sub _build_name {
     my $self = shift;
-    my $info = $self->snmp_info;
-    return $info->name;
+    return $self->snmp_sysName;
 }
 
 sub _build_model {
     my $self = shift;
-    my $info = $self->snmp_info;
-    return $info->model;
+    warn "TODO";
+    return undef;
 }
 
 sub _build_os {

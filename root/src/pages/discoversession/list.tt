@@ -1,0 +1,77 @@
+[%
+   page.title='Host discover sessions'
+-%]
+[% IF c.check_permission('discoversession', 'create') %]
+<a href="[% c.uri_for_action('discoversession/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
+
+<table class="table" id="sessionTable">
+  <thead>
+     <tr>
+       <th>From</th>
+       <th>To</th>
+       <th>Progress</th>
+       <th>Host found</th>
+       <th></th>
+     </tr>
+  </thead>
+  <tbody>
+    [% FOREACH object IN object_list %]
+    <tr>
+      <td data-sort="[% object.from_addr.padded %]">[% object.from_addr | html %]</td>
+      <td data-sort="[% object.to_addr.padded %]">[% object.to_addr | html %]</td>
+      <td>
+        [% IF object.is_running -%]
+           [% bootstrap_progressbar(object.progression, 'progress-bar-striped active') %]
+        [% ELSIF object.is_stopped -%]
+           [% bootstrap_progressbar(object.progression, 'progress-bar-warning') %]
+        [% ELSIF object.is_done -%]
+           [% bootstrap_progressbar(object.progression, 'progress-bar-success') %]
+        [% ELSE -%]
+           [% bootstrap_progressbar(object.progression, 'progress-bar') %]
+        [% END -%]
+      </td>
+      <td>[% object.get_column('num_hosts') %]</td>
+      <td>
+         [% IF object.is_done -%]
+            <a href="javascript:modifySession( [% object.id %], 'restart')">[% bootstrap_icon("refresh") %]<span class="sr-only">restart</span></a>
+         [% END -%]
+         [% IF object.is_running -%]
+            <a href="javascript:modifySession( [% object.id %], 'stop')">[% bootstrap_icon("pause") %]<span class="sr-only">stop</span></a>
+         [% END -%]
+         [% IF object.is_stopped -%]
+            <a href="javascript:modifySession( [% object.id %], 'start')">[% bootstrap_icon("play") %]<span class="sr-only">resume</span></a>
+         [% END -%]
+         [% IF object.get_column('num_hosts') > 0 -%]
+         <a href="[% c.uri_for_action('discoversession/view', [ object.id ]) %]">[% bootstrap_icon("list") %]<span class="sr-only">view host list</span></a>
+         [% END -%]
+         <a href="javascript:modifySession( [% object.id %], 'delete')">[% bootstrap_icon("trash") %]<span class="sr-only">delete</span></a>
+      </td>
+    </tr>
+[% END %]
+   </tbody>
+</table>
+
+[% script = BLOCK %]
+function modifySession(sessionId, command) {
+  url = "[% c.uri_for_action('discoversession/command') %]";
+  $.post( url, { csrf_token: '[% c.get_token %]',command: command, session: sessionId }).done(function( data ) {
+     });
+}
+
+$(document).ready(function () {
+  var interval = 5000;   //number of mili seconds between each call
+  var tableUrl = "[% c.uri_for_action('discoversession/list') %]";
+
+  var refreshPage = function() {
+    $( "#sessionTable" ).load(
+      tableUrl + " #sessionTable",
+      function() {
+        setTimeout(function() { refreshPage(); },
+                   interval);
+     });
+  }
+  refreshPage();
+});
+[% END -%]
+[% js_scripts.push(script) -%]
