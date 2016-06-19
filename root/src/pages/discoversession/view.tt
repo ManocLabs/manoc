@@ -1,0 +1,51 @@
+[%
+   page.title='Discovered hosts'
+-%]
+
+
+<table class="table" id="hosts">
+  <thead>
+     <tr>
+       <th></th>
+       <th>IP Address</th>
+       <th>Hostname</th>
+       <th>Vendor</th>
+       <th>Model</th>
+       <th>OS</th>
+       <th></th>
+     </tr>
+  </thead>
+  <tbody>
+    [% FOREACH host IN object.discovered_hosts %]
+    <tr>
+      <td><input id="[host.id]" type="checkbox" /></td>
+      <td data-sort="[% host.address.padded %]">[% host.address | html %]</td>
+      <td>[% host.hostname %]</td>
+      <td>[% host.vendor  %]</td>
+      <td>[% host.model %]</td>
+      <td>[% host.os %] [% host.os_ver %]</td>
+      <td><a href="[% c.uri_for_action('device/create', { discover=> host.id }) %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a></td>
+    </tr>
+[% END %]
+   </tbody>
+</table>
+
+[% IF c.check_permission('device', 'create') %]
+<a href="javascript:bulkAdd()" class="btn btn-sm btn-default">Add selected</a>
+[% END -%]
+
+[% script = BLOCK %]
+$(document).ready(function() {
+    $('#hosts').DataTable( {
+
+    });
+} );
+function bulkAdd() {
+  var data = $('#hosts').$('input, checkbox').serialize();
+  alert(
+     "The following data would have been submitted to the server: \n\n"+
+     data.substr( 0, 120 )+'...'
+  );
+}
+[% END -%]
+[% js_scripts.push(script) -%]

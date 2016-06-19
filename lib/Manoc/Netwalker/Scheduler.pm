@@ -6,8 +6,16 @@ package Manoc::Netwalker::Scheduler;
 use Moose;
 use namespace::autoclean;
 
+use Moose::Util::TypeConstraints;
+
 with 'Manoc::Logger::Role';
 use POE;
+
+subtype 'ManagerType'
+    => as 'Object'
+    => where sub { $_->does('Manoc::Netwalker::Manager') };
+
+
 
 has config => (
     is       => 'ro',
@@ -15,10 +23,16 @@ has config => (
     required => 1
 );
 
-has manager => (
+has workers_manager => (
     is       => 'ro',
-    isa      => 'Manoc::Netwalker::Manager',
-    required => 1,
+    isa      => 'ArrayRef[ManagerType]',
+    default => sub { [] },
+    traits  => ['Array'],
+
+    handles => {
+        all_workers_manager    => 'elements',
+        add_workers_manager    => 'push',
+    },
 );
 
 has session => (
@@ -27,7 +41,7 @@ has session => (
     required => 1,
     lazy     => 1,
     default  => sub {
-        POE::Session->create( object_states => [ $_[0] => [qw (_start tick )] ] );
+        POE::Session->create( object_states => [ $_[0] => [qw ( _start tick )] ] );
     }
 );
 
@@ -36,13 +50,6 @@ has tick_interval => (
     is       => 'ro',
     required => 1,
     default  => 60,
-);
-
-has refresh_interval => (
-    is      => 'ro',
-    isa     => 'Int',
-    lazy    => 1,
-    builder => '_build_refresh_interval',
 );
 
 has schema => (
@@ -55,14 +62,15 @@ has next_alarm_time => (
     isa => 'Int',
 );
 
-sub _build_refresh_interval {
-    shift->config->refresh_interval;
-}
 
 sub _start {
     my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
     $self->log->debug( "starting scheduler, tick=", $self->tick_interval );
+
+    foreach my $m (@{$self->workers_manager}) {
+        $m->on_tick($kernel);
+    }
 
     $self->next_alarm_time( time() + 1 );
     $kernel->alarm( tick => $self->next_alarm_time );
@@ -71,27 +79,12 @@ sub _start {
 sub tick {
     my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
-    # TODO better check
-    my $last_visited = time() - $self->refresh_interval;
-
-    my $dismissed_devices =
-        $self->schema->resultset('Device')->search( { dismissed => 1 } )->get_column('id');
-
-    my @device_ids = $self->schema->resultset('DeviceNWInfo')->search(
-        {
-            last_visited => { '<='    => $last_visited },
-            device_id    => { -not_in => $dismissed_devices->as_query }
-        }
-    )->get_column('device_id')->all();
-
-    $self->log->debug( "Tick: devices=" . join( ',', @device_ids ) );
-    foreach my $id (@device_ids) {
-        $self->manager->enqueue_device($id);
+    $self->log->debug( "scheduler tick");
+    foreach my $m (@{$self->workers_manager}) {
+        $m->on_tick($kernel);
     }
-
     $self->next_alarm_time( $self->next_alarm_time + $self->tick_interval );
     $kernel->alarm( tick => $self->next_alarm_time );
-
 }
 
 sub BUILD {

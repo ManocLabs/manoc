@@ -17,9 +17,15 @@ has config => (
     required => 1
 );
 
-has manager => (
+has device_manager => (
     is       => 'ro',
-    isa      => 'Manoc::Netwalker::Manager',
+    isa      => 'Manoc::Netwalker::Manager::Device',
+    required => 1,
+);
+
+has discover_manager => (
+    is       => 'ro',
+    isa      => 'Manoc::Netwalker::Manager::Discover',
     required => 1,
 );
 
