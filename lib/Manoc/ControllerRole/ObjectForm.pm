@@ -48,6 +48,7 @@ sub form : Private {
         $process_params{use_defaults_over_obj} = 1;
     }
     my $process_status = $form->process(%process_params);
+
     if ( $c->stash->{is_xhr} ) {
         my $json_data = {};
 
