@@ -9,6 +9,8 @@ use warnings;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::Horizontal';
+with 'Manoc::Form::TraitFor::SaveButton';
 
 has '+name'        => ( default => 'form-rack' );
 has '+html_prefix' => ( default => 1 );
@@ -16,7 +18,7 @@ has '+html_prefix' => ( default => 1 );
 has_field 'name' => (
     type     => 'Text',
     required => 1,
-    label    => 'Rack name',
+    label    => 'Name',
     apply    => [
         'Str',
         {
@@ -38,18 +40,25 @@ has_field 'floor' => (
     required => 1,
     label    => 'Floor',
 );
-has_field 'notes' => (
-    type  => 'TextArea',
-    label => 'Notes',
+
+has_field 'room' => (
+    type     => 'Text',
+    size     => 32,
+    required => 1
 );
 
-has_field 'save' => (
-    type           => 'Submit',
-    widget         => 'ButtonTag',
-    element_attr   => { class => [ 'btn', 'btn-primary' ] },
-    widget_wrapper => 'None',
-    value          => "Save"
+has_field 'notes' => (
+    type     => 'TextArea',
+    label    => 'Notes',
+    required => 0,
+    row      => 3,
 );
+
+has 'default_building_id' => (
+    is       => 'ro',
+    required => 0
+);
+
 
 sub options_building {
     my $self = shift;
@@ -58,9 +67,8 @@ sub options_building {
         $self->schema->resultset('Building')->search( {}, { order_by => 'name' } )->all();
     my @selections;
     foreach my $b (@buildings) {
-        my $label  = $b->name . " (" . $b->description . ")";
         my $option = {
-            label => $label,
+            label => $b->label,
             value => $b->id
         };
         push @selections, $option;

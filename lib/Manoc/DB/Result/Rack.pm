@@ -14,19 +14,24 @@ __PACKAGE__->add_columns(
         data_type         => 'int',
         is_nullable       => 0,
         is_auto_increment => 1,
-
     },
     name => {
         data_type => 'varchar',
         size      => '32',
     },
-    building => {
+    building_id => {
         data_type      => 'int',
         is_nullable    => 0,
         is_foreign_key => 1,
     },
     floor => {
-        data_type   => 'int',
+        data_type   => 'varchar',
+        size        => '4',
+        is_nullable => 0,
+    },
+    room => {
+        data_type   => 'varchar',
+        size        => '16',
         is_nullable => 0,
     },
     notes => {
@@ -38,10 +43,37 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
-__PACKAGE__->belongs_to( building => 'Manoc::DB::Result::Building' );
-__PACKAGE__->has_many(
-    devices => 'Manoc::DB::Result::Device',
-    'rack', { cascade_delete => 0 }
+__PACKAGE__->belongs_to(
+    building => 'Manoc::DB::Result::Building',
+    'building_id'
 );
+
+__PACKAGE__->has_many(
+    hwassets => 'Manoc::DB::Result::HWAsset',
+    'rack_id',
+    { cascade_delete => 0 }
+);
+
+sub devices {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('Device');
+    $rs = $rs->search(
+        {
+            'hwasset.rack_id' => $self->id,
+        },
+        {
+            join => 'hwasset',
+        }
+    );
+    return wantarray() ? $rs->all() : $rs;
+}
+
+
+sub label {
+    my $self = shift;
+    return $self->name . " (" . $self->building->name . ")";
+}
+
 
 1;

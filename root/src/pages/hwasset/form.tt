@@ -1,0 +1,11 @@
+[%
+  page.section='Section'
+  page.subsection='Subsection'
+%]
+[% form.render %]
+[% fragment = BLOCK -%]
+$( document ).ready(function() {
+    $("#form-hwasset\\.rack").selectize();
+    $("#form-hwasset\\.building").selectize();
+});
+[% END %]

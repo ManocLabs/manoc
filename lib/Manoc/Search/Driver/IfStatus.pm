@@ -20,16 +20,16 @@ sub search_note {
         },
         {
             order_by => 'description',
-            prefetch => 'device_info',
+            prefetch => 'device',
         },
     );
     while ( my $e = $rs->next ) {
         my $item = Manoc::Search::Item::Iface->new(
             {
-                device    => $e->device_info,
+                device    => $e->device,
                 interface => $e->interface,
                 text      => $e->description,
-                match     => $e->device_info->name,
+                match     => $e->device->name,
             }
         );
         $result->add_item($item);

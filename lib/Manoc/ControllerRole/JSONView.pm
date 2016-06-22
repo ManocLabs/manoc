@@ -9,6 +9,7 @@ requires 'object', 'object_list';
 has json_columns => (
     is  => 'rw',
     isa => 'ArrayRef[Str]',
+    default => sub { [] },
 );
 
 has json_add_object_href => (

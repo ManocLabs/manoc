@@ -22,25 +22,15 @@ Manoc TT plugin to generate application navigation menu
 
 my @DEFAULT_MENU_ITEMS = (
     {
-        name  => 'Asset',
+        name  => 'Network',
         items => [
             {
-                name   => 'Device',
+                name   => 'Network Devices',
                 action => '/device/list',
             },
             {
-                name   => 'Building',
-                action => '/building/list',
+                separator => 1,
             },
-            {
-                name   => 'Rack',
-                action => '/rack/list',
-            },
-        ]
-    },
-    {
-        name  => 'Network',
-        items => [
             {
                 name   => 'IP Address Plan',
                 action => '/ipnetwork/list',
@@ -50,11 +40,33 @@ my @DEFAULT_MENU_ITEMS = (
                 action => '/vlanrange/list',
             },
             {
-                name => 'SSid',
+                name => 'WLAN',
                 path => '#',
             },
         ],
     },
+    {
+        name  => 'Assets',
+        items => [
+            {
+                name   => 'Hardware Inventory',
+                action => '/hwasset/list',
+            },
+            {
+                separator => 1,
+            },
+            {
+                name   => 'Buildings',
+                action => '/building/list',
+            },
+            {
+                name   => 'Racks',
+                action => '/rack/list',
+            },
+
+        ]
+    },
+
     {
         name  => 'Config',
         items => [

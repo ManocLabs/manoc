@@ -21,7 +21,11 @@
               </a>
               <ul class="dropdown-menu">
 [%- FOREACH i IN s.items %]
+  [%- IF i.separator -%]
+        <li role="separator" class="divider"></li>
+  [%- ELSE -%]
 		<li><a href="[% i.path %]">[% i.name | html %]</a></li>
+  [%- END -%]
 [%- END %]
 	      </ul>
 	    </li>

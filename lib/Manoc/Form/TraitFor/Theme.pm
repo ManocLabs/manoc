@@ -12,15 +12,9 @@ with 'HTML::FormHandler::Widget::Theme::Bootstrap3';
 
 sub build_do_form_wrapper { 1 }
 
-sub build_form_wrapper_class {
-    [ 'col-sm-6', 'col-sm-offset-1', 'col-md-8', 'col-md-offset-1' ];
-}
-
 sub build_form_tags {
     {
         wrapper_tag => 'div',
-        after_start => '<fieldset>',
-        before_end  => '</fieldset>',
     };
 }
 
