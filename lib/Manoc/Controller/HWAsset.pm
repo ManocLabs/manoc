@@ -13,6 +13,7 @@ with 'Manoc::ControllerRole::JSONView';
 with 'Manoc::ControllerRole::JQDatatable';
 
 use Manoc::DB::Result::HWAsset;
+
 use Manoc::Form::HWAsset;
 
 =head1 NAME
