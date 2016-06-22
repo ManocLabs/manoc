@@ -137,6 +137,7 @@ sub location {
     return $location;
 }
 
+
 #TODO
 # - has(service_contract)
 

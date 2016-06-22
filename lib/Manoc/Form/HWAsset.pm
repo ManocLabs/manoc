@@ -20,6 +20,7 @@ use constant {
     LOCATION_SPECIFY   => 's',
 };
 
+
 sub build_render_list {
     [
         'type',
@@ -140,6 +141,7 @@ has_field 'floor' => (
     type  => 'Text',
     label => 'Floor',
     size  => 4,
+
     do_wrapper => 0,
     tags       => {
         before_element => '<div class="col-sm-2">',
@@ -158,9 +160,7 @@ has_field 'room' => (
         after_element  => '</div>'
     },
     label_class  => ['col-sm-1'],
-
 );
-
 
 sub default_location {
     my $self = shift;
@@ -233,7 +233,6 @@ override 'update_model' => sub {
 
     super();
 };
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

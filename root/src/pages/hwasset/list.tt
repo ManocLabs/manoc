@@ -10,7 +10,7 @@
 <a href="[% c.uri_for_action('hwasset/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
 
- <table class="table" id="hwasset_list">
+<table class="table" id="hwasset_list">
    <thead>
      <tr>
         <th>Inventory</th>
