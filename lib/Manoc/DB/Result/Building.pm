@@ -36,7 +36,14 @@ __PACKAGE__->add_unique_constraint( [qw/name/] );
 
 __PACKAGE__->has_many(
     racks => 'Manoc::DB::Result::Rack',
-    'building', { cascade_delete => 0 }
+    'building_id', { cascade_delete => 0 }
 );
+
+sub label {
+    my $self = shift;
+    my $label = $self->name;
+    $self->description and $label .= " (" . $self->description . ")";
+    return $label;
+}
 
 1;

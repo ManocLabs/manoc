@@ -87,6 +87,7 @@ sub _build_schema {
 
     my $config       = $self->config;
     my $connect_info = $config->{'Model::ManocDB'}->{connect_info};
+
     my $schema       = Manoc::DB->connect($connect_info);
 
     return $schema;

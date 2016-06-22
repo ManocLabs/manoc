@@ -13,7 +13,7 @@ __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('dot11_assoc');
 
 __PACKAGE__->add_columns(
-    'device' => {
+    'device_id' => {
         data_type      => 'int',
         is_nullable    => 0,
         is_foreign_key => 1,
@@ -58,9 +58,8 @@ __PACKAGE__->add_columns(
     },
 );
 
-__PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'archived' );
+__PACKAGE__->set_primary_key( 'macaddr', 'device_id', 'firstseen', 'archived' );
 
-__PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
+__PACKAGE__->belongs_to( 'device' => 'Manoc::DB::Result::Device', 'device_id' );
 
 1;
-

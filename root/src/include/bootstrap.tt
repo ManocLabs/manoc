@@ -1,12 +1,15 @@
-[% link_css.push(               
+[% link_css.push(
       c.uri_for('/static/external/bootstrap/css/bootstrap.min.css'),
       c.uri_for('/static/external/bootstrap/css/bootstrap-theme.min.css'),
+      c.uri_for('/static/external/selectize/css/selectize.bootstrap3.css'),
       )
 -%]
 [% link_js.push(
       c.uri_for('/static/external/jquery/jquery-2.1.4.min.js'),
       c.uri_for('/static/external/bootstrap/js/bootstrap.min.js'),
-      ) 
+      c.uri_for('/static/external/selectize/js/selectize.min.js'),
+      c.uri_for('/static/external/bootbox/js/bootbox.min.js'),
+      )
 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO bootstrap_icon(name) BLOCK -%]

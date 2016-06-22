@@ -1,0 +1,38 @@
+[% META
+   section='Asset'
+   subsection='Hardware'
+   tile='List server hardware'
+   use_table=1
+-%]
+
+<div class="buttons create_btn">
+<a href="[% c.uri_for_action('/serverhw/create') %]" >
+   [% ui_icon('circle-plus') %] Create</a>
+ [% add_css_create_btn %]
+</div>
+
+
+[% init_table('list',[20,20,20,20,20]) %]
+ <table class="display" id="list">
+   <thead>  
+     <tr>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Serial</th>
+        <th>Inventory</th>
+        <th></th>
+     </tr>
+   </thead>  
+   <tbody>
+[% FOREACH o IN objects %]
+
+         <tr>
+ 	 <td>[% o.vendor    %]</td>
+ 	 <td>[% o.model     %]</td>
+ 	 <td>[% o.serial    %]</td>
+ 	 <td>[% o.inventory %]</td>
+ 	 <td><a href=[% c.uri_for_action('/serverhw/view', [o.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

@@ -11,7 +11,8 @@ with "Manoc::ControllerRole::CommonCRUD" => { -excludes => ['list'] };
 with "Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
 
 use Text::Diff;
-use Manoc::Form::Device;
+
+use Manoc::Form::Device::Create;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
 use Manoc::Form::Device::Dismiss;
@@ -42,10 +43,14 @@ __PACKAGE__->config(
         }
     },
     class                   => 'ManocDB::Device',
-    form_class              => 'Manoc::Form::Device',
+    create_form_class       => 'Manoc::Form::Device::Create',
+#    edit_form_class         => 'Manoc::Form::Device::Edit',
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+
+    create_page_template    => 'device/create.tt',
+    edit_page_template      => 'device/edit.tt',
 );
 
 =head1 ACTIONS
@@ -313,8 +318,10 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $rack_id = $c->req->query_parameters->{'rack'};
-    $c->log->debug("new device in $rack_id") if $c->debug;
-    $c->stash( form_defaults => { rack => $rack_id } );
+    if ( defined($rack_id) ) {
+        $c->log->debug("new device in rack $rack_id") if $c->debug;
+        $c->stash( form_defaults => { rack => $rack_id } );
+    }
 };
 
 =head2 object_list

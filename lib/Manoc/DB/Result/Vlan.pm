@@ -25,7 +25,7 @@ __PACKAGE__->add_columns(
         size        => 255,
         is_nullable => 1
     },
-    vlan_range => {
+    vlan_range_id => {
         data_type      => 'int',
         is_nullable    => 0,
         is_foreign_key => 1
@@ -39,10 +39,10 @@ sub devices {
     my $ids = $self->interfaces->search(
         {},
         {
-            columns  => [qw/device vlan/],
+            columns  => [qw/device_id/],
             distinct => 1
         }
-    )->get_column('device')->as_query;
+    )->get_column('device_id')->as_query;
 
     my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Device');
     return $rs->search( { id => { -in => $ids } } );
@@ -50,10 +50,10 @@ sub devices {
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->belongs_to( vlan_range => 'Manoc::DB::Result::VlanRange' );
+__PACKAGE__->belongs_to( vlan_range => 'Manoc::DB::Result::VlanRange', 'vlan_range_id' );
 __PACKAGE__->has_many(
     ip_networks => 'Manoc::DB::Result::IPNetwork',
-    { 'foreign.vlan_id' => 'self.if' },
+    { 'foreign.vlan_id' => 'self.id' },
     {
         join_type      => 'LEFT',
         cascade_update => 0,

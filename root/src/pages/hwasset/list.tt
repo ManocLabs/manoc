@@ -1,0 +1,48 @@
+[%
+   page.title='List HWAsset'
+   page.section='Section'
+   page.subsection='Subsection'
+-%]
+<div id="hwasset_create">
+<a href="[% c.uri_for_action('hwasset/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+ <table class="table" id="hwasset_list">
+   <thead>
+     <tr>
+        <th>id</th>
+        <th>type</th>
+        <th>vendor</th>
+        <th>model</th>
+        <th>serial</th>
+        <th>inventory</th>
+        <th>rack</th>
+        <th>rack_level</th>
+        <th>building</th>
+        <th>floor</th>
+        <th>room</th>
+        <th>in_warehouse</th>
+        <th>dismissed</th>
+        <th></th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH object IN object_list %]
+         <tr>
+ 	 <td>[% object.id | html %]</td>
+ 	 <td>[% object.type | html %]</td>
+ 	 <td>[% object.vendor | html %]</td>
+ 	 <td>[% object.model | html %]</td>
+ 	 <td>[% object.serial | html %]</td>
+ 	 <td>[% object.inventory | html %]</td>
+ 	 <td>[% object.rack | html %]</td>
+ 	 <td>[% object.rack_level | html %]</td>
+ 	 <td>[% object.building | html %]</td>
+ 	 <td>[% object.floor | html %]</td>
+ 	 <td>[% object.room | html %]</td>
+ 	 <td>[% object.in_warehouse | html %]</td>
+ 	 <td>[% object.dismissed | html %]</td>
+     	 <td><a href=[% c.uri_for_action('hwasset/view', [object.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

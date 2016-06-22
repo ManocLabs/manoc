@@ -94,13 +94,13 @@ __PACKAGE__->add_columns(
         default_value => '0',
     },
 
-    mat_native_vlan => {
+    mat_native_vlan_id => {
         data_type     => 'int',
         default_value => '1',
         is_nullable   => 1,
     },
 
-    arp_vlan => {
+    arp_vlan_id => {
         data_type     => 'int',
         default_value => '1',
         is_nullable   => 1,
@@ -116,8 +116,11 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.device_id' }
 );
 
-__PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan' );
-__PACKAGE__->belongs_to( arp_vlan        => 'Manoc::DB::Result::Vlan' );
+__PACKAGE__->belongs_to( mat_native_vlan => 'Manoc::DB::Result::Vlan', 'mat_native_vlan_id' );
+__PACKAGE__->belongs_to(
+    arp_vlan => 'Manoc::DB::Result::Vlan',
+    'arp_vlan_id'
+);
 
 =head1 NAME
 

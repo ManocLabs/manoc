@@ -1,0 +1,9 @@
+[%  META
+    title='Create/Edit Server Hardware'
+    section='Asset'
+    subsection='Hardware'
+%]
+
+<div class="buttons">
+[% form.render %]
+</div>

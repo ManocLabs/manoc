@@ -105,7 +105,7 @@ sub get_json_object {
 
 =head1 AUTHOR
 
-gabriel&rigo
+The Manoc Team
 
 =head1 LICENSE
 

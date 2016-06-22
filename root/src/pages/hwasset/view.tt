@@ -1,0 +1,40 @@
+[%
+   page.title='View HWAsset'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('hwasset/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('hwasset/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>type</dt>
+  <dd>[% object.type | html %]</dd>
+  <dt>vendor</dt>
+  <dd>[% object.vendor | html %]</dd>
+  <dt>model</dt>
+  <dd>[% object.model | html %]</dd>
+  <dt>serial</dt>
+  <dd>[% object.serial | html %]</dd>
+  <dt>inventory</dt>
+  <dd>[% object.inventory | html %]</dd>
+  <dt>rack</dt>
+  <dd>[% object.rack | html %]</dd>
+  <dt>rack_level</dt>
+  <dd>[% object.rack_level | html %]</dd>
+  <dt>building</dt>
+  <dd>[% object.building | html %]</dd>
+  <dt>floor</dt>
+  <dd>[% object.floor | html %]</dd>
+  <dt>room</dt>
+  <dd>[% object.room | html %]</dd>
+  <dt>in_warehouse</dt>
+  <dd>[% object.in_warehouse | html %]</dd>
+  <dt>dismissed</dt>
+  <dd>[% object.dismissed | html %]</dd>
+</dl>

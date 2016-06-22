@@ -24,19 +24,15 @@ __PACKAGE__->add_columns(
         ipv4_address => 1,
         accessor     => '_mng_address',
     },
-    mng_url_format => {
+    mng_url_format_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
     },
-    rack => {
+    hwasset_id => {
         data_type      => 'int',
-        is_nullable    => 0,
+        is_nullable    => 1,
         is_foreign_key => 1,
-    },
-    level => {
-        data_type   => 'int',
-        is_nullable => 0,
     },
     name => {
         data_type     => 'varchar',
@@ -44,23 +40,23 @@ __PACKAGE__->add_columns(
         default_value => 'NULL',
         is_nullable   => 1,
     },
+
+    # these fields are populated by netwalker
+    # and can be compared with hwasset one
+    vendor => {
+        data_type   => 'varchar',
+        is_nullable => 0,
+        size        => 32,
+    },
     model => {
-        data_type     => 'varchar',
-        size          => 32,
-        default_value => 'NULL',
-        is_nullable   => 1,
+        data_type   => 'varchar',
+        is_nullable => 0,
+        size        => 32,
     },
     serial => {
-        data_type     => 'varchar',
-        size          => 32,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    vendor => {
-        data_type     => 'varchar',
-        size          => 32,
-        default_value => 'NULL',
-        is_nullable   => 1,
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 32,
     },
     os => {
         data_type     => 'varchar',
@@ -99,19 +95,26 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/id/] );
 __PACKAGE__->add_unique_constraint( [qw/mng_address/] );
 
-__PACKAGE__->belongs_to( rack => 'Manoc::DB::Result::Rack' );
+__PACKAGE__->belongs_to(
+    hwasset => 'Manoc::DB::Result::HWAsset',
+    'hwasset_id',
+    {
+        proxy          => [qw/rack rack_level/],
+        cascade_update => 1
+    }
+);
 
-__PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus' );
-__PACKAGE__->has_many( uplinks      => 'Manoc::DB::Result::Uplink' );
-__PACKAGE__->has_many( ifnotes      => 'Manoc::DB::Result::IfNotes' );
-__PACKAGE__->has_many( ssids        => 'Manoc::DB::Result::SSIDList' );
-__PACKAGE__->has_many( dot11clients => 'Manoc::DB::Result::Dot11Client' );
-__PACKAGE__->has_many( dot11assocs  => 'Manoc::DB::Result::Dot11Assoc' );
-__PACKAGE__->has_many( mat_assocs   => 'Manoc::DB::Result::Mat' );
+__PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus', 'device_id' );
+__PACKAGE__->has_many( uplinks      => 'Manoc::DB::Result::Uplink', 'device_id' );
+__PACKAGE__->has_many( ifnotes      => 'Manoc::DB::Result::IfNotes', 'device_id' );
+__PACKAGE__->has_many( ssids        => 'Manoc::DB::Result::SSIDList', 'device_id' );
+__PACKAGE__->has_many( dot11clients => 'Manoc::DB::Result::Dot11Client', 'device_id' );
+__PACKAGE__->has_many( dot11assocs  => 'Manoc::DB::Result::Dot11Assoc', 'device_id' );
+__PACKAGE__->has_many( mat_assocs   => 'Manoc::DB::Result::Mat', 'device_id' );
 
 __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
-    { 'foreign.from_device' => 'self.id' },
+    { 'foreign.from_device_id' => 'self.id' },
     {
         cascade_copy   => 0,
         cascade_delete => 0,
@@ -121,7 +124,7 @@ __PACKAGE__->has_many(
 
 __PACKAGE__->might_have(
     config => 'Manoc::DB::Result::DeviceConfig',
-    { 'foreign.device' => 'self.id' },
+    { 'foreign.device_id' => 'self.id' },
     {
         cascade_delete => 1,
         cascade_copy   => 0,
@@ -139,7 +142,7 @@ __PACKAGE__->might_have(
 
 __PACKAGE__->belongs_to(
     mng_url_format => 'Manoc::DB::Result::MngUrlFormat',
-    'mng_url_format',
+    'mng_url_format_id',
     { join_type => 'LEFT' }
 );
 

@@ -22,7 +22,7 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         size        => 17
     },
-    'device' => {
+    'device_id' => {
         data_type      => 'int',
         is_nullable    => 0,
         is_foreign_key => 1,
@@ -42,23 +42,22 @@ __PACKAGE__->add_columns(
     },
 );
 
-__PACKAGE__->set_tuple_archive_columns( 'macaddr', 'device', 'interface', 'vlan' );
+__PACKAGE__->set_tuple_archive_columns( 'macaddr', 'device_id', 'interface', 'vlan' );
 
-__PACKAGE__->set_primary_key( 'macaddr', 'device', 'firstseen', 'vlan' );
+__PACKAGE__->set_primary_key( 'macaddr', 'device_id', 'firstseen', 'vlan' );
 
-__PACKAGE__->belongs_to( 'device_entry' => 'Manoc::DB::Result::Device', 'device' );
+__PACKAGE__->belongs_to( 'device' => 'Manoc::DB::Result::Device', 'device_id' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::Mat');
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_mat_device',  fields => ['device'] );
+    $sqlt_schema->add_index( name => 'idx_mat_device',  fields => ['device_id'] );
     $sqlt_schema->add_index( name => 'idx_mat_macaddr', fields => ['macaddr'] );
 
-    $sqlt_schema->add_index( name => 'idx_mat_dev_iface', fields => [ 'device', 'interface' ] );
+    $sqlt_schema->add_index( name => 'idx_mat_dev_iface', fields => [ 'device_id', 'interface' ] );
 
 }
 
 1;
-

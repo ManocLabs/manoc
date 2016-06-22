@@ -44,7 +44,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( ['name'] );
-__PACKAGE__->has_many( vlans => 'Manoc::DB::Result::Vlan', 'vlan_range' );
+__PACKAGE__->has_many( vlans => 'Manoc::DB::Result::Vlan', 'vlan_range_id' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::VlanRange');
 

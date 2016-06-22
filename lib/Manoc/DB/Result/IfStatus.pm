@@ -11,7 +11,7 @@ use warnings;
 __PACKAGE__->table('if_status');
 
 __PACKAGE__->add_columns(
-    'device' => {
+    'device_id' => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -91,7 +91,7 @@ __PACKAGE__->add_columns(
 __PACKAGE__->add_relationship(
     mat_entry => 'Manoc::DB::Result::Mat',
     {
-        'foreign.device'    => 'self.device',
+        'foreign.device_id' => 'self.device_id',
         'foreign.interface' => 'self.interface'
     },
     {
@@ -101,8 +101,8 @@ __PACKAGE__->add_relationship(
     },
 );
 
-__PACKAGE__->belongs_to( device_info => 'Manoc::DB::Result::Device', 'device' );
-__PACKAGE__->set_primary_key( 'device', 'interface' );
+__PACKAGE__->belongs_to( device => 'Manoc::DB::Result::Device', 'device_id' );
+__PACKAGE__->set_primary_key( 'device_id', 'interface' );
 
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IfStatus');
 

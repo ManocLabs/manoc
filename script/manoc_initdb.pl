@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-package Manoc::InitDB;
+package Manoc::Script::InitDB;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -188,7 +188,7 @@ no Moose;
 
 package main;
 
-my $app = Manoc::InitDB->new_with_options();
+my $app = Manoc::Script::InitDB->new_with_options();
 $app->run();
 
 # Local Variables:

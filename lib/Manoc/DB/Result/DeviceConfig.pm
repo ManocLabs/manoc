@@ -10,7 +10,7 @@ use warnings;
 
 __PACKAGE__->table('device_config');
 __PACKAGE__->add_columns(
-    'device' => {
+    'device_id' => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -35,11 +35,11 @@ __PACKAGE__->add_columns(
     },
 );
 
-__PACKAGE__->set_primary_key("device");
+__PACKAGE__->set_primary_key("device_id");
 
 __PACKAGE__->belongs_to(
     device => 'Manoc::DB::Result::Device',
-    { 'foreign.id' => 'self.device' }
+    'device_id',
 );
 
 =head1 NAME

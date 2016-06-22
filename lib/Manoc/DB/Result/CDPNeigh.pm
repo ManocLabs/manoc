@@ -12,7 +12,7 @@ __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('cdp_neigh');
 __PACKAGE__->add_columns(
-    'from_device' => {
+    'from_device_id' => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -50,13 +50,13 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key(
-    qw(from_device from_interface
+    qw(from_device_id from_interface
         to_device to_interface)
 );
 
 __PACKAGE__->belongs_to(
     from_device => 'Manoc::DB::Result::Device',
-    { 'foreign.id' => 'self.from_device' }
+    { 'foreign.id' => 'self.from_device_id' }
 );
 
 __PACKAGE__->belongs_to(
