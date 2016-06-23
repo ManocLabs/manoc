@@ -32,7 +32,7 @@ has_field 'dhcp_server' => (
     label => 'DHCP Server', 
 );
 
-has_field 'shared_subnet' => ( 
+has_field 'dhcp_shared_subnet' => ( 
     type => 'Select', 
     label => 'Shared Subnet', 
 );

@@ -32,10 +32,11 @@ has_field 'dhcp_server' => (
     label => 'DHCP Server', 
 );
 
-has_field 'dhcp_subnet' => ( 
-    type => 'Multiple', 
-    label => 'DHCP Subnet', 
-);
+ has_field 'dhcp_subnet' => ( 
+     type => 'Multiple', 
+     label => 'DHCP Subnet',
+     noupdate => 1,
+ );
 
 has_field 'max_lease_time' => ( 
     type => 'Integer', 
@@ -66,17 +67,22 @@ has_field 'domain_name' => (
     label => 'Domain Name', 
 );
 
+around 'update_model' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $item = $self->item;
+    my $subnet_list =  $self->field('dhcp_subnet')->value;
 
-
-# sub options_dhcp_subnet {
-#     my $self = shift;
-
-#     return unless $self->schema;
-#     my $rs = $self->schema->resultset('DHCPSubnet')->search( { 'dhcp_shared_subnet.id' => undef }, {  join => 'dhcp_subnet' , prefetch => 'dhcp_subnet', order_by => 'address'} );
-
-#     return map +{ value => $_->id, label => $_->name . " ( ".
-#     $_->address . "/". $_->prefix . " )" }, $rs->all();
-# }
+    $self->schema->txn_do( sub {
+	$self->$orig(@_);
+	
+	foreach my $sub_id (@{$subnet_list}){
+	    my $rs = $self->schema->resultset('DHCPSubnet')
+		->search( { 'id' => $sub_id  },)->single; 
+	    $rs->dhcp_shared_subnet($item)->update;
+	}         
+   });
+};
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
