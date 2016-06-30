@@ -1,0 +1,12 @@
+[Unit]
+Description=manoc fast CGI front end
+After=network.target 
+
+[Service]
+Type=forking
+EnvironmentFile=<path to a file with environment variables>
+ExecStart=/bin/bash -c "perl -Mlocal::lib=$LOCALLIB $SERVER_SCRIPT $SERVER_SCRIPT_ARGS "
+ExecStop=/bin/bash  -c "pkill --pidfile $PID_FILE"
+
+[Install]
+WantedBy=default.target
