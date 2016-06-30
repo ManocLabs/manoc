@@ -47,15 +47,28 @@ sub form : Private {
         $process_params{defaults}              = $c->stash->{form_defaults};
         $process_params{use_defaults_over_obj} = 1;
     }
-    return unless $form->process(%process_params);
-
-    $c->stash( message => $self->object_updated_message );
+    my $process_status = $form->process(%process_params);
     if ( $c->stash->{is_xhr} ) {
-        $c->stash( no_wrapper => 1 );
-        $c->stash( template   => 'dialog/message.tt' );
-        return;
+        my $json_data = {};
+
+        # render as a fragment
+        $c->stash->{no_wrapper} = 1;
+
+        $json_data->{form_ok} = $process_status ? 1 : 0;
+
+        if ($process_status) {
+            $json_data->{message}  = $self->object_updated_message;
+            $json_data->{redirect} = $self->get_form_success_url($c);
+        } else {
+            $json_data->{html} =
+                $c->forward("View::TT", "render", [ "form.tt", $c->stash]);
+        }
+        $c->stash->{json_data} = $json_data;
+        $c->detach('View::JSON');
     }
 
+    return unless $process_status;
+    $c->stash( message => $self->object_updated_message );
     $c->res->redirect( $self->get_form_success_url($c) );
     $c->detach();
 }

@@ -30,8 +30,7 @@ sub encode_json($) {
         return undef;
     }
 
-    # HACK we use latin1 to avoid a double uft8 encoding
-    my $encoder = JSON->new->latin1();
+    my $encoder = JSON->new->utf8();
     $encoder->allow_blessed(1);
     $encoder->convert_blessed(1);
     return $encoder->encode($data);
