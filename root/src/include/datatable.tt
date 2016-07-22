@@ -2,23 +2,35 @@
                c.uri_for('/static/external/datatables-1.10.8/datatables.css'),
              )
   -%]
-  [%  link_js.push(
+[%  link_js.push(
                c.uri_for('/static/external/datatables-1.10.8/datatables.min.js'),
                c.uri_for('/static/external/datatables-1.10.8/ip-address.js'),
-             ) 
-  -%]
+             )
+ -%]
 [%# Init Table -%]
 [% MACRO init_table(id, options) BLOCK -%]
 [% capture = BLOCK -%]
 $(function() {
     $("#[% id  %]").DataTable( {
-[% IF options.paging   %] "paging":   true,[% END %]
-[% IF options.ordering %] "ordering": true,[% END %]
-[% IF options.info     %] "info":     true,[% END %]
-  "dom":
+[% IF options.paging   %] "paging":   true,[% END -%]
+[% IF options.ordering %] "ordering": true,[% END -%]
+[% IF options.info     %] "info":     true,[% END -%]
+[% IF options.server_source -%]
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":         "[% options.server_source %]",
+[% END -%]
+[% IF options.columns -%]
+   "columns": [
+  [% FOREACH c in options.columns -%]
+        { "data": [% c %] },
+  [% END -%]
+]
+[% END -%]
+   "dom":
     [%- IF options.toolbar -%]'<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip'
     [%- ELSE %]'frtip'
-    [%- END  %],
+    [%- END  %]
    });
 [% IF options.toolbar -%]
    var origin=$("#[% options.toolbar %]");
