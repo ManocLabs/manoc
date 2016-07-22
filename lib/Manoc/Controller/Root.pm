@@ -78,7 +78,7 @@ sub auto : Private {
         $c->log->debug("Not authenticated") if $c->debug;
 
         if ( $c->stash->{is_api} || $c->stash->{is_xhr} ) {
-            $self->detach('access_denied');
+            $c->detach('access_denied');
         }
         else {
             $c->response->redirect(
