@@ -48,8 +48,8 @@ sub form : Private {
         $process_params{use_defaults_over_obj} = 1;
     }
 
-    if (self->can("get_form_process_params")) {
-        %process_params = $self->get_form_process_params( %process_params );
+    if ($self->can("get_form_process_params")) {
+        %process_params = $self->get_form_process_params( $c, %process_params );
     }
     my $process_status = $form->process(%process_params);
 
