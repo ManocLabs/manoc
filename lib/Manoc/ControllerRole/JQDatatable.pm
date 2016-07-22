@@ -52,7 +52,8 @@ sub get_datatable_resultset {
     return $c->stash->{'resultset'};
 }
 
-sub datatable_response : Private {
+sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
+    {
     my ( $self, $c ) = @_;
 
     my $start  = $c->request->param('start') || 0;
@@ -112,15 +113,15 @@ sub datatable_response : Private {
     while ( my $item = $search_rs->next ) {
         my $row;
         if ($row_callback) {
-            $row = $row_callback->( $c, $item );
+            $row = $self->$row_callback( $c, $item );
         }
         else {
-            $row = [];
+            $row = {};
 
             foreach my $name (@$col_names) {
                 # default accessor is preferred
                 my $v = $item->can($name) ? $item->$name : $item->get_column($name);
-                push @$row, $v;
+                $row->{$name} = $v;
             }
         }
         push @rows, $row;
