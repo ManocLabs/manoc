@@ -8,7 +8,9 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::JSONView" => {
+    -excludes => 'get_json_object',
+};
 
 use Text::Diff;
 use Manoc::Form::Device;
@@ -44,7 +46,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::Device',
     enable_permission_check => 1,
     view_object_perm        => undef,
-
+    json_columns            => [ 'id', 'name' ],
 );
 
 =head1 ACTIONS
@@ -386,17 +388,16 @@ sub delete_object {
     return 1;
 }
 
-=head2 prepare_json_object
+=head2 get_json_object
 
 =cut
 
-sub prepare_json_object {
-    my ( $self, $device ) = @_;
-    return {
-        id   => $device->id,
-        name => $device->name,
-        rack => $device->rack->id,
-    };
+sub get_json_object {
+    my ( $self, $c, $device ) = @_;
+
+    my $r = $self->prepare_json_object($c, $device);
+    $r->{rack} = $device->rack->id,
+    return $r;
 }
 
 =head1 AUTHOR
