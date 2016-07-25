@@ -54,12 +54,6 @@ has_field 'notes' => (
     row      => 3,
 );
 
-has 'default_building_id' => (
-    is       => 'ro',
-    required => 0
-);
-
-
 sub options_building {
     my $self = shift;
     return unless $self->schema;
