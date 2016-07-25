@@ -119,9 +119,23 @@ around "rack" => sub {
 sub label {
     my $self = shift;
 
-    return $self->inventory . "(" . $self->vendor . " - " . $self->model . ")",
+    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",
 }
 
+sub location {
+    my $self = shift;
+    if ( $self->rack ) {
+        return "Rack " . $self->rack->label;
+    }
+
+    my $location = "";
+    if ( $self->building ) {
+        $location = $self->building->label;
+        defined($self->floor) and $location .= " Floor " . $self->floor;
+        defined($self->room) and $location .= " Room " . $self->room;
+    }
+    return $location;
+}
 
 #TODO
 # - has(service_contract)

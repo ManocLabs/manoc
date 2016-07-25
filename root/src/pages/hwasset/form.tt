@@ -7,5 +7,31 @@
 $( document ).ready(function() {
     $("#form-hwasset\\.rack").selectize();
     $("#form-hwasset\\.building").selectize();
+    form_hwasset_refresh();
 });
+$('#form-hwasset input').on('change', function() {
+    form_hwasset_refresh();
+
+ });
+function form_hwasset_refresh() {
+  l=$('input[name="form-hwasset.location"]:checked').val();
+  $("#form-hwasset\\.building").prop('disabled', l != 's');
+  if ( l == 's') {
+    $("#form-hwasset\\.building")[0].selectize.enable();
+    $("#form-hwasset\\.room").prop('disabled', false);
+    $("#form-hwasset\\.floor").prop('disabled', false);
+  } else {
+    $("#form-hwasset\\.building")[0].selectize.disable();
+    $("#form-hwasset\\.room").prop('disabled', true);
+    $("#form-hwasset\\.floor").prop('disabled', true);
+  }
+  if ( l == 'r' ) {
+    $("#form-hwasset\\.rack")[0].selectize.enable();
+    $("#form-hwasset\\.rack_level").prop('disabled', false);
+  } else {
+    $("#form-hwasset\\.rack_level").prop('disabled', true);
+    $("#form-hwasset\\.rack")[0].selectize.disable();
+  }
+}
 [% END %]
+[% js_scripts.push(fragment) -%]
