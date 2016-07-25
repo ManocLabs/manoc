@@ -1,0 +1,40 @@
+[%
+page.title='Create Device'
+page.subsection='Device'
+page.section='Assets'
+-%]
+
+[% form.render %]
+[% fragment = BLOCK -%]
+var rack_control;
+var asset_control;
+
+var hwasset_url = "[% c.uri_for_action('hwasset/view_js', [ '%' ] )%]";
+
+var onAssetChange = function(asset_id) {
+    url = hwasset_url.replace('%', asset_id);
+    if (asset_id) {
+      $.get( url, function( data ) {
+        rack_control.setValue(data.rack_id);
+        $('#form-device\\.rack_level').val(data.rack_level);
+      });
+    }
+};
+
+$( document ).ready(function() {
+    var $rack_select = $('#form-device\\.rack').selectize();
+    rack_control = $rack_select[0].selectize;
+
+    var $asset_select = $('#form-device\\.hwasset').selectize({
+      onChange: onAssetChange,
+      create: true
+    });
+    asset_control = $asset_select[0].selectize;
+
+	$('#form-device\\.asset_button').click(function() {
+      showDialogForm("[% c.uri_for_action('/hwasset/create', { type => 'D' }) %]", "Create asset");
+      return false;
+    });
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]
