@@ -89,7 +89,7 @@ has_field 'mng_address' => (
 
     do_wrapper => 0,
     tags => {
-        before_element => '<div class="col-sm-4">',
+        before_element => '<div class="col-sm-5">',
         after_element  => '</div>'
     },
     label_class  => ['col-sm-2'],
@@ -105,7 +105,7 @@ has_field 'mng_url_format' => (
         before_element => '<div class="col-sm-3">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-3'],
+    label_class  => ['col-sm-2'],
 );
 
 has_block 'rack_block' => (
@@ -157,14 +157,10 @@ sub options_hwasset {
     my $self = shift;
     return unless $self->schema;
 
-    my $assets = $self->schema->resultset('HWAsset')->search(
-        { type => Manoc::DB::Result::HWAsset::TYPE_DEVICE },
-    );
-
     return map +{
         value => $_->id,
         label => $_->label,
-    }, $assets->all();
+    }, $self->schema->resultset('HWAsset')->unused_devices()->all();
 }
 
 sub options_rack {
