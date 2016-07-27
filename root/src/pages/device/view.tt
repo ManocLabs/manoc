@@ -2,11 +2,17 @@
    use_table = 1
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+[%- IF object.dismissed                                -%]
+[%-  page.title   = 'Dismissed device ' _ object.name  -%]
+[%- ELSE                                               -%]
+[%-  page.title   = 'Device' _ object.name             -%]
+[%- END                                                -%]
 [%
-page.title   = 'Device ' _ object.name
 page.section = 'Asset'
 page.subsection = 'Device'
 -%]
+[%- IF !object.dismissed %]
 [% page.toolbar = BLOCK -%]
 <div>
 [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') ||  c.check_permission(object, 'edit_nwinfo')  -%]
@@ -23,6 +29,10 @@ page.subsection = 'Device'
       <li>
 	<a href="[% c.uri_for_action('/device/uplinks', [object.id]) %]">
 	  [% bootstrap_icon('link') %] Set uplink</a>
+      </li>
+      <li>
+	<a href="[% c.uri_for_action('/device/dismiss', [object.id]) %]">
+	  [% bootstrap_icon('remove') %]Dismiss</a>
       </li>
 [%- END -%]
 [%- IF c.check_permission(object, 'edit_nwinfo')  -%]
@@ -44,6 +54,7 @@ page.subsection = 'Device'
   <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]">
     [% bootstrap_icon('refresh') %] Refresh Info</a>
 </div>
+[% END -%]
 [% END -%]
 
 <!-- Nav tabs -->
@@ -105,7 +116,7 @@ page.subsection = 'Device'
 	<dd>[% nwinfo.get_dot11 ? 'Yes' : 'No'  %]</dd>
 [% ELSE -%]
        	<dt>Netwalker</dt>
-	<dd>No netwalker configuration found. [%  object %]-</dd>
+	<dd>No netwalker configuration found.</dd>
 [% END -%]
 	<dt>Configuration</dt>
 	<dd>

@@ -1,6 +1,0 @@
-[% META title='Edit Device'
-   subsection='Device'
-   section='Asset' -%]
-<h3>IP Address: [% object.id.address %]</h3>
-
-[% INCLUDE device/form.tt %]

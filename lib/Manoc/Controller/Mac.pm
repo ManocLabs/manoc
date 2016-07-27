@@ -29,14 +29,6 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
         macaddr => $macaddr,
 
         mat_results => [
-            $c->model('ManocDB::MatArchive')->search(
-                {
-                    macaddr => $macaddr
-                },
-                {
-                    prefetch => [ 'device', ],
-                }
-            ),
             $c->model('ManocDB::Mat')->search(
                 {
                     macaddr => $macaddr
