@@ -49,7 +49,7 @@ Catalyst Controller.
 sub split : Chained('object') : PathPart('split') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->require_permission( $self->stash->{object}, 'edit' );
+    $c->require_permission( $c->stash->{object}, 'edit' );
 
     my $form = Manoc::Form::VlanRange::Split->new( { ctx => $c } );
 
@@ -69,7 +69,7 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
 sub merge : Chained('object') : PathPart('merge') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->require_permission( $self->stash->{object}, 'edit' );
+    $c->require_permission( $c->stash->{object}, 'edit' );
 
     my $form = Manoc::Form::VlanRange::Merge->new( { ctx => $c } );
 
