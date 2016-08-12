@@ -11,10 +11,12 @@ function showDialogForm(url, title, on_close) {
 	        success: function(data) {
                 if (data.html) {
                     $('#modalBoxMessage').html(data.html);
+                    form = $('#modalBoxMessage form');
+                    form.submit(function(e) { e.preventDefault(e); submit_func(form); });
                     return;
                 }
                 modalBox.modal('hide');
-                on_close();
+                on_close(data);
             }
 	    });
 	};
