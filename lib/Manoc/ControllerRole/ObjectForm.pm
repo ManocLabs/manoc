@@ -64,6 +64,7 @@ sub form : Private {
         if ($process_status) {
             $json_data->{message}  = $self->object_updated_message;
             $json_data->{redirect} = $self->get_form_success_url($c);
+            $json_data->{object_id} = $form->item_id;
         }
         else {
             $json_data->{html} =
