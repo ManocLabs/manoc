@@ -10,6 +10,12 @@ use namespace::autoclean;
 
 requires 'base';
 
+has object_list_filter_columns => (
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [] }
+);
+
 =head1 NAME
 
 Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
@@ -27,7 +33,7 @@ a resultset.
   extends "Catalyst::Controller";
   with "Manoc::ControllerRole::Object";
 
-  __PACKAGE__->config( 
+  __PACKAGE__->config(
       # define PathPart
       action => {
           setup => {
@@ -40,7 +46,7 @@ a resultset.
   # manages /artist/
   sub list : Chained('object_list') : PathPart('') : Args(0) {
      my ( $self, $c ) = @_;
-     
+
      # render with default template
      # objects are stored in $c->{object_list}
   }
@@ -65,11 +71,33 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
 
 =cut
 
-sub get_object_list : Private {
+sub get_object_list {
     my ( $self, $c ) = @_;
 
     my $rs = $c->stash->{resultset};
-    return [ $rs->search( {} ) ];
+    my $filter = $self->get_object_list_filter($c);
+    return [ $rs->search( $filter ) ];
+}
+
+=head2 get_object_list_filter
+
+=cut
+
+sub get_object_list_filter {
+    my ( $self, $c ) = @_;
+
+    my %filter;
+
+    my $qp = $c->req->query_parameters;
+    foreach my $col (@{$self->object_list_filter_columns}) {
+        my $param = $qp->{$col};
+        defined($param) or next;
+        ref($param) eq "ARRAY" and next;
+        $filter{ $col } = $param;
+        $c->log->debug("filter object list $col = $param") if $c->debug;
+    }
+
+    return \%filter;
 }
 
 1;
