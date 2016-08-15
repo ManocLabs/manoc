@@ -12,7 +12,7 @@ sub search_unused {
     my ( $self, $device ) = @_;
 
     my $conditions = { 'mat_entry.macaddr' => undef };
-    $device and $conditions->{'me.device'} = $device;
+    $device and $conditions->{'me.device_id'} = $device;
 
     $self->search(
         $conditions,
@@ -27,13 +27,13 @@ sub search_mat_last_activity {
     my ( $self, $device ) = @_;
 
     my $conditions = {};
-    $device and $conditions->{'me.device'} = $device;
+    $device and $conditions->{'me.device_id'} = $device;
 
     $self->search(
         $conditions,
         {
             alias    => 'me',
-            group_by => [qw(me.device me.interface)],
+            group_by => [qw(me.device_id me.interface)],
             select   => [ 'me.interface', { max => 'mat_entry.lastseen' }, ],
             as       => [qw(interface lastseen)],
             join     => 'mat_entry',
