@@ -21,21 +21,21 @@ sub search_multihost {
         { 'archived' => 0 },
         {
             select => [
-                'me.device', 'me.interface',
+                'me.device_id', 'me.interface',
                 { count => { distinct => 'macaddr' } }, 'description',
             ],
 
             as       => [ 'device', 'interface', 'count', 'description', ],
             group_by => [ 'device', 'interface' ],
             having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
-            order_by => [ 'me.device', 'me.interface' ],
+            order_by => [ 'me.device_id', 'me.interface' ],
             alias    => 'me',
             from     => [
                 { me => 'mat' },
                 [
                     { 'ifstatus' => 'if_status' },
                     {
-                        'ifstatus.device'    => 'me.device',
+                        'ifstatus.device_id' => 'me.device_id',
                         'ifstatus.interface' => 'me.interface',
                     }
                 ]
