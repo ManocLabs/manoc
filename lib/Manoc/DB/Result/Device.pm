@@ -3,10 +3,10 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Device;
+use Moose;
 
-use parent 'DBIx::Class::Core';
-use strict;
-use warnings;
+extends 'DBIx::Class::Core';
+
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
@@ -41,55 +41,28 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    # these fields are populated by netwalker
-    # and can be compared with hwasset one
-    vendor => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 32,
+    rack_id => {
+        data_type      => 'int',
+        is_nullable    => 1,
+        is_foreign_key => 1,
     },
-    model => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 32,
-    },
-    serial => {
-        data_type   => 'varchar',
+    rack_level => {
+        data_type   => 'int',
         is_nullable => 1,
-        size        => 32,
-    },
-    os => {
-        data_type     => 'varchar',
-        size          => 32,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    os_ver => {
-        data_type     => 'varchar',
-        size          => 32,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    vtp_domain => {
-        data_type     => 'varchar',
-        size          => 64,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-    boottime => {
-        data_type     => 'int',
-        default_value => '0',
     },
     dismissed => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',
     },
+
     notes => {
         data_type   => 'text',
         is_nullable => 1,
     },
 );
+
+
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/id/] );
@@ -98,11 +71,27 @@ __PACKAGE__->add_unique_constraint( [qw/mng_address/] );
 __PACKAGE__->belongs_to(
     hwasset => 'Manoc::DB::Result::HWAsset',
     'hwasset_id',
-    {
-        proxy          => [qw/rack rack_level/],
-        cascade_update => 1
-    }
+    { join_type => 'left' }
 );
+
+__PACKAGE__->belongs_to(
+    rack => 'Manoc::DB::Result::Rack',
+    'rack_id',
+    { join_type => 'left' }
+);
+
+around "rack" => sub {
+    my ( $orig, $self ) = ( shift, shift );
+
+    if (@_) {
+        my $rack = $_[0];
+        if ( $rack ) {
+            $self->hwasset->rack = $rack;
+        }
+    }
+
+    $self->$orig(@_);
+};
 
 __PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus', 'device_id' );
 __PACKAGE__->has_many( uplinks      => 'Manoc::DB::Result::Uplink', 'device_id' );

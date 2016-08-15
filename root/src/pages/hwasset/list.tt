@@ -2,7 +2,7 @@
    use_table=1
 -%]
 [%
-   page.title='List HWAsset'
+   page.title='Hardware assets'
    page.section='Section'
    page.subsection='Subsection'
 -%]
@@ -19,7 +19,6 @@
         <th>Model</th>
         <th>Serial</th>
         <th>Location</th>
-        <th>Warehouse</th>
      </tr>
    </thead>
    <tbody>
@@ -42,7 +41,6 @@
                      { 'data' : 'model' },
                      { 'data' : 'serial' },
                      { 'data' : 'location' },
-                     { 'data' : 'in_warehouse' }
    ],
    "dom":'frtip'
    });

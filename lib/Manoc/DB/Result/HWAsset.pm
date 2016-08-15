@@ -3,7 +3,6 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::HWAsset;
-use base 'DBIx::Class';
 use Moose;
 
 extends 'DBIx::Class::Core';
@@ -85,7 +84,7 @@ __PACKAGE__->add_columns(
     in_warehouse => {
         data_type     => 'int',
         size          => '1',
-        default_value => '0',
+        default_value => '1',
     },
     dismissed => {
         data_type     => 'int',
@@ -108,8 +107,23 @@ around "rack" => sub {
     if (@_) {
         my $rack = $_[0];
         if ( $rack ) {
-            $self->room     = $rack->room;
-            $self->building = $rack->building;
+            $self->room($rack->room);
+            $self->building_id($rack->building_id);
+            $self->in_warehouse(0);
+        }
+    }
+
+    $self->$orig(@_);
+};
+
+
+around "building" => sub {
+    my ( $orig, $self ) = ( shift, shift );
+
+    if (@_) {
+        my $building = $_[0];
+        if ( $building ) {
+            $self->in_warehouse(0);
         }
     }
 
@@ -124,6 +138,11 @@ sub label {
 
 sub location {
     my $self = shift;
+
+    if ($self->in_warehouse) {
+        return "Warehouse";
+    }
+
     if ( $self->rack ) {
         return "Rack " . $self->rack->label;
     }
@@ -132,7 +151,7 @@ sub location {
     if ( $self->building ) {
         $location = $self->building->label;
         defined($self->floor) and $location .= " Floor " . $self->floor;
-        defined($self->room) and $location .= " Room " . $self->room;
+        defined($self->room)  and $location .= " Room " . $self->room;
     }
     return $location;
 }

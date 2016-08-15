@@ -44,7 +44,7 @@ __PACKAGE__->config(
     },
     class                   => 'ManocDB::Device',
     create_form_class       => 'Manoc::Form::Device::Create',
-#    edit_form_class         => 'Manoc::Form::Device::Edit',
+    edit_form_class         => 'Manoc::Form::Device::Create',
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
@@ -322,6 +322,8 @@ before 'create' => sub {
         $c->log->debug("new device in rack $rack_id") if $c->debug;
         $c->stash( form_defaults => { rack => $rack_id } );
     }
+
+
 };
 
 =head2 object_list
@@ -334,20 +336,20 @@ sub list : Chained('base') : PathPart('') {
     my $rs             = $c->stash->{resultset};
     my @active_devices = $rs->search(
         {
-            dismissed => 0
+            "me.dismissed" => 0
         },
         {
-            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+            prefetch => [ { 'hwasset' => {'rack' => 'building' }}, 'mng_url_format', ]
         }
     );
     $c->stash( active_device_list => \@active_devices );
 
     my @dismissed_devices = $rs->search(
         {
-            dismissed => 1
+            "me.dismissed" => 1
         },
         {
-            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+            prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'mng_url_format', ]
         }
     );
     $c->stash( dismissed_device_list => \@dismissed_devices );

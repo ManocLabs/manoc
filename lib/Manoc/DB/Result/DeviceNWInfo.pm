@@ -105,6 +105,56 @@ __PACKAGE__->add_columns(
         default_value => '1',
         is_nullable   => 1,
     },
+
+    # these fields are populated by netwalker
+    # and can be compared with hwasset ones
+    name => {
+        data_type     => 'varchar',
+        size          => 128,
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+    vendor => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 32,
+        default_value => 'NULL',
+    },
+    model => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 32,
+        default_value => 'NULL',
+    },
+    serial => {
+        data_type   => 'varchar',
+        is_nullable => 1,
+        size        => 32,
+        default_value => 'NULL',
+    },
+    os => {
+        data_type     => 'varchar',
+        size          => 32,
+        default_value => 'NULL',
+        is_nullable   => 1,
+        default_value => 'NULL',
+    },
+    os_ver => {
+        data_type     => 'varchar',
+        size          => 32,
+        is_nullable   => 1,
+        default_value => 'NULL',
+    },
+    vtp_domain => {
+        data_type     => 'varchar',
+        size          => 64,
+        is_nullable   => 1,
+        default_value => 'NULL',
+    },
+    boottime => {
+        data_type     => 'int',
+        default_value => '0',
+    },
 );
 
 __PACKAGE__->make_credentials_columns;

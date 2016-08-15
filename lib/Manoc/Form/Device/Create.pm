@@ -54,7 +54,7 @@ has_field 'hwasset' => (
     type         => 'Select',
     label        => 'Hardware asset',
     empty_select => '--- Select asset ---',
-    required     => 1,
+    required     => 0,
 
     do_wrapper => 0,
     tags => {
@@ -119,7 +119,7 @@ has_field 'rack' => (
     type         => 'Select',
     label        => 'Rack',
     empty_select => '--- Select a rack ---',
-    required     => 1,
+    required     => 0,
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
@@ -170,6 +170,41 @@ sub options_rack {
 
     return $self->get_rack_options;
 }
+
+override validate_model => sub {
+    my ($self) = @_;
+
+    my $found_error = 0;
+    my $rs          = $self->resultset;
+
+    my $field = $self->field('mng_address');
+    my %id_clause;
+    $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
+    my $value = Manoc::IPAddress::IPv4->new($field->value);
+    my $count = $rs->search( { mng_address => $value->padded, %id_clause } )->count;
+    if ($count >= 1) {
+        my $field_error = 'Duplicate management address';
+        $field->add_error( $field_error, $field->loc_label );
+        $found_error++;
+    }
+
+    return $found_error || super();
+};
+
+override update_model => sub {
+    my $self   = shift;
+    my $device = $self->item;
+
+    $self->schema->txn_do(
+        sub {
+            super();
+            if (my $hwasset = $device->hwasset) {
+                $hwasset->rack($device->rack);
+                $hwasset->update();
+            }
+        }
+    );
+};
 
 =head1 AUTHOR
 
