@@ -36,10 +36,14 @@ __PACKAGE__->config(
     class      => 'ManocDB::HWAsset',
     form_class => 'Manoc::Form::HWAsset',
 
-    json_columns => [ qw(serial vendor model inventory rack_id rack_level building room)],
+    json_columns => [ qw(id serial vendor model inventory rack_id rack_level building_id room label)],
 
     datatable_row_callback => 'datatable_row',
+    datatable_search_columns => [  qw(serial vendor model inventory) ],
+
+    object_list_filter_columns => [ qw( type vendor rack_id building_id ) ],
 );
+
 
 =head1 METHODS
 
@@ -58,7 +62,9 @@ sub get_form_process_params {
         $Manoc::DB::Result::HWAsset::TYPE{$type} and
             $params{preset_type} = $type;
     }
-    $qp->{building} and $params{defaults}->{building} = $qp->{'building'};
+
+    $qp->{hide_location} and $params{hide_location} = $qp->{hide_location};
+    $qp->{building}      and $params{defaults}->{building} = $qp->{'building'};
 
     return %params;
 }
@@ -73,11 +79,19 @@ sub datatable_row {
         vendor    => $row->vendor,
         model     => $row->model,
         serial    => $row->serial,
-        in_warehouse => $row->in_warehouse,
         location  => $row->location,
         link      => $c->uri_for_action('hwasset/view', [ $row->id ]),
     }
 }
+
+sub unused_devices_js : Chained('base') : PathPart('js/device/unused') {
+    my ($self, $c) = @_;
+
+    my $rs = $c->stash->{resultset};
+    $c->stash(object_list => [ $rs->unused_devices->all() ]);
+    $c->detach('/hwasset/list_js');
+}
+
 
 =head1 AUTHOR
 

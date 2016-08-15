@@ -20,18 +20,34 @@ use constant {
     LOCATION_SPECIFY   => 's',
 };
 
+has hide_location => (
+    isa     => 'Bool',
+    is      => 'rw',
+    default => 0,
+);
 
 sub build_render_list {
-    [
+    my $self = shift;
+
+    my @list;
+
+    push @list,
         'type',
         'inventory',
-        'vendor', 'model', 'serial',
-        'location',
-        'location_block',
-        'rack_block',
+        'vendor', 'model', 'serial';
+
+    unless ($self->hide_location) {
+        push @list,
+            'location',
+            'location_block',
+            'rack_block';
+    }
+
+    push @list,
         'save',
-        'csrf_token'
-    ];
+        'csrf_token';
+
+    return \@list;
 }
 
 has_field 'type' => (
@@ -211,11 +227,13 @@ before 'process' => sub {
     my %args = @_;
 
     if (my $type = $args{preset_type}) {
-        $self->preset_type($type);
-        #        $args{defaults}->{type} = $self->preset_type;
-        #        push @{ $args{inactive} }, 'type';
         push @{ $self->inactive }, 'type';
         $self->defaults->{type} = $type;
+    }
+
+    if ($args{hide_location}) {
+        push @{ $self->inactive }, qw(location building rack room floor);
+        $self->defaults->{location} = LOCATION_WAREHOUSE;
     }
 };
 
