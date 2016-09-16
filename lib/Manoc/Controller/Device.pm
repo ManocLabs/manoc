@@ -7,13 +7,18 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::CommonCRUD" => {
+    -excludes => [ 'list' ]
+};
+with "Manoc::ControllerRole::JSONView" => {
+    -excludes => 'get_json_object',
+};
 
 use Text::Diff;
 use Manoc::Form::Device;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
+use Manoc::Form::Device::Dismiss;
 use Manoc::Netwalker::Config;
 use Manoc::Netwalker::ControlClient;
 
@@ -44,7 +49,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::Device',
     enable_permission_check => 1,
     view_object_perm        => undef,
-
+    json_columns            => [ 'id', 'name' ],
 );
 
 =head1 ACTIONS
@@ -254,16 +259,16 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
 =cut
 
 sub get_object_list {
-    my ( $self, $c ) = @_;
+    my ($self, $c) = @_;
 
-    my $rs      = $c->stash->{resultset};
-    my @devices = $rs->search(
-        {},
+    return [ $c->stash->{resultset}->search(
+        {
+            dismissed => 0
+        },
         {
             prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
         }
-    );
-    return \@devices;
+    ) ];
 }
 
 =head2 show_run
@@ -314,6 +319,60 @@ before 'create' => sub {
     $c->stash( form_defaults => { rack => $rack_id } );
 };
 
+
+=head2 object_list
+
+=cut
+
+sub list : Chained('base') : PathPart('') {
+    my ( $self, $c ) = @_;
+
+    my $rs      = $c->stash->{resultset};
+    my @active_devices = $rs->search(
+        {
+            dismissed => 0
+        },
+        {
+            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+        }
+    );
+    $c->stash(active_device_list => \@active_devices);
+
+    my @dismissed_devices = $rs->search(
+        {
+            dismissed => 1
+        },
+        {
+            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+        }
+    );
+    $c->stash(dismissed_device_list => \@dismissed_devices);
+}
+
+=head2 dismiss
+
+=cut
+
+sub dismiss : Chained('object') : PathPart('dismiss') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{object}, 'edit' );
+
+    my $form = Manoc::Form::Device::Dismiss->new( { ctx => $c } );
+
+    $c->stash(
+        form   => $form,
+        action => $c->uri_for( $c->action, $c->req->captures ),
+    );
+    return unless $form->process(
+        item   => $c->stash->{object},
+        params => $c->req->parameters,
+    );
+
+    $c->response->redirect( $c->uri_for_action('device/list') );
+    $c->detach();
+}
+
 =head1 METHODS
 
 =cut
@@ -335,68 +394,34 @@ sub get_object {
 sub delete_object {
     my ( $self, $c ) = @_;
     my $device = $c->stash->{'object'};
-    my $id     = $device->id;
-    my ( $e, $it );
+    my $name = $device->name;
 
-    # transaction....
-    # 1) create a new deletedevice d2
-    # 2) move mat for $device to archivedmat for d2
-    # 3) $device->delete
-    $c->model('ManocDB')->schema->txn_do(
-        sub {
-            my $del_device = $c->model('ManocDB::DeletedDevice')->create(
-                {
-                    ipaddr    => $id,
-                    name      => $device->name,
-                    model     => $device->model,
-                    vendor    => $device->vendor,
-                    timestamp => time()
-                }
-            );
-            $it = $c->model('ManocDB::Mat')->search(
-                { device => $id, },
-                {
-                    select => [
-                        'macaddr', 'vlan',
-                        { 'min' => 'firstseen' }, { 'max' => 'lastseen' },
-                    ],
-                    group_by => [qw(macaddr vlan)],
-                    as       => [ 'macaddr', 'vlan', 'min_firstseen', 'max_lastseen' ]
-                }
-            );
+    my $has_related_info =
+        $device->ifstatus->count() ||
+        $device->uplinks->count() ||
+        $device->mat_assocs()->count() ||
+        $device->dot11assocs->count() ||
+        $device->neighs->count();
 
-            while ( $e = $it->next ) {
-                $del_device->add_to_mat_assocs(
-                    {
-                        macaddr   => $e->macaddr,
-                        firstseen => $e->get_column('min_firstseen'),
-                        lastseen  => $e->get_column('max_lastseen'),
-                        vlan      => $e->vlan
-                    }
-                );
-            }
-            $device->delete;
-        }
-    );
-
-    if ($@) {
-        $c->flash( error_msg => 'Error deleting device: ' . $@ );
+    if ( $has_related_info ) {
+        $c->flash( error_msg => "Device '$device' has some associated info and cannot be deleted." );
         return undef;
     }
-    return 1;
+
+    return $device->delete;
 }
 
-=head2 prepare_json_object
+
+=head2 get_json_object
 
 =cut
 
-sub prepare_json_object {
-    my ( $self, $device ) = @_;
-    return {
-        id   => $device->id,
-        name => $device->name,
-        rack => $device->rack->id,
-    };
+sub get_json_object {
+    my ( $self, $c, $device ) = @_;
+
+    my $r = $self->prepare_json_object($c, $device);
+    $r->{rack} = $device->rack->id,
+    return $r;
 }
 
 =head1 AUTHOR

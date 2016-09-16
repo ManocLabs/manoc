@@ -4,19 +4,27 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
+requires 'object', 'object_list';
+
 has json_columns => (
     is  => 'rw',
     isa => 'ArrayRef[Str]',
 );
 
-=head2 prepare_json_object 
+has json_add_object_href => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => 1,
+);
+
+=head2 prepare_json_object
 
 Get an hashref from a row.
 
 =cut
 
 sub prepare_json_object {
-    my ( $self, $row ) = @_;
+    my ( $self, $c, $row ) = @_;
 
     my $ret = {};
     foreach my $name ( @{ $self->json_columns } ) {
@@ -24,7 +32,21 @@ sub prepare_json_object {
         my $val = $row->can($name) ? $row->$name : $row->get_column($name);
         $ret->{$name} = $val;
     }
+    if ($self->json_add_object_href) {
+        $ret->{href} = $c->uri_for_action( $c->namespace . "/view", [ $row->id ] );
+    }
     return $ret;
+}
+
+=head2 get_json_object
+
+Call prepare_json_object. Redefine this method for custom serialization.
+
+=cut
+
+sub get_json_object {
+    my ( $self, $c, $row ) = shift;
+    return $self->prepare_json_object($c, $row);
 }
 
 =head2 view_js
@@ -34,7 +56,7 @@ sub prepare_json_object {
 sub view_js : Chained('object') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $r = $self->prepare_json_object( $c->stash->{object} );
+    my $r = $self->prepare_json_object( $c, $c->stash->{object} );
     $c->stash( json_data => $r );
     $c->forward('View::JSON');
 }
@@ -46,7 +68,7 @@ sub view_js : Chained('object') : PathPart('js') : Args(0) {
 sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my @r = map { $self->prepare_json_object($_) } @{ $c->stash->{object_list} };
+    my @r = map { $self->prepare_json_object($c, $_) } @{ $c->stash->{object_list} };
     $c->stash( json_data => \@r );
     $c->forward('View::JSON');
 }

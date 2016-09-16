@@ -10,76 +10,69 @@ use Manoc::Support;
 package Manoc::Archiver;
 use Moose;
 use Manoc::Logger;
-use Manoc::Utils qw(str2seconds print_timestamp);
+use Manoc::Utils::Datetime qw(str2seconds print_timestamp);
 
 use Data::Dumper;
 
 extends 'Manoc::Script';
 
-has 'sources' => (
-    traits   => ['NoGetopt'],
-    is       => 'rw',
-    isa      => 'ArrayRef[Str]',
-    required => 0,
-    default  => sub { [qw(Mat Arp Dot11Assoc WinLogon WinHostname)] },
-);
-
 sub archive {
-    my ( $self, $time ) = @_;
+    my ( $self, $time) = @_;
     my $conf = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
     my $schema       = $self->schema;
-    my $archive_age  = Manoc::Utils::str2seconds( $conf->{'archive_age'} );
-    my $tot_archived = 0;
 
-    if ( !$archive_age ) {
-        $self->log->info("Archiver: archive_age = 0: skipping.");
-        return;
-    }
+    my $archive_age  = str2seconds( $conf->{'archive_age'} );
+    my $discard_age  = str2seconds( $conf->{'discard_age'} );
 
-    $self->log->info(
-        "Archiver: archiving lastseen before " . Manoc::Utils::print_timestamp($archive_date) );
-
-    foreach my $source ( @{ $self->sources } ) {
-        $self->log->debug("Archiving in table $source");
-        $tot_archived = $schema->resultset($source)->archive_entries($archive_age);
-    }
-}
-
-sub discard {
-    my ( $self, $time ) = @_;
-    my $conf = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
-    my $discard_age   = Manoc::Utils::str2seconds( $conf->{'discard_age'} );
     my $tot_discarded = 0;
+    my $tot_archived  = 0;
 
-    if ( !$discard_age ) {
-        $self->log->info("Archiver: discard_age = 0: skipping.");
-        return;
+    if ($archive_age) {
+        $self->log->info(
+            "Archiver: archiving lastseen befor " . print_timestamp( $time - $archive_age) );
     }
 
-    my $discard_date = $time - $discard_age;
-
-    $self->log->info(
-        "Archiver: deleting lastseen before " . Manoc::Utils::print_timestamp($discard_date) );
-
-    foreach my $source ( @{ $self->sources } ) {
-        my $it = $self->schema->resultset($source)->search(
-            {
-                'archived' => 1,
-                'lastseen' => { '<', $discard_date },
-            }
-        );
-        $tot_discarded += $it->count;
-        $it->delete();
-
+    my $discard_date;
+    if ($discard_age) {
+        $discard_date = $time - $discard_age;
+        $self->log->info(
+            "Archiver: deleting lastseen before " . print_timestamp($discard_date) );
     }
 
-    my $it = $self->schema->resultset('CDPNeigh')->search(
-        {
-            'last_seen' => { '<', $discard_date },
+
+    my @source_names = $schema->sources;
+    foreach my $source ( @source_names ) {
+        my $rs = $schema->resultset($source);
+        $rs->can('archive') or next;
+
+        $self->log->debug("Table $source supports archiving");
+
+        if ($archive_age) {
+            $tot_archived += $schema->resultset($source)->archive($archive_age);
         }
-    );
-    $tot_discarded += $it->count;
-    $it->delete();
+
+        if ($discard_age) {
+            my $it = $self->schema->resultset($source)->search(
+                {
+                    'archived' => 1,
+                    'lastseen' => { '<', $discard_date },
+                }
+            );
+            $tot_discarded += $it->count;
+            $it->delete();
+        }
+    }
+
+    if ($discard_age) {
+        my $cdp = $self->schema
+            ->resultset('CDPNeigh')
+            ->search('last_seen' => { '<', $discard_date });
+        $tot_discarded += $cdp->count;
+        $cdp->delete();
+    }
+
+    $self->log->info("Archived $tot_archived entries");
+    $self->log->info("Deleted $tot_discarded entries");
 }
 
 sub run {
@@ -87,7 +80,6 @@ sub run {
     my $time = time;
 
     $self->archive($time);
-    $self->discard($time);
 }
 
 no Moose;

@@ -27,6 +27,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::VlanRange',
     enable_permission_check => 1,
     view_object_perm        => undef,
+    json_columns            => [ qw(id name description) ],
 );
 
 =head1 NAME
@@ -48,7 +49,7 @@ Catalyst Controller.
 sub split : Chained('object') : PathPart('split') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->require_permission( $self->stash->{object}, 'edit' );
+    $c->require_permission( $c->stash->{object}, 'edit' );
 
     my $form = Manoc::Form::VlanRange::Split->new( { ctx => $c } );
 
@@ -68,7 +69,7 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
 sub merge : Chained('object') : PathPart('merge') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->require_permission( $self->stash->{object}, 'edit' );
+    $c->require_permission( $c->stash->{object}, 'edit' );
 
     my $form = Manoc::Form::VlanRange::Merge->new( { ctx => $c } );
 
@@ -144,19 +145,6 @@ sub get_delete_failure_url {
     my ( $self, $c ) = @_;
 
     return $c->uri_for_action( $c->namespace . "/list" );
-}
-
-=head2 prepare_json_object
-
-=cut
-
-sub prepare_json_object {
-    my ( $self, $range ) = @_;
-    return {
-        id          => $range->name,
-        name        => $range->name,
-        description => $range->description,
-    };
 }
 
 =head1 AUTHOR
