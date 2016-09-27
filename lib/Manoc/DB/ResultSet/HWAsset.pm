@@ -8,19 +8,23 @@ use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
 
+use Manoc::DB::Result::HWAsset;
 use Carp;
 
 sub unused_devices {
     my ( $self, $type ) = @_;
 
     my $used_asset_ids = $self->result_source->schema->resultset('Device')
-        ->search({dismissed => 0, hwasset_id => { -is_not => undef } })
+        ->search({
+            dismissed => 0,
+            hwasset_id => { -is_not => undef }
+        })
         ->get_column('hwasset_id');
 
     my $assets = $self->search(
         {
             type => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
-            dismissed => 0,
+            location => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DISMISSED },
             id =>  {
                 -not_in => $used_asset_ids->as_query,
             }

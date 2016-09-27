@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Device::Create;
+package Manoc::Form::Device::Edit;
 
 use strict;
 use warnings;
@@ -157,10 +157,19 @@ sub options_hwasset {
     my $self = shift;
     return unless $self->schema;
 
-    return map +{
+    my @options;
+    if ( my $hwasset = $self->item->hwasset) {
+        push @options, {
+            value => $hwasset->id,
+            label => $hwasset->label,
+        };
+    }
+    push @options, map +{
         value => $_->id,
         label => $_->label,
     }, $self->schema->resultset('HWAsset')->unused_devices()->all();
+
+    return @options;
 }
 
 sub options_rack {
@@ -197,9 +206,16 @@ override update_model => sub {
 
     $self->schema->txn_do(
         sub {
+            my $prev_hwasset = $device->hwasset;
             super();
-            if (my $hwasset = $device->hwasset) {
-                $hwasset->rack($device->rack);
+            my $hwasset = $device->hwasset;
+
+            if ($prev_hwasset && $prev_hwasset != $hwasset) {
+                $prev_hwasset->move_to_warehouse();
+                $prev_hwasset->update();
+            }
+            if ( $hwasset ) {
+                $hwasset->move_to_rack($device->rack);
                 $hwasset->update();
             }
         }

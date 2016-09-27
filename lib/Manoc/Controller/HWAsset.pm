@@ -75,11 +75,11 @@ sub datatable_row {
 
     return {
         inventory => $row->inventory,
-        type      => $row->type,
+        type      => $row->display_type,
         vendor    => $row->vendor,
         model     => $row->model,
         serial    => $row->serial,
-        location  => $row->location,
+        location  => $row->display_location,
         link      => $c->uri_for_action('hwasset/view', [ $row->id ]),
     }
 }

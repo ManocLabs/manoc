@@ -29,8 +29,8 @@ page.section = 'Asset'
 	 <tr>
  	   <th>Name</th>
 	   <th>Building</th>
+   	   <th>Floor</th>
 	   <th>Rack</th>
-	   <th>Floor</th>
 	   <th>Vendor</th>
            <th>OS Version</th>
            <th>Serial</th>
@@ -42,8 +42,8 @@ page.section = 'Asset'
      <tr>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>
+   	   <td>[% d.rack.floor | html %]</td>a
 	   <td>[% print_rack(d.rack) %]</td>
-	   <td>[% d.rack.floor | html %]</td>
 	   <td>[% d.vendor | html %]</td>
            <td>[% d.os_ver | html %]</td>
 	   <td>[% d.serial | html %]</td>
@@ -62,23 +62,15 @@ page.section = 'Asset'
 	   <th>Building</th>
 	   <th>Rack</th>
 	   <th>Floor</th>
-	   <th>Vendor</th>
-           <th>OS Version</th>
-           <th>Serial</th>
-	   <th>Model</th>
-         </tr>
+     </tr>
      </thead>
      <tbody>
 [% FOREACH d IN dismissed_device_list %]
      <tr>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>
+   	   <td>[% d.rack.floor | html %]</td>
 	   <td>[% print_rack(d.rack) %]</td>
-	   <td>[% d.rack.floor | html %]</td>
-	   <td>[% d.vendor | html %]</td>
-           <td>[% d.os_ver | html %]</td>
-	   <td>[% d.serial | html %]</td>
-	   <td>[% d.model | html%]</td>
      </tr>
 [% END %]
      </tbody>
