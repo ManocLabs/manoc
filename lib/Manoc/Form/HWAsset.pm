@@ -6,7 +6,7 @@ with 'Manoc::Form::TraitFor::Horizontal';
 with 'Manoc::Form::TraitFor::SaveButton';
 with 'Manoc::Form::TraitFor::RackOptions';
 
-use Manoc::DB::Result::HWAsset;
+use aliased 'Manoc::DB::Result::HWAsset' => 'DB::HWAsset';
 
 use namespace::autoclean;
 
@@ -14,16 +14,15 @@ has '+item_class' => ( default => 'HWAsset' );
 has '+name'       => ( default => 'form-hwasset' );
 has '+html_prefix' => ( default => 1 );
 
-use constant {
-    LOCATION_WAREHOUSE => 'w',
-    LOCATION_RACK      => 'r',
-    LOCATION_SPECIFY   => 's',
-};
-
 has hide_location => (
     isa     => 'Bool',
     is      => 'rw',
     default => 0,
+);
+
+has 'preset_type' => (
+    is   => 'rw',
+    isa  => 'Str'
 );
 
 sub build_render_list {
@@ -34,16 +33,10 @@ sub build_render_list {
     push @list,
         'type',
         'inventory',
-        'vendor', 'model', 'serial';
-
-    unless ($self->hide_location) {
-        push @list,
-            'location',
-            'location_block',
-            'rack_block';
-    }
-
-    push @list,
+        'vendor', 'model', 'serial',
+        'location',
+        'location_block',
+        'rack_block',
         'save',
         'csrf_token';
 
@@ -89,10 +82,11 @@ has_field 'location' => (
     required => 1,
     label    => 'Location',
     widget   => 'RadioGroup',
+    noupdate => 1,
     options  => [
-        { value => LOCATION_WAREHOUSE, label => 'Warehouse' },
-        { value => LOCATION_RACK,      label => 'Rack' },
-        { value => LOCATION_SPECIFY,   label => 'Specify' },
+        { value => DB::HWAsset->LOCATION_WAREHOUSE, label => 'Warehouse' },
+        { value => DB::HWAsset->LOCATION_RACK,      label => 'Rack' },
+        { value => DB::HWAsset->LOCATION_ROOM,   label => 'Specify' },
     ],
     wrapper_tags => { inline => 1 },
 );
@@ -184,9 +178,9 @@ sub default_location {
 
     return unless $item;
 
-    $item->in_warehouse and return LOCATION_WAREHOUSE;
-    $item->rack and return LOCATION_RACK;
-    return LOCATION_SPECIFY;
+    $item->is_in_warehouse and return DB::HWAsset->LOCATION_WAREHOUSE;
+    $item->is_in_rack and return DB::HWAsset->LOCATION_RACK;
+    return DB::HWAsset->LOCATION_ROOM;
 }
 
 sub options_building {
@@ -219,34 +213,75 @@ sub options_type {
     return @results;
 }
 
-has 'preset_type' => ( is => 'rw', isa => 'Str' );
-
 before 'process' => sub {
     my $self = shift;
 
     my %args = @_;
 
-    if (my $type = $args{preset_type}) {
+    if ( $args{preset_type}) {
         push @{ $self->inactive }, 'type';
-        $self->defaults->{type} = $type;
     }
 
     if ($args{hide_location}) {
-        push @{ $self->inactive }, qw(location building rack room floor);
-        $self->defaults->{location} = LOCATION_WAREHOUSE;
+        push @{ $self->inactive },
+            qw(location building rack rack_level room floor
+               location_block rack_block);
+        $self->defaults->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
     }
+};
+
+override validate_model => sub {
+    my $self = shift;
+    my $item = $self->item;
+    my $found_error;
+
+    # location field are not validating when not entered :D
+    if ( ! $self->hide_location ) {
+
+        # when moving to warehouse check for in_use
+        my $location_field = $self->field('location');
+        if ($location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
+                $item->in_use)
+            {
+                $location_field->( "Asset is in use, cannot be moved to warehouse" );
+                $found_error++;
+            }
+    }
+
+    $found_error += super();
+
+    return $found_error;
 };
 
 override 'update_model' => sub {
     my $self   = shift;
-    my $values = $self->values;
+    my $values = $self->value;
+    my $item   = $self->item;
 
-    $values->{location} eq LOCATION_WAREHOUSE and
-        $values->{in_warehouse} = 1;
-
-    if ( $self->preset_type ) {
+    $self->preset_type and
         $values->{type} = $self->preset_type;
+    $self->hide_location and
+        $values->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
+
+    my $location = $values->{location};
+    if ($location eq DB::HWAsset->LOCATION_WAREHOUSE) {
+        $item->move_to_warehouse();
     }
+    if ($location eq DB::HWAsset->LOCATION_ROOM) {
+        $item->move_to_room(
+            $values->{building},
+            $values->{floor},
+            $values->{room});
+    }
+    if ($location eq DB::HWAsset->LOCATION_RACK) {
+        $item->move_to_rack($values->{rack});
+    }
+
+    delete $values->{building};
+    delete $values->{rack};
+    delete $values->{room};
+    delete $values->{floor};
+
     $self->_set_value($values);
 
     super();

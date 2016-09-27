@@ -11,7 +11,6 @@ var asset_control;
 
 function on_close_create_form(data) {
   refresh_assets();
-  alert(data.object_id);
   asset_control.setValue(data.object_id);
 }
 

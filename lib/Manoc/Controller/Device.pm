@@ -12,7 +12,7 @@ with "Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
 
 use Text::Diff;
 
-use Manoc::Form::Device::Create;
+use Manoc::Form::Device::Edit;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
 use Manoc::Form::Device::Dismiss;
@@ -43,8 +43,7 @@ __PACKAGE__->config(
         }
     },
     class                   => 'ManocDB::Device',
-    create_form_class       => 'Manoc::Form::Device::Create',
-    edit_form_class         => 'Manoc::Form::Device::Create',
+    form_class              => 'Manoc::Form::Device::Edit',
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
