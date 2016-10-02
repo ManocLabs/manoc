@@ -15,7 +15,7 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
         is_auto_increment => 1,
     },
-    name => {
+    hostname => {
         data_type   => 'varchar',
         is_nullable => 0,
         size        => 128,
@@ -60,75 +60,43 @@ __PACKAGE__->add_columns(
     },
 
     # used if this is a physical server
-    hwasset_id => {
+    serverhw_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
     },
 
-    ram_memory => {
-        data_type   => 'int',
-        is_nullable => 0,
-    },
-    n_procs => {
-        data_type     => 'int',
-        is_nullable   => 0,
-        default_value => 1
-    },
-    n_cores_procs => {
-        data_type     => 'int',
-        is_nullable   => 0,
-        default_value => 1
-    },
-    proc_freq => {
-        data_type   => 'real',
-        is_nullable => 0,
-    },
-    storage1_size => {
-        data_type     => 'real',
-        is_nullable   => 0,
-        default_value => 0
-    },
-    storage2_size => {
-        data_type     => 'real',
-        is_nullable   => 0,
-        default_value => 0
-    },
-    notes => {
-        data_type   => 'text',
-        is_nullable => 1,
-    },
-
-    template => {
-        data_type     => 'int',
-        size          => '1',
-        is_nullable   => '1',
-        default_value => '0',
+    # used if this is a physical server
+    servervm_id => {
+        data_type      => 'int',
+        is_nullable    => 1,
+        is_foreign_key => 1,
     },
 
 );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraints( [qw/address/] );
-__PACKAGE__->resultset_class('Manoc::DB::ResultSet::Server');
 
 __PACKAGE__->belongs_to(
-    hwasset => 'Manoc::DB::Result::HWAsset',
-    'hwasset_id',
+    serverhw => 'Manoc::DB::Result::ServerHW',
+    'serverhw_id',
     {
-        proxy          => [qw/vendor model serial inventory/],
         cascade_update => 1,
         join_type => 'left',
     }
 );
 
 __PACKAGE__->belongs_to(
-    on_virtinfr => 'Manoc::DB::Result::VirtualInfr',
-    'on_virtinfr_id',
+    servervm => 'Manoc::DB::Result::HWAsset',
+    'serverhw_id',
     {
+        cascade_update => 1,
         join_type => 'left',
     }
 );
+
+
 __PACKAGE__->belongs_to(
     hosted_virtinfr => 'Manoc::DB::Result::VirtualInfr',
     'hosted_virtinfr_id',
@@ -137,13 +105,6 @@ __PACKAGE__->belongs_to(
     }
 );
 
-__PACKAGE__->belongs_to(
-    on_hypervisor => 'Manoc::DB::Result::Server',
-    'on_hypervisor_id',
-    {
-        join_type => 'left',
-    }
-);
 __PACKAGE__->has_many(
     virtual_machines => 'Manoc::DB::Result::Server',
     { 'foreign.on_hypervisor_id' => 'self.id' },
@@ -165,9 +126,25 @@ __PACKAGE__->inflate_column(
 );
 
 
-sub cores {
+sub num_cpus {
     my ($self) = @_;
-    return $self->n_procs * $self->n_cores_procs;
+    if ($self->serverhw) {
+        return $self->serverhw->n_procs * $self->serverhw->n_cores_procs;
+    }
+    if ($self->servervm) {
+        return $self->servervm->vcpus;
+    }
+    return undef;
+}
+
+sub ram_memory {
+    my ($self) = @_;
+    if ($self->serverhw) {
+        return $self->serverhw->ram_memory;
+    }
+    if ($self->servervm) {
+        return $self->servervm->ram_memory;
+    }
 }
 
 1;
