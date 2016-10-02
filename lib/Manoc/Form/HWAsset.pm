@@ -31,7 +31,6 @@ sub build_render_list {
     my @list;
 
     push @list,
-        'type',
         'inventory',
         'vendor', 'model', 'serial',
         'location',
@@ -42,13 +41,6 @@ sub build_render_list {
 
     return \@list;
 }
-
-has_field 'type' => (
-    type     => 'Select',
-    size     => 1,
-    required => 1,
-    label    => 'Asset type',
-);
 
 has_field 'inventory' => (
     type     => 'Text',
@@ -205,14 +197,6 @@ sub options_rack {
     return $self->get_rack_options;
 }
 
-sub options_type {
-    my @results;
-    while ( my ( $key, $attrs ) = each(%Manoc::DB::Result::HWAsset::TYPE) ) {
-        push @results, { value => $key, label => $attrs->{label} };
-    }
-    return @results;
-}
-
 before 'process' => sub {
     my $self = shift;
 
@@ -258,8 +242,8 @@ override 'update_model' => sub {
     my $values = $self->value;
     my $item   = $self->item;
 
-    $self->preset_type and
-        $values->{type} = $self->preset_type;
+    $values->{type} = $self->preset_type;
+
     $self->hide_location and
         $values->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
 

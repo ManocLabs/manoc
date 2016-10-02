@@ -37,7 +37,7 @@ $( document ).ready(function() {
     asset_control = asset_select[0].selectize;
 
 	$('#form-device\\.asset_button').click(function() {
-      showDialogForm("[% c.uri_for_action('/hwasset/create', { type => 'D', hide_location => 1 }) %]", "Create asset", on_close_create_form);
+      showDialogForm("[% c.uri_for_action('/hwasset/create_device', { hide_location => 1 }) %]", "Create asset", on_close_create_form);
       return false;
     });
 });

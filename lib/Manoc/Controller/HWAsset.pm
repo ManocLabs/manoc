@@ -8,7 +8,12 @@ package Manoc::Controller::HWAsset;
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'Manoc::ControllerRole::CommonCRUD';
+
+# Not using CommonCRUD
+with 'Manoc::ControllerRole::ResultSet';
+with 'Manoc::ControllerRole::ObjectForm';
+with 'Manoc::ControllerRole::ObjectList';
+
 with 'Manoc::ControllerRole::JSONView';
 with 'Manoc::ControllerRole::JQDatatable';
 
@@ -44,31 +49,109 @@ __PACKAGE__->config(
     object_list_filter_columns => [ qw( type vendor rack_id building_id ) ],
 );
 
+=head1 ACTIONS
+
+=head2 create_device
+
+Create a new device using a form. Chained to base.
+
+=cut
+
+sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{resultset}->new_result( {} );
+
+    ## TODO better permission
+    $c->require_permission( $object, 'create' );
+
+    $c->stash(
+        object          => $object,
+        form_class      => 'Manoc::Form::HWAsset',
+        form_parameters => { type => $Manoc::DB::Result::Device::TYPE_DEVICE },
+    );
+    $c->detach('form');
+}
+
+=head2 list
+
+Display a list of items.
+
+=cut
+
+sub list : Chained('object_list') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{resultset}, 'list' );
+}
+
+=head2 view
+
+Display a single items.
+
+=cut
+
+sub view : Chained('object') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+
+    $c->require_permission( $object, 'view' );
+}
+
+=head2 edit
+
+Use a form to edit a row.
+
+=cut
+
+sub edit : Chained('object') : PathPart('update') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->require_permission( $object, 'edit' );
+
+    #TODO redirect to specific forms if needed
+
+    $c->detach('form');
+}
+
+=haed2 delete
+
+=cut
+
+sub delete : Chained('object') : PathPart('delete') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->require_permission( $object, 'delete' );
+
+    if ( $c->req->method eq 'POST' ) {
+        if ( $self->delete_object($c) ) {
+            $c->flash( message => $self->object_deleted_message );
+            $c->res->redirect( $c->uri_for_action( 'hwasset/list' ));
+            $c->detach();
+        }
+        else {
+            $c->res->redirect( $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ]));
+            $c->detach();
+        }
+    }
+
+}
 
 =head1 METHODS
 
 =cut
 
 sub get_form_process_params {
-    my $self = shift;
-    my $c    = shift;
-
-    my %params = @_;
+    my ( $self, $c, %params ) = @_;
 
     my $qp =  $c->req->query_parameters;
-
-    if ( my $type = $qp->{type} ) {
-        # check if is a valid type before using it
-        $Manoc::DB::Result::HWAsset::TYPE{$type} and
-            $params{preset_type} = $type;
-    }
-
     $qp->{hide_location} and $params{hide_location} = $qp->{hide_location};
-    $qp->{building}      and $params{defaults}->{building} = $qp->{'building'};
 
     return %params;
 }
-
 
 sub datatable_row {
     my ($self, $c, $row) = @_;
