@@ -221,7 +221,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-=haed2 delete
+=head2 delete
 
 =cut
 
