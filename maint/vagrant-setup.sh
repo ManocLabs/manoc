@@ -7,6 +7,7 @@ MANOC_DIR="/vagrant"
 INSTALL_DIR="/opt/manoc"
 PATH="$INSTALL_DIR/bin:/usr/local/bin:$PATH"
 
+yum makecache fast
 yum install -y perl-core perl-DBD-MySQL net-snmp-perl libpcap-devel
 
 test -d "$INSTALL_DIR" || mkdir -p "$INSTALL_DIR"
