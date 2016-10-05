@@ -1,0 +1,42 @@
+[% META
+   use_table=1
+-%]
+[%
+page.title = 'Server Hardware'
+page.subsection = 'Server'
+page.section = 'Server'
+%]
+
+[%- IF c.check_permission('serverhw.create') -%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a href="[% c.uri_for_action('/serverhw/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+[% END -%]
+[% END -%]
+
+  [% init_table('server_list') %]
+    <table class="table" id="server_list">
+     <thead>
+	 <tr>
+       <th>Inventory</th>
+	   <th>Vendor</th>
+   	   <th>Model</th>
+	   <th>RAM</th>
+	   <th>CPU</th>
+       <th>Location</th>
+     </tr>
+     </thead>
+     <tbody>
+[% FOREACH o IN object_list %]
+     <tr>
+ 	   <td>[% o.inventory | html %]</td>
+   	   <td>[% o.vendor | html %]</td>
+	   <td>[% o.model | html%]</td>
+   	   <td>[% o.ram_memory | html %]</td>
+	   <td>[% o.n_procs %]&nbsp;[% o.cpu_model%]</td>
+       <td>[% o.hwasset.display_location %]</td>
+     </tr>
+[% END %]
+     </tbody>
+    </table>

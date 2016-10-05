@@ -3,9 +3,10 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::HWAsset;
-use Moose;
+use strict;
+use warnings;
 
-extends 'DBIx::Class::Core';
+use base 'DBIx::Class::Core';
 
 use Carp;
 
@@ -69,7 +70,7 @@ __PACKAGE__->add_columns(
     },
     inventory => {
         data_type   => 'varchar',
-        is_nullable => 0,
+        is_nullable => 1,
         size        => 32,
     },
     type => {
@@ -234,6 +235,17 @@ sub display_location {
     }
 }
 
+sub insert {
+    my ( $self, @args ) = @_;
+    $self->next::method(@args);
+
+    if ( ! defined( $self->inventory ) ) {
+        my $inventory = sprintf("%s%06d", $self->type, $self->id);
+        $self->inventory($inventory);
+        $self->update;
+    }
+    return $self;
+}
 
 #TODO
 # - has(service_contract)

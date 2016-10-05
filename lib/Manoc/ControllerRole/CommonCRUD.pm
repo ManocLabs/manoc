@@ -78,12 +78,6 @@ has 'list_page_template' => (
     isa => 'Str'
 );
 
-has 'object_updated_message' => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => 'Updated',
-);
-
 has 'object_deleted_message' => (
     is      => 'rw',
     isa     => 'Str',
