@@ -15,6 +15,13 @@ has 'form_class' => (
     isa => 'ClassName'
 );
 
+has 'object_updated_message' => (
+    is  => 'rw',
+    isa => 'Str',
+    default => 'Updated',
+);
+
+
 =head1 ACTIONS
 
 =head2 form
@@ -95,7 +102,6 @@ sub get_form {
     $class or die "Form class not set (use form_class)";
 
     my $parameters = $c->stash->{form_parameters} || {};
-
     return $class->new( ctx => $c, %$parameters );
 }
 

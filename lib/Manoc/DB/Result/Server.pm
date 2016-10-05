@@ -66,7 +66,7 @@ __PACKAGE__->add_columns(
         is_foreign_key => 1,
     },
 
-    # used if this is a physical server
+    # used if this is a virtual server
     servervm_id => {
         data_type      => 'int',
         is_nullable    => 1,

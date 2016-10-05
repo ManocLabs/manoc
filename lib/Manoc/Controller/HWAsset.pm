@@ -68,7 +68,7 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
     $c->stash(
         object          => $object,
         form_class      => 'Manoc::Form::HWAsset',
-        form_parameters => { type => $Manoc::DB::Result::Device::TYPE_DEVICE },
+        form_parameters => { type => Manoc::DB::Result::HWAsset->TYPE_DEVICE },
     );
     $c->detach('form');
 }

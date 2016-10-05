@@ -1,0 +1,37 @@
+[%
+  page.section='Section'
+  page.subsection='Subsection'
+%]
+[% form.render %]
+[% fragment = BLOCK -%]
+$( document ).ready(function() {
+    $("#form-serverhw\\.rack").selectize();
+    $("#form-serverhw\\.building").selectize();
+    form_serverhw_refresh();
+});
+$('#form-serverhw input').on('change', function() {
+    form_serverhw_refresh();
+
+ });
+function form_serverhw_refresh() {
+  l=$('input[name="form-serverhw.location"]:checked').val();
+  $("#form-serverhw\\.building").prop('disabled', l != 'o');
+  if ( l == 'o') {
+    $("#form-serverhw\\.building")[0].selectize.enable();
+    $("#form-serverhw\\.room").prop('disabled', false);
+    $("#form-serverhw\\.floor").prop('disabled', false);
+  } else {
+    $("#form-serverhw\\.building")[0].selectize.disable();
+    $("#form-serverhw\\.room").prop('disabled', true);
+    $("#form-serverhw\\.floor").prop('disabled', true);
+  }
+  if ( l == 'r' ) {
+    $("#form-serverhw\\.rack")[0].selectize.enable();
+    $("#form-serverhw\\.rack_level").prop('disabled', false);
+  } else {
+    $("#form-serverhw\\.rack_level").prop('disabled', true);
+    $("#form-serverhw\\.rack")[0].selectize.disable();
+  }
+}
+[% END %]
+[% js_scripts.push(fragment) -%]
