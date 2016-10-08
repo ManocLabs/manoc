@@ -7,9 +7,10 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "Manoc::ControllerRole::CommonCRUD" => { -excludes => ['list'] };
-with "Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
-
+with "Manoc::ControllerRole::CommonCRUD";
+with "Manoc::ControllerRole::JSONView" => {
+    -excludes => 'get_json_object',
+};
 use Text::Diff;
 
 use Manoc::Form::Device::Edit;
@@ -325,24 +326,17 @@ before 'create' => sub {
 
 };
 
-=head2 object_list
+
+=head2 list_dismissed
+
+List dismissed devices
 
 =cut
 
-sub list : Chained('base') : PathPart('') {
+sub list_dismissed : Chained('base') : PathPart('dismissed') {
     my ( $self, $c ) = @_;
 
-    my $rs             = $c->stash->{resultset};
-    my @active_devices = $rs->search(
-        {
-            "me.dismissed" => 0
-        },
-        {
-            prefetch => [ { 'hwasset' => {'rack' => 'building' }}, 'mng_url_format', ]
-        }
-    );
-    $c->stash( active_device_list => \@active_devices );
-
+    my $rs      = $c->stash->{resultset};
     my @dismissed_devices = $rs->search(
         {
             "me.dismissed" => 1
