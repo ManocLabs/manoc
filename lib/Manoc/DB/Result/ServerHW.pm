@@ -5,6 +5,8 @@
 package Manoc::DB::Result::ServerHW;
 use base 'DBIx::Class';
 
+use Sub::Quote qw(quote_sub);
+
 __PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
 __PACKAGE__->table('serverhw');
@@ -61,16 +63,17 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('hwasset_id');
 
-__PACKAGE__->belongs_to(
+__PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
-    'hwasset_id',
+    'id',
     {
         proxy          => [qw/
                                  vendor model serial inventory
                                  building rack rack_level room
+
+                                 is_dismissed is_in_warehouse is_in_rack move_to_rack
+                                 move_to_room move_to_warehouse
                              /],
-        cascade_update => 1,
-        cascade_delete => 1
     }
 );
 
@@ -78,15 +81,6 @@ sub cores {
     my ($self) = @_;
     return $self->n_procs * $self->n_cores_procs;
 }
-
-sub is_dismissed { my $self = shift; $self->hwasset or return; return $self->hwasset->is_dismissed(@_); }
-sub is_in_warehouse { my $self = shift;  $self->hwasset or return; return $self->hwasset->is_in_warehouse(@_); }
-sub is_in_rack { my $self = shift; $self->hwasset or return;return $self->hwasset->is_in_rack(@_); }
-
-sub move_to_rack {  my $self = shift; $self->hwasset or return;return $self->hwasset->move_to_rack(@_); }
-sub move_to_room {  my $self = shift; $self->hwasset or return; return $self->hwasset->move_to_room(@_); }
-sub move_to_warehouse {  my $self = shift; $self->hwasset or return; return $self->hwasset->move_to_warehouse(@_); }
-
 
 sub insert {
     my ( $self, @args ) = @_;

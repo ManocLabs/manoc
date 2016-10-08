@@ -145,11 +145,13 @@ has_field 'ram_memory' => (
 has_field 'storage1_size' => (
     type  => 'Integer',
     label => 'Primary storage (GB)',
+    default => 0,
 );
 
 has_field 'storage2_size' => (
     type  => 'Integer',
     label => 'Secondary storage (GB)',
+    default => 0,
 );
 
 has_field 'notes' => (
@@ -164,7 +166,6 @@ override validate_model => sub {
     my $found_error = super() || 0;
 
     return $found_error unless $item->in_storage;
-
 
     my $field = $self->field('inventory');
     return $found_error if $field->has_errors;
