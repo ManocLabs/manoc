@@ -235,13 +235,30 @@ sub display_location {
     }
 }
 
+sub generate_inventory {
+    my $self = shift;
+
+    my $inventory = sprintf("%s%06d", $self->type, $self->id);
+    $self->inventory($inventory);
+}
+
 sub insert {
     my ( $self, @args ) = @_;
     $self->next::method(@args);
 
     if ( ! defined( $self->inventory ) ) {
-        my $inventory = sprintf("%s%06d", $self->type, $self->id);
-        $self->inventory($inventory);
+        $self->generate_inventory;
+        $self->update;
+    }
+    return $self;
+}
+
+sub update {
+    my ( $self, @args ) = @_;
+    $self->next::method(@args);
+
+    if ( ! defined( $self->inventory ) ) {
+        $self->generate_inventory;
         $self->update;
     }
     return $self;
