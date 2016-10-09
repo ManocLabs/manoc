@@ -2,13 +2,8 @@
    use_table = 1
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
-
-[%- IF object.dismissed                                -%]
-[%-  page.title   = 'Dismissed device ' _ object.name  -%]
-[%- ELSE                                               -%]
-[%-  page.title   = 'Device' _ object.name             -%]
-[%- END                                                -%]
 [%
+page.title   = 'Device ' _ object.name
 page.section = 'Asset'
 page.subsection = 'Device'
 -%]
@@ -56,6 +51,10 @@ page.subsection = 'Device'
 </div>
 [% END -%]
 [% END -%]
+
+[%- IF object.dismissed                                -%]
+<p>Dismissed</d>
+[%- END                                                -%]
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">

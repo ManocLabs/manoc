@@ -181,7 +181,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id;
 
-    my $config = Manoc::Netwalker::Config->new( $c->config->{Netwalker} );
+    my $config = Manoc::Netwalker::Config->new(  $c->config->{Netwalker} || {} );
     my $client = Manoc::Netwalker::ControlClient->new( config => $config );
 
     my $status = $client->enqueue_device($device_id);
