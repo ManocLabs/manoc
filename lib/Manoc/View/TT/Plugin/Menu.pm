@@ -25,7 +25,7 @@ my @DEFAULT_MENU_ITEMS = (
         name  => 'Network',
         items => [
             {
-                name   => 'Network Devices',
+                name   => 'Devices',
                 action => '/device/list',
             },
             {
@@ -46,11 +46,34 @@ my @DEFAULT_MENU_ITEMS = (
         ],
     },
     {
+        name  => 'Server',
+        items => [
+            {
+                name   => 'Servers',
+                #action => '/server/list',
+                path   => '#',
+            },
+            {
+                name   => 'Virtualization',
+                #action => '/vinfr/list',
+                path   => '#',
+            },
+        ]
+    },
+    {
         name  => 'Assets',
         items => [
             {
-                name   => 'Hardware Inventory',
+                name   => 'Complete Inventory',
                 action => '/hwasset/list',
+            },
+            {
+                name   => 'Server Hardware',
+                action => '/serverhw/list',
+            },
+            {
+                name   => 'Device Hardware',
+                action => '/serverhw/list',
             },
             {
                 separator => 1,
