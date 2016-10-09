@@ -34,6 +34,7 @@ __PACKAGE__->add_columns(
         is_nullable    => 1,
         is_foreign_key => 1,
     },
+
     name => {
         data_type     => 'varchar',
         size          => 128,
@@ -85,8 +86,8 @@ around "rack" => sub {
 
     if (@_) {
         my $rack = $_[0];
-        if ( $rack ) {
-            $self->hwasset->rack = $rack;
+        if ( $rack && $self->hwasset ) {
+            $self->hwasset->rack( $rack );
         }
     }
 

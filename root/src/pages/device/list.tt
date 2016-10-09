@@ -24,22 +24,20 @@ page.section = 'Asset'
    	   <th>Floor</th>
 	   <th>Rack</th>
 	   <th>Vendor</th>
-           <th>OS Version</th>
-           <th>Serial</th>
-	   <th>Model</th>
-         </tr>
+       <th>Model</th>
+       <th>OS Version</th>
+     </tr>
      </thead>
      <tbody>
-[% FOREACH d IN device_list %]
+[% FOREACH d IN object_list %]
      <tr>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>
-   	   <td>[% d.rack.floor | html %]</td>a
+   	   <td>[% d.rack.floor | html %]</td>
 	   <td>[% print_rack(d.rack) %]</td>
-	   <td>[% d.vendor | html %]</td>
-       <td>[% d.os_ver | html %]</td>
-	   <td>[% d.serial | html %]</td>
-	   <td>[% d.model | html%]</td>
+	   <td>[% d.netwalker_info.vendor | html %]</td>
+   	   <td>[% d.netwalker_info.model | html%]</td>
+       <td>[% d.netwalker_info.os_ver | html %]</td>
      </tr>
 [% END %]
      </tbody>
