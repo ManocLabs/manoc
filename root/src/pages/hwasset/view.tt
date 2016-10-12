@@ -3,7 +3,11 @@
    page.section='Assets'
    page.subsection='Hardware Inventory'
 -%]
+
 [% page.toolbar = BLOCK -%]
+
+
+
 [%- IF c.check_permission(object, 'delete') || c.check_permission(object, 'edit') %]
 <div>
 [%- IF c.check_permission(object, 'edit') -%]

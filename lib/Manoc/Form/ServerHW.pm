@@ -174,7 +174,9 @@ override validate_model => sub {
     return $found_error unless defined $value;
 
     my $rs =  $self->schema->resultset('HWAsset');
-    my $count = $rs->search( { inventory => $value } )->count;
+    my $unique_filter = { inventory => $value };
+    $item->id and $unique_filter->{id} = { '!=' => $item->id  };
+    my $count = $rs->search( $unique_filter )->count;
 
     if ($count > 0) {
         my $field_error = $field->get_message('unique') || $field->unique_message || 'Duplicate value for [_1]';
