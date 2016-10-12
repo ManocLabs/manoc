@@ -110,11 +110,24 @@ __PACKAGE__->add_unique_constraints( [qw/inventory/] );
 __PACKAGE__->belongs_to( building => 'Manoc::DB::Result::Building', 'building_id', );
 __PACKAGE__->belongs_to( rack     => 'Manoc::DB::Result::Rack', 'rack_id' );
 
-__PACKAGE__->might_have( device   => 'Manoc::DB::Result::Device', 'hwasset_id' );
+__PACKAGE__->might_have(
+    device   => 'Manoc::DB::Result::Device',
+    'hwasset_id'
+);
+
+__PACKAGE__->might_have(
+    server => 'Manoc::DB::Result::Server',
+    'serverhw_id',
+    {
+        cascade_update => 0,
+        cascade_delete => 1,
+    }
+);
+
 
 sub in_use {
     my $self = shift;
-    return $self->device;
+    return defined($self->device) || defined($self->server);
 }
 
 sub is_dismissed {

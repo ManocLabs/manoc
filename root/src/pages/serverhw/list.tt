@@ -25,17 +25,19 @@ page.section = 'Server'
 	   <th>RAM</th>
 	   <th>CPU</th>
        <th>Location</th>
+       <th>Used by</th>
      </tr>
      </thead>
      <tbody>
 [% FOREACH o IN object_list %]
      <tr>
- 	   <td>[% o.inventory | html %]</td>
+ 	   <td>[% print_serverhw(o) %]</td>
    	   <td>[% o.vendor | html %]</td>
 	   <td>[% o.model | html%]</td>
    	   <td>[% o.ram_memory | html %]</td>
 	   <td>[% o.n_procs %]&nbsp;[% o.cpu_model%]</td>
        <td>[% o.hwasset.display_location %]</td>
+       <td>[% print_server(o.server) %]</td>
      </tr>
 [% END %]
      </tbody>

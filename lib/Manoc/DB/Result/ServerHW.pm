@@ -5,8 +5,6 @@
 package Manoc::DB::Result::ServerHW;
 use base 'DBIx::Class';
 
-use Sub::Quote qw(quote_sub);
-
 __PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
 __PACKAGE__->table('serverhw');
@@ -41,23 +39,17 @@ __PACKAGE__->add_columns(
     },
     storage1_size => {
         data_type     => 'int',
-        is_nullable   => 0,
+        is_nullable   => 1,
         default_value => 0
     },
     storage2_size => {
         data_type     => 'int',
-        is_nullable   => 0,
+        is_nullable   => 1,
         default_value => 0
     },
     notes => {
         data_type   => 'text',
         is_nullable => 1,
-    },
-    template => {
-        data_type     => 'int',
-        size          => '1',
-        is_nullable   => '1',
-        default_value => '0',
     },
 );
 
@@ -67,15 +59,17 @@ __PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
     'id',
     {
-        proxy          => [qw/
-                                 vendor model serial inventory
-                                 building rack rack_level room
-
-                                 is_dismissed is_in_warehouse is_in_rack move_to_rack
-                                 move_to_room move_to_warehouse
-                             /],
+        proxy => [qw/
+                        vendor model serial inventory
+                        building rack rack_level room
+                        is_dismissed is_in_warehouse is_in_rack move_to_rack
+                        move_to_room move_to_warehouse
+                        server
+                    /],
     }
 );
+
+
 
 sub cores {
     my ($self) = @_;

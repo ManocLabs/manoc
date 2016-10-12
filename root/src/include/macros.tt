@@ -93,3 +93,9 @@
 [% MACRO print_dhcp_shared_subnet(network) BLOCK -%]
 <a href=[% c.uri_for_action('dhcpsharedsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                         Server HardWare                           -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_serverhw(server) BLOCK -%]
+<a href=[% c.uri_for_action('serverhw/view', [ server.id ]) %]>[% server.inventory | html %]</a>
+[%- END -%]
