@@ -27,6 +27,31 @@ sub new_result {
     return $item;
 };
 
+sub unused {
+    my ( $self ) = @_;
+
+    my $used_asset_ids = $self->result_source->schema->resultset('Server')
+        ->search({
+            dismissed => 0,
+            serverhw_id  => { -is_not => undef }
+        })
+        ->get_column('serverhw_id');
+
+    my $assets = $self->search(
+        {
+            'hwasset.location' => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DISMISSED },
+            id =>  {
+                -not_in => $used_asset_ids->as_query,
+            }
+        },
+        {
+            join     => 'hwasset',
+        }
+    );
+
+    return $assets;
+}
+
 1;
 # Local Variables:
 # mode: cperl

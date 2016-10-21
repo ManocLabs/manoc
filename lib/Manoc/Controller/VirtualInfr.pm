@@ -2,20 +2,17 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-use strict;
-
-package Manoc::Controller::Server;
+package Manoc::Controller::VirtualInfr;
 use Moose;
 use namespace::autoclean;
-
-extends 'Catalyst::Controller';
+BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
 
-use Manoc::Form::Server;
+use Manoc::Form::VirtualInfr;
 
 =head1 NAME
 
-Manoc::Controller::Server - Catalyst Controller
+Manoc::Controller::VirtualInfr - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -27,16 +24,12 @@ __PACKAGE__->config(
     # define PathPart
     action => {
         setup => {
-            PathPart => 'server',
+            PathPart => 'vinfr',
         }
     },
-    class                   => 'ManocDB::Server',
-    form_class              => 'Manoc::Form::Server',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
+    class      => 'ManocDB::VirtualInfr',
+    form_class => 'Manoc::Form::VirtualInfr',
 );
-
 
 =head1 AUTHOR
 
@@ -52,3 +45,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

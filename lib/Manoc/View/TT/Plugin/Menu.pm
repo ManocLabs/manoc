@@ -50,14 +50,24 @@ my @DEFAULT_MENU_ITEMS = (
         items => [
             {
                 name   => 'Servers',
-                #action => '/server/list',
-                path   => '#',
+                action => '/server/list',
             },
             {
-                name   => 'Virtualization',
-                #action => '/vinfr/list',
-                path   => '#',
+                separator => 1,
             },
+            {
+                name   => 'Virtual Infrastructures',
+                action => '/virtualinfr/list',
+            },
+            {
+                name   => 'Virtual Machines',
+                action => '/virtualmachine/list',
+            },
+            {
+                name   => 'Hypervisors',
+#                action => '/server/hypervisors',
+            },
+
         ]
     },
     {

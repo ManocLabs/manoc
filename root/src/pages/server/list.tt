@@ -1,38 +1,36 @@
 [% META
-   section='Asset'
-   subsection='Hardware'
-   tile='List server hardware'
    use_table=1
 -%]
+[%
+page.title='Servers'
+page.section='Server'
+page.subsection='Server'
+-%]
 
-<div class="buttons create_btn">
-<a href="[% c.uri_for_action('/serverhw/create') %]" >
-   [% ui_icon('circle-plus') %] Create</a>
- [% add_css_create_btn %]
+[%- IF c.check_permission('server.create') -%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a href="[% c.uri_for_action('/server/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
 </div>
+[% END -%]
+[% END -%]
 
-
-[% init_table('list',[20,20,20,20,20]) %]
- <table class="display" id="list">
-   <thead>  
+[% init_table('server_list') %]
+ <table class="table" id="server_list">
+   <thead>
      <tr>
-        <th>Vendor</th>
-        <th>Model</th>
-        <th>Serial</th>
-        <th>Inventory</th>
-        <th></th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>OS</th>
      </tr>
-   </thead>  
+   </thead>
    <tbody>
 [% FOREACH o IN objects %]
-
-         <tr>
- 	 <td>[% o.vendor    %]</td>
- 	 <td>[% o.model     %]</td>
- 	 <td>[% o.serial    %]</td>
- 	 <td>[% o.inventory %]</td>
- 	 <td><a href=[% c.uri_for_action('/serverhw/view', [o.id]) %]>View</a></td>
-         </tr>
+   <tr>
+ 	 <td><a href=[% c.uri_for_action('/serverhw/view', [o.id]) %]>[% o.name %]</a></td>
+ 	 <td>[% o.address     %]</td>
+ 	 <td>[% o.os   %]</td>
+   </tr>
 [% END %]
    </tbody>
 </table>

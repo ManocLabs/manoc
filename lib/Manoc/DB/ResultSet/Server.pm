@@ -9,4 +9,37 @@ use strict;
 use warnings;
 
 
+sub hypervisors {
+    my $self = shift;
+
+    my $rs = $self->search(
+        { is_hypervisor => 1 }
+    );
+    return wantarray() ? $rs->all() : $rs;
+}
+
+sub standalone_hypervisors {
+    my $self = shift;
+
+    my $rs = $self->hypervisors->search(
+        { virtual_infr => undef }
+    );
+    return wantarray() ? $rs->all() : $rs;
+}
+
+sub logical_servers {
+    my $self = shift;
+
+    my $rs = $self->search(
+        { vm_id => undef, serverhw_id => undef },
+    );
+    return wantarray() ? $rs->all() : $rs;
+}
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

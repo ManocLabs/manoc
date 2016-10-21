@@ -1,0 +1,48 @@
+[%
+   page.title='Server Hardware'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>Delete</a>
+ </div>
+[% END %]
+ <dl class="dl-horizontal">
+  <dt>Inventory</dt>
+  <dd>[% object.inventory | html %]</dd>
+  <dt>Vendor</dt>
+  <dd>[% object.vendor | html %]</dd>
+  <dt>Model</dt>
+  <dd>[% object.model | html %]</dd>
+  <dt>Serial</dt>
+  <dd>[% object.serial | html %]</dd>
+[% IF object.is_in_warehouse %]
+  <dt>Warehouse</dt>
+  <dd>Yes</dd>
+[% ELSE -%]
+  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Floor</dt><dd>[% object.floor | html %]</dd>
+  <dt>Room</dt> <dd>[% object.room | html %]</dd>
+  [% IF object.rack %]
+   <dt>Rack</dt><dd>[% print_rack(object.rack) %]</dd>
+   <dt>Level<dt><dd>[% object.rack_level %]</dd>
+  [% END %]
+[% END %]
+  <dt>Dismissed</dt><dd>[% IF object.dismissed %]Yes[% ELSE %]No[%END %]</dd>
+  <dt>Used by</dt><dd>[% print_server(object.server) IF object.server %]</dd>
+  <dt>RAM</dt>
+  <dd>[% object.ram_memory | html %]</dd>
+  <dt>CPU</dt>
+  <dd>[% object.n_procs | html %] x [% object.cpu_model | html %] at [% object.proc_freq | html %]Mhz
+  <dt>Cores</dt>
+  <dd>[% object.cors | html %] ([% object.n_cores_proc | html %] x CPU)</dd>
+  <dt>Primary storage</dt>
+  <dd>[% object.storage1_size | html %]</dd>
+  <dt>Secondary storage</dt>
+  <dd>[% object.storage2_size | html %]</dd>
+  <dt>Notes</dt>
+  <dd>[% object.notes | html %]</dd>
+</dl>

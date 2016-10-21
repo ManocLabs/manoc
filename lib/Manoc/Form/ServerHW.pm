@@ -138,20 +138,21 @@ has_field 'n_cores_proc' => (
 
 has_field 'ram_memory' => (
     type  => 'Integer',
-    label => 'Memory Size (MB)',
-);
+    label => 'RAM Memory',
+    element_attr => { placeholder => 'MB' },
 
+);
 
 has_field 'storage1_size' => (
     type  => 'Integer',
-    label => 'Primary storage (GB)',
-    default => 0,
+    label => 'Primary storage',
+    element_attr => { placeholder => 'GB' },
 );
 
 has_field 'storage2_size' => (
     type  => 'Integer',
     label => 'Secondary storage (GB)',
-    default => 0,
+    element_attr => { placeholder => 'GB' },
 );
 
 has_field 'notes' => (

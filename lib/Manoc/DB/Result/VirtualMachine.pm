@@ -2,12 +2,15 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::Result::ServerVM;
+package Manoc::DB::Result::VirtualMachine;
 use base 'DBIx::Class';
+
+use strict;
+use warnings;
 
 __PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
 
-__PACKAGE__->table('servers');
+__PACKAGE__->table('virtual_machines');
 
 __PACKAGE__->add_columns(
     id => {
@@ -17,7 +20,6 @@ __PACKAGE__->add_columns(
     },
     identifier => {
         data_type   => 'varchar',
-        is_nullable => 0,
         size        => 36,
     },
     name => {
@@ -27,13 +29,14 @@ __PACKAGE__->add_columns(
     },
 
     # the virtual infrastructure is running the
-    on_virtinfr_id => {
+    virtinfr_id => {
         data_type      => 'int',
         is_foreign_key => 1,
+        is_nullable    => 1,
     },
 
     # the hypervisor which is hosting this server
-    on_hypervisor_id => {
+    hypervisor_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
@@ -41,12 +44,12 @@ __PACKAGE__->add_columns(
 
     ram_memory => {
         data_type   => 'int',
-        is_nullable => 0,
+        is_nullable => 1,
     },
 
     vcpus => {
         data_type     => 'int',
-        is_nullable   => 0,
+        is_nullable   => 1,
         default_value => 1
     },
 
@@ -59,16 +62,36 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->belongs_to(
-    on_virtinfr => 'Manoc::DB::Result::VirtualInfr',
-    'on_virtinfr_id',
-);
-
-__PACKAGE__->belongs_to(
-    on_hypervisor => 'Manoc::DB::Result::Server',
-    'on_hypervisor_id',
+    virtinfr => 'Manoc::DB::Result::VirtualInfr',
+    'virtinfr_id',
     {
         join_type => 'left',
     }
 );
+
+__PACKAGE__->belongs_to(
+    hypervisor => 'Manoc::DB::Result::Server',
+    'hypervisor_id',
+    {
+        join_type => 'left',
+    }
+);
+
+__PACKAGE__->might_have(
+    server => 'Manoc::DB::Result::Server',
+    'vm_id',
+);
+
+sub label {
+    my $self = shift;
+
+    my $label = $self->name;
+    if ( $self->virtinfr ) {
+        $label .= ' - ' . $self->virtinfr->name;
+    } elsif ( $self->hypervisor ) {
+        $label .= ' -' . $self->virtinfr->hostname;
+    }
+    return $label;
+}
 
 1;

@@ -1,0 +1,30 @@
+[%
+   page.title='View VirtualMachine'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>identifier</dt>
+  <dd>[% object.identifier | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>on_virtinfr_id</dt>
+  <dd>[% object.on_virtinfr_id | html %]</dd>
+  <dt>on_hypervisor_id</dt>
+  <dd>[% object.on_hypervisor_id | html %]</dd>
+  <dt>ram_memory</dt>
+  <dd>[% object.ram_memory | html %]</dd>
+  <dt>vcpus</dt>
+  <dd>[% object.vcpus | html %]</dd>
+  <dt>notes</dt>
+  <dd>[% object.notes | html %]</dd>
+</dl>

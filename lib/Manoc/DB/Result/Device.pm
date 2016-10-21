@@ -56,7 +56,6 @@ __PACKAGE__->add_columns(
         size          => '1',
         default_value => '0',
     },
-
     notes => {
         data_type   => 'text',
         is_nullable => 1,

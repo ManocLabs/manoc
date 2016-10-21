@@ -1,0 +1,25 @@
+[%
+   page.title='Virtual Infrastructures'
+   page.section='Server'
+-%]
+<div id="virtualinfr_create">
+<a href="[% c.uri_for_action('virtualinfr/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+ <table class="table" id="virtualinfr_list">
+   <thead>
+     <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Hypervisors</th>
+        <th>Virtual Machines</th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH object IN object_list %]
+    <tr>
+ 	 <td><a href=[% c.uri_for_action('virtualinfr/view', [object.id]) %]>[% object.name | html %]</a></td>
+ 	 <td>[% object.description | html %]</td>
+   </tr>
+[% END %]
+   </tbody>
+</table>

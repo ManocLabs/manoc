@@ -23,10 +23,16 @@
 </table>
 
 [% fragment = BLOCK -%]
+$(document).ready(function() {
   $("#hwasset_list").DataTable( {
    "serverSide":   true,
    "processing":   true,
-   "ajax":         "[% c.uri_for_action('hwasset/datatable_source') %]",
+   "ajax":  {
+      "url":  "[% c.uri_for_action('hwasset/datatable_source') %]",
+      "data": function ( d ) {
+         d.extra_search = $('#dismissed').checked;
+      }
+   },
    "columns":      [
                      { 'data' : 'inventory',
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -39,7 +45,14 @@
                      { 'data' : 'serial' },
                      { 'data' : 'location' },
    ],
-   "dom":'frtip'
-   });
+   "dom": '<"toolbar">frtip',
+ })
+
+ $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed);
+
+ $('#dismissed').on('change', function() {
+   $( '#hwasset_list' ).dataTable().api().ajax.reload();
+  } );
+});
 [% END %]
 [% js_scripts.push(fragment) -%]
