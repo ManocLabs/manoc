@@ -38,22 +38,14 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    # used if the server is running on a virtual infrastructure
-    on_virtinfr_id => {
-        data_type      => 'int',
-        is_nullable    => 1,
-        is_foreign_key => 1,
-    },
-
-    # the hypervisor which is hosting this server
-    on_hypervisor_id => {
-        data_type      => 'int',
-        is_nullable    => 1,
-        is_foreign_key => 1,
+    is_hypervisor => {
+        data_type     => 'int',
+        size          => '1',
+        default_value => '0',
     },
 
     # the server is an hypervisor in a virtual infrastructure
-    hosted_virtinfr_id => {
+    virtinfr_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
@@ -67,7 +59,7 @@ __PACKAGE__->add_columns(
     },
 
     # used if this is a virtual server
-    servervm_id => {
+    vm_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
@@ -88,27 +80,42 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->belongs_to(
-    servervm => 'Manoc::DB::Result::HWAsset',
-    'serverhw_id',
+    vm => 'Manoc::DB::Result::ServerHW',
+    'vm_id',
     {
         cascade_update => 1,
         join_type => 'left',
     }
 );
 
-
 __PACKAGE__->belongs_to(
-    hosted_virtinfr => 'Manoc::DB::Result::VirtualInfr',
-    'hosted_virtinfr_id',
+    virtinfr => 'Manoc::DB::Result::VirtualInfr',
+    'virtinfr_id',
     {
         join_type => 'left',
     }
 );
 
 __PACKAGE__->has_many(
-    virtual_machines => 'Manoc::DB::Result::Server',
-    { 'foreign.on_hypervisor_id' => 'self.id' },
+    virtual_machines => 'Manoc::DB::Result::VirtualMachine',
+    { 'foreign.hypervisor_id' => 'self.id' },
 );
+
+
+sub virtual_servers {
+    my $self = shift;
+
+    my $rs = $self->result_source->schema->resultset('Server');
+    $rs = $rs->search(
+        {
+            'mv.hypervisor_id' => $self->id,
+        },
+        {
+            join => 'vm',
+        }
+    );
+    return wantarray() ? $rs->all() : $rs;
+}
 
 sub _inflate_address {
     return Manoc::IPAddress::IPv4->new( { padded => $_[0] } ) if defined( $_[0] );
@@ -131,8 +138,8 @@ sub num_cpus {
     if ($self->serverhw) {
         return $self->serverhw->n_procs * $self->serverhw->n_cores_procs;
     }
-    if ($self->servervm) {
-        return $self->servervm->vcpus;
+    if ($self->vm) {
+        return $self->vm->vcpus;
     }
     return undef;
 }
@@ -142,8 +149,8 @@ sub ram_memory {
     if ($self->serverhw) {
         return $self->serverhw->ram_memory;
     }
-    if ($self->servervm) {
-        return $self->servervm->ram_memory;
+    if ($self->vm) {
+        return $self->vm->ram_memory;
     }
 }
 

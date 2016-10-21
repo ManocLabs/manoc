@@ -70,6 +70,12 @@ __PACKAGE__->has_one(
 );
 
 
+sub label {
+    my $self = shift;
+
+    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",
+}
+
 
 sub cores {
     my ($self) = @_;

@@ -1,0 +1,63 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Device hardware'
+   page.section='Assets'
+   page.subsection='Assets'
+-%]
+
+<table class="table" id="hwasset_list">
+   <thead>
+     <tr>
+        <th>Inventory</th>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Serial</th>
+        <th>Location</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+
+[% fragment = BLOCK -%]
+  $("#hwasset_list").DataTable( {
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":         "[% c.uri_for_action('hwasset/datatable_source_devices') %]",
+   "columns":      [
+                     { 'data' : 'inventory',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='"+oData.link+"'>"+oData.inventory+"</a>");
+                         }
+                     },
+                     { 'data' : 'vendor' },
+                     { 'data' : 'model' },
+                     { 'data' : 'serial' },
+                     { 'data' : 'location' },
+   ],
+   "dom":'frtip',
+   initComplete: function () {
+            this.api().columns().every( function () {
+                var column = this;
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo( $(column.footer()).empty() )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+                    } );
+
+                column.data().unique().sort().each( function ( d, j ) {
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                } );
+            } );
+        }
+   });
+[% END %]
+[% js_scripts.push(fragment) -%]

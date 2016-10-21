@@ -3,4 +3,3 @@
   page.subsection='Subsection'
 %]
 [% form.render %]
-[% PROCESS location.tt %]

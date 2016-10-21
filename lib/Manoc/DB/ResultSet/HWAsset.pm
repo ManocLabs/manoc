@@ -12,7 +12,7 @@ use Manoc::DB::Result::HWAsset;
 use Carp;
 
 sub unused_devices {
-    my ( $self, $type ) = @_;
+    my ( $self ) = @_;
 
     my $used_asset_ids = $self->result_source->schema->resultset('Device')
         ->search({

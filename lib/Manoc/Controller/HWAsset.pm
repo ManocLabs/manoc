@@ -75,11 +75,23 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
 
 =head2 list
 
-Display a list of items.
+Display a list of items. Chained to base since the table is AJAX based
 
 =cut
 
-sub list : Chained('object_list') : PathPart('') : Args(0) {
+sub list : Chained('base') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{resultset}, 'list' );
+}
+
+=head2 list_devices
+
+Display a list of items. Chained to base since the table is AJAX based
+
+=cut
+
+sub list_devices : Chained('base') : PathPart('devices') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->require_permission( $c->stash->{resultset}, 'list' );
@@ -111,8 +123,9 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( $object, 'edit' );
 
-    #TODO redirect to specific forms if needed
+    $c->stash->{form_parameters}->{type} = $object->type;
 
+    #TODO redirect to specific forms if needed
     $c->detach('form');
 }
 
@@ -165,6 +178,18 @@ sub datatable_row {
         location  => $row->display_location,
         link      => $c->uri_for_action('hwasset/view', [ $row->id ]),
     }
+}
+
+sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devices') : Args(0)  {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{'datatable_resultset'} =
+        $c->stash->{resultset}->search(
+            {
+                type => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
+            }
+        );
+    $c->forward('/hwasset/datatable_source');
 }
 
 sub unused_devices_js : Chained('base') : PathPart('js/device/unused') {

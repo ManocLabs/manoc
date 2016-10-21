@@ -1,0 +1,5 @@
+[%
+  page.title='Virtual Machine'
+  page.section='Server'
+%]
+[% form.render %]
