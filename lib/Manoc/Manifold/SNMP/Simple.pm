@@ -1,11 +1,11 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2011-2016 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
 # A frontend for Net::SNMP
 
-package Manoc::Manifold::SNMP;
+package Manoc::Manifold::SNMP::Simple;
 use Moose;
 
 with 'Manoc::ManifoldRole::Base';
@@ -26,15 +26,15 @@ has 'community' => (
 
 has 'version' => (
     is      => 'ro',
-    isa     => 'Int',
+    isa     => 'Str',
     lazy    => '1',
     builder => '_build_version',
 );
 
-has 'session' => (
+has 'snmp_session' => (
     is     => 'ro',
     isa    => 'Object',
-    writer => '_set_snmp_info',
+    writer => '_set_snmp_session',
 );
 
 sub _build_community {
@@ -68,20 +68,17 @@ sub connect {
     $options{-hostname} = $self->host;
 
     my $extra_params = $self->extra_params;
-    $options{-port}     = $self->port;
-    $options{-version}  = $self->version;
-    $options{-timeout}  = $self->timeout;
-    $options{-retries } = $self->retries;
-    $options{-localaddr}    = $->localaddr    if $self->localaddr;
-    $options{-localport}    = $self->localport    if $self->localport;
-    $options{-community}    = $self->community    if $self->community;
-    $options{-username}     = $self->username     if $self->username;
-    $options{-authkey}      = $self->authkey      if $self->authkey;
-    $options{-authpassword} = $self->authpassword if $self->authpassword;
-    $options{-authprotocol} = $self->authprotocol if $self->authprotocol;
-    $options{-privkey}      = $self->privkey      if $self->privkey;
-    $options{-privpassword} = $self->privpassword if $self->privpassword;
-    $options{-privprotocol} = $self->privprotocol if $self->privprotocol;
+    $options{-version}   = $self->version;
+    $options{-community} = $self->community;
+
+    my @extra_options = qw(  -port -timeout -retries
+                             -localaddr -localport -username -authkey
+                             -authpassword -authprotocol
+                             -privkey -privpassword -privprotocol
+                      );
+    foreach (@extra_options) {
+        $options{$_} = $extra_params->{$_} if exists $extra_params->{$_};
+    }
 
     # $options{-debug} = DEBUG_ALL
     #  if ( defined(_debug_level) && _debug_level > 1 );
@@ -98,6 +95,7 @@ sub connect {
         '-unsigned'       => 1,
     ];
 
+    my $session;
     try {
         $session = Net::SNMP->session(%options);
     }
@@ -107,23 +105,23 @@ sub connect {
         return undef;
     };
 
-    unless ($info) {
+    unless ($session) {
         $self->log->error( "Could not connect to ", $self->host );
         return undef;
     }
 
-    $self->_set_session($info);
+    $self->_set_snmp_session($session);
     return 1;
 }
 
 sub has_snmp_scalar {
-    my ( $name, $oid, %options ) = @_;
+    my ( $name,  %options ) = @_;
 
-    my $oid    = $options{oid} || croak "oid attribute is required";
+    my $oid    = $options{oid} or croak "oid attribute is required";
     my $munger = $options{munger};
 
     my $attr_name = "snmp_$name";
-    my $builder_name = "_build_${attr_name}"
+    my $builder_name = "_build_${attr_name}";
 
     has $attr_name => (
         is      => 'ro',
@@ -140,16 +138,77 @@ sub has_snmp_scalar {
     }
 }
 
-has_snmp_scalar "sysDescr"    => ( oid => "1" );
-has_snmp_scalar "sysObjectID" => ( oid => "2" );
-has_snmp_scalar "sysUpTime"   => ( oid => "3" );
-has_snmp_scalar "sysName"     => ( oid => "5" );
-has_snmp_scalar "sysLocation" => ( oid => "6" );
-has_snmp_scalar "sysServices" => ( oid => "7" );
+sub has_snmp_table {
+    my ( $name, %options ) = @_;
+    my $table_oid = $options{oid};
+    $table_oid or croak "Table $name has no oid";
 
-sub _build_snmp_sysUpTime {
-    my $self = shift;
+    my $columns = $options{columns};
+    $columns or croak "Table $name has no columns definition";
+
+    my @column_names = keys %$columns;
+    while ( my ( $col_name, $col_opts ) = each(%$columns) ) {
+        ref $col_opts eq 'ARRAY' or $col_opts = [$col_opts];
+        my ( $sub_id, $munger ) = @$col_opts;
+        my $col_oid = "$table_oid.1.$sub_id";
+
+        my $attr_name = "snmp_$col_name";
+        my $builder_name = "_build_${attr_name}";
+
+        has $attr_name => (
+            is      => 'ro',
+            lazy    => 1,
+            builder => "_build_${attr_name}"
+        );
+
+        {
+            no strict 'refs';
+            *{$builder_name} = sub {
+                my $self = shift;
+                $self->_mib_read_tablerow($col_oid, $munger);
+            }
+        }
+    }
 }
+
+
+my $SNMPV2_MIB_OID =  '1.3.6.1.2.1.1';
+has_snmp_scalar "sysDescr"    => ( oid => "$SNMPV2_MIB_OID.1" );
+has_snmp_scalar "sysObjectID" => ( oid => "$SNMPV2_MIB_OID.2" );
+has_snmp_scalar "sysUpTime"   => ( oid => "$SNMPV2_MIB_OID.3" );
+has_snmp_scalar "sysName"     => ( oid => "$SNMPV2_MIB_OID.5" );
+has_snmp_scalar "sysLocation" => ( oid => "$SNMPV2_MIB_OID.6" );
+has_snmp_scalar "sysServices" => ( oid => "$SNMPV2_MIB_OID.7" );
+
+my $HOST_RESOURCES_MIB_OID = '1.3.6.1.2.1.25';
+has_snmp_table 'hrSWInstalledTable' => (
+    oid     => "$HOST_RESOURCES_MIB_OID.6.3",
+    columns => {
+        'hrSWInstalledIndex' => 1,
+        'hrSWInstalledName'  => 2,
+        'hrSWInstalledID'    => 3,
+        'hrSWInstalledType'  => 4,
+        'hrSWInstalledDate'  => [ 5, \&_munge_sw_installed_date ],
+    },
+);
+has_snmp_table 'hrDeviceTable' => (
+    oid     =>  "$HOST_RESOURCES_MIB_OID.3.2",
+    index   => 'hrDeviceIndex',
+    columns => {
+        'hrDeviceType'   => 2,
+        'hrDeviceDescr'  => 3,
+        'hrDeviceID'     => 4,
+        'hrDeviceStatus' => [ 5,
+                              sub {
+                                  my $val   = shift;
+                                  my @stati = qw(INVALID unknown running warning testing down);
+                                  return $stati[$val];
+                              }
+                          ],
+        'hrDeviceErrors' => 6,
+    },
+);
+
 
 sub _build_boottime {
     my $self = shift;
@@ -209,7 +268,7 @@ sub _build_os_ver {
     }
 
     if ($vendor eq 'Cisco') {
-        $os = $self->os;
+        my $os = $self->os;
 
         if ( defined $os && defined $descr ) {
             # Older Catalysts
@@ -274,12 +333,8 @@ sub _build_os_ver {
 
 sub _build_vendor {
     my $self = shift;
-    my $info = $self->snmp_sysObjectID
-
-    return sysObjectID2vendor( $self->sysObjectID ) || "";
-
-
-    return $info->vendor;
+    my $info = $self->snmp_sysObjectID;
+    return _sysObjectID2vendor( $info ) || "";
 }
 
 sub _build_serial {
@@ -299,12 +354,12 @@ sub _build_serial {
 sub _get_scalar {
     my ( $self, $oid ) = @_;
 
-    my $session = $self->_driver;
+    my $session = $self->snmp_session;
 
     #add istance number to the oid
     $oid .= '.0';
 
-    _debug( $self->meta->name, "Fetching scalar $oid" );
+    $self->log->debug( $self->meta->name, "Fetching scalar $oid" );
 
     my $result = $session->get_request( '-varbindlist' => [$oid] );
     $result or die "SNMP error " . $session->error();
@@ -319,10 +374,10 @@ sub _get_subtree {
 
     my @result;
 
-    my $s = $self->_driver;
+    my $s = $self->snmp_session;
     $oid eq '.' and $oid = '0';
 
-    _debug( $self->meta->name, "Fetching subtree $oid" );
+    $self->log->debug( $self->meta->name, "Fetching subtree $oid" );
 
     my $last_oid = $oid;
 
@@ -385,7 +440,7 @@ sub _get_subtree {
 sub _mib_read_scalar {
     my ( $self, $oid, $munger ) = @_;
 
-    my $v = $self->session->get_scalar($oid);
+    my $v = $self->_get_scalar($oid);
     $munger and $v = $munger->($v);
     return $v;
 }
@@ -393,7 +448,7 @@ sub _mib_read_scalar {
 sub _mib_read_tablerow {
     my ( $self, $oid, $munger ) = @_;
 
-    my $row = $self->session->get_subtree($oid);
+    my $row = $self->_get_subtree($oid);
 
     my $ret = {};
     foreach (@$row) {
@@ -433,6 +488,15 @@ sub _munge_macaddress {
     $mac = join( ':', map { sprintf "%02x", $_ } unpack( 'C*', $mac ) );
     return $mac if $mac =~ /^([0-9A-F][0-9A-F]:){5}[0-9A-F][0-9A-F]$/i;
     return "ERROR";
+}
+
+sub _munge_sw_installed_date {
+    my $val = shift;
+
+    my ( $y, $m, $d, $hour, $min, $sec ) = unpack( 'n C6 a C2', $val );
+
+    return "$y-$m-$d $hour:$min:$sec";
+
 }
 
 my %ID_VENDOR_MAP = (
