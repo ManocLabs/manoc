@@ -86,7 +86,10 @@ sub get_form {
 
     my $class = $c->stash->{form_class} || $self->form_class;
     $class or die "Form class not set (use form_class)";
-    return $class->new( ctx => $c );
+
+    my $parameters = $c->stash->{form_parameters} || {};
+
+    return $class->new( ctx => $c, %$parameters );
 }
 
 =head2 get_form_success_url
