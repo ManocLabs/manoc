@@ -175,7 +175,7 @@ sub _build_neighbors {
         my $neigh_id    = $c_id->{$neigh}       || "";
         my $neigh_model = $c_platform->{$neigh} || "";
 
-        my %cap = map {$_ => 1} @{$c_capabilities->{$neigh}};
+        my %cap = map { $_ => 1 } @{ $c_capabilities->{$neigh} };
         $cap{'Switch'} and $self->log->debug("$host/$port connected to $neigh_ip");
 
         my $entry = {
