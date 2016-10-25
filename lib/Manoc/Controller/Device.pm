@@ -7,12 +7,8 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "Manoc::ControllerRole::CommonCRUD" => {
-    -excludes => [ 'list' ]
-};
-with "Manoc::ControllerRole::JSONView" => {
-    -excludes => 'get_json_object',
-};
+with "Manoc::ControllerRole::CommonCRUD" => { -excludes => ['list'] };
+with "Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
 
 use Text::Diff;
 use Manoc::Form::Device;
@@ -259,16 +255,18 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
 =cut
 
 sub get_object_list {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
-    return [ $c->stash->{resultset}->search(
-        {
-            dismissed => 0
-        },
-        {
-            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
-        }
-    ) ];
+    return [
+        $c->stash->{resultset}->search(
+            {
+                dismissed => 0
+            },
+            {
+                prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+            }
+        )
+    ];
 }
 
 =head2 show_run
@@ -319,7 +317,6 @@ before 'create' => sub {
     $c->stash( form_defaults => { rack => $rack_id } );
 };
 
-
 =head2 object_list
 
 =cut
@@ -327,7 +324,7 @@ before 'create' => sub {
 sub list : Chained('base') : PathPart('') {
     my ( $self, $c ) = @_;
 
-    my $rs      = $c->stash->{resultset};
+    my $rs             = $c->stash->{resultset};
     my @active_devices = $rs->search(
         {
             dismissed => 0
@@ -336,7 +333,7 @@ sub list : Chained('base') : PathPart('') {
             prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
         }
     );
-    $c->stash(active_device_list => \@active_devices);
+    $c->stash( active_device_list => \@active_devices );
 
     my @dismissed_devices = $rs->search(
         {
@@ -346,7 +343,7 @@ sub list : Chained('base') : PathPart('') {
             prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
         }
     );
-    $c->stash(dismissed_device_list => \@dismissed_devices);
+    $c->stash( dismissed_device_list => \@dismissed_devices );
 }
 
 =head2 dismiss
@@ -394,23 +391,22 @@ sub get_object {
 sub delete_object {
     my ( $self, $c ) = @_;
     my $device = $c->stash->{'object'};
-    my $name = $device->name;
+    my $name   = $device->name;
 
-    my $has_related_info =
-        $device->ifstatus->count() ||
-        $device->uplinks->count() ||
+    my $has_related_info = $device->ifstatus->count() ||
+        $device->uplinks->count()      ||
         $device->mat_assocs()->count() ||
-        $device->dot11assocs->count() ||
+        $device->dot11assocs->count()  ||
         $device->neighs->count();
 
-    if ( $has_related_info ) {
-        $c->flash( error_msg => "Device '$device' has some associated info and cannot be deleted." );
+    if ($has_related_info) {
+        $c->flash(
+            error_msg => "Device '$device' has some associated info and cannot be deleted." );
         return undef;
     }
 
     return $device->delete;
 }
-
 
 =head2 get_json_object
 
@@ -419,9 +415,8 @@ sub delete_object {
 sub get_json_object {
     my ( $self, $c, $device ) = @_;
 
-    my $r = $self->prepare_json_object($c, $device);
-    $r->{rack} = $device->rack->id,
-    return $r;
+    my $r = $self->prepare_json_object( $c, $device );
+    $r->{rack} = $device->rack->id, return $r;
 }
 
 =head1 AUTHOR

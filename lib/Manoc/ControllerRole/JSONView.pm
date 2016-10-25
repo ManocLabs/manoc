@@ -12,8 +12,8 @@ has json_columns => (
 );
 
 has json_add_object_href => (
-    is  => 'rw',
-    isa => 'Bool',
+    is      => 'rw',
+    isa     => 'Bool',
     default => 1,
 );
 
@@ -32,7 +32,7 @@ sub prepare_json_object {
         my $val = $row->can($name) ? $row->$name : $row->get_column($name);
         $ret->{$name} = $val;
     }
-    if ($self->json_add_object_href) {
+    if ( $self->json_add_object_href ) {
         $ret->{href} = $c->uri_for_action( $c->namespace . "/view", [ $row->id ] );
     }
     return $ret;
@@ -46,7 +46,7 @@ Call prepare_json_object. Redefine this method for custom serialization.
 
 sub get_json_object {
     my ( $self, $c, $row ) = shift;
-    return $self->prepare_json_object($c, $row);
+    return $self->prepare_json_object( $c, $row );
 }
 
 =head2 view_js
@@ -68,7 +68,7 @@ sub view_js : Chained('object') : PathPart('js') : Args(0) {
 sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my @r = map { $self->prepare_json_object($c, $_) } @{ $c->stash->{object_list} };
+    my @r = map { $self->prepare_json_object( $c, $_ ) } @{ $c->stash->{object_list} };
     $c->stash( json_data => \@r );
     $c->forward('View::JSON');
 }

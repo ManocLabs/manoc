@@ -16,7 +16,6 @@ use Net::SNMP 6.0 qw( :snmp DEBUG_ALL ENDOFMIBVIEW );
 use Carp qw(croak);
 use Try::Tiny;
 
-
 has 'community' => (
     is      => 'ro',
     isa     => 'Str',
@@ -56,8 +55,6 @@ sub _build_version {
     return $version_map{$version};
 }
 
-
-
 sub connect {
     my ($self) = @_;
     my $opts = shift || {};
@@ -72,10 +69,10 @@ sub connect {
     $options{-community} = $self->community;
 
     my @extra_options = qw(  -port -timeout -retries
-                             -localaddr -localport -username -authkey
-                             -authpassword -authprotocol
-                             -privkey -privpassword -privprotocol
-                      );
+        -localaddr -localport -username -authkey
+        -authpassword -authprotocol
+        -privkey -privpassword -privprotocol
+    );
     foreach (@extra_options) {
         $options{$_} = $extra_params->{$_} if exists $extra_params->{$_};
     }
@@ -115,12 +112,12 @@ sub connect {
 }
 
 sub has_snmp_scalar {
-    my ( $name,  %options ) = @_;
+    my ( $name, %options ) = @_;
 
-    my $oid    = $options{oid} or croak "oid attribute is required";
+    my $oid = $options{oid} or croak "oid attribute is required";
     my $munger = $options{munger};
 
-    my $attr_name = "snmp_$name";
+    my $attr_name    = "snmp_$name";
     my $builder_name = "_build_${attr_name}";
 
     has $attr_name => (
@@ -133,8 +130,8 @@ sub has_snmp_scalar {
         no strict 'refs';
         *{$builder_name} = sub {
             my $self = shift;
-            $self->_mib_read_scalar($oid, $munger);
-        }
+            $self->_mib_read_scalar( $oid, $munger );
+            }
     }
 }
 
@@ -152,7 +149,7 @@ sub has_snmp_table {
         my ( $sub_id, $munger ) = @$col_opts;
         my $col_oid = "$table_oid.1.$sub_id";
 
-        my $attr_name = "snmp_$col_name";
+        my $attr_name    = "snmp_$col_name";
         my $builder_name = "_build_${attr_name}";
 
         has $attr_name => (
@@ -165,14 +162,13 @@ sub has_snmp_table {
             no strict 'refs';
             *{$builder_name} = sub {
                 my $self = shift;
-                $self->_mib_read_tablerow($col_oid, $munger);
-            }
+                $self->_mib_read_tablerow( $col_oid, $munger );
+                }
         }
     }
 }
 
-
-my $SNMPV2_MIB_OID =  '1.3.6.1.2.1.1';
+my $SNMPV2_MIB_OID = '1.3.6.1.2.1.1';
 has_snmp_scalar "sysDescr"    => ( oid => "$SNMPV2_MIB_OID.1" );
 has_snmp_scalar "sysObjectID" => ( oid => "$SNMPV2_MIB_OID.2" );
 has_snmp_scalar "sysUpTime"   => ( oid => "$SNMPV2_MIB_OID.3" );
@@ -192,23 +188,23 @@ has_snmp_table 'hrSWInstalledTable' => (
     },
 );
 has_snmp_table 'hrDeviceTable' => (
-    oid     =>  "$HOST_RESOURCES_MIB_OID.3.2",
+    oid     => "$HOST_RESOURCES_MIB_OID.3.2",
     index   => 'hrDeviceIndex',
     columns => {
         'hrDeviceType'   => 2,
         'hrDeviceDescr'  => 3,
         'hrDeviceID'     => 4,
-        'hrDeviceStatus' => [ 5,
-                              sub {
-                                  my $val   = shift;
-                                  my @stati = qw(INVALID unknown running warning testing down);
-                                  return $stati[$val];
-                              }
-                          ],
+        'hrDeviceStatus' => [
+            5,
+            sub {
+                my $val   = shift;
+                my @stati = qw(INVALID unknown running warning testing down);
+                return $stati[$val];
+            }
+        ],
         'hrDeviceErrors' => 6,
     },
 );
-
 
 sub _build_boottime {
     my $self = shift;
@@ -255,19 +251,20 @@ sub _build_os {
 }
 
 sub _build_os_ver {
-    my $self = shift;
+    my $self   = shift;
     my $descr  = $self->snmp_sysDescr;
     my $vendor = $self->vendor;
 
     $vendor eq 'Microsoft' and
-        $descr =~ /Windows Version\s+([\d\.]+)/ and return $1;
+        $descr =~ /Windows Version\s+([\d\.]+)/ and
+        return $1;
 
     if ( $vendor eq 'NetSNMP' ) {
         my @fields = split /\s+/, $descr;
         return $fields[2];
     }
 
-    if ($vendor eq 'Cisco') {
+    if ( $vendor eq 'Cisco' ) {
         my $os = $self->os;
 
         if ( defined $os && defined $descr ) {
@@ -276,34 +273,29 @@ sub _build_os_ver {
                 return $1;
             }
 
-            if (   $os eq 'css'
-                       && $descr
-                       =~ m/Content Switch SW Version ([0-9\.\(\)]+) with SNMPv1\/v2c Agent/
-                   )
-                {
-                    return $1;
-                }
+            if ( $os eq 'css' &&
+                $descr =~ m/Content Switch SW Version ([0-9\.\(\)]+) with SNMPv1\/v2c Agent/ )
+            {
+                return $1;
+            }
 
-            if (   $os eq 'css-sca'
-                       && $descr
-                       =~ m/Cisco Systems Inc CSS-SCA-2FE-K9, ([0-9\.\(\)]+) Release / )
-                {
-                    return $1;
-                }
+            if ( $os eq 'css-sca' &&
+                $descr =~ m/Cisco Systems Inc CSS-SCA-2FE-K9, ([0-9\.\(\)]+) Release / )
+            {
+                return $1;
+            }
 
-            if (   $os eq 'pix'
-                       && $descr
-                       =~ m/Cisco PIX Security Appliance Version ([0-9\.\(\)]+)/ )
-                {
-                    return $1;
-                }
+            if ( $os eq 'pix' &&
+                $descr =~ m/Cisco PIX Security Appliance Version ([0-9\.\(\)]+)/ )
+            {
+                return $1;
+            }
 
-            if (   $os eq 'asa'
-                       && $descr
-                       =~ m/Cisco Adaptive Security Appliance Version ([0-9\.\(\)]+)/ )
-                {
-                    return $1;
-                }
+            if ( $os eq 'asa' &&
+                $descr =~ m/Cisco Adaptive Security Appliance Version ([0-9\.\(\)]+)/ )
+            {
+                return $1;
+            }
 
             if ( $os =~ /^fwsm/ && $descr =~ m/Version (\d+\.\d+(\(\d+\)){0,1})/ ) {
                 return $1;
@@ -321,12 +313,12 @@ sub _build_os_ver {
         }
 
         # Newer Catalysts and IOS devices
-        if ( defined $descr
-                 and $descr =~ m/Version (\d+\.\d+\([^)]+\)[^,\s]*)(,|\s)+/ )
-            {
-                return $1;
-            }
-    } # end of Cisco
+        if ( defined $descr and
+            $descr =~ m/Version (\d+\.\d+\([^)]+\)[^,\s]*)(,|\s)+/ )
+        {
+            return $1;
+        }
+    }    # end of Cisco
 
     return '';
 }
@@ -334,7 +326,7 @@ sub _build_os_ver {
 sub _build_vendor {
     my $self = shift;
     my $info = $self->snmp_sysObjectID;
-    return _sysObjectID2vendor( $info ) || "";
+    return _sysObjectID2vendor($info) || "";
 }
 
 sub _build_serial {
@@ -390,8 +382,7 @@ sub _get_subtree {
             }
 
             # store into result
-            push @result,
-              [ $returned_oid, $s->var_bind_list()->{$returned_oid} ];
+            push @result, [ $returned_oid, $s->var_bind_list()->{$returned_oid} ];
 
             $last_oid = $returned_oid;
         }
@@ -399,13 +390,13 @@ sub _get_subtree {
     }
     else {
 
-      GET_BULK:
+    GET_BULK:
         while (
             defined $s->get_bulk_request(
                 -maxrepetitions => 1,
                 -varbindlist    => [$last_oid]
             )
-          )
+            )
         {
             my @oids = $s->var_bind_names();
 
@@ -424,8 +415,7 @@ sub _get_subtree {
                     last GET_BULK;
                 }
 
-                push @result,
-                  [ $returned_oid, $s->var_bind_list()->{$returned_oid} ];
+                push @result, [ $returned_oid, $s->var_bind_list()->{$returned_oid} ];
 
                 $last_oid = $returned_oid;
             }
@@ -435,7 +425,6 @@ sub _get_subtree {
 
     return \@result;
 }
-
 
 sub _mib_read_scalar {
     my ( $self, $oid, $munger ) = @_;
@@ -556,7 +545,6 @@ sub _sysObjectID2vendor {
     $id =~ /^\.?1\.3\.6\.1\.4\.1\.(\d+)/ and return $ID_VENDOR_MAP{$1};
     return "UNKNOWN";
 }
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -22,7 +22,6 @@ has_field 'dismiss' => (
     order          => 1000,
 );
 
-
 sub update_model {
     my $self   = shift;
     my $values = $self->values;
@@ -33,8 +32,7 @@ sub update_model {
             return $self->item->update;
         }
     );
-};
-
+}
 
 =head1 AUTHOR
 

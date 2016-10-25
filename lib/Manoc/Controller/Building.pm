@@ -10,9 +10,7 @@ use Manoc::Form::Building;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView" => {
-    -excludes => 'get_json_object',
-};
+with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
 
 =head1 NAME
 
@@ -38,7 +36,7 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
 
-    json_columns            => [ 'id', 'name', 'description' ],
+    json_columns => [ 'id', 'name', 'description' ],
 );
 
 sub get_object_list {
@@ -63,11 +61,10 @@ sub delete_object {
 sub get_json_object {
     my ( $self, $c, $building ) = @_;
 
-    my $r = $self->prepare_json_object($c, $building);
+    my $r = $self->prepare_json_object( $c, $building );
     $r->{racks} = [ map +{ id => $_->id, name => $_->name }, $building->racks ];
     return $r;
-};
-
+}
 
 =head1 AUTHOR
 
