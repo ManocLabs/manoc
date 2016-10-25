@@ -8,6 +8,8 @@ use 5.008;
 use Moose::Role;
 use Log::Log4perl;
 
+use Manoc::Logger;
+
 has 'log' => (
     is      => 'rw',
     lazy    => 1,
