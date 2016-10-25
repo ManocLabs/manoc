@@ -59,9 +59,10 @@ sub form : Private {
         if ($process_status) {
             $json_data->{message}  = $self->object_updated_message;
             $json_data->{redirect} = $self->get_form_success_url($c);
-        } else {
+        }
+        else {
             $json_data->{html} =
-                $c->forward("View::TT", "render", [ "form.tt", $c->stash]);
+                $c->forward( "View::TT", "render", [ "form.tt", $c->stash ] );
         }
         $c->stash->{json_data} = $json_data;
         $c->detach('View::JSON');

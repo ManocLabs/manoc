@@ -9,9 +9,7 @@ use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
-with "Manoc::ControllerRole::JSONView" => {
-    -excludes => 'get_json_object',
-};
+with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
 
 use Manoc::Form::Rack;
 
@@ -96,11 +94,11 @@ sub delete_object {
 sub get_json_object {
     my ( $self, $c, $rack ) = @_;
 
-    my $r = $self->prepare_json_object($c, $rack);
+    my $r = $self->prepare_json_object( $c, $rack );
     $r->{building} = {
-            id   => $rack->building->id,
-            name => $rack->building->name,
-        };
+        id   => $rack->building->id,
+        name => $rack->building->name,
+    };
     $r->{devices} = [ map +{ id => $_->id, name => $_->name }, $rack->devices ];
     return $r;
 }

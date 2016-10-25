@@ -27,7 +27,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::VlanRange',
     enable_permission_check => 1,
     view_object_perm        => undef,
-    json_columns            => [ qw(id name description) ],
+    json_columns            => [qw(id name description)],
 );
 
 =head1 NAME

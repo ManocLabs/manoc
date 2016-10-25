@@ -17,19 +17,19 @@ use Data::Dumper;
 extends 'Manoc::Script';
 
 sub archive {
-    my ( $self, $time) = @_;
+    my ( $self, $time ) = @_;
     my $conf = $self->config->{'Archiver'} || $self->log->logdie("Could not find config file!");
-    my $schema       = $self->schema;
+    my $schema = $self->schema;
 
-    my $archive_age  = str2seconds( $conf->{'archive_age'} );
-    my $discard_age  = str2seconds( $conf->{'discard_age'} );
+    my $archive_age = str2seconds( $conf->{'archive_age'} );
+    my $discard_age = str2seconds( $conf->{'discard_age'} );
 
     my $tot_discarded = 0;
     my $tot_archived  = 0;
 
     if ($archive_age) {
         $self->log->info(
-            "Archiver: archiving lastseen befor " . print_timestamp( $time - $archive_age) );
+            "Archiver: archiving lastseen befor " . print_timestamp( $time - $archive_age ) );
     }
 
     my $discard_date;
@@ -39,9 +39,8 @@ sub archive {
             "Archiver: deleting lastseen before " . print_timestamp($discard_date) );
     }
 
-
     my @source_names = $schema->sources;
-    foreach my $source ( @source_names ) {
+    foreach my $source (@source_names) {
         my $rs = $schema->resultset($source);
         $rs->can('archive') or next;
 
@@ -64,9 +63,8 @@ sub archive {
     }
 
     if ($discard_age) {
-        my $cdp = $self->schema
-            ->resultset('CDPNeigh')
-            ->search('last_seen' => { '<', $discard_date });
+        my $cdp = $self->schema->resultset('CDPNeigh')
+            ->search( 'last_seen' => { '<', $discard_date } );
         $tot_discarded += $cdp->count;
         $cdp->delete();
     }
