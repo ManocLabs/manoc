@@ -61,7 +61,23 @@ sub _build_config {
             $config and last;
         }
     }
-    $config or die "Cannot find config file";
+    if ( ! $config ) {
+        $config = {
+            name => 'Manoc',
+
+            'Model::ManocDB' => {
+                connect_info => {
+                    dsn => $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
+                    user => $ENV{MANOC_DB_USERNAME} || undef,
+                    password => $ENV{MANOC_DB_PASSWORD} || undef,
+                    # dbi_attributes
+                    quote_names => 1,
+                    # extra attributes
+                    AutoCommit  => 1,
+                },
+            },
+        }
+    }
 
     return $config;
 }
