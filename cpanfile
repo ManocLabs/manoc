@@ -31,6 +31,7 @@ requires 'MooseX::Workers';
 requires 'MooseX::Getopt';
 requires 'Net::OpenSSH';
 requires 'Net::NBName';
+requires 'Net::SNMP';
 requires 'Regexp::Common';
 requires 'YAML::Syck';
 requires 'Config::JFDI';
@@ -58,7 +59,7 @@ feature 'arpsniffer', 'ARP sniffer support' => sub {
   requires 'NetPacket', '1.2.0';
 };
 
-feature 'snmp', 'SNMP support' => sub {
+feature 'snmp', 'SNMP::Info support' => sub {
   requires 'SNMP::Info', '3.27';
 };
 
