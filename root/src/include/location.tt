@@ -2,13 +2,13 @@
 $( document ).ready(function() {
     $("#[% form.name %]\\.rack").selectize();
     $("#[% form.name %]\\.building").selectize();
-    form_hwasset_refresh();
+    form_location_refresh();
 });
 $('#[% form.name %] input').on('change', function() {
-    form_hwasset_refresh();
+    form_location_refresh();
 
  });
-function form_hwasset_refresh() {
+function form_location_refresh() {
   l=$('input[name="[% form.name %].location"]:checked').val();
   $("#[% form.name %]\\.building").prop('disabled', l != 'o');
   if ( l == 'o') {
