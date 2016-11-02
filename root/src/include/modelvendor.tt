@@ -1,0 +1,30 @@
+[% fragment = BLOCK -%]
+$( document ).ready(function() {
+    $("#[% form.name %]\\.vendor").typeahead({
+        source: function (query, process) {
+            return $.get(
+                '[% c.uri_for_action("hwasset/vendors_js") %]',
+                { q: query },
+                function (data) {
+                   return process(data);
+                 });
+        },
+        minLength: 0
+    }).attr('autocomplete', 'off');
+    $("#[% form.name %]\\.model").typeahead({
+        source: function (query, process) {
+            return $.get(
+                '[% c.uri_for_action("hwasset/models_js") %]',
+                {
+                    q:      query,
+                    vendor: $('#[% form.name %]\\.vendor').val()
+                },
+                function (data) {
+                   return process(data);
+                 });
+        },
+        minLength: 0
+    }).attr('autocomplete', 'off');
+});
+[% END %]
+[% js_scripts.push(fragment) -%]
