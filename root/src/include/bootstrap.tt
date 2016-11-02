@@ -9,6 +9,7 @@
       c.uri_for('/static/external/bootstrap/js/bootstrap.min.js'),
       c.uri_for('/static/external/selectize/js/selectize.min.js'),
       c.uri_for('/static/external/bootbox/js/bootbox.min.js'),
+      c.uri_for('/static/external/typeahead/typeahead.min.js'),
       )
 -%]
 [%# ----------------------------------------------------------------- -%]
