@@ -153,6 +153,68 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
 }
 
+=head2 vendors_js
+
+Get a list of vendors
+
+=cut
+
+
+sub vendors_js : Chained('base') : PathPart('vendors/js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{resultset}, 'list' );
+
+    my $filter = {};
+
+    my $q = $c->req->query_parameters->{'q'};
+    $q and $filter->{vendor} = { -like => "$q%" };
+
+    my @data = $c->stash->{resultset}->search(
+        $filter,
+        {
+            columns => [ qw/vendor/ ],
+            distinct => 1
+        }
+    )->get_column('vendor')->all();
+    $c->log->error("data=@data");
+    $c->stash( json_data => \@data);
+    $c->forward('View::JSON');
+}
+
+
+=head2 models_js
+
+Get a list of models optionally filtered by vendor
+
+=cut
+
+
+sub models_js: Chained('base') : PathPart('models/js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{resultset}, 'list' );
+
+    my $filter = {};
+
+    my $vendor = $c->req->query_parameters->{vendor};
+    $vendor and $filter->{vendor} = $vendor;
+
+    my $q = $c->req->query_parameters->{'q'};
+    $q and $filter->{model} = { -like => "$q%" };
+
+    my @data = $c->stash->{resultset}->search(
+        $filter,
+        {
+            columns => [ qw/model/ ],
+            distinct => 1
+        }
+    )->get_column('model')->all();
+
+    $c->stash( json_data => \@data );
+    $c->forward('View::JSON');
+}
+
 =head1 METHODS
 
 =cut
