@@ -67,6 +67,7 @@ __PACKAGE__->belongs_to(
  __PACKAGE__->has_many( 
      'dhcp_subnet' => 'Manoc::DB::Result::DHCPSubnet',
       { 'foreign.dhcp_shared_id' => 'self.id' },
+      { cascade_delete => 0}
  );
 
 
