@@ -72,14 +72,15 @@ around 'update_model' => sub {
     my $self = shift;
     my $item = $self->item;
     my $subnet_list =  $self->field('dhcp_subnet')->value;
-
+;
     $self->schema->txn_do( sub {
 	$self->$orig(@_);
 	
 	foreach my $sub_id (@{$subnet_list}){
 	    my $rs = $self->schema->resultset('DHCPSubnet')
-		->search( { 'id' => $sub_id  },)->single; 
-	    $rs->dhcp_shared_subnet($item)->update;
+		->search( { 'id' => $sub_id  })->single; 
+	    $rs->dhcp_shared_subnet($item);
+	    $rs->update;
 	}         
    });
 };

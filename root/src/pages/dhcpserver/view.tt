@@ -38,13 +38,32 @@
 </div>
 
 <div class="row">
+[% IF object.dhcp_shared_subnet -%]
+  <table class="table table-condensed" id="net_list">
+    <thead>  
+      <tr>
+ 	<th>Name</th>
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH n IN object.dhcp_shared_subnet -%]
+      <tr>
+	<td>[% print_dhcp_shared_subnet(n)  %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>
+
+<div class="row">
 [% IF object.dhcp_subnet -%]
   <table class="table table-condensed" id="net_list">
     <thead>  
       <tr>
  	<th>Name</th>
  	<th>Network</th>
- 	<th>IP Pool</th>
+ 	<th>IP Pool</th
 
       </tr>
     </thead>  
@@ -52,9 +71,8 @@
       [% FOREACH n IN object.dhcp_subnet -%]
       <tr>
 	<td>[% print_dhcpsubnet(n)  %]</td>
-	<td>[% n.network.address %]/
-	    [% n.network.prefix %]</td>
-	<td>[% n.range_from %] - [% n.range_to %]</td>
+	<td>[% n.network.address %]/[% n.network.prefix %]</td>
+	<td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
       </tr>
       [% END %]
     </tbody>

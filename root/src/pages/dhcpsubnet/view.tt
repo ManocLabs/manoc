@@ -32,12 +32,14 @@
   <dd>[% object.range.from_addr | html %]</dd>
   <dt>Ip Pool to </dt>
   <dd>[% object.range.to_addr | html %]</dd>
+  <dt>Pool of shared subnet</dt>
+  <dd>[% print_dhcp_shared_subnet(object.dhcp_shared_subnet) %]</dd>
   <dt>Domain</dt>
   <dd>
       [%IF object.domain_name -%]
   	   [% object.domain_name | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.domain_name | html %] 
+      	   <i>[% object.dhcp_server.domain_name | html %]</i>
       [%END -%]  
   </dd>
   <dt>DNS</dt>
@@ -45,7 +47,7 @@
       [%IF object.domain_nameserver -%]
   	   [% object.domain_nameserver | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.domain_nameserver | html %] 
+      	 <i>[% object.dhcp_server.domain_nameserver | html %]</i>
       [%END -%]  
   </dd>
   <dt>NTP</dt>
@@ -61,7 +63,7 @@
       [%IF object.default_lease_time  -%]
   	   [% object.default_lease_time | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.default_lease_time | html %] 
+      	  <i>[% object.dhcp_server.default_lease_time | html %]</i>
       [%END -%]
   </dd>
   <dt>Maximum Lease Time</dt>
@@ -69,7 +71,7 @@
       [%IF object.max_lease_time  -%]
   	   [% object.max_lease_time | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.max_lease_time | html %] 
+      	  <i>[% object.dhcp_server.max_lease_time | html %]</i> 
       [%END -%]
   </dd>
       </dl>

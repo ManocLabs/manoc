@@ -35,6 +35,7 @@ has_field 'dhcp_server' => (
 has_field 'dhcp_shared_subnet' => ( 
     type => 'Select', 
     label => 'Shared Subnet', 
+    empty_select => 'No shared subnet', 
 );
 
 has_field 'network' => ( 
