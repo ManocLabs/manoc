@@ -48,7 +48,7 @@ $(document).ready(function() {
    "dom": '<"toolbar">frtip',
  })
 
- $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed);
+ $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed');
 
  $('#dismissed').on('change', function() {
    $( '#hwasset_list' ).dataTable().api().ajax.reload();
