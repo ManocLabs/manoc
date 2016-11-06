@@ -59,7 +59,7 @@ __PACKAGE__->add_columns(
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
-    }
+    },
 );
 
 has network => (
@@ -245,6 +245,12 @@ __PACKAGE__->belongs_to(
     'vlan_id',
     { join_type => 'LEFT' }
 );
+
+__PACKAGE__->might_have(
+    dhcp_subnet =>
+    'Manoc::DB::Result::DHCPSubnet',
+    { 'foreign.network_id' => 'self.id' },
+ );
 
 __PACKAGE__->add_relationship(
     'supernets' => 'IPNetwork',

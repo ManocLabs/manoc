@@ -13,10 +13,10 @@ __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 __PACKAGE__->table('dhcp_reservation');
 
 __PACKAGE__->add_columns(
-    'server' => {
-        data_type   => 'varchar',
-        size        => 255,
-        is_nullable => 0,
+    'id' => {
+        data_type         => 'int',
+        is_auto_increment => 1,
+        is_nullable       => 0,
     },
 
     'macaddr' => {
@@ -44,8 +44,39 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
 
+    'dhcpnet_id' => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+
+    last_modified => {
+        data_type     => 'int',
+        default_value => '0',
+    },
+
+    manoc_managed => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+
+    on_server => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+
 );
 
-__PACKAGE__->set_primary_key( 'server', 'ipaddr', 'macaddr' );
+__PACKAGE__->belongs_to( 
+    'dhcp_subnet' => 'Manoc::DB::Result::DHCPSubnet',
+    { 'foreign.id' => 'self.dhcpnet_id' }, 
+);
+
+
+__PACKAGE__->set_primary_key( 'id' );
+
+__PACKAGE__->add_unique_constraint( [ 'ipaddr', 'macaddr', 'dhcpnet_id'] );
 
 1;

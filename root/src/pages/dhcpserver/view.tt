@@ -1,0 +1,81 @@
+[%
+   page.title='View DHCPServer'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('dhcpserver/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a>&nbsp;
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpsubnet/create', { server_id => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add a DHCP subnet </a>&nbsp;
+  <a class="btn btn-default" href="[% c.uri_for('/dhcpsharedsubnet/create', { server_id => object.id}) %]">
+    [% bootstrap_icon('plus') %] Add a DHCP shared subnet </a>
+    </div>
+[% END %]
+   <div class="row">
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <dl class="dl-horizontal">
+	<dt>Name</dt>
+  	<dd>[% object.name | html %]</dd>
+  	<dt>Domain Name</dt>
+  	<dd>[% object.domain_name | html %]</dd>
+  	<dt>Domain Nameserver</dt>
+  	<dd>[% object.domain_nameserver | html %]</dd>
+  	<dt>Ntp Server</dt>
+  	<dd>[% object.ntp_server | html %]</dd>
+  	<dt>Default Lease Time</dt>
+  	<dd>[% object.default_lease_time | html %]</dd>
+  	<dt>Maximum Lease Time</dt>
+  	<dd>[% object.max_lease_time | html %]</dd>
+  	</dl>
+
+    </div>
+  </div>
+</div>
+
+<div class="row">
+[% IF object.dhcp_shared_subnet -%]
+  <table class="table table-condensed" id="net_list">
+    <thead>  
+      <tr>
+ 	<th>Name</th>
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH n IN object.dhcp_shared_subnet -%]
+      <tr>
+	<td>[% print_dhcp_shared_subnet(n)  %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>
+
+<div class="row">
+[% IF object.dhcp_subnet -%]
+  <table class="table table-condensed" id="net_list">
+    <thead>  
+      <tr>
+ 	<th>Name</th>
+ 	<th>Network</th>
+ 	<th>IP Pool</th
+
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH n IN object.dhcp_subnet -%]
+      <tr>
+	<td>[% print_dhcpsubnet(n)  %]</td>
+	<td>[% n.network.address %]/[% n.network.prefix %]</td>
+	<td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>

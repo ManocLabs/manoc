@@ -84,3 +84,12 @@
     [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
  [% END -%]
 [% END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                            IP DHCP Network                        -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_dhcpsubnet(network) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
+[%- END -%]
+[% MACRO print_dhcp_shared_subnet(network) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpsharedsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
+[%- END -%]

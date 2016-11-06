@@ -1,0 +1,108 @@
+[%
+   page.title='View DHCPSubnet'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('dhcpsubnet/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpsubnet/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+
+</dl>
+
+
+
+
+<div class="row">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+  <dt>Name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>DHCP Server</dt>
+  <dd>[% object.dhcp_server.name | html %]</dd>
+  <dt>Network</dt>
+  <dd>[% object.network.address | html %]/
+      [% object.network.prefix  | html %]</dd>
+    <dt>IP Pool from</dt>
+  <dd>[% object.range.from_addr | html %]</dd>
+  <dt>Ip Pool to </dt>
+  <dd>[% object.range.to_addr | html %]</dd>
+  <dt>Pool of shared subnet</dt>
+  <dd>[% print_dhcp_shared_subnet(object.dhcp_shared_subnet) %]</dd>
+  <dt>Domain</dt>
+  <dd>
+      [%IF object.domain_name -%]
+  	   [% object.domain_name | html %]
+      [%ELSE -%]
+      	   <i>[% object.dhcp_server.domain_name | html %]</i>
+      [%END -%]  
+  </dd>
+  <dt>DNS</dt>
+  <dd>
+      [%IF object.domain_nameserver -%]
+  	   [% object.domain_nameserver | html %]
+      [%ELSE -%]
+      	 <i>[% object.dhcp_server.domain_nameserver | html %]</i>
+      [%END -%]  
+  </dd>
+  <dt>NTP</dt>
+  <dd>
+      [%IF object.ntp_server -%]
+  	   [% object.ntp_server | html %]
+      [%ELSE -%]
+      	   [% object.dhcp_server.ntp_server | html %] 
+      [%END -%]
+  </dd>
+  <dt>Lease Time</dt>
+  <dd>
+      [%IF object.default_lease_time  -%]
+  	   [% object.default_lease_time | html %]
+      [%ELSE -%]
+      	  <i>[% object.dhcp_server.default_lease_time | html %]</i>
+      [%END -%]
+  </dd>
+  <dt>Maximum Lease Time</dt>
+  <dd>
+      [%IF object.max_lease_time  -%]
+  	   [% object.max_lease_time | html %]
+      [%ELSE -%]
+      	  <i>[% object.dhcp_server.max_lease_time | html %]</i> 
+      [%END -%]
+  </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="row">
+[% IF object.reservations -%]
+  <table class="table table-condensed" id="device_list">
+    <thead>  
+      <tr>
+ 	<th>Mac Address</th>
+ 	<th>IP Address</th>
+ 	<th>Name</th>
+ 	<th>Hostname</th>
+
+      </tr>
+    </thead>  
+    <tbody>
+      [% FOREACH r IN object.reservations -%]
+      <tr>
+	<td>[% print_mac(r.macaddr) %]</td>
+	<td>[% print_ip(r.ipaddr) %]</td>
+	<td>[% r.name %]</td>
+	<td>[% r.hostname %]</td>
+      </tr>
+      [% END %]
+    </tbody>
+  </table>
+  [% END -%]
+</div>
