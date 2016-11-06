@@ -83,7 +83,7 @@ my @DEFAULT_MENU_ITEMS = (
             },
             {
                 name   => 'Device Hardware',
-                action => '/serverhw/list',
+                action => '/hwasset/devices',
             },
             {
                 separator => 1,
