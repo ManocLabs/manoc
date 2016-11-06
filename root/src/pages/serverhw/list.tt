@@ -10,7 +10,10 @@ page.section = 'Server'
 [%- IF c.check_permission('serverhw.create') -%]
 [% page.toolbar = BLOCK -%]
 <div>
- <a href="[% c.uri_for_action('/serverhw/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<div class="btn-group" role="group">
+  <a href="[% c.uri_for_action('serverhw/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+  <a href="[% c.uri_for_action('serverhw/import_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("upload") %] Import CSV</a>
+</div>
 </div>
 [% END -%]
 [% END -%]
