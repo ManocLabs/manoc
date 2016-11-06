@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::DHCPSubnet' }
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::DHCPSubnet;
-
-ok( request('/dhcpsubnet')->is_success, 'Request should succeed' );
 done_testing();

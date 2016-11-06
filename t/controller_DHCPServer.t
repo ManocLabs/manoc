@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::DHCPServer' }
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::DHCPServer;
-
-ok( request('/dhcpserver')->is_success, 'Request should succeed' );
 done_testing();
