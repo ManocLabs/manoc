@@ -43,6 +43,13 @@ my @DEFAULT_MENU_ITEMS = (
                 name => 'WLAN',
                 path => '#',
             },
+            {
+                separator => 1,
+            },
+            {
+                name   => 'DHCP Servers',
+                action => '/dhcpserver/list',
+            },
         ],
     },
     {
@@ -83,7 +90,7 @@ my @DEFAULT_MENU_ITEMS = (
             },
             {
                 name   => 'Device Hardware',
-                action => '/hwasset/devices',
+                action => '/hwasset/list_devices',
             },
             {
                 separator => 1,
