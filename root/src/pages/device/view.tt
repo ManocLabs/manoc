@@ -81,22 +81,27 @@ page.subsection = 'Device'
 	<dt>Rack</dt>
 	<dd>[% print_rack(object.rack) %]</dd>
 
+[% IF object.hwasset -%]
+	<dt>Asset</dt>
+	<dd><a href="[% c.uri_for_action('hwasset/view', [object.hwasset.id]) %]">[% object.hwasset.inventory | html %]</a></dd>
+
+
 	<dt>Model</dt>
-	<dd>[% object.vendor | html %] [% object.model  | html %]</dd>
+	<dd>[% object.hwasset.vendor | html %] [% object.hwasset.model  | html %]</dd>
 
 	<dt>Serial</dt>
-	<dd>[% object.serial | html %]</dd>
-
-	<dt>OS</dt>
-	<dd>[% object.os | html %] [% object.os_ver | html %]</dd>
-
-	<dt>VTP domain</dt>
-	<dd>[% object.vtp_domain | html %]</dd>
-
-	<dt>Up from</dt><dd>[% date.format(object.boottime) | html %]</dd>
-
+	<dd>[% object.hwasset.serial | html %]</dd>
+[% END %]
 [% IF object.netwalker_info -%]
 [% SET nwinfo = object.netwalker_info -%]
+	<dt>OS</dt>
+	<dd>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
+
+	<dt>VTP domain</dt>
+	<dd>[% nwinfo.vtp_domain | html %]</dd>
+
+	<dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
+
 	<dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
 	<dt>Fetch configuration<dt>
 	<dd>[% nwinfo.get_config ? 'Yes' : 'No' %]</dd>

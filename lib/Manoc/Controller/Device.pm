@@ -48,9 +48,6 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
-
-    create_page_template    => 'device/create.tt',
-    edit_page_template      => 'device/edit.tt',
 );
 
 =head1 ACTIONS
