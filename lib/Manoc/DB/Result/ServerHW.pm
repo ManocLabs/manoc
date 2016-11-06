@@ -25,17 +25,15 @@ __PACKAGE__->add_columns(
     },
     n_procs => {
         data_type     => 'int',
-        is_nullable   => 0,
-        default_value => 1
+        is_nullable   => 1,
     },
     n_cores_proc => {
         data_type     => 'int',
-        is_nullable   => 0,
-        default_value => 1
+        is_nullable   => 1,
     },
     proc_freq => {
         data_type   => 'int',
-        is_nullable => 0,
+        is_nullable => 1,
     },
     storage1_size => {
         data_type     => 'int',
