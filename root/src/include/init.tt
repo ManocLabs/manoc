@@ -9,12 +9,16 @@
 [% PROCESS 'datatable.tt' IF template.use_table -%]
 [% PROCESS 'macros.tt'    -%]
 [%
-   link_css.push(c.uri_for('/static/css/manoc.css'))
+   link_css.push(
+        c.uri_for('/static/external/sbadmin2/css/sb-admin-2.css'),
+        c.uri_for('/static/css/manoc.css')
+   )
 -%]
 [%-
    link_js.push(
-         c.uri_for('/static/js/manoc.js'),
-         )
+        c.uri_for('/static/external/sbadmin2/js/sb-admin-2.js'),
+        c.uri_for('/static/js/manoc.js'),
+   )
 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO make_css_links BLOCK -%]

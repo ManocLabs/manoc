@@ -23,11 +23,11 @@ page.subsection='Server'
      </tr>
    </thead>
    <tbody>
-[% FOREACH o IN objects %]
+[% FOREACH o IN object_list %]
    <tr>
- 	 <td><a href=[% c.uri_for_action('/serverhw/view', [o.id]) %]>[% o.name %]</a></td>
- 	 <td>[% o.address     %]</td>
- 	 <td>[% o.os   %]</td>
+ 	 <td><a href=[% c.uri_for_action('/server/view', [o.id]) %]>[% o.hostname %]</a></td>
+ 	 <td>[% o.address.unpadded     %]</td>
+ 	 <td>[% o.os %] [% o.os_ver %]</td>
    </tr>
 [% END %]
    </tbody>
