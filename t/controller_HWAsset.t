@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::HWAsset' }
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::HWAsset;
-
-ok( request('/hwasset')->is_success, 'Request should succeed' );
 done_testing();

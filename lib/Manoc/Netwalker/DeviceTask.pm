@@ -367,7 +367,7 @@ sub update_device_info {
     my $name  = $source->name;
     $nw_entry->name($name);
     if ( defined($name) && $name ne $dev_entry->name ) {
-        if ($dev_entry($name)) {
+        if ($dev_entry->name) {
             my $msg = "Name mismatch " . $dev_entry->name . " $name";
             $self->log->warn($msg);
         } else {

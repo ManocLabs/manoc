@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::Server' };
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::Server;
-
-ok( request('/server')->is_success, 'Request should succeed' );
 done_testing();

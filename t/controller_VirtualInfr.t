@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::VirtualInfr' }
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::VirtualInfr;
-
-ok( request('/virtualinfr')->is_success, 'Request should succeed' );
 done_testing();
