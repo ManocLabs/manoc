@@ -5,7 +5,6 @@
    page.title = 'Compare VTP'
    page.subsection = 'VLAN'
    page.section = 'Network'
-   page.load_section_file = 1
 -%]
 
 [% init_table('vlan_list', {}) %]

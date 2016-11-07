@@ -3,9 +3,9 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Server;
-use base 'DBIx::Class';
+use base 'DBIx::Class::Core';
 
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('servers');
 
@@ -21,9 +21,10 @@ __PACKAGE__->add_columns(
         size        => 128,
     },
     address => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 15,
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
     },
     os => {
         data_type     => 'varchar',
@@ -116,22 +117,6 @@ sub virtual_servers {
     );
     return wantarray() ? $rs->all() : $rs;
 }
-
-sub _inflate_address {
-    return Manoc::IPAddress::IPv4->new( { padded => $_[0] } ) if defined( $_[0] );
-}
-
-sub _deflate_address {
-    return scalar $_[0]->padded if defined( $_[0] );
-}
-
-__PACKAGE__->inflate_column(
-    address => {
-        inflate => \&_inflate_address,
-        deflate => \&_deflate_address,
-    }
-);
-
 
 sub num_cpus {
     my ($self) = @_;

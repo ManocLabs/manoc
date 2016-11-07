@@ -1,8 +1,6 @@
 [% link_css.push(
       c.uri_for('/static/external/bootstrap/css/bootstrap.min.css'),
       c.uri_for('/static/external/metisMenu/metisMenu.min.css'),
-      c.uri_for('/static/external/sbadmin2/css/sb-admin-2.css'),
-
       c.uri_for('/static/external/selectize/css/selectize.bootstrap3.css'),
       )
 -%]
@@ -15,8 +13,7 @@
       c.uri_for('/static/external/bootbox/js/bootbox.min.js'),
       c.uri_for('/static/external/typeahead/typeahead.min.js'),
 
-       c.uri_for('/static/external//metisMenu/metisMenu.min.js'),
-      c.uri_for('/static/external/sbadmin2/js/sb-admin-2.js'),
+      c.uri_for('/static/external//metisMenu/metisMenu.min.js'),
       )
 -%]
 [%# ----------------------------------------------------------------- -%]

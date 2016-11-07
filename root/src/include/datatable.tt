@@ -31,10 +31,11 @@ $(function() {
   [% END -%]
 ]
 [% END -%]
-   "dom":
-    [%- IF options.toolbar -%]'<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip'
-    [%- ELSE %]'frtip'
-    [%- END  %]
+[%- IF options.toolbar -%]
+   "dom": "<'row'<'col-sm-6'<'toolbar'>><'col-sm-6'f>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-6'i><'col-sm-6'p>>",
+[%- END  %]
    });
 [% IF options.toolbar -%]
    var origin=$("#[% options.toolbar %]");
