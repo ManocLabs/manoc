@@ -15,6 +15,13 @@ has 'form_class' => (
     isa => 'ClassName'
 );
 
+has 'object_updated_message' => (
+    is  => 'rw',
+    isa => 'Str',
+    default => 'Updated',
+);
+
+
 =head1 ACTIONS
 
 =head2 form
@@ -47,7 +54,12 @@ sub form : Private {
         $process_params{defaults}              = $c->stash->{form_defaults};
         $process_params{use_defaults_over_obj} = 1;
     }
+
+    if ($self->can("get_form_process_params")) {
+        %process_params = $self->get_form_process_params( $c, %process_params );
+    }
     my $process_status = $form->process(%process_params);
+
     if ( $c->stash->{is_xhr} ) {
         my $json_data = {};
 
@@ -59,6 +71,7 @@ sub form : Private {
         if ($process_status) {
             $json_data->{message}  = $self->object_updated_message;
             $json_data->{redirect} = $self->get_form_success_url($c);
+            $json_data->{object_id} = $form->item_id;
         }
         else {
             $json_data->{html} =
@@ -89,7 +102,6 @@ sub get_form {
     $class or die "Form class not set (use form_class)";
 
     my $parameters = $c->stash->{form_parameters} || {};
-
     return $class->new( ctx => $c, %$parameters );
 }
 

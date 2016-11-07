@@ -66,9 +66,13 @@ sub check_token {
         my $params = $c->req->params;
         while ( my ( $key, $value ) = each(%$params) ) {
             my ( $name, $attr ) = split /\./, $key, 2;
+
+            # only care for named form (i.e. avoid query parameters)
+            next unless $attr;
+
             if ( $attr eq $c->token_request_name ) {
                 $request_token = $value;
-                $c->log->debug("found token in form $name") if $c->debug;
+                $c->log->debug("token found in form $name") if $c->debug;
                 last;
             }
         }

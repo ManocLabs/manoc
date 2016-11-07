@@ -315,14 +315,14 @@ sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
     my @rs = $schema->resultset('IfStatus')->search(
         { cps_status => 'shutdown' },
         {
-            order_by => 'device, interface',
-            join     => 'device_info'
+            order_by => 'device_id, interface',
+            join     => 'device'
         }
     );
 
     my @table = map {
         id              => $_->device,
-            device_name => $_->device_info->name,
+            device_name => $_->device->name,
             interface   => $_->interface,
             description => $_->description,
             cps_count   => $_->cps_count,

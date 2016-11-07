@@ -1,0 +1,32 @@
+[% fragment = BLOCK -%]
+$( document ).ready(function() {
+    $("#[% form.name %]\\.rack").selectize();
+    $("#[% form.name %]\\.building").selectize();
+    form_location_refresh();
+});
+$('#[% form.name %] input').on('change', function() {
+    form_location_refresh();
+
+ });
+function form_location_refresh() {
+  l=$('input[name="[% form.name %].location"]:checked').val();
+  $("#[% form.name %]\\.building").prop('disabled', l != 'o');
+  if ( l == 'o') {
+    $("#[% form.name %]\\.building")[0].selectize.enable();
+    $("#[% form.name %]\\.room").prop('disabled', false);
+    $("#[% form.name %]\\.floor").prop('disabled', false);
+  } else {
+    $("#[% form.name %]\\.building")[0].selectize.disable();
+    $("#[% form.name %]\\.room").prop('disabled', true);
+    $("#[% form.name %]\\.floor").prop('disabled', true);
+  }
+  if ( l == 'r' ) {
+    $("#[% form.name %]\\.rack")[0].selectize.enable();
+    $("#[% form.name %]\\.rack_level").prop('disabled', false);
+  } else {
+    $("#[% form.name %]\\.rack_level").prop('disabled', true);
+    $("#[% form.name %]\\.rack")[0].selectize.disable();
+  }
+}
+[% END %]
+[% js_scripts.push(fragment) -%]

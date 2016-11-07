@@ -1,0 +1,7 @@
+[%
+  page.section='Assets'
+  page.subsection='Hardware'
+%]
+[% form.render -%]
+[% PROCESS location.tt -%]
+[% PROCESS modelvendor.tt %]

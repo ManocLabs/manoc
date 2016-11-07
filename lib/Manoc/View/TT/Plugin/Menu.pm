@@ -22,25 +22,15 @@ Manoc TT plugin to generate application navigation menu
 
 my @DEFAULT_MENU_ITEMS = (
     {
-        name  => 'Asset',
+        name  => 'Network',
         items => [
             {
-                name   => 'Device',
+                name   => 'Devices',
                 action => '/device/list',
             },
             {
-                name   => 'Building',
-                action => '/building/list',
+                separator => 1,
             },
-            {
-                name   => 'Rack',
-                action => '/rack/list',
-            },
-        ]
-    },
-    {
-        name  => 'Network',
-        items => [
             {
                 name   => 'IP Address Plan',
                 action => '/ipnetwork/list',
@@ -50,11 +40,73 @@ my @DEFAULT_MENU_ITEMS = (
                 action => '/vlanrange/list',
             },
             {
-                name => 'SSid',
+                name => 'WLAN',
                 path => '#',
+            },
+            {
+                separator => 1,
+            },
+            {
+                name   => 'DHCP Servers',
+                action => '/dhcpserver/list',
             },
         ],
     },
+    {
+        name  => 'Server',
+        items => [
+            {
+                name   => 'Servers',
+                action => '/server/list',
+            },
+            {
+                separator => 1,
+            },
+            {
+                name   => 'Virtual Infrastructures',
+                action => '/virtualinfr/list',
+            },
+            {
+                name   => 'Virtual Machines',
+                action => '/virtualmachine/list',
+            },
+            {
+                name   => 'Hypervisors',
+#                action => '/server/hypervisors',
+            },
+
+        ]
+    },
+    {
+        name  => 'Assets',
+        items => [
+            {
+                name   => 'Complete Inventory',
+                action => '/hwasset/list',
+            },
+            {
+                name   => 'Server Hardware',
+                action => '/serverhw/list',
+            },
+            {
+                name   => 'Device Hardware',
+                action => '/hwasset/list_devices',
+            },
+            {
+                separator => 1,
+            },
+            {
+                name   => 'Buildings',
+                action => '/building/list',
+            },
+            {
+                name   => 'Racks',
+                action => '/rack/list',
+            },
+
+        ]
+    },
+
     {
         name  => 'Config',
         items => [

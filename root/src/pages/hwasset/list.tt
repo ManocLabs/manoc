@@ -1,0 +1,58 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Hardware assets'
+   page.section='Section'
+   page.subsection='Subsection'
+-%]
+
+<table class="table" id="hwasset_list">
+   <thead>
+     <tr>
+        <th>Inventory</th>
+        <th>Type</th>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Serial</th>
+        <th>Location</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+  $("#hwasset_list").DataTable( {
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":  {
+      "url":  "[% c.uri_for_action('hwasset/datatable_source') %]",
+      "data": function ( d ) {
+         d.extra_search = $('#dismissed').checked;
+      }
+   },
+   "columns":      [
+                     { 'data' : 'inventory',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='"+oData.link+"'>"+oData.inventory+"</a>");
+                         }
+                     },
+                     { 'data' : 'type' },
+                     { 'data' : 'vendor' },
+                     { 'data' : 'model' },
+                     { 'data' : 'serial' },
+                     { 'data' : 'location' },
+   ],
+   "dom": '<"toolbar">frtip',
+ })
+
+ $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed');
+
+ $('#dismissed').on('change', function() {
+   $( '#hwasset_list' ).dataTable().api().ajax.reload();
+  } );
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

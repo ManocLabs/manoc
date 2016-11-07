@@ -1,0 +1,47 @@
+[%
+   page.title='Hardware Asset ' _  object.inventory | html
+   page.section='Assets'
+   page.subsection='Hardware Inventory'
+-%]
+
+[% page.toolbar = BLOCK -%]
+
+
+
+[%- IF c.check_permission(object, 'delete') || c.check_permission(object, 'edit') %]
+<div>
+[%- IF c.check_permission(object, 'edit') -%]
+ <a class="btn btn-default" href=[%c.uri_for_action('hwasset/edit', [object.id]) %]>Edit</a>
+[%- END -%]
+[%- IF c.check_permission(object, 'delete') -%]
+ <a class="btn btn-danger" href=[% c.uri_for_action('hwasset/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END -%]
+[% END -%]
+[% END -%]
+ <dl class="dl-horizontal">
+  <dt>Inventory number</dt>
+  <dd>[% object.inventory | html %]</dd>
+  <dt>Asset type</dt>
+  <dd>[% object.display_type | html %]</dd>
+  <dt>Vendor</dt>
+  <dd>[% object.vendor | html %]</dd>
+  <dt>Model</dt>
+  <dd>[% object.model | html %]</dd>
+  <dt>Serial</dt>
+  <dd>[% object.serial | html %]</dd>
+[% IF object.is_in_warehouse %]
+  <dt>Warehouse</dt>
+  <dd>Yes</dd>
+[% ELSE -%]
+  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Floor</dt><dd>[% object.floor | html %]</dd>
+  <dt>Room</dt> <dd>[% object.room | html %]</dd>
+    [% IF object.rack %]
+   <dt>Rack</dt><dd>[% print_rack(object.rack) %]</dd>
+   <dt>Level<dt><dd>[% object.rack_level %]</dd>
+  [% END %]
+[% END %]
+  <dt>Dismissed</dt><dd>[% IF object.dismissed %]Yes[% ELSE %]No[%END %]</dd>
+  <dt>Used by</dt><dd>[% print_device(object.device) IF object.device %]</dd>
+</dl>

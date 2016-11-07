@@ -1,0 +1,24 @@
+[%
+   page.title='View VirtualInfr'
+   page.section='Section'
+   page.subsection='Subsection'
+   use_table=1
+-%]
+[% page.toolbar = BLOCK -%]
+<div>
+ <a class="btn btn-default" href=[%c.uri_for_action('virtualinfr/edit', [object.id]) %]>Edit</a>
+  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('virtualinfr/delete', [object.id]) %]>Delete</a>
+    </div>
+[% END %]
+<dl>
+  <dt>id</dt>
+  <dd>[% object.id | html %]</dd>
+  <dt>name</dt>
+  <dd>[% object.name | html %]</dd>
+  <dt>address</dt>
+  <dd>[% object.address | html %]</dd>
+  <dt>platform</dt>
+  <dd>[% object.platform | html %]</dd>
+  <dt>version</dt>
+  <dd>[% object.version | html %]</dd>
+</dl>

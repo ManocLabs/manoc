@@ -1,7 +1,8 @@
-# Copyright 2011 by the Manoc Team
+# Copyright 2015 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
+
 package Manoc::Form::Base;
 use utf8;
 use HTML::FormHandler::Moose;
@@ -22,10 +23,7 @@ has '+ctx' => ( required => 1, );
 sub html_attributes {
     my ( $self, $field, $type, $attr ) = @_;
     if ( $type eq 'label' && $field->{required} ) {
-        my $label = $field->{label};
-        if ($label) {
-            $field->{label} = "$label *" unless $label =~ /\*$/;
-        }
+       # TODO highlight required fields
     }
     return $attr;
 }

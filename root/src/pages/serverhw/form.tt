@@ -1,0 +1,7 @@
+[%
+  page.section='Section'
+  page.subsection='Subsection'
+%]
+[% form.render %]
+[% PROCESS location.tt %]
+[% PROCESS modelvendor.tt %]

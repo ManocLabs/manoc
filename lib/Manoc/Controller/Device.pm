@@ -7,11 +7,13 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "Manoc::ControllerRole::CommonCRUD" => { -excludes => ['list'] };
-with "Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
-
+with "Manoc::ControllerRole::CommonCRUD";
+with "Manoc::ControllerRole::JSONView" => {
+    -excludes => 'get_json_object',
+};
 use Text::Diff;
-use Manoc::Form::Device;
+
+use Manoc::Form::Device::Edit;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
 use Manoc::Form::Device::Dismiss;
@@ -42,7 +44,7 @@ __PACKAGE__->config(
         }
     },
     class                   => 'ManocDB::Device',
-    form_class              => 'Manoc::Form::Device',
+    form_class              => 'Manoc::Form::Device::Edit',
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
@@ -176,7 +178,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id;
 
-    my $config = Manoc::Netwalker::Config->new( $c->config->{Netwalker} );
+    my $config = Manoc::Netwalker::Config->new(  $c->config->{Netwalker} || {} );
     my $client = Manoc::Netwalker::ControlClient->new( config => $config );
 
     my $status = $client->enqueue_device($device_id);
@@ -313,34 +315,31 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $rack_id = $c->req->query_parameters->{'rack'};
-    $c->log->debug("new device in $rack_id") if $c->debug;
-    $c->stash( form_defaults => { rack => $rack_id } );
+    if ( defined($rack_id) ) {
+        $c->log->debug("new device in rack $rack_id") if $c->debug;
+        $c->stash( form_defaults => { rack => $rack_id } );
+    }
+
+
 };
 
-=head2 object_list
+
+=head2 list_dismissed
+
+List dismissed devices
 
 =cut
 
-sub list : Chained('base') : PathPart('') {
+sub list_dismissed : Chained('base') : PathPart('dismissed') {
     my ( $self, $c ) = @_;
 
-    my $rs             = $c->stash->{resultset};
-    my @active_devices = $rs->search(
-        {
-            dismissed => 0
-        },
-        {
-            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
-        }
-    );
-    $c->stash( active_device_list => \@active_devices );
-
+    my $rs      = $c->stash->{resultset};
     my @dismissed_devices = $rs->search(
         {
-            dismissed => 1
+            "me.dismissed" => 1
         },
         {
-            prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+            prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'mng_url_format', ]
         }
     );
     $c->stash( dismissed_device_list => \@dismissed_devices );

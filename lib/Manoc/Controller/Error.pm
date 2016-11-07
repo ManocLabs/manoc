@@ -28,8 +28,8 @@ Error page for HTTP 403.
 
 sub http_403 : Private {
     my ( $self, $c ) = @_;
-    $c->response->status(403);
     $c->stash( template => 'error_403.tt' );
+    $c->response->status(403);
 }
 
 =head2 http_404

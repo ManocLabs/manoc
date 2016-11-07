@@ -1,5 +1,5 @@
 [%
-page.section = 'Asset'
+page.section = 'Assets'
 page.subsection = 'Rack'
 page.title = 'Rack ' _ object.name
 -%]

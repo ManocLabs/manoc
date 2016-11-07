@@ -1,0 +1,38 @@
+[%
+   page.title='List VirtualMachine'
+   page.section='Section'
+   page.subsection='Subsection'
+-%]
+<div id="virtualmachine_create">
+<a href="[% c.uri_for_action('virtualmachine/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+ <table class="table" id="virtualmachine_list">
+   <thead>
+     <tr>
+        <th>id</th>
+        <th>identifier</th>
+        <th>name</th>
+        <th>on_virtinfr_id</th>
+        <th>on_hypervisor_id</th>
+        <th>ram_memory</th>
+        <th>vcpus</th>
+        <th>notes</th>
+        <th></th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH object IN object_list %]
+         <tr>
+ 	 <td>[% object.id | html %]</td>
+ 	 <td>[% object.identifier | html %]</td>
+ 	 <td>[% object.name | html %]</td>
+ 	 <td>[% object.on_virtinfr_id | html %]</td>
+ 	 <td>[% object.on_hypervisor_id | html %]</td>
+ 	 <td>[% object.ram_memory | html %]</td>
+ 	 <td>[% object.vcpus | html %]</td>
+ 	 <td>[% object.notes | html %]</td>
+     	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>View</a></td>
+         </tr>
+[% END %]
+   </tbody>
+</table>

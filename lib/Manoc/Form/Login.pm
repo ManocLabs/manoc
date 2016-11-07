@@ -29,6 +29,10 @@ has_field 'submit' => (
     element_attr => { class => [ 'btn', 'btn-primary' ] },
 );
 
+sub build_form_wrapper_class {
+    [ 'col-sm-10', 'col-sm-offset-1', 'col-md-8', 'col-md-offset-2' ];
+}
+
 sub validate {
     my $self = shift;
 

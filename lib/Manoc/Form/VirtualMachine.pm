@@ -1,0 +1,108 @@
+# Copyright 2011-2015 by the Manoc Team
+#
+# This library is free software. You can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+package Manoc::Form::VirtualMachine;
+use HTML::FormHandler::Moose;
+use namespace::autoclean;
+
+use Manoc::Form::Helper qw/bs_block_field_helper/;
+
+extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::SaveButton';
+with 'Manoc::Form::TraitFor::Horizontal';
+
+has '+name'        => ( default => 'form-virtualmachine' );
+has '+html_prefix' => ( default => 1 );
+
+has '+item_class' => ( default => 'VirtualMachine' );
+
+
+sub build_render_list {
+    return [
+        qw/
+              name identifier
+              resources_block
+              hyper_block
+
+              save
+              csrf_token
+          /
+      ];
+}
+
+has_block 'resources_block' => (
+    render_list => [ 'ram_memory', 'vcpus' ],
+    tag         => 'div',
+    class       => ['form-group'],
+);
+
+has_block 'hyper_block' => (
+    render_list => [ 'virtinfr', 'hypervisor' ],
+    tag         => 'div',
+    class       => ['form-group'],
+);
+
+
+
+has_field 'name' => (
+    type => 'Text',
+    size => 15,
+    required => 1,
+    label => 'Name',
+);
+
+has_field 'identifier' => (
+    type => 'Text',
+    size => 36,
+    label => 'Identifier',
+);
+
+has_field 'vcpus' => (
+    type => 'Integer',
+    required => 1,
+    label => 'Virtual CPUs',
+
+    bs_block_field_helper({ label => 2, input => 4 })
+);
+
+has_field 'ram_memory' => (
+    type => 'Integer',
+    required => 1,
+    label => 'RAM (Mb)',
+
+    bs_block_field_helper({ label => 2, input => 4 })
+);
+
+has_field 'virtinfr' => (
+    type => 'Select',
+    label => 'Virtual Infrastructure',
+    nullable => 1,
+
+    bs_block_field_helper({ label => 2, input => 4 })
+);
+
+has_field 'hypervisor' => (
+    type => 'Select',
+    label => 'Hypervisor',
+    nullable => 1,
+    bs_block_field_helper({ label => 2, input => 4 })
+);
+
+has_field 'notes' => (
+    type => 'TextArea',
+    label => 'Notes',
+);
+
+
+__PACKAGE__->meta->make_immutable;
+no HTML::FormHandler::Moose;
+
+1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

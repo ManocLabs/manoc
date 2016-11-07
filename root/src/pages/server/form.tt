@@ -1,0 +1,32 @@
+[%  META
+    title='Server'
+    section='Asset'
+    subsection='Hardware'
+%]
+[% form.render %]
+[% fragment = BLOCK -%]
+$( document ).ready(function() {
+    $("#[% form.name %]\\.servervm").selectize();
+    $("#[% form.name %]\\.serverhw").selectize();
+    form_refresh();
+});
+$('#[% form.name %] input').on('change', function() {
+    form_refresh();
+
+ });
+function form_refresh() {
+  l=$('input[name="[% form.name %].type"]:checked').val();
+  if ( l == 'p') {
+    $("#[% form.name %]\\.serverhw")[0].selectize.enable();
+  } else {
+    $("#[% form.name %]\\.serverhw")[0].selectize.disable();
+  }
+  if ( l == 'v') {
+    $("#[% form.name %]\\.servervm")[0].selectize.enable();
+
+  } else {
+    $("#[% form.name %]\\.servervm")[0].selectize.disable();
+  }
+}
+[% END %]
+[% js_scripts.push(fragment) -%]

@@ -18,18 +18,23 @@ my $ROWS            = 100000;
 my $LOAD_BLOCK_SIZE = 5000;
 
 my $SOURCE_DEPENDECIES = {
-    'Device'       => 'Rack',
-    'Rack'         => 'Building',
-    'Mat'          => 'Device',
-    'IfStatus'     => 'Device',
-    'IfNotes'      => 'Device',
-    'CDPNeigh'     => 'Device',
-    'DeviceConfig' => 'Device',
-    'DeviceNWInfo' => 'Device',
-    'Uplink'       => 'Device',
-    'SSIDList'     => 'Device',
-    'Dot11Assoc'   => 'Device',
-    'Dot11Client'  => 'Device',
+    'Server  '       => [ 'ServerHW', 'VirtualMachine' ],
+    'VirtualMachine' => 'VirtualInfr',
+    'ServerHW'       => 'HWAsset',
+    'Device'         => 'HWAsset',
+    'HWAsset'        => 'Rack',
+    'Rack'           => 'Building',
+    'Mat'            => 'Device',
+    'IfStatus'       => 'Device',
+    'IfNotes'        => 'Device',
+    'CDPNeigh'       => 'Device',
+    'DeviceConfig'   => 'Device',
+    'DeviceNWInfo'   => 'Device',
+    'Uplink'         => 'Device',
+    'SSIDList'       => 'Device',
+    'Dot11Assoc'     => 'Device',
+    'Dot11Client'    => 'Device',
+    'DiscoveredHost' => 'DiscoverSession',
 };
 
 has 'filename' => (
@@ -115,10 +120,13 @@ sub _order_sources {
     my @ordered_list;
 
     my $connections_to = {};
-    while ( my ( $from, $to ) = each %$SOURCE_DEPENDECIES ) {
-        $set{$from} or next;
-        $set{$to}   or next;
-        $connections_to->{$from}->{$to} = 1;
+    while ( my ( $from, $deps ) = each %$SOURCE_DEPENDECIES ) {
+        ref($deps) eq 'ARRAY' or $deps = [ $deps ];
+        foreach my $to (@$deps) {
+            $set{$from} or next;
+            $set{$to}   or next;
+            $connections_to->{$from}->{$to} = 1;
+        }
     }
 
     while (%set) {
@@ -171,59 +179,63 @@ sub _load_tables_loop {
             next;
         }
 
-        my $table = $source->from;
-        $self->log->debug("Loading $source_name");
-
-        $converter and $table = $converter->get_table_name($source_name);
-        $table ||= $source->from;
-
         if ($overwrite) {
             $self->log->debug("Cleaning $source_name");
             $source->resultset->delete();
         }
 
-        my @filenames = grep( /^$table\./, keys %{$file_set} );
-        if ( @filenames > 1 ) {
-            # sort by page
-            @filenames =
-                map  { $_->[0] }
-                sort { $a->[1] <=> $b->[1] }
-                map  { [ $_, /\.(\d+)/ ] } @filenames;
-        }
+        $self->log->debug("Loading $source_name");
 
-        foreach my $filename (@filenames) {
-            $self->log->debug("Loading $filename");
+        my $tables;
+        $converter and $tables = $converter->get_table_name($source_name);
+        $tables ||= [ $source->from ];
+        ref($tables) eq 'ARRAY' or $tables = [ $tables ];
 
-            #load in RAM all the table records
-            my $records = $datadump->load_file($filename);
-            if ( !$records ) {
-                $self->log->info("File $filename not found, skipping");
-                next;
+        foreach my $table (@$tables) {
+            $self->log->debug("Loading $source_name from $table");
+
+            my @filenames = grep( /^$table\./, keys %{$file_set} );
+            if ( @filenames > 1 ) {
+                # sort by page
+                @filenames =
+                    map  { $_->[0] }
+                    sort { $a->[1] <=> $b->[1] }
+                    map  { [ $_, /\.(\d+)/ ] } @filenames;
             }
 
-            my $count = scalar(@$records);
-            $self->log->info("Read $count records from $filename");
-            unless ($count) {
-                $self->log->info("Skipped empy file $filename");
-                next;
+            foreach my $filename (@filenames) {
+                $self->log->debug("Loading $filename");
+
+                #load in RAM all the table records
+                my $records = $datadump->load_file($filename);
+                if ( !$records ) {
+                    $self->log->info("File $filename not found, skipping");
+                    next;
+                }
+
+                my $count = scalar(@$records);
+                $self->log->info("Read $count records from $filename");
+                unless ($count) {
+                    $self->log->info("Skipped empy file $filename");
+                    next;
+                }
+
+                # convert records if needed
+                $converter and
+                    $converter->upgrade_table( $records, $table );
+
+                # converter callback
+                $converter and
+                    $converter->upgrade_table( $records, $source_name );
+
+                # load into db
+                $self->_load_table( $source, $records, $force );
+
+                #free memory
+                undef @$records;
+                undef $records;
             }
-
-            # convert records if needed
-            $converter and
-                $converter->upgrade_table( $records, $table );
-
-            # converter callback
-            $converter and
-                $converter->upgrade_table( $records, $source_name );
-
-            # load into db
-            $self->_load_table( $source, $records, $force );
-
-            #free memory
-            undef @$records;
-            undef $records;
         }
-
         # converter callback
         $converter and
             $converter->after_import_source($source);

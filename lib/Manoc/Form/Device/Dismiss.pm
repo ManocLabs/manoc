@@ -22,14 +22,38 @@ has_field 'dismiss' => (
     order          => 1000,
 );
 
+has_field 'asset_action' => (
+    label   => 'Action for associated hardware',
+    type    => 'Select',
+    widget  => 'RadioGroup',
+    options => [
+        { value => 'DISMISS',  label => 'Dismiss' },
+        { value => 'WAREHOUSE', label => 'Return to warehouse' },
+    ],
+);
+
 sub update_model {
     my $self   = shift;
     my $values = $self->values;
 
     $self->schema->txn_do(
         sub {
-            $self->item->dismissed(1);
-            return $self->item->update;
+            my $device = $self->item;
+            $device->dismissed(1);
+
+
+            if (my $hwasset = $device->hwasset) {
+                my $action = $values->{asset_action};
+                $action eq 'DISMISS' and
+                    $hwasset->dismiss(1);
+                $action eq 'WAREHOUSE' and
+                    $hwasset->in_warehouse(1);
+                $hwasset->update();
+
+                $device->hwasset(undef);
+            }
+
+            $device->update;
         }
     );
 }

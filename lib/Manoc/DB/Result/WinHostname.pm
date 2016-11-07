@@ -24,11 +24,10 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     'ipaddr' => {
-        data_type      => 'char',
-        is_nullable    => 0,
-        size           => 15,
-        is_foreign_key => 1,
-        ipv4_address   => 1
+        data_type    => 'char',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1
     },
 );
 

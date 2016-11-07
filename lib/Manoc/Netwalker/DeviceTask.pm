@@ -361,38 +361,31 @@ sub update_device_info {
     my $self = shift;
 
     my $source = $self->source;
-    my $entry  = $self->device_entry;
+    my $dev_entry = $self->device_entry;
+    my $nw_entry  = $self->nwinfo;
 
     my $name  = $source->name;
-    my $model = $source->model;
-
-    if ( !defined( $entry->name ) or $entry->name eq "" ) {
-        $entry->name($name);
-    }
-    elsif ( defined($name) && $name ne $entry->name ) {
-        my $msg = "Name mismatch " . $entry->name . " $name";
-        $self->log->warn($msg);
-        $self->task_report->add_warning($msg);
-    }
-
-    if ( !defined( $entry->model ) or $entry->model eq "" ) {
-        $entry->model($model);
-    }
-    elsif ( $model ne $entry->model ) {
-        my $msg = "Model mismatch " . $entry->model . " $model";
-        $self->log->warn($msg);
-        $self->task_report->add_warning($msg);
+    $nw_entry->name($name);
+    if ( defined($name) && $name ne $dev_entry->name ) {
+        if ($dev_entry->name) {
+            my $msg = "Name mismatch " . $dev_entry->name . " $name";
+            $self->log->warn($msg);
+        } else {
+            $dev_entry->name($name);
+            $dev_entry->update;
+        }
     }
 
-    $entry->os( $source->os );
-    $entry->os_ver( $source->os_ver );
-    $entry->vendor( $source->vendor );
-    $entry->serial( $source->serial );
+    $nw_entry->model($source->model);
+    $nw_entry->os( $source->os );
+    $nw_entry->os_ver( $source->os_ver );
+    $nw_entry->vendor( $source->vendor );
+    $nw_entry->serial( $source->serial );
 
-    $entry->vtp_domain( $source->vtp_domain );
-    $entry->boottime( $source->boottime || 0 );
+    $nw_entry->vtp_domain( $source->vtp_domain );
+    $nw_entry->boottime( $source->boottime || 0 );
 
-    $entry->update;
+    $nw_entry->update;
 }
 
 #----------------------------------------------------------------------#

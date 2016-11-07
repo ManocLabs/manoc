@@ -50,14 +50,6 @@ sub auto : Private {
     $c->stash->{is_api} and
         $c->stash->{skip_csrf} = 1;
 
-    # CSRF protection
-    $c->stash->{skip_csrf} //= 0;
-    $c->log->debug( "Manoc root: skip CSRF = ", $c->stash->{skip_csrf} );
-    if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf} ) {
-        $c->log->debug("POST method, token validation required");
-        $c->require_valid_token();
-    }
-
     ##  XHR detection ##
     if ( my $req_with = $c->req->header('X-Requested-With') ) {
         $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
@@ -78,7 +70,7 @@ sub auto : Private {
         $c->log->debug("Not authenticated") if $c->debug;
 
         if ( $c->stash->{is_api} || $c->stash->{is_xhr} ) {
-            $self->detach('access_denied');
+            $c->detach('access_denied');
         }
         else {
             $c->response->redirect(
@@ -92,6 +84,15 @@ sub auto : Private {
         }
         return 0;
     }
+
+    # CSRF protection
+    $c->stash->{skip_csrf} //= 0;
+    $c->log->debug( "Manoc root: skip CSRF = ", $c->stash->{skip_csrf} );
+    if ( $c->req->method eq 'POST' && !$c->stash->{skip_csrf} ) {
+        $c->log->debug("POST method, token validation required");
+        $c->require_valid_token();
+    }
+
     return 1;
 }
 

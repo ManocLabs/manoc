@@ -35,8 +35,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::Building',
     enable_permission_check => 1,
     view_object_perm        => undef,
-
-    json_columns => [ 'id', 'name', 'description' ],
+    json_columns            => [ 'id', 'name', 'description', 'label' ],
 );
 
 sub get_object_list {
