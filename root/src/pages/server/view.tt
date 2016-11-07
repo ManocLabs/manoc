@@ -1,28 +1,19 @@
 [% META
-   section='Asset'
-   subsection='Hardware'  
-   title='View server hardware'
-   use_table=1
+   section='Server'
+   subsection=''
+   title='View server'
 -%]
+    <div>
+	<a class="btn btn-sm btn-primary" href=[%c.uri_for_action('server/edit', [object.id]) %]> [% bootstrap_icon('pencil') %] Edit</a>
+    <a class="btn btn-sm btn-default" href=[% c.uri_for_action('server/delete', [object.id]) %]>
+	[% bootstrap_icon('trash') %] Delete</a>
+      </div>
+
     <table id="info">
       <tr>
-	<td>Vendor:</td><td>[% object.vendor %] </td>
+	<td>Hostname:</td><td>[% object.hostname %] </td>
       </tr>
       <tr>
-	<td>Model:</td><td>[% object.model %] </td>
+	<td>OS:</td><td>[% object.os %] [% object.os_ver %] </td>
       </tr>
       <tr>
-	<td>Serial:</td><td>[% object.serial %]</td>
-      </tr>
-      <tr>
-	<td>Inventory:</td><td>[% object.inventory %]</td>
-      </tr>
-    </table>
-    [% add_css_tableinfo -%]
-    <p>
-      <div class="buttons">	
-	<a href=[%c.uri_for_action('serverhw/edit', [object.id]) %]> [% ui_icon('pencil') %] Edit</a>
-	&nbsp;<a href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>
-	[% ui_icon('closethick') %]  Delete</a>
-      </div>
-    </p>
