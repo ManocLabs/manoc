@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN { use_ok 'Manoc::Controller::VirtualMachine' }
 
-use Catalyst::Test 'Manoc';
-use Manoc::Controller::VirtualMachine;
-
-ok( request('/virtualmachine')->is_success, 'Request should succeed' );
 done_testing();
