@@ -41,7 +41,7 @@ requires 'Plack::Middleware::ReverseProxy';
 requires 'POE';
 requires 'Digest::SHA1';
 requires 'Archive::Tar';
-requires 'Text:CSV';
+requires 'Text::CSV';
 
 on 'test' => sub {
   requires 'Test::More';

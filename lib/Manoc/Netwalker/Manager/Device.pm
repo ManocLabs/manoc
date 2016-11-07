@@ -85,7 +85,7 @@ sub on_tick {
         my $status = $self->scoreboard->{$id};
         if ( defined($status) && ( $status eq 'QUEUED' || $status eq 'RUNNING' ) ) {
             $self->log->debug("Device $id is $status, skipping");
-            continue;
+            next;
         }
 
         $self->enqueue_device($id);
