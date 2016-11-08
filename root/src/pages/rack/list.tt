@@ -6,23 +6,22 @@ page.title='Racks'
 page.subsection='Rack'
 page.section='Asset'
 -%]
+
+<div id="tabletoolbar">
 [%- IF c.check_permission('rack.create') -%]
-[%-  init_table('rack_list', { toolbar="rack_create" }) -%]
-<div id="rack_create">
-     <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
-</div>
-[%- ELSE -%]
-[%-   init_table('rack_list') -%]
+     <a href="[% c.uri_for_action('/rack/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
 [%- END -%]
+</div>
+[%-  init_table('rack_list', { toolbar="tabletoolbar" }) -%]
  <table class="table" id="rack_list">
-       <thead>
+  <thead>
 	 <tr>
  	 <th>Rack</th>
  	 <th>Building</th>
  	 <th>Floor</th>
-	 <th>Notes</th>
-         </tr>
-       </thead>
+  	 <th>Notes</th>
+     </tr>
+  </thead>
   <tbody>
 [% FOREACH r IN object_list %]
          <tr>

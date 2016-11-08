@@ -7,12 +7,12 @@
 [% PROCESS 'menu.tt'      -%]
 [% PROCESS 'datatable.tt' IF template.use_table -%]
 [% PROCESS 'macros.tt'    -%]
-[%-
-   link_css.push(c.uri_for('/static/css/style.css'))
+[%
+   link_css.push(c.uri_for('/static/css/manoc.css'))
 -%]
 [%-
    link_js.push(
-         c.uri_for('/static/js/common.js'),
+         c.uri_for('/static/js/manoc.js'),
          )
 -%]
 [%# ----------------------------------------------------------------- -%]

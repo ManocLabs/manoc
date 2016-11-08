@@ -6,14 +6,13 @@ page.section='Asset'
 page.subsection='Building'
 page.title='Buildings'
 %]
-[%- IF c.check_permission('building.create') -%]
-[% init_table('building_list',{ toolbar="building_create" } ) %]
-<div id="building_create">
-<a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<div id="tabletoolbar">
+[% IF c.check_permission('building.create') -%]
+<a href="[% c.uri_for_action('/building/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
 </div>
-[%- ELSE -%]
-[% init_table('building_list') %]
-[%- END -%]
+
+[% init_table('building_list',{ toolbar="tabletoolbar" } ) %]
 <table id="building_list" class="table">
    <thead>
      <tr>

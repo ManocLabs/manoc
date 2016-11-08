@@ -1,7 +1,6 @@
 [%
-page.title='Create Device'
 page.subsection='Device'
-page.section='Assets'
+page.section='Network'
 -%]
 
 [% form.render %]
