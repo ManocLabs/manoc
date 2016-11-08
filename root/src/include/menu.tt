@@ -53,9 +53,8 @@
              [% FOREACH s IN Menu.menu %]
              <li>
                <a href="[%IF s.path %][% s.path %][% ELSE %]#[% END %]">
-               [%- IF s.fa_icon %]<i class="fa [% s.fa_icon %] fa-fw"></i>[% END -%]
-               [%- s.name|html %]<span class="fa arrow"></span>
-               </a>
+              [% fa_icon_fw(s.fa_icon) IF s.fa_icon -%][%- s.name|html -%]
+              <span class="fa arrow"></span></a>
                [% IF s.submenu -%]
                <ul class="nav nav-second-level">
                [% FOREACH i IN s.submenu -%]
@@ -65,13 +64,18 @@
                      <ul class="nav nav-third-level">
                      [% FOREACH ii IN i.submenu -%]
                         <li>
-                          <a href="[% ii.path %]">[% ii.name | html %]</a>
-                          [%- IF ii.fa_icon %]<i class="fa [% ii.fa_icon %] fa-fw"></i>[% END -%]
+                          <a href="[% ii.path %]">
+                         [% fa_icon_fw(ii.fa_icon) IF ii.fa_icon -%]
+                         [% ii.name | html -%]
+                          </a>
                         </li>
                      [% END -%]
                      </ul>
                      [% ELSE %]
-                     <a href="[% i.path %]">[% i.name | html %]</a>
+                     <a href="[% i.path %]">
+                     [% fa_icon_fw(i.fa_icon) IF i.fa_icon  -%]
+                     [% i.name | html -%]
+                     </a>
                      [% END -%]
                   </li>
                [% END %]

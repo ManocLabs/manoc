@@ -1,0 +1,11 @@
+[% link_css.push(
+      c.uri_for('/static/external/font-awesome/css/font-awesome.min.css'),
+      )
+ -%]
+
+[% MACRO fa_icon_fw(name) BLOCK -%]
+<i class="fa fa-[% name %] fa-fw" aria-hidden="true"></i>
+[% END %]
+[% MACRO fa_icon(name) BLOCK -%]
+<i class="fa fa-[% name %]" aria-hidden="true"></i>
+[% END %]
