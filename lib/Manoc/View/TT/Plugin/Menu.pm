@@ -24,6 +24,7 @@ Manoc TT plugin to generate application navigation menu
 my @DEFAULT_MENU_ITEMS = (
     {
         name  => 'Network',
+        fa_icon => 'globe',
         submenu  => [
             {
                 name   => 'Devices',
@@ -75,6 +76,7 @@ my @DEFAULT_MENU_ITEMS = (
     },
     {
         name  => 'Server',
+        fa_icon => 'server',
         submenu => [
             {
                 name   => 'Servers',
@@ -98,6 +100,7 @@ my @DEFAULT_MENU_ITEMS = (
     },
     {
         name  => 'Assets',
+        fa_icon => 'building',
         submenu => [
             {
                 name   => 'Complete Inventory',
@@ -122,9 +125,9 @@ my @DEFAULT_MENU_ITEMS = (
 
         ]
     },
-
     {
         name  => 'Config',
+        fa_icon => 'cogs',
         submenu => [
             {
                 name       => 'Users',
@@ -172,7 +175,9 @@ sub process_menu {
 
         _permission_check($c, $item) or next;
 
-        $new_item->{name} = $item->{name};
+        $new_item->{name}    = $item->{name};
+        $new_item->{icon}    = $item->{icon};
+        $new_item->{fa_icon} = $item->{fa_icon};
 
         if ( $item->{action} ) {
             $new_item->{path} = $c->uri_for_action( $item->{action} );

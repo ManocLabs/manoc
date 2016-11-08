@@ -4,6 +4,7 @@
    js_scripts = []
 -%]
 [% PROCESS 'bootstrap.tt' -%]
+[% PROCESS 'fontawesome.tt' -%]
 [% PROCESS 'menu.tt'      -%]
 [% PROCESS 'datatable.tt' IF template.use_table -%]
 [% PROCESS 'macros.tt'    -%]

@@ -4,7 +4,6 @@
       c.uri_for('/static/external/sbadmin2/css/sb-admin-2.css'),
 
       c.uri_for('/static/external/selectize/css/selectize.bootstrap3.css'),
-      c.uri_for('/static/external/font-awesome/css/font-awesome.min.css'),
       )
 -%]
 [% link_js.push(
