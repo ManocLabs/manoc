@@ -48,6 +48,9 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+
+    edit_page_title         => 'Edit device',
+    create_page_title       => 'New device',
 );
 
 =head1 ACTIONS

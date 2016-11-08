@@ -1,0 +1,27 @@
+/**********************************************************************/
+/* Expand Table trick by GM                                           */
+/* Used for indenting child rows                                      */
+/**********************************************************************/
+
+
+.table > tbody > tr.childrow > td:first-of-type {
+    padding-left : 6ex;
+}
+
+.table > tbody > tr.leafrow > td:first-of-type {
+    padding-left : 3ex;
+}
+
+.collapse-chevron:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";
+    float: left;
+    color: grey;
+    padding-right: 2px;
+}
+.collapse-chevron.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";
+    padding-right: 2px;
+}

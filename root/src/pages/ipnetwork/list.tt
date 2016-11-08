@@ -7,7 +7,7 @@
 -%]
 [%- IF c.check_permission('ipnetwork', 'create') -%]
 <div id="ipnetwork_create">
-<a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<a href="[% c.uri_for_action('ipnetwork/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
 </div>
 [% init_table("network_list", { toolbar="ipnetwork_create" }) -%]
 [%- ELSE -%]

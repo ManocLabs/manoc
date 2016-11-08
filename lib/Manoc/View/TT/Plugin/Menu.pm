@@ -9,6 +9,7 @@ use warnings;
 
 use Template::Plugin;
 use base 'Template::Plugin';
+use namespace::autoclean;
 
 =head1 NAME
 
@@ -23,28 +24,48 @@ Manoc TT plugin to generate application navigation menu
 my @DEFAULT_MENU_ITEMS = (
     {
         name  => 'Network',
-        items => [
+        submenu  => [
             {
                 name   => 'Devices',
                 action => '/device/list',
             },
             {
-                separator => 1,
-            },
-            {
                 name   => 'IP Address Plan',
-                action => '/ipnetwork/list',
+                submenu  => [
+                    {
+                        name   => "All IP Networks",
+                        action => 'ipnetwork/list',
+                    },
+                    {
+                        name   => "Top level IP Networks",
+                        action => 'ipnetwork/root',
+                    },
+                    {
+                        name   => "IP Blocks",
+                        action => 'ipblock/list',
+                    },
+                ]
             },
             {
                 name   => 'VLAN',
-                action => '/vlanrange/list',
+                submenu  => [
+                    {
+                        name   => "VLAN by range",
+                        action => 'vlanrange/list',
+                    },
+                    {
+                        name  => "VTP list",
+                        action => 'vtp/list',
+                    },
+                    {
+                        name   => "Compare with VTP",
+                        action => 'vtp/compare',
+                    },
+                ]
             },
             {
                 name => 'WLAN',
                 path => '#',
-            },
-            {
-                separator => 1,
             },
             {
                 name   => 'DHCP Servers',
@@ -54,13 +75,10 @@ my @DEFAULT_MENU_ITEMS = (
     },
     {
         name  => 'Server',
-        items => [
+        submenu => [
             {
                 name   => 'Servers',
                 action => '/server/list',
-            },
-            {
-                separator => 1,
             },
             {
                 name   => 'Virtual Infrastructures',
@@ -72,6 +90,7 @@ my @DEFAULT_MENU_ITEMS = (
             },
             {
                 name   => 'Hypervisors',
+                path   => '#',
 #                action => '/server/hypervisors',
             },
 
@@ -79,7 +98,7 @@ my @DEFAULT_MENU_ITEMS = (
     },
     {
         name  => 'Assets',
-        items => [
+        submenu => [
             {
                 name   => 'Complete Inventory',
                 action => '/hwasset/list',
@@ -91,9 +110,6 @@ my @DEFAULT_MENU_ITEMS = (
             {
                 name   => 'Device Hardware',
                 action => '/hwasset/list_devices',
-            },
-            {
-                separator => 1,
             },
             {
                 name   => 'Buildings',
@@ -109,7 +125,7 @@ my @DEFAULT_MENU_ITEMS = (
 
     {
         name  => 'Config',
-        items => [
+        submenu => [
             {
                 name       => 'Users',
                 action     => '/user/list',
@@ -142,44 +158,47 @@ sub menu {
     # get Catalyst app
     my $c = $ctx->stash->get('c');
 
-    my @menu;
-    foreach my $item (@DEFAULT_MENU_ITEMS) {
-
-        my $subitems = $item->{items};
-        if ( defined($subitems) ) {
-
-            my @new_subitems =
-                map { _expand_item( $c, $_ ) }
-                grep { _permission_check( $c, $_ ) } @$subitems;
-
-            # do not add empty items
-            next unless scalar(@new_subitems);
-
-            $item->{items} = \@new_subitems;
-
-        }
-        _expand_item( $c, $item );
-        push @menu, $item;
-    }
-    return @menu;
+    return process_menu($c, @DEFAULT_MENU_ITEMS);
 }
+
+sub process_menu {
+    my $c = shift;
+    my @menu = @_;
+
+    my @result;
+
+    foreach my $item (@menu) {
+        my $new_item = {};
+
+        _permission_check($c, $item) or next;
+
+        $new_item->{name} = $item->{name};
+
+        if ( $item->{action} ) {
+            $new_item->{path} = $c->uri_for_action( $item->{action} );
+        } else {
+            $new_item->{path} = $item->{path};
+        }
+
+        if ( $item->{submenu} ) {
+            my @submenu = process_menu($c, @{$item->{submenu}});
+            next unless @submenu;
+            $new_item->{submenu} = \@submenu;
+        }
+
+        push @result, $new_item;
+    }
+    return @result;
+}
+
 
 sub _permission_check {
     my ( $c, $item ) = @_;
 
     $item->{permission} or return 1;
-
     return $c->check_permission( $item->{permission} );
 }
 
-sub _expand_item {
-    my ( $c, $item ) = @_;
-
-    $item->{action} and
-        $item->{path} = $c->uri_for_action( $item->{action} );
-
-    return $item;
-}
 
 =head1 SEE ALSO
 

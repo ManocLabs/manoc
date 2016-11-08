@@ -45,7 +45,7 @@ $(document).ready(function() {
                      { 'data' : 'serial' },
                      { 'data' : 'location' },
    ],
-   "dom": '<"toolbar">frtip',
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
  })
 
  $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed');

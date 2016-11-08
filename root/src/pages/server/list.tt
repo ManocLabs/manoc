@@ -7,15 +7,13 @@ page.section='Server'
 page.subsection='Server'
 -%]
 
+<div id="tabletoolbar">
 [%- IF c.check_permission('server.create') -%]
-[% page.toolbar = BLOCK -%]
-<div>
- <a href="[% c.uri_for_action('/server/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+ <a href="[% c.uri_for_action('/server/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
 </div>
-[% END -%]
-[% END -%]
 
-[% init_table('server_list') %]
+[% init_table('server_list', { toolbar="tabletoolbar" }) %]
  <table class="table" id="server_list">
    <thead>
      <tr>

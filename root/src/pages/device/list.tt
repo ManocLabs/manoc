@@ -7,15 +7,13 @@ page.subsection = 'Device'
 page.section = 'Asset'
 %]
 
+<div id="tabletoolbar">
 [%- IF c.check_permission('device.create') -%]
-[% page.toolbar = BLOCK -%]
-<div>
-      <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+      <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
 </div>
-[% END -%]
-[% END -%]
 
-[% init_table('device_list') %]
+[% init_table('device_list', { toolbar="tabletoolbar" } ) %]
     <table class="table" id="device_list">
      <thead>
 	 <tr>
@@ -35,9 +33,9 @@ page.section = 'Asset'
 	   <td>[% print_building(d.rack.building) %]</td>
    	   <td>[% d.rack.floor | html %]</td>
 	   <td>[% print_rack(d.rack) %]</td>
-	   <td>[% d.netwalker_info.vendor | html %]</td>
-   	   <td>[% d.netwalker_info.model | html%]</td>
-       <td>[% d.netwalker_info.os_ver | html %]</td>
+	   <td>[% d.hwasset.vendor | html %]</td>
+   	   <td>[% d.hwasset.model | html%]</td>
+       <td>[% d.netwalker_info.os | html %] [% d.netwalker_info.os_ver | html %]</td>
      </tr>
 [% END %]
      </tbody>

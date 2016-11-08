@@ -5,9 +5,6 @@
   page.title='View VLAN ' _ object.id
   page.subsection='VLAN'
   page.section='Network'
-
-  page.layout = 'with_sidebar';
-  page.load_section_file = 1
 -%]
 [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK %]

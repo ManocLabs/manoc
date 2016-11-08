@@ -7,18 +7,15 @@ page.subsection = 'Server'
 page.section = 'Server'
 %]
 
-[%- IF c.check_permission('serverhw.create') -%]
-[% page.toolbar = BLOCK -%]
-<div>
-<div class="btn-group" role="group">
-  <a href="[% c.uri_for_action('serverhw/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
-  <a href="[% c.uri_for_action('serverhw/import_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("upload") %] Import CSV</a>
-</div>
-</div>
-[% END -%]
-[% END -%]
 
-  [% init_table('server_list') %]
+<div id="tabletoolbar">
+[%- IF c.check_permission('serverhw.create') -%]
+  <a href="[% c.uri_for_action('serverhw/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+  <a href="[% c.uri_for_action('serverhw/import_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("upload") %] Import CSV</a>
+[% END -%]
+</div>
+
+  [% init_table('server_list', {toolbar='tabletoolbar' }) %]
     <table class="table" id="server_list">
      <thead>
 	 <tr>

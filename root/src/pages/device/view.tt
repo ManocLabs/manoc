@@ -12,7 +12,7 @@ page.subsection = 'Device'
 <div>
 [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') ||  c.check_permission(object, 'edit_nwinfo')  -%]
   <div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Action <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
