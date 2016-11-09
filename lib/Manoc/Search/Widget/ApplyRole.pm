@@ -28,5 +28,4 @@ sub get_widget_role {
     die "Can't find widget $widget_class from " . join( ", ", @name_spaces );
 }
 
-use namespace::autoclean;
 1;

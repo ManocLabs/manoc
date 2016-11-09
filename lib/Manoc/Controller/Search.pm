@@ -38,8 +38,8 @@ sub index : Path : Args(0) {
     my $q        = $c->request->param('q') || '';
     my $button   = $c->request->param('submit');
     my $advanced = $c->request->param('advanced') || 0;
-    my $limit    = $c->request->param('limit') || '';
-    my $type     = $c->request->param('type');
+    my $limit    = $advanced ? $c->request->param('limit') : undef;
+    my $type     = $advanced ? $c->request->param('type') : undef;
 
     my @search_types = (
         [ 'ipaddr',    'IP' ],
@@ -93,15 +93,6 @@ sub index : Path : Args(0) {
         }
     );
     $c->stash( search_types => \@search_types );
-}
-
-sub _plugin_types {
-    my ( $self, $c ) = shift;
-
-    return unless $self->can('plugin_registry');
-    # my $reg = $self->plugin_registry;
-    # foreach my $plugin TODO
-    return;
 }
 
 =head1 AUTHOR

@@ -53,12 +53,6 @@ around BUILDARGS => sub {
     return $class->$orig(@_);
 };
 
-sub render {
-    my ( $self, $ctx ) = @_;
-
-    my $url = $ctx->uri_for_action( 'device/view', [ $self->id ] );
-    return '<a href="$url">' . $self->name . "</a>";
-}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

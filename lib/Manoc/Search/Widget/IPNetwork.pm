@@ -6,7 +6,7 @@ package Manoc::Search::Widget::IPNetwork;
 use Moose::Role;
 
 sub render {
-    my ( $self, $ctx );
+    my ( $self, $ctx ) = @_;
 
     my $url = $ctx->uri_for_action( 'ipnetwork/view', [ $self->id ] );
     return "<a href=\"$url\">" . $self->name . '</a> ' . $self->network;
