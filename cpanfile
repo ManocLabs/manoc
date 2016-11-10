@@ -61,8 +61,12 @@ feature 'arpsniffer', 'ARP sniffer support' => sub {
   requires 'NetPacket', '1.2.0';
 };
 
-feature 'snmp', 'SNMP::Info support' => sub {
+feature 'snmp-info', 'SNMP::Info support' => sub {
   requires 'SNMP::Info', '3.27';
+};
+
+feature 'virtual' => sub {
+  recommends 'Sys::Virt', '2.4';
 };
 
 feature 'sqlite', 'SQLite support' => sub {
