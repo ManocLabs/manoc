@@ -1,10 +1,13 @@
 [% link_css.push(
-               c.uri_for('/static/external/datatables-1.10.8/datatables.css'),
+               c.uri_for('/static/external/datatables-plugins/dataTables.bootstrap.css'),
+               c.uri_for('/static/external/datatables-responsive/dataTables.responsive.css'),
              )
   -%]
 [%  link_js.push(
-               c.uri_for('/static/external/datatables-1.10.8/datatables.min.js'),
-               c.uri_for('/static/external/datatables-1.10.8/ip-address.js'),
+               c.uri_for('/static/external/datatables/js/jquery.dataTables.min.js'),
+               c.uri_for('/static/external/datatables-plugins/dataTables.bootstrap.min.js'),
+               c.uri_for('/static/external/datatables-plugins/dataTables.ipAddress.js'),
+               c.uri_for('/static/external/datatables-responsive/dataTables.responsive.js'),
              )
  -%]
 [%# Init Table -%]
@@ -12,6 +15,7 @@
 [% capture = BLOCK -%]
 $(function() {
     $("#[% id  %]").DataTable( {
+      "responsive" : true,
 [% IF options.paging   %] "paging":   true,[% END -%]
 [% IF options.ordering %] "ordering": true,[% END -%]
 [% IF options.info     %] "info":     true,[% END -%]

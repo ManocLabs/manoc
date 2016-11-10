@@ -7,6 +7,13 @@
    page.subsection='Assets'
 -%]
 
+
+<div id="tabletoolbar">
+[%- IF c.check_permission('hwasset.create') -%]
+  <a href="[% c.uri_for_action('hwasset/create_device') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
+</div>
+
 <table class="table" id="hwasset_list">
    <thead>
      <tr>
@@ -22,7 +29,7 @@
 </table>
 
 [% fragment = BLOCK -%]
-  $("#hwasset_list").DataTable( {
+$("#hwasset_list").DataTable( {
    "serverSide":   true,
    "processing":   true,
    "ajax":         "[% c.uri_for_action('hwasset/datatable_source_devices') %]",
@@ -37,27 +44,8 @@
                      { 'data' : 'serial' },
                      { 'data' : 'location' },
    ],
-   "dom":'frtip',
-   initComplete: function () {
-            this.api().columns().every( function () {
-                var column = this;
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo( $(column.footer()).empty() )
-                    .on( 'change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                        );
-
-                        column
-                            .search( val ? '^'+val+'$' : '', true, false )
-                            .draw();
-                    } );
-
-                column.data().unique().sort().each( function ( d, j ) {
-                    select.append( '<option value="'+d+'">'+d+'</option>' )
-                } );
-            } );
-        }
-   });
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+});
+$("#tabletoolbar").appendTo($("#hwasset_list_wrapper div.toolbar").first());
 [% END %]
 [% js_scripts.push(fragment) -%]
