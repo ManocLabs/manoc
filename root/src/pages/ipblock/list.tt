@@ -1,11 +1,12 @@
+[% META use_table = 1 %]
 [%
-   page.title='IP Blocks'
+   page.title='IP Address blocks'
 -%]
 [% PROCESS 'ipblock/_common.tt' -%]
-[% META use_table = 1 %]
+
 [% IF c.check_permission('ipblock', 'create') %]
 <div id="ipblock_create">
-<a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+<a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
 </div>
 [% init_table('ipblock_list', { toolbar="ipblock_create" }) %]
 [% ELSE %]
