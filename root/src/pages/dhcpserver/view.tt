@@ -1,7 +1,5 @@
 [%
    page.title='DHCP server ' _ object.name
-   page.section='Section'
-   page.subsection='Subsection'
 
    page.no_content_row=1
 %]

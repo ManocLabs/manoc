@@ -1,7 +1,5 @@
 [%
    page.title='Hardware Asset ' _  object.inventory | html
-   page.section='Assets'
-   page.subsection='Hardware Inventory'
 -%]
 
 [% page.toolbar = BLOCK -%]

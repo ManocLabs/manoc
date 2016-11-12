@@ -1,7 +1,5 @@
 [%
-   section='Asset'
-   subsection='Device'
-   title='Interface View'
+    page.title='Interface View'
 -%]
 [% META
    use_table=1
@@ -40,15 +38,15 @@
 	<dd>
 	  [% object.duplex | html %]([% object.duplex_admin %])
 	</dd>
-	
+
 	<dt>Vlan:</dt>
 	<dd>
 	  [% object.vlan | html %]
 	</dd>
-	
+
 	<dt>STP Status</dt>
 	<dd> [% object.stp_state | html %] </dd>
-	
+
 	<dt>Portsecurity:</dt>
 	<dd>
 	  [% IF object.cps_enable %]
@@ -65,7 +63,7 @@
 	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span>	</a>
 	  [% IF notes != '' -%]
 	  <a href="[% c.uri_for_action('interface/delete_notes', [object.device, object.interface])%]">
-	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Note</span></a> 
+	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Note</span></a>
 	  [% END -%]
       </dl>
     </div><!-- row -->
@@ -74,15 +72,15 @@
   <div role="tabpanel" class="tab-pane" id="history">
     <div class="row">
       <table class="table">
-	<thead>  
+	<thead>
           <tr>
  	    <th>Mac Address</th>
  	    <th>Vlan</th>
  	    <th>From</th>
 	    <th>To</th>
           </tr>
-	</thead>  
-	<tbody>	  
+	</thead>
+	<tbody>
 	  [% FOREACH m IN mat_history %]
 	  <tr>
 	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
@@ -94,5 +92,5 @@
 	</tbody>
       </table>
     </div> <!-- end row -->
-  </div> <!-- end tab -->  
+  </div> <!-- end tab -->
 </div> <!-- end tab content -->

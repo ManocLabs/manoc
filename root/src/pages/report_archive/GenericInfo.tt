@@ -1,11 +1,12 @@
-[% META 
-   title='Generic Info'
+[% META
    use_table=1
-   section='Reports'
 -%]
+[%
+   page.title='Generic Info'
+%]
 <div id="tabs">
        <ul>
-       	   <li><a href="#tabs-1">Info</a></li>		
+       	   <li><a href="#tabs-1">Info</a></li>
        </ul>
    <table id="info">
          <tr>

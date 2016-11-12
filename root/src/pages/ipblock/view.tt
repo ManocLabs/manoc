@@ -2,7 +2,6 @@
    page.title='IP address block ' _ object.name
    page.no_content_row = 1
 -%]
-[% PROCESS 'ipblock/_common.tt' -%]
 [% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
   <div class="btn-group">
     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

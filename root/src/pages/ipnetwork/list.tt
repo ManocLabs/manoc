@@ -1,7 +1,6 @@
 [%
    page.title='List Networks'
 -%]
-[% PROCESS 'ipnetwork/_common.tt' -%]
 [% META
   use_table = 1
 -%]

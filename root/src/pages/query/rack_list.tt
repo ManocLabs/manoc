@@ -1,6 +1,5 @@
-[% META 
-   title='Managed rack list'
-   section='Reports'
+[%
+   page.title='Managed rack list'
 -%]
 
 <table>
@@ -21,8 +20,3 @@
        </tr>
 [% END %]
 </table>
-
-
-
-
-

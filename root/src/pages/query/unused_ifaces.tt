@@ -1,9 +1,10 @@
- [% META 
-   title='Unused interfaces'
-   use_table=1
-   section='Reports'
--%]
+ [% META
 
+   use_table=1
+-%]
+[%
+page.title='Unused interfaces'
+%]
 
 <form method="get" action="[% c.uri_for_action('/query/unused_ifaces') %]">
 <table>
@@ -12,7 +13,7 @@
 <td>
 	<select name=device>
 	[% FOREACH d IN device_list %]
-	<option value="[% d.id %]" 
+	<option value="[% d.id %]"
         	[% IF d.selected %] selected="1"[% END %] >[% d.label%]
       	</option>
 	[% END %]
@@ -34,13 +35,13 @@
 [% FOREACH u IN unused_ifaces %]
    [% IF loop.first %]
     <table class="display" id="un">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Device</th>
  	 <th>Interface</th>
  	 <th>Description</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
        <tr>

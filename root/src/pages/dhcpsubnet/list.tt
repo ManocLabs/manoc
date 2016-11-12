@@ -1,7 +1,5 @@
 [%
    page.title='List DHCPSubnet'
-   page.section='Section'
-   page.subsection='Subsection'
 -%]
 <div id="dhcpsubnet_create">
 <a href="[% c.uri_for_action('dhcpsubnet/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
@@ -35,34 +33,34 @@
      	     [%IF object.domain_name -%]
   	     [% object.domain_name | html %]
       	     [%ELSE -%]
-      	     [% object.dhcp_server.domain_name | html %] 
+      	     [% object.dhcp_server.domain_name | html %]
       	     [%END -%]
 	 </td>
  	 <td>
      	     [%IF object.domain_nameserver -%]
   	     [% object.domain_nameserver | html %]
       	     [%ELSE -%]
-      	     [% object.dhcp_server.domain_nameserver | html %] 
+      	     [% object.dhcp_server.domain_nameserver | html %]
       	     [%END -%]
 	 </td>
  	 <td>
      	     [%IF object.ntp_server -%]
   	     [% object.ntp_server | html %]
       	     [%ELSE -%]
-      	     [% object.dhcp_server.ntp_server | html %] 
+      	     [% object.dhcp_server.ntp_server | html %]
       	     [%END -%]
  	 <td>
      	     [%IF object.default_lease_time -%]
   	     [% object.default_lease_time | html %]
       	     [%ELSE -%]
-      	     [% object.dhcp_server.default_lease_time | html %] 
+      	     [% object.dhcp_server.default_lease_time | html %]
       	     [%END -%]
         </td>
  	 <td>
  	     [%IF object.max_lease_time -%]
   	     [% object.max_lease_time | html %]
       	     [%ELSE -%]
-      	     [% object.dhcp_server.max_lease_time | html %] 
+      	     [% object.dhcp_server.max_lease_time | html %]
       	     [%END -%]
    	</td>
      	 <td><a href=[% c.uri_for_action('dhcpsubnet/view', [object.id]) %]>View</a></td>

@@ -1,6 +1,5 @@
-[% META 
-   title='Managed devices list'
-   section='Reports'
+[%
+   page.title='Managed devices list'
 -%]
 
 <table>

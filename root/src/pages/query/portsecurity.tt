@@ -1,23 +1,24 @@
-[% META 
-   title='Portsecurity'
+[% META
    use_table=1
-   section='Reports'
 -%]
+[%
+title='Portsecurity'
+%]
 
 [% init_table('ps') %]
 
 [% FOREACH t IN table %]
    [% IF loop.first %]
-    
+
     <table class="display" id="ps">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Device</th>
  	 <th>Interface</th>
  	 <th>Description</th>
  	 <th>Violations</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>

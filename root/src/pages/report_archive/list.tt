@@ -1,27 +1,28 @@
-[% META 
-   title='Scheduled Reports'
+[% META
    use_table=1
-   section='Reports'
+-%]
+[%
+   page.title='Scheduled Reports'
 -%]
 
- [% init_table('report_list', [50,30,20])%] 
+ [% init_table('report_list', [50,30,20])%]
  <table class="display" id="report_list">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Type</th>
          <th>Report Title</th>
  	 <th>Time of last execution</th>
          </tr>
-       </thead>  
+       </thead>
   <tbody>
 [% FOREACH r IN reports %]
          <tr>
  	 <td><a href=[% c.uri_for_action('/reportarchive/view_type', r.type) %]> [% r.type  %] </a></td>
 	 <td>[% r.name | html %] </td>
- 	 <td>[% r.timestamp | html %]  
+ 	 <td>[% r.timestamp | html %]
  	 <div style="float:right;">
  	 <a href="[% c.uri_for_action('/reportarchive/view', [r.id]) %]">[% ui_icon('extlink')%] </a>
- 	 </div> 
+ 	 </div>
  	 </td>
          </tr>
  [% END %]

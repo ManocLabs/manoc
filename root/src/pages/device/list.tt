@@ -3,9 +3,7 @@
 -%]
 [%
 page.title = 'Devices'
-page.subsection = 'Device'
-page.section = 'Asset'
-%]
+-%]
 
 <div id="tabletoolbar">
 [%- IF c.check_permission('device.create') -%]

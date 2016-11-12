@@ -1,5 +1,5 @@
-[% META title='Dismiss Device'
-   subsection='Device'
-   section='Asset' -%]
+[%
+page.title='Dismiss Device'
+-%]
 
 [% form.render %]

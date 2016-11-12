@@ -1,7 +1,5 @@
-[%  META
-    title='Server'
-    section='Asset'
-    subsection='Hardware'
+[%
+    page.title='Server'
 %]
 [% form.render %]
 [% fragment = BLOCK -%]

@@ -1,7 +1,5 @@
 [%
    page.title='List Group'
-   page.section='Section'
-   page.subsection='Subsection'
 -%]
 <div id="group_create">
 <a href="[% c.uri_for_action('group/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>

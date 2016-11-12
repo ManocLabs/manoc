@@ -1,9 +1,9 @@
-[% META 
-   title='Statistics'
+[% META
    use_table=1
-   section='Reports'
 -%]
-
+[%
+title='Statistics'
+%]
 <div id="tabs">
      		<ul>
 	      	  <li><a href="#tabs-1">Vlan Info</a></li>
@@ -14,15 +14,15 @@
  [% init_table('stats') %]
 [% FOREACH v IN vlan_table %]
    [% IF loop.first %]
-    
+
     <table class="display" id="stats">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>VLAN</th>
  	 <th>Mac Address</th>
  	 <th>Ip Address</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>

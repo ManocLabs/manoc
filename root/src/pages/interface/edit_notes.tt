@@ -1,11 +1,5 @@
-[% META
-   section='Asset'
-   subsection='Device'
-   title='Edit Interface Notes'
+[%
+   page.title='Edit Interface Notes'
 %]
 
-<div class="buttons">
-[% form.render %] 
-</div>
-
-
+[% form.render %]

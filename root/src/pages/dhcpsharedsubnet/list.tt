@@ -1,7 +1,5 @@
 [%
-   page.title='List DHCPSharedSubnet'
-   page.section='Section'
-   page.subsection='Subsection'
+   page.title='DHCP Shared Subnets'
 -%]
 <div id="dhcpsharedsubnet_create">
 <a href="[% c.uri_for_action('dhcpsharedsubnet/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>

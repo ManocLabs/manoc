@@ -2,7 +2,6 @@
    page.title='Network ' _ object.name
    page.no_content_row = 1
 -%]
-[% PROCESS 'ipnetwork/_common.tt' -%]
 [% page.toolbar = BLOCK %]
 [% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
   <div class="btn-group">

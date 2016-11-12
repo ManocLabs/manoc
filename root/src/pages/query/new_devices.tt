@@ -1,11 +1,9 @@
-[% META 
-   title='New Devices'
+[% META
    use_table=1
-   section='Reports'
-   subsection='Queries'
 -%]
-
-
+[%
+title='New Devices'
+-%]
 <form method="get" action="[% c.uri_for_action('/query/new_devices') %]">
 <table>
 <tr>
@@ -22,16 +20,16 @@
 [% init_table('new_devices')%]
 [% FOREACH u IN new_devs %]
    [% IF loop.first %]
-    
+
     <table class="display" id="new_devices">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Mac Address</th>
  	 <th>Devices</th>
  	 <th>Interface</th>
  	 <th>From</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
 
@@ -46,8 +44,3 @@
     </table>
    [% END %]
 [% END %]
-
-
-
-
-
