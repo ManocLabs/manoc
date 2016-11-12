@@ -24,7 +24,7 @@ Catalyst::Helper::Controller::ManocCRUD
 
 $ script/manoc_create.pl controller <modelname> ManocCRUD
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 This creates (1) a CRUD controller (2) a form for create/update
  operations (3) templates for the specified DB Class
@@ -129,22 +129,24 @@ __DATA__
 =begin pod_to_ignore
 __form_tt__
 [% TAGS <+ +> -%]
-[%
-  page.section='Section'
-  page.subsection='Subsection'
-%]
 [% form.render %]
 __list_tt__
 [% TAGS <+ +> -%]
-[%
-   page.title='List <+ model +>'
-   page.section='Section'
-   page.subsection='Subsection'
+[% META
+   use_table=1
 -%]
-<div id="<+ model.lower +>_create">
-<a href="[% c.uri_for_action('<+ model.lower +>/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+[%
+ page.title='List <+ model +>'
+ -%]
+<div id="tabletoolbar">
+[%- IF c.check_permission('<+ model.lower +>.create') -%]
+ <a href="[% c.uri_for_action('<+ model.lower +>/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
 </div>
- <table class="table" id="<+ model.lower +>_list">
+
+[% init_table('<+ model.lower +>_list', { toolbar="tabletoolbar" }) %]
+
+<table class="table" id="<+ model.lower +>_list">
    <thead>
      <tr>
 <+- FOREACH col IN columns +>
@@ -168,24 +170,38 @@ __view_tt__
 [% TAGS <+ +> -%]
 [%
    page.title='View <+ model +>'
-   page.section='Section'
-   page.subsection='Subsection'
-   use_table=1
 -%]
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('<+ model.lower +>/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('<+ model.lower +>/delete', [object.id]) %]>Delete</a>
-    </div>
-[% END %]
-<dl>
-  <+- FOREACH col IN columns +>
-  <dt><+ col +></dt>
-  <dd>[% object.<+ col +> | html %]</dd>
-  <+- END +>
-</dl>
+[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Edit <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+    [% IF c.check_permission(object, 'edit') -%]
+      <li><a href="[% c.uri_for_action('<+ model.lower +>/edit',[object.id]) %]">
+    [% bootstrap_icon('pencil') %] Edit info</a></li>
+    [% END -%]
+    [% IF c.check_permission(object, 'delete') -%]
+      <li><a href="[%c.uri_for_action('<+ model.lower +>/delete',[object.id]) %]">
+    [% bootstrap_icon('trash') %] Delete</a></li>
+    [% END -%]
+    </ul>
+  </div><!-- end btn group -->
+[% END -%]
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+    <+- FOREACH col IN columns +>
+      <dt><+ col +></dt>
+      <dd>[% object.<+ col +> | html %]</dd>
+     <+- END +>
+    </dl>
+  </div><!-- panel body -->
+</div><!-- panel -->
 __controller__
-# Copyright 2015 by the Manoc Team
+# Copyright 2016 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
