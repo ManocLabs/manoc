@@ -42,6 +42,13 @@ sub _build_username {
     return $self->credentials->{username};
 }
 
+sub _build_use_ssh_key {
+     my $self = shift;
+
+    return $self->credentials->{use_ssh_key};
+}
+
+
 sub _build_key_path {
     my $self = shift;
 
@@ -68,7 +75,7 @@ sub connect {
 
     my %opts;
     $opts{user} = $self->username;
-    if ( $self->key_path ) {
+    if ( $self->use_ssh_key ) {
         $opts{key_path} = $self->key_path;
     }
     else {
@@ -106,4 +113,3 @@ no Moose::Role;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
