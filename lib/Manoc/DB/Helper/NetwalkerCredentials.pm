@@ -29,6 +29,13 @@ sub make_credentials_columns {
             is_nullable   => 1,
         },
 
+        use_ssh_key => {
+            data_type     => 'int',
+            size          => 1,
+            default_value => 'NULL',
+            is_nullable   => 1,
+        },
+
         key_path => {
             data_type     => 'varchar',
             size          => 256,
