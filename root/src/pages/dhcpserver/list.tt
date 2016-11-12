@@ -1,36 +1,31 @@
 [%
-   page.title='List DHCPServer'
+   page.title='DHCP Servers'
    page.section='Section'
    page.subsection='Subsection'
 -%]
-<div id="dhcpserver_create">
-<a href="[% c.uri_for_action('dhcpserver/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+[% META
+use_table = 1
+%]
+
+<div id="tabletoolbar">
+<a href="[% c.uri_for_action('dhcpserver/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
 </div>
- <table class="table" id="dhcpserver_list">
+
+[% init_table('dhcpserver_list',{ toolbar="tabletoolbar" } ) %]
+<table class="table" id="dhcpserver_list">
    <thead>
      <tr>
-        <th>id</th>
-        <th>name</th>
-        <th>domain_name</th>
-        <th>domain_nameserver</th>
-        <th>ntp_server</th>
-        <th>default_lease_time</th>
-        <th>max_lease_time</th>
+        <th>Server name</th>
+        <th>Domain name</th>
         <th></th>
      </tr>
    </thead>
    <tbody>
 [% FOREACH object IN object_list %]
-         <tr>
- 	 <td>[% object.id | html %]</td>
- 	 <td>[% object.name | html %]</td>
+   <tr>
+ 	 <td><a href=[% c.uri_for_action('dhcpserver/view', [object.id]) %]>[% object.name | html %]</a></td>
  	 <td>[% object.domain_name | html %]</td>
- 	 <td>[% object.domain_nameserver | html %]</td>
- 	 <td>[% object.ntp_server | html %]</td>
- 	 <td>[% object.default_lease_time | html %]</td>
- 	 <td>[% object.max_lease_time | html %]</td>
-     	 <td><a href=[% c.uri_for_action('dhcpserver/view', [object.id]) %]>View</a></td>
-         </tr>
+   </tr>
 [% END %]
    </tbody>
 </table>
