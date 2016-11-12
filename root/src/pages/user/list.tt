@@ -1,7 +1,5 @@
 [%
-   page.section='Config'
-   page.subsection='Users'
-   page.title='List'
+   page.title='List users'
 -%]
 <div id='user_create'>
   <a href="[% c.uri_for_action('/user/create') %]" class="btn btn-sm btn-default">

@@ -1,8 +1,3 @@
-[%
-page.subsection='Device'
-page.section='Network'
--%]
-
 [% form.render %]
 [% fragment = BLOCK -%]
 var rack_control;

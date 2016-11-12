@@ -1,8 +1,8 @@
+[% META
+use_table=1
+-%]
 [%
    page.title='View DHCPSubnet'
-   page.section='Section'
-   page.subsection='Subsection'
-   use_table=1
 -%]
 [% page.toolbar = BLOCK -%]
 <div>
@@ -40,7 +40,7 @@
   	   [% object.domain_name | html %]
       [%ELSE -%]
       	   <i>[% object.dhcp_server.domain_name | html %]</i>
-      [%END -%]  
+      [%END -%]
   </dd>
   <dt>DNS</dt>
   <dd>
@@ -48,14 +48,14 @@
   	   [% object.domain_nameserver | html %]
       [%ELSE -%]
       	 <i>[% object.dhcp_server.domain_nameserver | html %]</i>
-      [%END -%]  
+      [%END -%]
   </dd>
   <dt>NTP</dt>
   <dd>
       [%IF object.ntp_server -%]
   	   [% object.ntp_server | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.ntp_server | html %] 
+      	   [% object.dhcp_server.ntp_server | html %]
       [%END -%]
   </dd>
   <dt>Lease Time</dt>
@@ -71,7 +71,7 @@
       [%IF object.max_lease_time  -%]
   	   [% object.max_lease_time | html %]
       [%ELSE -%]
-      	  <i>[% object.dhcp_server.max_lease_time | html %]</i> 
+      	  <i>[% object.dhcp_server.max_lease_time | html %]</i>
       [%END -%]
   </dd>
       </dl>
@@ -84,7 +84,7 @@
 <div class="row">
 [% IF object.reservations -%]
   <table class="table table-condensed" id="device_list">
-    <thead>  
+    <thead>
       <tr>
  	<th>Mac Address</th>
  	<th>IP Address</th>
@@ -92,7 +92,7 @@
  	<th>Hostname</th>
 
       </tr>
-    </thead>  
+    </thead>
     <tbody>
       [% FOREACH r IN object.reservations -%]
       <tr>

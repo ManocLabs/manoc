@@ -2,8 +2,6 @@
 use_table=1
 -%]
 [%
-page.section='Asset'
-page.subsection='Building'
 page.title='Buildings'
 %]
 <div id="tabletoolbar">

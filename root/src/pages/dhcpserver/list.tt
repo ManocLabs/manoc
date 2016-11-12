@@ -1,7 +1,5 @@
 [%
    page.title='DHCP Servers'
-   page.section='Section'
-   page.subsection='Subsection'
 -%]
 [% META
 use_table = 1

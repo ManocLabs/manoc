@@ -1,6 +1,5 @@
-[%  title='Uplinks for ' _ object.name
-   subsection='Device'
-   section='Asset'
+[%
+    page.title='Uplinks for ' _ object.name
 -%]
 
 [% action -%]
@@ -16,6 +15,5 @@
     </tr>
     [%- END %]
   </table>
-  <input class="btn btn-default" name="submit" value="Save" type="submit">	
+  <input class="btn btn-default" name="submit" value="Save" type="submit">
 </form>
-

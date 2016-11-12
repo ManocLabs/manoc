@@ -1,18 +1,19 @@
-[% META 
-   title='Report list of one type'
+[% META
    use_table=1
-   section='Reports'
 -%]
+[%
+  page.title='Report list of one type'
+%]
 
 
- [% init_table('repolist', [75,25],{sortby => 1, order => 'desc'})%] 
+ [% init_table('repolist', [75,25],{sortby => 1, order => 'desc'})%]
  <table class="display" id="repolist">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Name</th>
  	 <th>Time of execution</th>
          </tr>
-       </thead>  
+       </thead>
   <tbody>
 [% FOREACH r IN reports %]
          <tr>

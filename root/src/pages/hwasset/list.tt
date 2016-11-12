@@ -3,8 +3,6 @@
 -%]
 [%
    page.title='Hardware assets'
-   page.section='Section'
-   page.subsection='Subsection'
 -%]
 
 <table class="table" id="hwasset_list">

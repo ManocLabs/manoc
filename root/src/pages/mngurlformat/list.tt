@@ -1,7 +1,5 @@
-[% 
+[%
    page.title="Management URL List"
-   page.subsection='Management URLs'
-   page.section='Config'
 -%]
 
 <div id="create">
@@ -10,12 +8,12 @@
 
 
 <table class="table">
-  <thead>  
+  <thead>
     <tr>
       <th>Name</th>
       <th>Description</th>
     </tr>
-  </thead>  
+  </thead>
   <tbody>
     [% FOREACH o IN object_list %]
     <tr>
@@ -27,7 +25,7 @@
 	</a>
         <a href="[% c.uri_for_action('/mngurlformat/delete',[o.id]) %] ">
 	  [% bootstrap_icon('trash') %]<span class="sr-only">Delete</span>
-	</a>	
+	</a>
       </td>
     </tr>
     [% END %]

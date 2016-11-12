@@ -1,6 +1,5 @@
 [%
    page.title='Virtual Infrastructures'
-   page.section='Server'
 -%]
 <div id="virtualinfr_create">
 <a href="[% c.uri_for_action('virtualinfr/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>

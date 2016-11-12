@@ -3,8 +3,6 @@
 -%]
 [%
    page.title = 'VTP'
-   page.subsection = 'VLAN'
-   page.section = 'Network'
 %]
 [% FOREACH v IN vlan_vtp %]
    [% IF loop.first %]

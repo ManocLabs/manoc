@@ -3,8 +3,6 @@
 -%]
 [%
   page.title='View VLAN ' _ object.id
-  page.subsection='VLAN'
-  page.section='Network'
 -%]
 [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK %]

@@ -4,8 +4,6 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 [%
 page.title   = 'Device ' _ object.name
-page.section = 'Asset'
-page.subsection = 'Device'
 -%]
 [%- IF !object.dismissed %]
 [% page.toolbar = BLOCK -%]

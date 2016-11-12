@@ -1,20 +1,19 @@
-[% META 
-   title='MAC Addresses on multiple devices'
+[% META
    use_table=1
-   section='Reports'
-   subsection='Queries'
 -%]
-
+[%
+   title='MAC Addresses on multiple devices'
+   %]
 [% init_table('macs') %]
 [% FOREACH m IN multimacs %]
    [% IF loop.first %]
     <table class="display" id="macs">
-       <thead>  
+       <thead>
 	 <tr>
 	 <th>MAC Address</th>
  	 <th>Number of devices</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>

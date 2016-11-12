@@ -1,7 +1,6 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
-[% page.title   = 'View Configuration ' _ object.name
-   page.section = 'Asset'
-   page.subsection = 'Device'
+[%
+page.title   = 'View Configuration ' _ object.name
 -%]
 
 <ul class="nav nav-tabs" role="tablist">
@@ -10,7 +9,7 @@
   [% bootstrap_nav_tab("diff", "Diff", 0) -%]
 </ul>
 
-<div class="tab-content">	 
+<div class="tab-content">
  <div role="tabpanel" class="tab-pane active" id="current">
   <div class="row">
    <dl class="dl-horizontal">
@@ -28,10 +27,9 @@
  </div> <!-- panel -->
 
  <div role="tabpanel" class="tab-pane" id="diff">
-    <pre>  
+    <pre>
       [% diff %]
     </pre>
  </div> <!-- panel -->
 
 </div>
-

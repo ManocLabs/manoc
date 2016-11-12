@@ -1,8 +1,9 @@
-[% META 
-   title='Netwalker Report'
+[% META
    use_table=1
-   section='Reports'
 -%]
+[%
+   page.title='Netwalker Report'
+%]
 
 <h3>[% report_name | html %] ([% timestamp | html %])</h3>
 
@@ -15,7 +16,7 @@
 
 
 <div id="tabs-1">
-   
+
    <table id="info">
           <tr>
   	  <th> Total devices visited: </th>
@@ -40,7 +41,7 @@
  	 <tr>
   	  <th> Number of errors occurred: </th>
   	  <td> [% IF report_obj.all_error.0 %]
-               [% report_obj.error_count  %] 
+               [% report_obj.error_count  %]
                [% ELSE %] 0
                [% END %]
           </td>
@@ -48,10 +49,10 @@
  	  <tr>
 	  <td> Number of warnings: </td>
   	  <td> [% IF report_obj.all_warning.0 %]
-               [% report_obj.warning_count  %] 
+               [% report_obj.warning_count  %]
                [% ELSE %] 0
                [% END %]
-          </td> 
+          </td>
  	 </tr>
   </table>
     [% add_css_tableinfo %]
@@ -60,7 +61,7 @@
 
 
 <div id="tabs-2">
-[% PROCESS message_box.tt msg="No errors occurred." 
+[% PROCESS message_box.tt msg="No errors occurred."
                          UNLESS report_obj.error_count -%]
 <table class="report ui-priority-primary ui-corner-all">
   [% FOREACH error IN report_obj.error %]
@@ -78,7 +79,7 @@
 
 
 <div id="tabs-3">
-[% PROCESS message_box.tt msg="No warning occurred." 
+[% PROCESS message_box.tt msg="No warning occurred."
                          UNLESS report_obj.warning_count -%]
 
 <table class="report ui-priority-primary ui-corner-all">

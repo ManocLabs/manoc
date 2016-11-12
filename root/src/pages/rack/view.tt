@@ -1,6 +1,4 @@
 [%
-page.section = 'Assets'
-page.subsection = 'Rack'
 page.title = 'Rack ' _ object.name
 
 page.no_content_row = 1

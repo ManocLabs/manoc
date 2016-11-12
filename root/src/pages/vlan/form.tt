@@ -1,7 +1,5 @@
 [%
  page.title='VLAN'
- page.subsection='VLAN'
- page.section='Network' 
 %]
 
 [% form.render %]

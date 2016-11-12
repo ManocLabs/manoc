@@ -1,15 +1,15 @@
-[% META 
-   title='Unknown CDP hosts'
+[% META
    use_table=1
-   section='Reports'
-   subsection='Queries'
 -%]
+[%
+title='Unknown CDP hosts'
+%]
 [% init_table('devs') %]
 [% FOREACH u IN unknown_devices %]
    [% IF loop.first %]
-    
+
     <table class="display" id="devs">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>From Device</th>
  	 <th>Interface</th>
@@ -17,7 +17,7 @@
  	 <th>Interface</th>
  	 <th>Last Seen</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
 

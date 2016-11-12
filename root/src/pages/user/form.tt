@@ -1,6 +1,4 @@
 [%
    page.title = 'Edit user ' _ object.username
-   page.section = 'Config'
-   page.subsections = 'Users'
 -%]
 [% form.render %]

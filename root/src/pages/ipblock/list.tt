@@ -2,8 +2,6 @@
 [%
    page.title='IP Address blocks'
 -%]
-[% PROCESS 'ipblock/_common.tt' -%]
-
 [% IF c.check_permission('ipblock', 'create') %]
 <div id="ipblock_create">
 <a href="[% c.uri_for_action('ipblock/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>

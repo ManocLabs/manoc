@@ -1,7 +1,3 @@
-[%
-page.title   = 'About Manoc'
-page.section = 'About'
--%]
 <div id="poetry">
 <img class="center-block" src="[% c.uri_for('/static/images/manoc-logo.jpg') %]">
 <p class="text-center" id="fir">One Query to know them all,</p>
@@ -11,7 +7,7 @@ page.section = 'About'
 </div>
 
 <div class="row" id="stats">
-  <div class="col-sm-6 col-xs-12">		
+  <div class="col-sm-6 col-xs-12">
     <div class="panel panel-default">
       <div class="panel-heading">
 	<h3 class="panel-title">Software info</h3>
@@ -52,7 +48,7 @@ page.section = 'About'
       </div><!-- panel body-->
     </div><!-- panel -->
   </div><!-- col -->
-  
+
   <div class="col-sm-6 col-xs-12">
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -92,7 +88,7 @@ page.section = 'About'
 
 
 [% script = BLOCK %]
-$(function() { 
+$(function() {
   $( "#fir" ).hide();
   $( "#sec" ).hide();
   $( "#thi" ).hide();
