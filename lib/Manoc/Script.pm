@@ -11,8 +11,7 @@ with 'Manoc::Logger::Role';
 
 use Config::JFDI;
 use FindBin;
-use File::Spec;
-
+use File::Spec::Functions;
 use Manoc::DB;
 use Manoc::Logger;
 
@@ -42,40 +41,44 @@ has 'schema' => (
     builder => '_build_schema'
 );
 
+has 'manoc_config_dir' => (
+    traits  => ['NoGetopt'],
+    is      => 'rw',
+    isa     => 'Str',
+    default => sub { catdir( $FindBin::Bin, updir() ) }
+);
+
 sub _build_config {
     my $self = shift;
     my $config;
 
     if ( $ENV{MANOC_CONF} ) {
         $config = Config::JFDI->open( file => $ENV{MANOC_CONF}, );
+        my $path =  catdir( $ENV{MANOC_CONF}, updir());
+        $self->manoc_config_dir( $path );
     }
     else {
         my @config_paths =
-            ( File::Spec->catdir( $FindBin::Bin, File::Spec->updir() ), '/etc', );
+            (
+                catdir( $FindBin::Bin, updir() ),
+                '/etc/manoc',
+            );
 
         foreach my $path (@config_paths) {
             $config = Config::JFDI->open(
                 path => $path,
                 name => 'manoc',
             );
-            $config and last;
+            if ($config) {
+                $self->manoc_config_dir( $path );
+                last;
+            }
         }
     }
     if ( ! $config ) {
         $config = {
             name => 'Manoc',
-
-            'Model::ManocDB' => {
-                connect_info => {
-                    dsn => $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
-                    user => $ENV{MANOC_DB_USERNAME} || undef,
-                    password => $ENV{MANOC_DB_PASSWORD} || undef,
-                    # dbi_attributes
-                    quote_names => 1,
-                    # extra attributes
-                    AutoCommit  => 1,
-                },
-            },
+            'Model::ManocDB' => $Manoc::DB::DEFAULT_CONFIG,
         }
     }
 
