@@ -23,6 +23,8 @@ sub main {
 
     # get configuration and store it in a Config object
     my %config_args = %{ $self->config->{Netwalker} || {} };
+    $config_args{manoc_config_dir} ||= $self->manoc_config_dir;
+
     my $config      = Manoc::Netwalker::Config->new(%config_args);
 
     my $device_manager = Manoc::Netwalker::Manager::Device->new(

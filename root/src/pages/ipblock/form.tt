@@ -1,4 +1,3 @@
-[% PROCESS 'ipblock/_common.tt' -%]
 [%
   page.title='IP Block'
 -%]

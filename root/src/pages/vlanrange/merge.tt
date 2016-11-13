@@ -1,6 +1,4 @@
-[% 
-   page.section='Network'
-   page.subsection='VLAN'
+[%
    page.title='Merge VLAN range'
 -%]
 [% form.render %]

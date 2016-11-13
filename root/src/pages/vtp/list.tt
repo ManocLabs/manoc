@@ -3,8 +3,6 @@
 -%]
 [%
    page.title = 'VTP DB'
-   page.subsection = 'VLAN'
-   page.section = 'Network'
 -%]
 
 [% init_table('vlan_list', {}) %]

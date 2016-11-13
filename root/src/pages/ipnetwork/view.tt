@@ -1,7 +1,29 @@
 [%
    page.title='Network ' _ object.name
+   page.no_content_row = 1
 -%]
-[% PROCESS 'ipnetwork/_common.tt' -%]
+[% page.toolbar = BLOCK %]
+[% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Edit <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+       [% IF c.check_permission(object, 'edit') -%]
+       <li><a href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit properties</a></li>
+       [% END -%]
+       [% IF c.check_permission(object, 'delete') -%]
+       <li><a href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a></li>
+       [% END -%]
+    </ul>
+  </div>
+  [%- END -%]
+  [% IF c.check_permission(object, 'create') -%]
+  <a class="btn btn-default btn-sm"  href="[% c.uri_for('/dhcpsubnet/create', { network_id => object.id}) %]">Make DHCP subnet</a>
+  [% END -%]
+[% END %]
+
+<div class="row">
 
 <div class="col-sm-8">
   <div class="panel panel-default">
@@ -39,43 +61,19 @@
       </dl>
     </div><!-- end of content -->
   </div><!-- end of panel -->
-</div><!-- end of row -->
+</div><!-- end of col -->
 
 <div class="col-sm-4">
-
-<div class="row" style="margin-bottom: 20px">
-[%-  IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-  <div class="pull-right">
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-       [% IF c.check_permission(object, 'edit') -%]
-       <li><a href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit properties</a></li>
-       [% END -%]
-       [% IF c.check_permission(object, 'delete') -%]
-       <li><a href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a></li>
-       [% END -%]
-    </ul>
-  </div>
-  [%- END -%]
-  [% IF c.check_permission(object, 'create') -%]
-  <a class="btn btn-default btn-sm"  href="[% c.uri_for('/dhcpsubnet/create', { network_id => object.id}) %]">Make DHCP subnet</a>
-  [% END -%]
-  </div>
-</div>
-
-<div class="row">
     <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id])  %]">ARP activity</a></p>
     [% bootstrap_progressbar(arp_usage) %]
      <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id], {days=>60}) %]">ARP activity (last 60 days)</a></p>
     [% bootstrap_progressbar(arp_usage60) %]
     <p><a href="#">Registered hosts</a></p>
     [% bootstrap_progressbar(host_usage) %]
-</div>
 
-</div>
+</div><!-- end of col -->
+
+</div><!-- end of row -->
 
 <div class="row">
 [% IF object.children_ordered %]
@@ -100,7 +98,8 @@
       [% END -%]
     </tbody>
     </table>
-  </div>
-  </div>
+  </div><! -- panel body -->
+  </div><! -- panel -->
+  </div><! -- col -->
 [% END %]
-</div>
+</div><! -- row -->

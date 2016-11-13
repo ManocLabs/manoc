@@ -1,6 +1,5 @@
-[% META 
-   title='Queries'
-   section='Reports'
+[%
+   page.title='Queries'
 -%]
 [% list=[
 			{
@@ -46,9 +45,8 @@
 [% END -%]
 </ul>
 [% fragment = BLOCK -%]
-$(function() { 
+$(function() {
   $('#menu').menu();
 });
 [% END -%]
 [% js_scripts.push(fragment) -%]
-

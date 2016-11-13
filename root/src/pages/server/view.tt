@@ -1,19 +1,30 @@
-[% META
-   section='Server'
-   subsection=''
-   title='View server'
+[%
+   page.title='Server ' _ object.hostname
 -%]
-    <div>
-	<a class="btn btn-sm btn-primary" href=[%c.uri_for_action('server/edit', [object.id]) %]> [% bootstrap_icon('pencil') %] Edit</a>
-    <a class="btn btn-sm btn-default" href=[% c.uri_for_action('server/delete', [object.id]) %]>
-	[% bootstrap_icon('trash') %] Delete</a>
-      </div>
+[% page.toolbar = BLOCK -%]
+[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Edit <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+    [% IF c.check_permission(object, 'edit') -%]
+      <li><a href="[% c.uri_for_action('server/edit',[object.id]) %]">
+    [% bootstrap_icon('pencil') %] Edit rack info</a></li>
+    [% END -%]
+    [% IF c.check_permission(object, 'delete') -%]
+      <li><a href="[%c.uri_for_action('server/delete',[object.id]) %]">
+    [% bootstrap_icon('trash') %] Delete</a></li>
+    [% END -%]
+    </ul>
+  </div><!-- end btn group -->
+[% END -%]
 
-    <table id="info">
-      <tr>
-	<td>Hostname:</td><td>[% object.hostname %] </td>
-      </tr>
-      <tr>
-	<td>OS:</td><td>[% object.os %] [% object.os_ver %] </td>
-      </tr>
-      <tr>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+    <dt>Hostname:</dt><dd>[% object.hostname %] </dd>
+	<dt>OS:</dt><dd>[% object.os %] [% object.os_ver %] </dd>
+    </dl>
+  </div><!-- panel body -->
+</div><!-- panel -->

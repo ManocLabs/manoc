@@ -3,8 +3,6 @@
 -%]
 [%
 page.title = 'Dismissed devices'
-page.subsection = 'Device'
-page.section = 'Network'
 %]
 
 [% init_table('dismissed_device_list') %]

@@ -1,8 +1,8 @@
 [%
    page.title='Server Hardware'
-   page.section='Section'
-   page.subsection='Subsection'
-   use_table=1
+%]
+[% META
+use_table=1
 -%]
 [% page.toolbar = BLOCK -%]
 <div>

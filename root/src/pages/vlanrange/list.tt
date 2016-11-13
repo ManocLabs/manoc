@@ -1,8 +1,3 @@
-[%
-  page.title = 'VLAN list'
-  page.subsection = 'VLAN'
-  page.section = 'Network'
--%]
 [%- IF c.check_permission('vlanrange', 'create') -%]
 [%- page.toolbar = BLOCK %]
 <div id="vlanrange_create">

@@ -1,23 +1,23 @@
-[% META 
-   title='Interfaces with Multiple Hosts'
+[% META
    use_table=1
-   section='Reports'
-   subsection='Queries'
 -%]
+[%
+title='Interfaces with Multiple Hosts'
+%]
 
 [%init_table('host')%]
 [% FOREACH m IN multihost_ifaces %]
    [% IF loop.first %]
-    
+
     <table class="display" id="host">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Device</th>
  	 <th>Interface</th>
  	 <th>Description</th>
  	 <th>Hosts</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>
@@ -31,5 +31,3 @@
     </table>
    [% END %]
 [% END %]
-
-

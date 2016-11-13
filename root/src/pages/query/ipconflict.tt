@@ -1,9 +1,9 @@
-[% META 
-   title='Ip conflicts'
+[% META
    use_table=1
-   section='Reports'
 -%]
-
+[%
+   page.title='Ip conflicts'
+-%]
 <div id="tabs">
      		<ul>
 	      	  <li><a href="#tabs-1">Ip Conflicts</a></li>
@@ -14,14 +14,14 @@
 [% init_table('ipcnf')%]
 [% FOREACH ip IN conflicts %]
    [% IF loop.first %]
-    
+
     <table class="display" id="ipcnf">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Ip Address</th>
  	 <th>Count</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>
@@ -42,12 +42,12 @@
     [% init_table('multi')%]
 
     <table class="display" id="multi">
-       <thead>  
+       <thead>
 	 <tr>
  	 <th>Mac Address</th>
  	 <th>Count</th>
 	 </tr>
-       </thead>  
+       </thead>
        <tbody>
   [% END %]
          <tr>

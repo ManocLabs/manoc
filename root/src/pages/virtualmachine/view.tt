@@ -1,7 +1,5 @@
 [%
    page.title='View VirtualMachine'
-   page.section='Section'
-   page.subsection='Subsection'
    use_table=1
 -%]
 [% page.toolbar = BLOCK -%]

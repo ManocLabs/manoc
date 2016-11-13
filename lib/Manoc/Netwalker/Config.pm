@@ -15,6 +15,13 @@ subtype 'TimeInterval', as 'Int',
 
 coerce 'TimeInterval', from 'Str', via { str2seconds($_) };
 
+# use to construct default paths
+has manoc_config_dir => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1
+);
+
 has n_procs => (
     is      => 'rw',
     isa     => 'Int',
@@ -95,6 +102,22 @@ has config_update_interval => (
     coerce  => 1,
     default => '1d',
 );
+
+has 'default_ssh_key' => (
+    is      => 'rw',
+    isa     => 'Str',
+    builder => '_build_default_ssh_key',
+);
+
+sub _build_default_ssh_key {
+    my $self = shift;
+
+    my $basedir = $self->manoc_config_dir;
+    foreach ( qw( id_dsa id_ecdsa id_ed25519 id_rsa ) ) {
+        my $file = File::Spec->catfile($basedir, $_);
+        -f $file and return $file;
+    }
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

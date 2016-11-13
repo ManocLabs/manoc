@@ -9,6 +9,8 @@ our $VERSION = qv('2.009_001');
 
 use Catalyst::Runtime 5.90;
 
+use Manoc::DB;
+
 # Set flags and add plugins for the application
 #
 #         -Debug: activates the debug mode for very useful log messages
@@ -59,15 +61,7 @@ __PACKAGE__->config(
 
     use_request_uri_for_path => 1,
 
-    'Model::ManocDB' => {
-        connect_info => [
-            $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
-            $ENV{MANOC_DB_USERNAME},
-            $ENV{MANOC_DB_PASSWORD},
-            { AutoCommit  => 1 },
-            { quote_names => 1 },
-        ],
-    },
+    'Model::ManocDB' => $Manoc::DB::DEFAULT_CONFIG,
 
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,

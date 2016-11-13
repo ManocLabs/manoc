@@ -1,7 +1,5 @@
 [%
   page.title='Management URL Format'
-  page.subsection='Management URL Format' 
-  page.section='Config'
 -%]
 
 <div class="row">
@@ -11,4 +9,3 @@
 <div class="row">
 [% form.render %]
 </div>
-

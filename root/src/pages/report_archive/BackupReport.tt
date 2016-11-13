@@ -1,8 +1,9 @@
-[% META 
-   title='Backup Report'
+[% META
    use_table=1
-   section='Reports'
 -%]
+[%
+title='Backup Report'
+%]
 
 <h3> Report executed on host: [% report_name %] ([% timestamp %])</h3>
 
@@ -18,7 +19,7 @@
 
 
 <div id="tabs-1">
-   
+
    <table id="info">
          <tr>
   	  <th> Configurations up to date: </th>
@@ -45,9 +46,9 @@
 </div> <!--end of tab1 -->
 
 <div id="tabs-2">
-[% PROCESS message_box.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view"
                          UNLESS report_obj.updated_count -%]
-                         
+
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_updated %]
  	 <tr class="[% loop.parity %]">
@@ -58,7 +59,7 @@
  </div><!--end of tab2 -->
 
 <div id="tabs-3">
-[% PROCESS message_box.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view"
                          UNLESS report_obj.up_to_date_count -%]
 <table class="report  ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_up_to_date %]
@@ -70,7 +71,7 @@
 </div><!--end of tab3 -->
 
 <div id="tabs-4">
-[% PROCESS message_box.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view"
                          UNLESS report_obj.not_updated_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_not_updated %]
@@ -82,7 +83,7 @@
 </div><!--end of tab4 -->
 
 <div id="tabs-5">
-[% PROCESS message_box.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view"
                          UNLESS report_obj.created_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_created %]
@@ -94,7 +95,7 @@
 </div><!--end of tab5 -->
 
 <div id="tabs-6">
-[% PROCESS message_box.tt msg="There are no results for this view" 
+[% PROCESS message_box.tt msg="There are no results for this view"
                          UNLESS report_obj.error_count -%]
 <table class="report ui-priority-primary ui-corner-all">
 [% FOREACH element IN report_obj.all_error %]

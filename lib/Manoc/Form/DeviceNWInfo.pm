@@ -24,7 +24,7 @@ has 'device' => (
 
 has_field 'manifold' => (
     type     => 'Select',
-    label    => 'Fetch info with',
+    label    => 'Manifol info with',
     required => 1,
 );
 
@@ -58,18 +58,18 @@ has_field 'get_mat' => (
 
 has_field 'mat_native_vlan' => (
     type  => 'Select',
-    label => 'Native VLAN for MAT info',
+    label => 'Native VLAN for MAT information',
 );
 
 has_field 'get_dot11' => (
     type  => 'Checkbox',
-    label => 'Get Dot11 informations'
+    label => 'Get Dot11 information'
 );
 
 has_field 'get_vtp' => (
     type           => 'Checkbox',
     checkbox_value => 1,
-    label          => 'Download VTP DB',
+    label          => 'Download VTP database',
 );
 
 #Credentials, don't use username/password to avoid autofilling
@@ -82,7 +82,7 @@ has_field 'nw_username' => (
 
 has_field 'nw_password' => (
     type      => 'Text',
-    label     => 'First level Password',
+    label     => 'First level password',
     accessor  => 'password',
     widget    => 'Password',
     writeonly => 1,
@@ -90,9 +90,14 @@ has_field 'nw_password' => (
 
 has_field 'password2' => (
     type      => 'Text',
-    label     => 'Second level Password',
+    label     => 'Second level password',
     widget    => 'Password',
     writeonly => 1,
+);
+
+has_field 'use_ssh_key' => (
+    type  => 'Checkbox',
+    label => 'Use private key for SSH',
 );
 
 has_field 'key_path' => (
@@ -113,7 +118,7 @@ has_field 'snmp_version' => (
 
 has_field 'snmp_community' => (
     type  => 'Text',
-    label => 'SNMP Community String'
+    label => 'SNMP community string'
 );
 
 has_field 'snmp_user' => (

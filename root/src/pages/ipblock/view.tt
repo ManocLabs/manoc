@@ -1,20 +1,24 @@
 [%
-   page.title='IP block ' _ object.name
+   page.title='IP address block ' _ object.name
+   page.no_content_row = 1
 -%]
-[% PROCESS 'ipblock/_common.tt' -%]
-[%- IF c.check_permission(object, 'edit') ||  c.check_permission(object, 'delete') -%]
-[% page.toolbar = BLOCK -%]
-<div>
-  [%- IF c.check_permission(object, 'edit') -%]
-  <a class="btn btn-default" href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit</a>
-  &nbsp;
+[% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Edit <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+       [% IF c.check_permission(object, 'edit') -%]
+       <li><a href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit properties</a></li>
+       [% END -%]
+       [% IF c.check_permission(object, 'delete') -%]
+       <li><a href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a></li>
+       [% END -%]
+    </ul>
+  </div>
   [%- END -%]
-  [%- IF c.check_permission(object, 'delete') -%]
-  <a class="btn btn-danger" href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a>
-  [%- END -%]
-</div>
 [% END %]
-[% END %]
+<div class="row">
 
 <div class="col-sm-8">
   <div class="panel panel-default">
@@ -51,7 +55,11 @@
     [% bootstrap_progressbar(host_usage) %]
   </div>
   </div>
-</div>
+</div><!-- end of col -->
+
+</div><!-- end of row -->
+
+<div class="row">
 
 [% IF object.children_ordered %]
 <div class="col-sm-12">
@@ -76,5 +84,6 @@
     </tbody>
     </table>
   </div>
-  </div>
+  </div><! -- col -->
 [% END %]
+</div><! -- row -->

@@ -1,7 +1,6 @@
 [%
    page.title='Top level IP networks'
 -%]
-[% PROCESS 'ipnetwork/_common.tt' -%]
 [%- IF c.check_permission('ipnetwork', 'create') -%]
 [% page.toolbar = BLOCK %]
 <div id="IPNetwork_create">
