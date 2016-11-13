@@ -12,6 +12,21 @@ with 'Manoc::Form::TraitFor::CSRF';
 
 has '+name' => ( default => 'login_form' );
 
+sub build_do_form_wrapper { 0 }
+sub build_form_wrapper_class { [] }
+sub build_form_element_class { ['form-vertical'] }
+
+sub build_render_list {
+    [ 'fieldset', 'submit', 'csrf_token' ]
+}
+
+has_block 'fieldset' => (
+    tag => 'fieldset',
+    render_list => ['username', 'password'],
+    tag => 'fieldset',
+);
+
+
 has 'login_error_message' => (
     is       => 'ro',
     isa      => 'Str',
@@ -19,19 +34,29 @@ has 'login_error_message' => (
     default  => 'Wrong username or password',
 );
 
-has_field 'username' => ( type => 'Text',     required => 1 );
-has_field 'password' => ( type => 'Password', required => 1 );
+has_field 'username' => (
+    type         => 'Text',
+    required     => 1,
+    do_label     => 0,
+    element_attr => { placeholder => 'Username' },
+);
+has_field 'password' => (
+    type         => 'Password',
+    required     => 1,
+    do_label     => 0,
+    element_attr => { placeholder => 'Password' },
+);
 
 has_field 'submit' => (
     type         => 'Submit',
     value        => 'Login',
     widget       => 'ButtonTag',
-    element_attr => { class => [ 'btn', 'btn-primary' ] },
+    do_wrapper   => 0,
+    element_attr => { class => [ qw"btn btn-lg btn-success btn-block" ] },
 );
 
-sub build_form_wrapper_class {
-    [ 'col-sm-10', 'col-sm-offset-1', 'col-md-8', 'col-md-offset-2' ];
-}
+
+
 
 sub validate {
     my $self = shift;

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+  [% PROCESS layouts/_head_block.tt %]
+  <body>
+   <div class="container">
+   [% content %]
+   <!-- /container -->
+  [% make_js_block %]
+  </body>
+</html>
