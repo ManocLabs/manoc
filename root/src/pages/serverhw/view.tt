@@ -1,15 +1,32 @@
 [%
    page.title='Server Hardware'
 %]
-[% META
-use_table=1
--%]
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>Delete</a>
+[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') || c.check_permission('server.create') -%]
+ <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Edit <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+    [%- IF c.check_permission(object, 'edit') -%]
+      <li>
+        <a href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+      </li>
+    [% END -%]
+    [% IF  c.check_permission(object, 'delete') -%]
+      <li>
+         <a href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
+      </li>
+    [% END %]
+    [% IF c.check_permission('server.create') -%]
+       <li>
+         <a href=[% c.uri_for_action('server/create', { serverhw => object.id}) %]>Create server</a>
+       </li>
+    [% END %]
  </div>
-[% END %]
+[% END -%]
+[% END -%]
+
  <dl class="dl-horizontal">
   <dt>Inventory</dt>
   <dd>[% object.inventory | html %]</dd>

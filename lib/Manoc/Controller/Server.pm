@@ -37,6 +37,30 @@ __PACKAGE__->config(
     json_columns            => [ 'id', 'name' ],
 );
 
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    my $serverhw_id = $c->req->query_parameters->{'serverhw'};
+    my $vm_id       = $c->req->query_parameters->{'vm'};
+    my %form_defaults;
+
+    if ( defined($serverhw_id) ) {
+        $c->log->debug("new server using hardware $serverhw_id") if $c->debug;
+        $form_defaults{serverhw} = $serverhw_id;
+        $form_defaults{type}     = 'p';
+    }
+    if ( defined($vm_id) ) {
+        $c->log->debug("new server using vm $vm_id") if $c->debug;
+        $form_defaults{vm}    = $vm_id;
+        $form_defaults{type} = 'v';
+    }
+    %form_defaults and
+        $c->stash( form_defaults => \%form_defaults );
+};
 
 =head1 AUTHOR
 
@@ -52,3 +76,9 @@ it under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

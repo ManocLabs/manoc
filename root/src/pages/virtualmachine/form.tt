@@ -1,4 +1,4 @@
 [%
-  page.title='Virtual Machine'
+  page.title='Edit Virtual Machine'
 %]
 [% form.render %]
