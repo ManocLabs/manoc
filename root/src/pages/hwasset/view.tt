@@ -3,20 +3,17 @@
 -%]
 
 [% page.toolbar = BLOCK -%]
-
-
-
-[%- IF c.check_permission(object, 'delete') || c.check_permission(object, 'edit') %]
-<div>
-[%- IF c.check_permission(object, 'edit') -%]
- <a class="btn btn-default" href=[%c.uri_for_action('hwasset/edit', [object.id]) %]>Edit</a>
-[%- END -%]
-[%- IF c.check_permission(object, 'delete') -%]
- <a class="btn btn-danger" href=[% c.uri_for_action('hwasset/delete', [object.id]) %]>Delete</a>
-    </div>
+  <div class="btn-group">
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('hwasset/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('hwasset/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
+    </ul>
+  </div><!-- end btn group -->
 [% END -%]
-[% END -%]
-[% END -%]
+
  <dl class="dl-horizontal">
   <dt>Inventory number</dt>
   <dd>[% object.inventory | html %]</dd>

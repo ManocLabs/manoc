@@ -2,28 +2,20 @@
 page.title = 'Building ' _ object.name
 page.no_content_row = 1
 -%]
-[% page.toolbar = BLOCK %]
-[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') ||  c.check_permission('rack.create')  -%]
+[% page.toolbar = BLOCK -%]
   <div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('building/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-    [% IF c.check_permission(object, 'edit') -%]
-      <li><a href=[%c.uri_for_action('building/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a></li>
-    [%- END -%]
-    [%- IF c.check_permission('building.create') -%]
-      <li><a href="[% c.uri_for('/rack/create', { building => object.id}) %]">
-    [% bootstrap_icon('plus') %] Add Rack</a></li>
-    [% END -%]
-    [%- IF c.check_permission(object, 'delete') -%]
-      <li><a href=[% c.uri_for_action('building/delete', [object.id]) %]>
-    [% bootstrap_icon('trash') %] Delete</a></li>
-    [%- END -%]
-  </div>
-[% END %]
-[% END %]
-
+      <li class"[% 'disable' UNLESS c.check_permission('rack.create') %]">
+        <a href="[% c.uri_for('/rack/create', { building => object.id}) %]">[% bootstrap_icon('plus') %] Add Rack</a>
+      </li>
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('building/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
+    </ul>
+  </div><!-- end btn group -->
+[% END -%]
 
 <div class="row">
 <div class="col-sm-12">

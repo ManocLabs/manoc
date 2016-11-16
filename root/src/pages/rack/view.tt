@@ -4,34 +4,24 @@ page.title = 'Rack ' _ object.name
 page.no_content_row = 1
 -%]
 [% page.toolbar = BLOCK -%]
-<div>
-[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') ||  c.check_permission('serverhw.create')  -%]
-  <div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
+<div class="btn-group">
+  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-    [% IF c.check_permission(object, 'edit') -%]
-      <li><a href="[% c.uri_for_action('rack/edit',[object.id]) %]">
-    [% bootstrap_icon('pencil') %] Edit rack info</a></li>
-    [% END -%]
-    [%- IF  c.check_permission('device.create') -%]
-      <li><a href="[% c.uri_for_action('device/create', { rack => object.id}) %]">
-    [% bootstrap_icon('plus') %] Add device</a></li>
-    [%- END -%]
-    [%- IF  c.check_permission('serverhw.create') -%]
-      <li><a href="[% c.uri_for_action('serverhw/create', { rack => object.id}) %]">
-    [% bootstrap_icon('plus') %] Add server</a></li>
-    [%- END -%]
+      <li class="[% 'disabled' UNLESS c.check_permission('device.create') -%]">
+        <a href="[% c.uri_for_action('device/create', { rack => object.id}) %]">[% bootstrap_icon('plus') %] Add device</a>
+      </li>
+      <li class="[% 'disabled' UNLESS c.check_permission('serverhw.create') %]">
+         <a href="[% c.uri_for_action('serverhw/create', { rack => object.id}) %]">[% bootstrap_icon('plus') %] Add server</a>
+      </li>
       <li role="separator" class="divider"></li>
-    [% IF c.check_permission(object, 'delete') -%]
-      <li><a href="[%c.uri_for_action('rack/delete',[object.id]) %]">
-    [% bootstrap_icon('trash') %] Delete</a></li>
-    [% END -%]
+
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+        <a href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
+      </li>
     </ul>
-  </div><!-- end btn group -->
-</div>
-[% END -%]
+</div><!-- end btn group -->
 [% END -%]
 
 <div class="row">

@@ -1,23 +1,19 @@
-[% META
-   use_table = 1
--%]
 [%
   page.title='View VLAN ' _ object.id
 -%]
-[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
 [% page.toolbar = BLOCK %]
-<div id="toolbar">
-  [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-    <a class="btn btn-default" href="[%c.uri_for_action('vlan/edit',[object.id]) %]">
-    [% bootstrap_icon('pencil') %]Edit</a>
-  [%- END -%]
-  [%- IF c.check_permission(object, 'delete') -%]
-    <a class="btn btn-default" href="[%c.uri_for_action('vlan/delete',[object.id])%]">
-    [% bootstrap_icon('trash') %]Delete</a>
-  [%- END -%]
+<div class="btn-group">
+    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[%c.uri_for_action('vlan/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+       <a href="[%c.uri_for_action('vlan/delete',[object.id])%]">[% bootstrap_icon('trash') %] Delete</a>
+       </li>
+    </ul>
 </div>
 [% END -%]
-[% END -%]
+
 <dl class="dl-horizontal">
   <dt>VLAN ID</dt>
   <dd>[% object.id | html %]</dd>

@@ -2,29 +2,18 @@
    page.title='Virtual Machine ' _ object.name
 -%]
 [% page.toolbar = BLOCK -%]
-[%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') || c.check_permission('server.create') -%]
  <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
+    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-    [%- IF c.check_permission(object, 'edit') -%]
-      <li>
-        <a href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
-      </li>
-    [% END -%]
-    [% IF  c.check_permission(object, 'delete') -%]
-      <li>
+      <li class="[% 'disabled' UNLESS  c.check_permission(object, 'delete') %]">
          <a href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
       </li>
-    [% END %]
-    [% IF c.check_permission('server.create') -%]
-       <li>
+      <li class="[% 'disabled' IF c.check_permission('server.create') %]">
          <a href=[% c.uri_for_action('server/create', { vm => object.id}) %]>Create server</a>
-       </li>
-    [% END %]
+      </li>
  </div>
-[% END -%]
 [% END -%]
 
 <dl class="dl-horizontal">

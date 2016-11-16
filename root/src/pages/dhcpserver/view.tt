@@ -3,9 +3,6 @@
 
    page.no_content_row=1
 %]
-[% META
-   use_table=1
--%]
 [% page.toolbar = BLOCK -%]
 [% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
   <div class="btn-group">

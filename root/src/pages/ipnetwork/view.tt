@@ -3,24 +3,18 @@
    page.no_content_row = 1
 -%]
 [% page.toolbar = BLOCK %]
-[% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-       [% IF c.check_permission(object, 'edit') -%]
-       <li><a href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit properties</a></li>
-       [% END -%]
-       [% IF c.check_permission(object, 'delete') -%]
-       <li><a href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a></li>
-       [% END -%]
+<div class="btn-group">
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('ipnetwork/edit', [object.id]) %]>Edit</a>
+   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+   </button>
+   <ul class="dropdown-menu dropdown-menu-right">
+       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+           <a href=[% c.uri_for_action('ipnetwork/delete', [object.id]) %]>Delete</a>
+       </li>
     </ul>
-  </div>
-  [%- END -%]
-  [% IF c.check_permission(object, 'create') -%]
-  <a class="btn btn-default btn-sm"  href="[% c.uri_for('/dhcpsubnet/create', { network_id => object.id}) %]">Make DHCP subnet</a>
-  [% END -%]
+</div>
+<a class="btn btn-default [% 'disabled' UNLESS c.check_permission('dhcpsubnet.create') -%]"  href="[% c.uri_for('/dhcpsubnet/create', { network_id => object.id}) %]">Create DHCP Network</a>
 [% END %]
 
 <div class="row">

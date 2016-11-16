@@ -1,24 +1,18 @@
 [%
-   page.title='View VirtualInfr'
+   page.title='Virtual Infrastructure ' _ object.name
 %]
-[% META
-   use_table=1
--%]
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('virtualinfr/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('virtualinfr/delete', [object.id]) %]>Delete</a>
-    </div>
+ <div class="btn-group">
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('virtualinfr/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('virtualinfr/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
+    </ul>
+ </div><!-- end btn group -->
 [% END %]
-<dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
-  <dt>name</dt>
+<dl class="dl-horizontal">
+  <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
-  <dt>address</dt>
-  <dd>[% object.address | html %]</dd>
-  <dt>platform</dt>
-  <dd>[% object.platform | html %]</dd>
-  <dt>version</dt>
-  <dd>[% object.version | html %]</dd>
-</dl>
+ </dl>
