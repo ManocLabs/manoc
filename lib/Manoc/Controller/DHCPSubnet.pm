@@ -31,6 +31,8 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::DHCPSubnet',
     form_class => 'Manoc::Form::DHCPSubnet',
+    create_page_template      => 'dhcpsubnet/create.tt',
+
 );
 
 
