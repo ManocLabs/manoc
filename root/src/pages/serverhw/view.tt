@@ -1,15 +1,21 @@
 [%
-   page.title='Server Hardware'
+   page.title='Server Hardware' _ object.inventory
 %]
-[% META
-use_table=1
--%]
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>Delete</a>
+ <div class="btn-group">
+    <a class="btn btn-primary [% 'disabled' UNLESS  c.check_permission(object, 'delete') %]" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
+      </li>
+      <li class="[% 'disabled' IF NOT c.check_permission('server.create') OR object.server %]">
+         <a href=[% c.uri_for_action('server/create', { serverhw => object.id}) %]>Create server</a>
+      </li>
  </div>
-[% END %]
+[% END -%]
+
  <dl class="dl-horizontal">
   <dt>Inventory</dt>
   <dd>[% object.inventory | html %]</dd>

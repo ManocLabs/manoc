@@ -35,7 +35,7 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(2) {
     my ( $self, $c, $device_id, $iface ) = @_;
 
     my $object_pk = {
-        device    => $device_id,
+        device_id => $device_id,
         interface => $iface,
     };
 

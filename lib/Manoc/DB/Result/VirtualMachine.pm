@@ -21,6 +21,7 @@ __PACKAGE__->add_columns(
     identifier => {
         data_type   => 'varchar',
         size        => 36,
+        is_nullable => 1,
     },
     name => {
         data_type   => 'varchar',

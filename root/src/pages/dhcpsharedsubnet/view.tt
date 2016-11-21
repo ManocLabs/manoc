@@ -1,17 +1,24 @@
 [%
    page.title='View DHCPSharedSubnet'
+
+  page.no_content_row = 1
 -%]
-[% META
-   use_table=1
--%]
+
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('dhcpsharedsubnet/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('dhcpsharedsubnet/delete', [object.id]) %]>Delete</a>
-    </div>
-[% END %]
+  <div class="btn-group">
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('dhcpsharedsubnet/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('dhcpsharedsubnet/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
+    </ul>
+  </div><!-- end btn group -->
+[% END -%]
 
 <div class="row">
+<div class="col-sm-12">
+
   <div class="panel panel-default">
     <div class="panel-body">
       <dl class="dl-horizontal">
@@ -60,11 +67,13 @@
   <dt>DHCP Server</dt>
   <dd>[% object.dhcp_server.name | html %]</dd>
   </dl>
-    </div>
-  </div>
 </div>
+</div>
+</div><!-- col -->
+</div><!-- row -->
 
 <div class="row">
+<div class="col-sm-12">
   <table class="table table-condensed" id="subnet_list">
     <thead>
       <tr>
@@ -83,4 +92,5 @@
       [% END %]
     </tbody>
   </table>
-</div>
+</div><!-- col -->
+</div><!-- row -->

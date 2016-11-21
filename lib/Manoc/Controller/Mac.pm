@@ -34,7 +34,7 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                     macaddr => $macaddr
                 },
                 {
-                    prefetch => { 'device_entry' => ['mng_url_format'] }
+                    prefetch => { 'device' => ['mng_url_format'] }
                 }
             )
         ],

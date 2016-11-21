@@ -1,28 +1,36 @@
 [%
-   page.title='View VirtualMachine'
-   use_table=1
+   page.title='Virtual Machine ' _ object.name
 -%]
 [% page.toolbar = BLOCK -%]
-<div>
- <a class="btn btn-default" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>Edit</a>
-  &nbsp;<a class="btn btn-danger" href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>Delete</a>
-    </div>
-[% END %]
-<dl>
-  <dt>id</dt>
-  <dd>[% object.id | html %]</dd>
-  <dt>identifier</dt>
-  <dd>[% object.identifier | html %]</dd>
-  <dt>name</dt>
+ <div class="btn-group">
+    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS  c.check_permission(object, 'delete') %]">
+         <a href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
+      </li>
+      <li class="[% 'disabled' IF c.check_permission('server.create') %]">
+         <a href=[% c.uri_for_action('server/create', { vm => object.id}) %]>Create server</a>
+      </li>
+ </div>
+[% END -%]
+
+<dl class="dl-horizontal">
+  <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
-  <dt>on_virtinfr_id</dt>
-  <dd>[% object.on_virtinfr_id | html %]</dd>
-  <dt>on_hypervisor_id</dt>
-  <dd>[% object.on_hypervisor_id | html %]</dd>
-  <dt>ram_memory</dt>
+  <dt>Used by</dt>
+  <dd>[% print_server(object.server) IF object.server %]</dd>
+  <dt>Virtual infrastructure</dt>
+  <dd>[% object.on_virtinfr | html %]</dd>
+  <dt>Hypervisor</dt>
+  <dd>[% object.on_hypervisor | html %]</dd>
+  <dt>RAM Memory</dt>
   <dd>[% object.ram_memory | html %]</dd>
-  <dt>vcpus</dt>
+  <dt>Virtual CPUs</dt>
   <dd>[% object.vcpus | html %]</dd>
-  <dt>notes</dt>
+  <dt>Identifier</dt>
+  <dd>[% object.identifier | html %]</dd>
+  <dt>Notes</dt>
   <dd>[% object.notes | html %]</dd>
 </dl>

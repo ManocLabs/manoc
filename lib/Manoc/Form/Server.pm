@@ -39,7 +39,7 @@ has_field 'hostname' => (
     size => 128,
     required => 1,
     label => 'Hostname',
-    element_attr => { placeholder => 'hostname.local.domain' },
+    element_attr => { placeholder => 'hostname.loca.domain' },
     bs_block_field_helper({ label => 2, input => 4 })
 
 );

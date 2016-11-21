@@ -2,21 +2,17 @@
    page.title='IP address block ' _ object.name
    page.no_content_row = 1
 -%]
-[% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
+[% page.toolbar = BLOCK -%]
+ <div class="btn-group">
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('ipblock/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu">
-       [% IF c.check_permission(object, 'edit') -%]
-       <li><a href=[%c.uri_for_action('ipblock/edit', [object.id]) %]>Edit properties</a></li>
-       [% END -%]
-       [% IF c.check_permission(object, 'delete') -%]
-       <li><a href=[% c.uri_for_action('ipblock/delete', [object.id]) %]>Delete</a></li>
-       [% END -%]
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('ipblock/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
     </ul>
-  </div>
-  [%- END -%]
+  </div><!-- end btn group -->
 [% END %]
 <div class="row">
 
