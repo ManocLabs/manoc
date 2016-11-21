@@ -107,8 +107,16 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraints( [qw/inventory/] );
 
-__PACKAGE__->belongs_to( building => 'Manoc::DB::Result::Building', 'building_id', );
-__PACKAGE__->belongs_to( rack     => 'Manoc::DB::Result::Rack', 'rack_id' );
+__PACKAGE__->belongs_to(
+    building => 'Manoc::DB::Result::Building',
+    'building_id',
+    { join_type => 'left' }
+);
+__PACKAGE__->belongs_to(
+    rack     => 'Manoc::DB::Result::Rack',
+    'rack_id',
+    { join_type => 'left' }
+);
 
 __PACKAGE__->might_have(
     device   => 'Manoc::DB::Result::Device',
