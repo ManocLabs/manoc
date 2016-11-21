@@ -39,11 +39,39 @@ __PACKAGE__->config(
     view_object_perm        => undef,
 
     json_columns            => [ 'id', 'inventory', 'model', 'serial' ],
+
+    object_list_options     => { prefetch =>  { 'hwasset' => { 'rack' => 'building' } } },
 );
 
 =head1 ACTIONS
 
+
+
 =head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    my $copy_id = $c->req->query_parameters->{'copy'};
+    if ($copy_id) {
+        my $original = $c->stash->{resultset}->find($copy_id);
+        if ($original) {
+            $c->log->debug("copy server from $copy_id");
+            my %cols = $original->get_columns;
+            delete $cols{hwasset_id};
+            foreach ( qw(model vendor) ) {
+                $cols{$_} = $original->hwasset->get_column($_);
+            }
+
+            $c->stash( form_defaults => \%cols );
+        }
+    }
+};
+
+
+=head2 import_csv
 
 Import a server hardware list from a CSV file
 

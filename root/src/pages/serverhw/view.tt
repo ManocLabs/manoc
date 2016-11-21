@@ -1,5 +1,5 @@
 [%
-   page.title='Server Hardware' _ object.inventory
+   page.title='Server Hardware ' _ object.inventory
 %]
 [% page.toolbar = BLOCK -%]
  <div class="btn-group">
@@ -7,6 +7,9 @@
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission('serverhw.create') %]">
+         <a href=[% c.uri_for_action('serverhw/create', { copy => object.id }) %]>[% bootstrap_icon('duplicate') %] Duplicate</a>
+      </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
          <a href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
       </li>
