@@ -16,6 +16,14 @@ has object_list_filter_columns => (
     default => sub { [] }
 );
 
+
+has object_list_options => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
+
 =head1 NAME
 
 Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
@@ -76,7 +84,8 @@ sub get_object_list {
 
     my $rs = $c->stash->{resultset};
     my $filter = $self->get_object_list_filter($c);
-    return [ $rs->search( $filter ) ];
+    my $options = $self->object_list_options;
+    return [ $rs->search( $filter, $options ) ];
 }
 
 =head2 get_object_list_filter

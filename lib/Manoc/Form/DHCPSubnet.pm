@@ -6,8 +6,26 @@ use namespace::autoclean;
 
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
+with 'Manoc::Form::TraitFor::Horizontal';
 
 use HTML::FormHandler::Types ('IPAddress');
+
+sub build_render_list {
+    [
+        'name',
+        'dhcp_server',
+        'dhcp_shared_subnet',
+        'network',
+        'range_block',
+        'max_lease_time',
+        'default_lease_time',
+        'ntp_server',
+        'domain_name',
+        'domain_nameserver',
+        'save',
+        'csrf_token'
+    ];
+}
 
 has '+name'        => ( default => 'form-dhcpsubnet' );
 has '+html_prefix' => ( default => 1 );
@@ -40,12 +58,37 @@ has_field 'dhcp_shared_subnet' => (
 
 has_field 'network' => ( 
     type => 'Select', 
-    label => 'Network', 
+    label => 'Subnet', 
+    empty_select => '--- Select a subnet ---',
+);
+
+has_block 'range_block' => (
+    render_list => [ 'range', 'ipblock_button' ],
+    tag         => 'div',
+    class       => ['form-group'],
 );
 
 has_field 'range' => ( 
     type => 'Select', 
     label => 'IP Pool', 
+    empty_select => '--- Select Ip Pool ---',
+    do_wrapper => 0,
+    tags => {
+        before_element => '<div class="col-sm-8">',
+        after_element  => '</div>'
+    },
+    label_class  => ['col-sm-2'],
+);
+
+has_field 'ipblock_button' => (
+    type           => 'Button',
+    widget         => 'ButtonTag',
+    element_attr   => {
+        class => [ 'btn', 'btn-primary' ],
+        href => '#',
+    },
+    widget_wrapper => 'None',
+    value          => "Add",
 );
 
 has_field 'max_lease_time' => ( 
