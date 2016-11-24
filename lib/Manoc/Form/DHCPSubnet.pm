@@ -14,7 +14,7 @@ sub build_render_list {
     [
         'name',
         'dhcp_server',
-        'dhcp_shared_subnet',
+        'dhcp_shared_network',
         'network',
         'range_block',
         'max_lease_time',
@@ -32,10 +32,10 @@ has '+html_prefix' => ( default => 1 );
 
 has '+item_class' => ( default => 'DHCPSubnet' );
 
-has_field 'name' => ( 
-    type => 'Text', 
-    required => 1, 
-    label => 'Name', 
+has_field 'name' => (
+    type => 'Text',
+    required => 1,
+    label => 'Name',
     apply    => [
         'Str',
         {
@@ -45,20 +45,19 @@ has_field 'name' => (
     ]
 );
 
-has_field 'dhcp_server' => ( 
-    type => 'Select', 
-    label => 'DHCP Server', 
+has_field 'dhcp_server' => (
+    type => 'Hidden',
 );
 
-has_field 'dhcp_shared_subnet' => ( 
-    type => 'Select', 
-    label => 'Shared Subnet', 
-    empty_select => 'No shared subnet', 
+has_field 'dhcp_shared_network' => (
+    type => 'Select',
+    label => 'Shared Network',
+    empty_select => '--- No shared subnet ---',
 );
 
-has_field 'network' => ( 
-    type => 'Select', 
-    label => 'Subnet', 
+has_field 'network' => (
+    type => 'Select',
+    label => 'Subnet',
     empty_select => '--- Select a subnet ---',
 );
 
@@ -68,9 +67,9 @@ has_block 'range_block' => (
     class       => ['form-group'],
 );
 
-has_field 'range' => ( 
-    type => 'Select', 
-    label => 'IP Pool', 
+has_field 'range' => (
+    type => 'Select',
+    label => 'IP Pool',
     empty_select => '--- Select Ip Pool ---',
     do_wrapper => 0,
     tags => {
@@ -91,33 +90,33 @@ has_field 'ipblock_button' => (
     value          => "Add",
 );
 
-has_field 'max_lease_time' => ( 
-    type => 'Integer', 
-    label => 'Maximum Lease Time', 
+has_field 'max_lease_time' => (
+    type => 'Integer',
+    label => 'Maximum Lease Time',
 );
 
-has_field 'default_lease_time' => ( 
-    type => 'Integer', 
-    label => 'Default Lease Time', 
+has_field 'default_lease_time' => (
+    type => 'Integer',
+    label => 'Default Lease Time',
 );
 
-has_field 'ntp_server' => ( 
-    type => 'Text', 
-    size => 15, 
-    apply      => [IPAddress],
-    label => 'Ntp Server', 
-);
-
-has_field 'domain_nameserver' => ( 
+has_field 'ntp_server' => (
     type => 'Text',
-    size => 15, 
+    size => 15,
     apply      => [IPAddress],
-    label => 'Domain Nameserver', 
+    label => 'Ntp Server',
 );
-  
-has_field 'domain_name' => ( 
-    type => 'Text', 
-    label => 'Domain Name', 
+
+has_field 'domain_nameserver' => (
+    type   => 'Text',
+    size   =>  15,
+    apply  => [IPAddress],
+    label  => 'Domain Nameserver',
+);
+
+has_field 'domain_name' => (
+    type => 'Text',
+    label => 'Domain Name',
 );
 
 override validate_model => sub {
@@ -126,24 +125,74 @@ override validate_model => sub {
     my $values = $self->values;
 
     super();
-    
-   #TODO contollo che gli indirizzi from e to ricadino nella subnet associata
- 
+
+    my $network = $self->schema->resultset('IPNetwork')
+        ->find($values->{network});
+    my $range = $self->schema->resultset('IPBlock')
+        ->find($values->{range});
+
+    if ($range && $network) {
+        if ( !$network->network->contains_address($range->from_addr) ||
+                 !$network->network->contains_address($range->to_addr) )
+            {
+                $self->field('range')->add_error('Pool must be inside network')
+            }
+    }
 
 };
+
+
+sub options_dhcp_shared_network {
+    my $self = shift;
+
+    return unless $self->schema;
+
+    my $server_id =
+        ($self->item && $self->item->in_storage)
+        ? $self->item->dhcp_server_id
+        : $self->field('dhcp_server')->default;
+
+    my $rs = $self->schema->resultset('DHCPSharedNetwork')->search(
+        { dhcp_server_id => $server_id });
+
+    return map +{ value => $_->id, label => $_->name }, $rs->all;
+}
 
 sub options_network {
     my $self = shift;
 
     return unless $self->schema;
-    my $rs = $self->schema->resultset('IPNetwork')->search( { 'dhcp_subnet.id' => undef }, {  join => 'dhcp_subnet' , prefetch => 'dhcp_subnet', order_by => 'address'} );
 
-    return map +{ value => $_->id, label => $_->name . " ( ".
-    $_->address . "/". $_->prefix . " )" }, $rs->all();
+    my $server_id;
+    my $item_id;
+
+    if ($self->item && $self->item->in_storage) {
+        $server_id = $self->item->dhcp_server_id;
+        $item_id   = $self->item->id;
+    } else {
+        $self->field('dhcp_server')->default;
+    }
+
+
+    my $server_network_ids =
+        $self->resultset('DHCPSubnet')
+        ->search(
+            {
+                dhcp_server_id => $server_id,
+                -not => { id => $item_id },
+            },
+            {
+                columns => [ 'network_id' ],
+                distinct => 1
+            });
+
+    my $rs = $self->schema->resultset('IPNetwork')->search(
+        {
+           id => {  -not_in => $server_network_ids->as_query },
+        });
+
+    return map +{ value => $_->id, label => $_->label }, $rs->all();
 }
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
-
-
-

@@ -51,16 +51,12 @@ __PACKAGE__->add_columns(
         data_type => 'varchar',
         size      => 16,
     },
-    'dhcpnet_id' => {
-        data_type      => 'int',
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
+
 );
 
-__PACKAGE__->belongs_to( 
+__PACKAGE__->belongs_to(
     'dhcp_subnet' => 'Manoc::DB::Result::DHCPSubnet',
-    { 'foreign.id' => 'self.dhcpnet_id' }, 
+    { 'foreign.id' => 'self.dhcpnet_id' },
 );
 
 __PACKAGE__->set_primary_key('id');

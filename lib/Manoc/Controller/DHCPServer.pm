@@ -11,6 +11,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::DHCPServer;
+use Manoc::Form::DHCPSharedNetwork;
 
 =head1 NAME
 
