@@ -1,0 +1,43 @@
+[%
+page.title='Create DHCP Subnet'
+page.subsection='DHCP'
+page.section='Assets'
+-%]
+
+[% form.render %]
+[% fragment = BLOCK -%]
+var ipblock_control;
+
+function on_close_create_form(data) {
+  refresh_ipblocks();
+  ipblock_control.setValue(data.object_id);
+}
+
+function refresh_ipblocks() {
+  ipblock_control.clearOptions();
+  $.ajax({
+    url: '[% c.uri_for_action('/ipblock/ipblocks_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      $.each(res, function(index, item) {
+      console.log(item);
+        ipblock_control.addOption({value: item.id, text: item.name  });
+      });
+    }
+  });
+}
+
+$( document ).ready(function() {
+   var ipblock_select = $('#form-dhcpsubnet\\.range').selectize({
+      create: false,
+    });
+    ipblock_control = ipblock_select[0].selectize;
+
+
+	$('#form-dhcpsubnet\\.ipblock_button').click(function() {
+	showDialogForm("[% c.uri_for_action('/ipblock/create_ipblock') %]", "Create IP Block", on_close_create_form);
+      	return false;
+   	});
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]
