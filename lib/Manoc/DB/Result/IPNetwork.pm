@@ -121,6 +121,12 @@ sub broadcast {
     return $self->_broadcast( $self->network->broadcast );
 }
 
+
+sub label {
+    my $self = shift;
+    return $self->name . " (" . $self->network . ")";
+}
+
 # call this method after resizing a network
 sub _rebuild_subtree {
     my $self = shift;
@@ -246,8 +252,8 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
-__PACKAGE__->might_have(
-    dhcp_subnet =>
+__PACKAGE__->has_many(
+    dhcp_subnets =>
     'Manoc::DB::Result::DHCPSubnet',
     { 'foreign.network_id' => 'self.id' },
  );

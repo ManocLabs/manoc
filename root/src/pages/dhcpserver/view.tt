@@ -4,29 +4,29 @@
    page.no_content_row=1
 %]
 [% page.toolbar = BLOCK -%]
-[% IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-right">
-       [% IF c.check_permission(object, 'edit') -%]
-       <li><a href=[%c.uri_for_action('dhcpserver/edit', [object.id]) %]>Edit properties</a></li>
-       [% END -%]
-       [% IF c.check_permission(object, 'delete') -%]
-       <li><a href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a></li>
-       [% END -%]
-       <li role="separator" class="divider"></li>
-       <li><a href="[% c.uri_for('dhcpsubnet/create', { server_id => object.id}) %]">
-    [% bootstrap_icon('plus') %] Add DHCP subnet</a></li>
-       <li><a href="[% c.uri_for('/dhcpsharedsubnet/create', { server_id => object.id}) %]">[% bootstrap_icon('plus') %] Add DHCP shared subnet</a></li>
-    </ul>
-  </div>
-[%- END -%]
-[% END %]
+<div class="btn-group">
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('dhcpserver/edit', [object.id]) %]>Edit</a>
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-right">
+     <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') -%]">
+        <a href=[% c.uri_for_action('dhcpserver/delete', [object.id]) %]>Delete</a>
+     </li>
+     <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+        <a href="[% c.uri_for_action('dhcpsubnet/create', { server_id => object.id}) %]">
+        [% bootstrap_icon('plus') %] Add subnet</a>
+     </li>
+     <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+        <a class="btn btn-default" href="[% c.uri_for_action('/dhcpsharednetwork/create', { server_id => object.id}) %]">[% bootstrap_icon('plus') %] Add shared network</a>
+     </li>
+  </ul>
+</div>
+[% END -%]
 
 <div class="row">
-<div class="col-sm-12">
+
+<div class="col-sm-6">
   <div class="panel panel-default">
     <div class="panel-body">
     <dl class="dl-horizontal">
@@ -44,66 +44,46 @@
     </div><!-- panel body -->
   </div><!-- panel -->
 </div><!-- col -->
-</div><!-- row -->
-
-<div class="row">
 
 <div class="col-md-6">
-
-  <div class="panel panel-default">
-  <div class="panel-heading clearfix" style="padding: 5px;">
-     <h4 class="panel-title">Shared subnets</h4>
-  </div>
-  <div class="panel-body">
- [% IF object.dhcp_shared_subnet -%]
-  <table class="table table-condensed" id="share_subnet_list">
-    <thead>
-      <tr>
- 	<th>Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      [% FOREACH n IN object.dhcp_shared_subnet -%]
-      <tr>
-	<td>[% print_dhcp_shared_subnet(n)  %]</td>
-      </tr>
-      [% END %]
-    </tbody>
-  </table>
-  [% END -%]
-  </div><!-- panel body -->
-  </div><!-- panel -->
-</div><!-- col -->
-
-
-<div class="col-md-6">
-
   <div class="panel panel-default">
   <div class="panel-heading clearfix" style="padding: 5px;">
      <h4 class="panel-title">Subnets</h4>
   </div>
   <div class="panel-body">
-[% IF object.dhcp_subnet -%]
   <table class="table table-condensed" id="subnet_list">
     <thead>
       <tr>
- 	<th>Name</th>
- 	<th>Network</th>
- 	<th>IP Pool</th
+   	  <th>Name</th>
+      <th>Subnet</th>
+      <th>Pool</th>
       </tr>
     </thead>
     <tbody>
-      [% FOREACH n IN object.dhcp_subnet -%]
+   [% FOREACH s IN object.dhcp_shared_networks -%]
       <tr>
-	<td>[% print_dhcpsubnet(n)  %]</td>
-	<td>[% n.network.address %]/[% n.network.prefix %]</td>
-	<td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+	     <td colspan="3">[% print_dhcp_shared_subnet(s)  %]</td>
       </tr>
-      [% END %]
+      [% FOREACH n IN s.dhcp_subnets -%]
+      <tr>
+     	<td style="padding-left: 5ex">[% print_dhcpsubnet(n)  %]</td>
+ 	    <td>[% n.network.network %]</td>
+	    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+      </tr>
+      [% END -%]
+   [% END -%]
+   [% FOREACH n IN object.dhcp_subnets -%]
+     [% UNLESS n.dhcp_shared_network %]
+      <tr>
+        <td>[% print_dhcpsubnet(n)  %]</td>
+	    <td>[% n.network.network %]</td>
+  	    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+      </tr>
+     [% END -%]
+   [% END -%]
     </tbody>
   </table>
-  [% END -%]
-    </div><!-- panel body -->
+  </div><!-- panel body -->
   </div><!-- panel -->
 </div><!-- col -->
 

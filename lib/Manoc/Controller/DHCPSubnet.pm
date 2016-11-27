@@ -8,7 +8,9 @@ package Manoc::Controller::DHCPSubnet;
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'Manoc::ControllerRole::CommonCRUD';
+with 'Manoc::ControllerRole::CommonCRUD' => {
+    -excludes => [ 'list', 'get_form_success_url' ],
+};
 
 use Manoc::Form::DHCPSubnet;
 
@@ -45,12 +47,33 @@ before 'create' => sub {
 
     my $net_id    = $c->req->query_parameters->{'network_id'};
     my $server_id = $c->req->query_parameters->{'server_id'};
+    my %form_defaults;
 
-    defined($net_id)    and $c->stash( form_defaults => { network => $net_id } );
-    defined($server_id) and $c->stash( form_defaults => { dhcp_server  => $server_id } );
+    if (!defined($server_id) || !$c->model('ManocDB::DHCPServer')->find($server_id)) {
+        $c->response->redirect( $c->uri_for_action('dhcpserver/list') );
+        $c->detach();
+    } else {
+        $form_defaults{dhcp_server} = $server_id;
+    }
 
+    defined($net_id)    and $form_defaults{network} = $net_id;
+
+    $c->stash(
+        server_id     => $server_id,
+        form_defaults => \%form_defaults,
+    );
 };
 
+
+=head2 get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    return $c->uri_for_action('dhcpserver/view', [ $c->stash->{server_id} ] );
+}
 
 =head1 AUTHOR
 

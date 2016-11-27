@@ -153,6 +153,15 @@ sub _build_num_hosts {
     return $_[0]->_last_host_i - $_[0]->_first_host_i + 1;
 }
 
+sub contains_address {
+    my ($self, $address) = @_;
+
+    blessed($address) and $address->isa('Manoc::IPAddress::IPv4')
+        and $address = $address->numeric;
+
+    return ( $address & $self->_netmask_i ) == $self->_address_i;
+}
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -192,7 +201,8 @@ sub BUILD {
 }
 
 sub _stringify {
-    return $_[0]->address->unpadded . "/" . $_[0]->prefix;
+    my $self = shift;
+    return $self->address->unpadded . "/" . $self->prefix;
 }
 
 __PACKAGE__->meta->make_immutable;
