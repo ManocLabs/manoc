@@ -85,13 +85,16 @@
  [% END -%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
-[%#                            IP DHCP Network                        -%]
+[%#                             DHCP                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_dhcpsubnet(network) BLOCK -%]
 <a href=[% c.uri_for_action('dhcpsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
 [%- END -%]
-[% MACRO print_dhcp_shared_subnet(network) BLOCK -%]
-<a href=[% c.uri_for_action('dhcpsharedsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
+[% MACRO print_dhcpsharednetwork(network) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpsharednetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
+[%- END -%]
+[% MACRO print_dhcpserver(server) BLOCK -%]
+<a href=[% c.uri_for_action('dhcpserver/view', [ server.id ]) %]>[% server.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Server HardWare                           -%]

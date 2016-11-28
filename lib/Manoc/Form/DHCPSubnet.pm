@@ -194,5 +194,13 @@ sub options_network {
     return map +{ value => $_->id, label => $_->label }, $rs->all();
 }
 
+before 'update_model' => sub {
+    my $self = shift;
+
+    if ($self->item->in_storage) {
+        delete $self->values->{dhcp_server};
+    }
+};
+
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
