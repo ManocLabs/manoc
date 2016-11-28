@@ -97,7 +97,7 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->has_many(
     reservations =>
     'Manoc::DB::Result::DHCPReservation',
-    { 'foreign.dhcpnet_id' => 'self.id' },
+    { 'foreign.dhcp_subnet_id' => 'self.id' },
   );
 
 

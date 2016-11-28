@@ -25,7 +25,6 @@ BEGIN { extends 'Manoc::Controller::APIv1' }
 sub reservation_base : Chained('deserialize') PathPart('dhcp/reservation') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->stash( resultset => $c->model('ManocDB::DHCPReservation') );
-    $c->log->debug("I was here");
 }
 
 =head2 reservation_post
@@ -55,29 +54,41 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
     $c->forward('validate') or return;
 
     my $req_data = $c->stash->{api_request_data};
-    my $server   = $req_data->{server};
 
+    my $server_name   = $req_data->{server};
+    my $server = $c->model('ManocDB::DHCPServer')->find('name');
+    if (!$server) {
+        push @{ $c->stash->{api_field_errors} }, 'Unknown server';
+        return;
+    }
+    my $rs        = $c->stash->{resultset};
     my $records   = $req_data->{reservations};
     my $n_created = 0;
-    my $rs        = $c->stash->{resultset};
-    foreach my $r (@$records) {
-        my $macaddr = $r->{macaddr}                               or next;
-        my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
-        my $status  = $r->{server};
-        my $hostname = $r->{hostname};
-        my $name     = $r->{name};
 
-        $rs->update_or_create(
-            {
-                server   => $server,
-                macaddr  => $macaddr,
-                ipaddr   => $ipaddr,
-                hostname => $hostname,
-                name     => $name,
+    $c->schema->txn_do(
+        sub {
+            $server->reservations->update(on_server => 0);
+
+            foreach my $r (@$records) {
+                my $macaddr = $r->{macaddr}                               or next;
+                my $ipaddr  = Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
+                my $status  = $r->{server};
+                my $hostname = $r->{hostname};
+                my $name     = $r->{name};
+
+                $rs->update_or_create(
+                    {
+                        macaddr   => $macaddr,
+                        ipaddr    => $ipaddr,
+                        hostname  => $hostname,
+                        name      => $name,
+                        server    => $server,
+                        on_server => 1,
+                    }
+                );
+                $n_created++;
             }
-        );
-        $n_created++;
-    }
+        });
     my $data = { message => "created $n_created entries", };
 
     $c->stash( api_response_data => $data );

@@ -35,7 +35,8 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
     ok( $net, 'create IPv4 Network from address/prefix');
 
     cmp_ok( "$net", 'eq', '192.168.1.0/24', 'stringify');
-    
+    cmp_ok( $net->_stringify, 'eq', '192.168.1.0/24', 'stringify');
+
     cmp_ok( $net->address,    'eq', '192.168.1.0',   'address');
     cmp_ok( $net->prefix,     '==', '24',            'prefix');
     cmp_ok( $net->netmask,    'eq', '255.255.255.0', 'netmask');
@@ -78,4 +79,3 @@ done_testing();
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
