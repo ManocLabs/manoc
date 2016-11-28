@@ -16,9 +16,6 @@
 $(function() {
     $("#[% id  %]").DataTable( {
       "responsive" : true,
-[% IF options.paging   %] "paging":   true,[% END -%]
-[% IF options.ordering %] "ordering": true,[% END -%]
-[% IF options.info     %] "info":     true,[% END -%]
 [% IF options.server_source -%]
    "serverSide":   true,
    "processing":   true,
@@ -31,11 +28,9 @@ $(function() {
   [% END -%]
 ]
 [% END -%]
-[%- IF options.toolbar -%]
    "dom": "<'row'<'col-sm-6'<'toolbar'>><'col-sm-6'f>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-6'i><'col-sm-6'p>>",
-[%- END  %]
    });
 [% IF options.toolbar -%]
    var origin=$("#[% options.toolbar %]");
