@@ -268,7 +268,12 @@ sub get_object_list {
                 dismissed => 0
             },
             {
-                prefetch => [ { 'rack' => 'building' }, 'mng_url_format', ]
+                prefetch => [
+                    { 'rack' => 'building' },
+                    'mng_url_format',
+                    'hwasset',
+                    'netwalker_info',
+                ]
             }
         )
     ];
