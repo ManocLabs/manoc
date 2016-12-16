@@ -80,9 +80,6 @@
           regexp: ''
           replace: "{{manoc_mibs}}"
 
-
-# perl -ne "s||$MIBS_DIR|; if ( /^mibdirs/ ) { /cisco|rfc|net-snmp/ or print '# '; print; } else { print }" "$MIBS_DIR/snmp.conf"> /etc/snmp/snmp.conf
-
     - name: Test for cpanm
       shell: perl -MApp::cpanminus -e1
       register: cpanm_result
