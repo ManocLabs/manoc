@@ -1,5 +1,5 @@
 [%
-   page.title='View DHCPSubnet'
+   page.title='DHCP Subnet ' _ object.name
    page.no_content_row = 1
 -%]
 [% page.toolbar = BLOCK -%]
@@ -21,19 +21,15 @@
     <div class="panel-body">
 
 <dl class="dl-horizontal">
-  <dt>Name</dt>
-  <dd>[% object.name | html %]</dd>
   <dt>DHCP Server</dt>
-  <dd>[% object.dhcp_server.name | html %]</dd>
+  <dd>[% print_dhcpserver( object.dhcp_server) %]</dd>
   <dt>Network</dt>
   <dd>[% object.network.address | html %]/
       [% object.network.prefix  | html %]</dd>
-    <dt>IP Pool from</dt>
-  <dd>[% object.range.from_addr | html %]</dd>
-  <dt>Ip Pool to </dt>
-  <dd>[% object.range.to_addr | html %]</dd>
-  <dt>Pool of shared subnet</dt>
-  <dd>[% print_dhcp_shared_subnet(object.dhcp_shared_subnet) %]</dd>
+  <dt>Pool</dt>
+  <dd>[% object.range.from_addr | html %] - [% object.range.to_addr | html %]</dd>
+  <dt>Shared Network</dt>
+  <dd>[% print_dhcp_shared_network(object.dhcp_shared_network) %]</dd>
   <dt>Domain</dt>
   <dd>
       [%IF object.domain_name -%]
@@ -55,7 +51,7 @@
       [%IF object.ntp_server -%]
   	   [% object.ntp_server | html %]
       [%ELSE -%]
-      	   [% object.dhcp_server.ntp_server | html %]
+        <i>[% object.dhcp_server.ntp_server | html %]</i>
       [%END -%]
   </dd>
   <dt>Lease Time</dt>

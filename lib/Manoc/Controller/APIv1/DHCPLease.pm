@@ -55,7 +55,13 @@ sub lease_post : Chained('lease_base') PathPart('') POST {
 
     my $req_data = $c->stash->{api_request_data};
 
-    my $server  = $req_data->{server};
+    my $server_name   = $req_data->{server};
+    my $server = $c->model('ManocDB::DHCPServer')->find('name');
+    if (!$server) {
+        push  @{ $c->stash->{api_field_errors} }, 'Unknown server';
+        return;
+    }
+
     my $records = $req_data->{leases};
 
     my $n_created = 0;

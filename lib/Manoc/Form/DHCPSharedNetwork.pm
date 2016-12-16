@@ -31,11 +31,6 @@ has_field 'dhcp_server' => (
     type  => 'Hidden'
 );
 
-has_field 'dhcp_subnets' => (
-    type => 'Multiple',
-    label => 'DHCP Subnet',
-);
-
 has_field 'max_lease_time' => (
     type => 'Integer',
     label => 'Maximum Lease Time',
@@ -65,6 +60,13 @@ has_field 'domain_name' => (
     label => 'Domain Name',
 );
 
+before 'update_model' => sub {
+    my $self = shift;
+
+    if ($self->item->in_storage) {
+        delete $self->values->{dhcp_server};
+    }
+};
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

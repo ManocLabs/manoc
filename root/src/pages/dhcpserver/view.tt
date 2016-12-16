@@ -1,8 +1,8 @@
-[%
-   page.title='DHCP server ' _ object.name
 
-   page.no_content_row=1
-%]
+[%
+page.title='DHCP server ' _ object.name
+-%]
+[% META use_table=1 -%]
 [% page.toolbar = BLOCK -%]
 <div class="btn-group">
    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('dhcpserver/edit', [object.id]) %]>Edit</a>
@@ -24,67 +24,145 @@
 </div>
 [% END -%]
 
-<div class="row">
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    [% bootstrap_nav_tab("general", "General", 1) -%]
+    [% bootstrap_nav_tab("subnets", "Subnets", 0) -%]
+    [% bootstrap_nav_tab("reservations", "Reservations", 0) -%]
+    [% bootstrap_nav_tab("leases", "Leases", 0) -%]
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="general">
+        <div class="row">
+            <div class="col-sm12">
+                <dl class="dl-horizontal">
+  	                <dt>Domain Name</dt>
+  	                <dd>[% object.domain_name | html %]</dd>
+  	                <dt>Domain Nameserver</dt>
+  	                <dd>[% object.domain_nameserver | html %]</dd>
+  	                <dt>Ntp Server</dt>
+  	                <dd>[% object.ntp_server | html %]</dd>
+  	                <dt>Default Lease Time</dt>
+  	                <dd>[% object.default_lease_time | html %]</dd>
+  	                <dt>Maximum Lease Time</dt>
+  	                <dd>[% object.max_lease_time | html %]</dd>
+  	            </dl>
+            </div><!-- col -->
+        </div><!-- row -->
+    </div><!-- tab panel -->
 
-<div class="col-sm-6">
-  <div class="panel panel-default">
-    <div class="panel-body">
-    <dl class="dl-horizontal">
-  	<dt>Domain Name</dt>
-  	<dd>[% object.domain_name | html %]</dd>
-  	<dt>Domain Nameserver</dt>
-  	<dd>[% object.domain_nameserver | html %]</dd>
-  	<dt>Ntp Server</dt>
-  	<dd>[% object.ntp_server | html %]</dd>
-  	<dt>Default Lease Time</dt>
-  	<dd>[% object.default_lease_time | html %]</dd>
-  	<dt>Maximum Lease Time</dt>
-  	<dd>[% object.max_lease_time | html %]</dd>
-  	</dl>
-    </div><!-- panel body -->
-  </div><!-- panel -->
-</div><!-- col -->
+    <div role="tabpanel" class="tab-pane" id="subnets">
+        <div class="row">
+            <div class="col-sm12">
+                <table class="table table-condensed" id="subnet_list">
+                    <thead>
+                        <tr>
+   	                        <th>Name</th>
+                            <th>Subnet</th>
+                            <th>Pool</th>
+                        </tr>
+                    </thead>
+                    [% FOREACH s IN object.dhcp_shared_networks -%]
+                    [% IF s.dhcp_subnets.size %]
+                    <tbody>
+                        <tr>
+	                        <td>
+	                            <a role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%s.id %]" aria-expanded="false" aria-controls="children[%range.id %]" ></a>
+                                [% print_dhcpsharednetwork(s)  %]
+                            </td>
+                            <td colspan="2">Shared Network</td>
+                        </tr>
+                    </tbody>
+                    [% FOREACH n IN s.dhcp_subnets -%]
+                    <tbody id="children[%s.id%]" class="collapse" aria-labelledby="row[%range.id%]">
+                        <tr class="childrow">
+     	                    <td>[% print_dhcpsubnet(n) %]</td>
+ 	                        <td>[% n.network.network %]</td>
+	                        <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+                        </tr>
+                    </tbody>
+                    [% END -%]
+                    [% ELSE -%]
+                    <tbody>
+                        <tr>
+	                        <td>
+                                [% print_dhcpsharednetwork(s)  %]
+                            </td>
+                            <td colspan="2">Shared Network</td>
+                        </tr>
+                    </tbody>
+                    [% END -%]
+                    [% END -%]
+                    <tbody>
+                    [% FOREACH n IN object.dhcp_subnets -%]
+                    [% UNLESS n.dhcp_shared_network %]
+                    <tr>
+                        <td>[% print_dhcpsubnet(n)  %]</td>
+	                    <td>[% n.network.network %]</td>
+  	                    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
+                    </tr>
+                    [% END -%]
+                    [% END -%]
+                    </tbody>
+                </table>
+            </div><!-- col -->
+        </div><!-- row -->
+     </div><!-- tab panel -->
 
-<div class="col-md-6">
-  <div class="panel panel-default">
-  <div class="panel-heading clearfix" style="padding: 5px;">
-     <h4 class="panel-title">Subnets</h4>
-  </div>
-  <div class="panel-body">
-  <table class="table table-condensed" id="subnet_list">
-    <thead>
-      <tr>
-   	  <th>Name</th>
-      <th>Subnet</th>
-      <th>Pool</th>
-      </tr>
-    </thead>
-    <tbody>
-   [% FOREACH s IN object.dhcp_shared_networks -%]
-      <tr>
-	     <td colspan="3">[% print_dhcp_shared_subnet(s)  %]</td>
-      </tr>
-      [% FOREACH n IN s.dhcp_subnets -%]
-      <tr>
-     	<td style="padding-left: 5ex">[% print_dhcpsubnet(n)  %]</td>
- 	    <td>[% n.network.network %]</td>
-	    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
-      </tr>
-      [% END -%]
-   [% END -%]
-   [% FOREACH n IN object.dhcp_subnets -%]
-     [% UNLESS n.dhcp_shared_network %]
-      <tr>
-        <td>[% print_dhcpsubnet(n)  %]</td>
-	    <td>[% n.network.network %]</td>
-  	    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
-      </tr>
-     [% END -%]
-   [% END -%]
-    </tbody>
-  </table>
-  </div><!-- panel body -->
-  </div><!-- panel -->
-</div><!-- col -->
+      <div role="tabpanel" class="tab-pane" id="reservations">
+        <div class="row">
+            <div class="col-sm-12">
+               [% init_table('reservation_list' ) %]
+                <table class="table" style="width:100%"  id="reservation_list">
+                    <thead>
+                        <tr>
+                            <th>Mac Address</th>
+                            <th>IP Address</th>
+                            <th>Name</th>
+                            <th>Hostname</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        [% FOREACH r IN object.reservations -%]
+                        <tr>
+                            <td>[% print_mac(r.macaddr) %]</td>
+                            <td>[% print_ip(r.ipaddr) %]</td>
+                            <td>[% r.name %]</td>
+                            <td>[% r.hostname %]</td>
+                        </tr>
+                        [% END %]
+                    </tbody>
+                </table>
+            </div><!-- col -->
+        </div><!-- row -->
+      </div><!-- tab panel -->
 
-</div><!-- row -->
+
+       <div role="tabpanel" class="tab-pane" id="leases">
+           <div class="row">
+               <div class="col-sm-12">
+                   [% init_table('lease_list' ) %]
+                   <table class="table" style="width:100%" id="lease_list">
+                    <thead>
+                        <tr>
+                            <th>Mac Address</th>
+                            <th>IP Address</th>
+                            <th>Name</th>
+                            <th>Hostname</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        [% FOREACH r IN object.leases -%]
+                        <tr>
+                            <td>[% print_mac(r.macaddr) %]</td>
+                            <td>[% print_ip(r.ipaddr) %]</td>
+                            <td>[% r.name %]</td>
+                            <td>[% r.hostname %]</td>
+                        </tr>
+                        [% END %]
+                    </tbody>
+                </table>
+               </div>
+           </div><!-- row -->
+       </div><!-- tab panel -->
+</div><!-- tab-content -->

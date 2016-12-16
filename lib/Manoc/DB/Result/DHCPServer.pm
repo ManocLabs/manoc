@@ -64,6 +64,18 @@ __PACKAGE__->has_many(
     'dhcp_shared_networks' => 'Manoc::DB::Result::DHCPSharedNetwork',
      { 'foreign.dhcp_server_id' => 'self.id' },
 );
+
+__PACKAGE__->has_many(
+      'dhcp_leases' => 'Manoc::DB::Result::DHCPLease',
+     { 'foreign.dhcp_server_id' => 'self.id' },
+);
+
+__PACKAGE__->has_many(
+      'dhcp_reservations' => 'Manoc::DB::Result::DHCPReservation',
+     { 'foreign.dhcp_server_id' => 'self.id' },
+);
+
+
 1;
 
 # Local Variables:
