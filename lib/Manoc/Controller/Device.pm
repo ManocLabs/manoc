@@ -66,50 +66,41 @@ __PACKAGE__->config(
 sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
     my $device = $c->stash->{'object'};
+
+    # uplinks
+    $c->stash(uplinks => [ map { $_->interface } $device->uplinks->all() ] );
+
+    #Unused interfaces
+    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused($device->id);
+    $c->stash(unused_ifaces => \@unused_ifaces);
+
+    # prepare template
+    $c->stash( template => 'device/view.tt' );
+}
+
+=head2 ifstatus
+
+Called via xhr by view
+
+=cut
+
+sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $device = $c->stash->{'object'};
     my $id     = $device->id;
-
-    my %tmpl_param;
-    my @iface_info;
-
-    $tmpl_param{uplinks} = join( ", ", map { $_->interface } $device->uplinks->all() );
-
-    # CPD
-    my @neighs = $device->neighs( {}, { prefetch => 'to_device_info' } );
-
-    my @cdp_links;
-    my $time_limit = $c->config->{Device}->{cdp_age} || 3600 * 12;    #12 hours
-    foreach my $n (@neighs) {
-        push(
-            @cdp_links,
-            {
-                expired        => time - $n->last_seen > $time_limit,
-                local_iface    => $n->from_interface,
-                to_device      => $n->to_device,
-                to_device_info => $n->to_device_info,
-                remote_id      => $n->remote_id,
-                remote_type    => $n->remote_type,
-                date           => $n->last_seen,
-            }
-        );
-    }
-
-    #------------------------------------------------------------
-    # Interfaces info
-    #------------------------------------------------------------
 
     # prefetch notes
     my %if_notes = map { $_->interface => 1 } $device->ifnotes;
 
     # prefetch interfaces last activity
-    my ( $e, $it );
-
-    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
-
     my %if_last_mat;
-
+    my ( $e, $it );
+    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
     while ( $e = $it->next ) {
         $if_last_mat{ $e->interface } = $e->get_column('lastseen');
     }
+
+    my @iface_info;
 
     # fetch ifstatus and build result array
     my @ifstatus = $device->ifstatus;
@@ -118,8 +109,8 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         my $lc_if = lc( $r->interface );
 
         push @iface_info, {
-            controller   => $controller,                                  # for sorting
-            port         => $port,                                        # for sorting
+            controller   => $controller,                # for sorting
+            port         => $port,                      # for sorting
             interface    => $r->interface,
             speed        => $r->speed || 'n/a',
             up           => $r->up || 'n/a',
@@ -135,13 +126,52 @@ sub view : Chained('object') : PathPart('') : Args(0) {
             has_notes    => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
         };
     }
+    @iface_info = sort { $a->{controller} cmp $b->{controller} || $a->{port} cmp $b->{port} } @iface_info;
 
-    #Unused interfaces
-    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused($id);
+    $c->stash->{no_wrapper}  = 1;
+    $c->stash->{iface_info}  = \@iface_info;
+}
 
-    #------------------------------------------------------------
+=head2 neighs
+
+Called via xhr by view
+
+=cut
+
+
+sub neighs : Chained('object') : PathPart('neighs') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $device = $c->stash->{'object'};
+
+    my $time_limit = $c->config->{Device}->{cdp_age} || 3600 * 12;    #12 hours
+
+    my @neighs =
+        map +{
+            expired        => time - $_->last_seen > $time_limit,
+            local_iface    => $_->from_interface,
+            to_device      => $_->to_device,
+            to_device_info => $_->to_device_info,
+            remote_id      => $_->remote_id,
+            remote_type    => $_->remote_type,
+            date           => $_->last_seen,
+        },
+        $device->neighs( {}, { prefetch => 'to_device_info' } )->all();
+
+    $c->stash->{no_wrapper} = 1;
+    $c->stash->{neighs}     = \@neighs;
+}
+
+=head2 ssids
+
+Called via xhr by view
+
+=cut
+
+sub ssids : Chained('object') : PathPart('ssids') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $device = $c->stash->{'object'};
+
     # wireless info
-    #------------------------------------------------------------
 
     # ssid
     my @ssid_list = map +{
@@ -151,8 +181,21 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         channel   => $_->channel
         },
         $device->ssids;
+    $c->stash->{ssid_list} = \@ssid_list;
 
-    # wireless clients
+    $c->stash->{no_wrapper} = 1;
+}
+
+=head2 dot11clients
+
+Called via xhr by view
+
+=cut
+
+sub dot11clients : Chained('object') : PathPart('dot11clients') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $device = $c->stash->{'object'};
+
     my @dot11_clients = map +{
         ssid    => $_->ssid,
         macaddr => $_->macaddr,
@@ -162,18 +205,9 @@ sub view : Chained('object') : PathPart('') : Args(0) {
         state   => $_->state,
         },
         $device->dot11clients;
+    $c->stash->{dot11_clients} = \@dot11_clients;
 
-    # prepare template
-    $c->stash( template => 'device/view.tt' );
-    $c->stash(%tmpl_param);
-
-    $c->stash(
-        iface_info    => \@iface_info,
-        cdp_links     => \@cdp_links,
-        ssid_list     => \@ssid_list || undef,
-        dot11_clients => \@dot11_clients || undef,
-        unused_ifaces => \@unused_ifaces
-    );
+    $c->stash->{no_wrapper} = 1;
 }
 
 =head2 refresh

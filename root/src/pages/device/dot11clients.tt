@@ -1,0 +1,25 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>SSID</th>
+            <th>Mac Address</th>
+            <th>IP Address</th>
+            <th>Vlan</th>
+            <th>State</th>
+            <th>Quality</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH s IN dot11_clients %]
+        <tr>
+            <td><a href="#"> [% s.ssid %]</a></td>
+            <td><a href="[% c.uri_for('mac', s.macaddr ) %]"> [% s.macaddr %]</a></td>
+            <td><a href="[% c.uri_for_action('ip', [s.ipaddr] ) %]"> [% s.ipaddr %]</a></td>
+            <td><a href="[% c.uri_for_action('vlan', [s.vlan] ) %]"> [% s.vlan %]</a></td>
+            <td>[% s.state %]</td>
+            <td>[% s.quality %]</td>
+            <!-- <a href="<tmpl_var name=detail_link>">details</a> -->
+        </tr>
+        [% END %]
+    </tbody>
+</table>

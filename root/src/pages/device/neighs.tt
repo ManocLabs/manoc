@@ -1,0 +1,30 @@
+<table class="table">
+    <thead>
+	    <tr>
+	        <th>Local Interface</th>
+            <th>Neigh Address</th>
+	        <th>Neigh Name</th>
+	        <th>Neigh Description</th>
+            <th>Last seen</th>
+	    </tr>
+    </thead>
+    <tbody>
+	    [% FOREACH link IN neighs %]
+	    <tr [% UNLESS link.expired %]class="success"[% END %]>
+	        <td>
+	            <a href="[% c.uri_for_action('interface/view', [object.id, link.local_iface]) %]">
+	                [% link.local_iface %]</a>
+	        </td>
+	        [% IF  link.to_device_info  %]
+            <td>[% link.to_device_info.mng_address %]</td>
+	        <td>[% print_device(link.to_device_info) %]</td>
+	        [% ELSE %]
+            <td>[% print_ip(link.to_device) -%]</td>
+            <td>[% link.remote_id %]</td>
+	        [% END %]
+	        <td>[% link.remote_type %]</td>
+	        <td>[% date.format(link.date) %]</td>
+	    </tr>
+	    [% END -%]
+    </tbody>
+</table>

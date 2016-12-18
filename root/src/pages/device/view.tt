@@ -48,12 +48,15 @@ page.title   = 'Device ' _ object.name
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist">
   [% bootstrap_nav_tab("general", "General", 1) -%]
-  [% bootstrap_nav_tab("ifstatus", "Interface Status", 0) -%]
-  [% bootstrap_nav_tab("ifactivity", "Interface Activity", 0) -%]
+  [% bootstrap_nav_tab_remote("ifstatus", "Interface Status",
+                      c.uri_for_action('/device/ifstatus', [object.id])  0) -%]
   [% bootstrap_nav_tab("ifunused", "Unused Intefaces", 0)-%]
-  [% bootstrap_nav_tab("cdp", "CDP", 0) -%]
-  [% bootstrap_nav_tab("ssid", "SSID List", 0)-%]
-  [% bootstrap_nav_tab("clients", "Wireless clients", 0) -%]
+  [% bootstrap_nav_tab_remote("neighs", "Neighbours",
+    c.uri_for_action('/device/neighs', [object.id]), 0) -%]
+  [% bootstrap_nav_tab_remote("ssid", "SSID List",
+    c.uri_for_action('/device/ssids', [object.id]), 0) -%]
+  [% bootstrap_nav_tab_remote("clients", "Wireless clients",
+    c.uri_for_action('/device/dot11clients', [object.id]), 0) -%]
 </ul>
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="general">
@@ -119,108 +122,17 @@ page.title   = 'Device ' _ object.name
 	  No backup found
 	  [% END %]
 	</dd>
-	<dt>Uplinks</dt><dd>[% object.uplinks %]</dd>
+	<dt>Uplinks</dt><dd>[% object.uplinks.join(',') %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- row -->
   </div>
 
-  <div role="tabpanel" class="tab-pane" id="cdp">
-    <table class="table">
-      <thead>
-	<tr>
-	  <th>Local Interface</th>
-          <th>Neigh Address</th>
-	  <th>Neigh Name</th>
-	  <th>Neigh Description</th>
-          <th>Last seen</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH link IN cdp_links %]
-	<tr [% UNLESS link.expired %]class="success"[% END %]>
-	  <td>
-	    <a href="[% c.uri_for_action('interface/view', [object.id, link.local_iface]) %]">
-	      [% link.local_iface %]</a>
-	  </td>
-	  [% IF  link.to_device_info  %]
-          <td>[% link.to_device_info.mng_address %]</td>
-	  <td>[% print_device(link.to_device_info) %]</td>
-	  [% ELSE %]
-          <td>[% print_ip(link.to_device) -%]</td>
-          <td>[% link.remote_id %]</td>
-	  [% END %]
-	  <td>[% link.remote_type %]</td>
-	  <td>[% date.format(link.date) %]</td>
-	</tr>
-	[% END -%]
-      </tbody>
-    </table>
-  </div> <!-- cdp -->
+  <div role="tabpanel" class="tab-pane" id="neighs">
+  </div> <!-- neighs -->
 
   <div role="tabpanel" class="tab-pane" id="ifstatus">
-    <table class="table">
-      <thead>
-	<tr>
-          <th>Interface</th>
-	  <th>Connected</th>
-	  <th>Adm Status</th>
-	  <th>Speed</th>
-	  <th>Duplex</th>
-	  <th>Vlan</th>
-	  <th>Port Security</th>
-	  <th>Description</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH if IN iface_info %]
-	[% row_class = if.up == 'up' ? 'active' : 'warning' %]
-	<tr class="[% row_class %]">
-          <td>[% print_iface(object.id, if.interface) %]</td>
-          <td>[% if.up | html %]</td>
-          <td>[% if.up_admin | html %]</td>
-	  <td>[% if.speed | html %]</td>
-	  <td>[% if.duplex | html %]/[% if.duplex_admin | html %]</td>
-	  <td>[% if.vlan | html %]</td>
-	  <td>
-            [% IF if.cps_enable -%]
-	    [% if.cps_status | html %] ([% if.cps_count | html %])
-	    [% ELSE %]
-  	    Disabled
-	    [% END -%]
-	  <td>[% if.description | html %]</td>
-	</tr>
-	[% END -%]
-      </tbody>
-    </table>
   </div> <!-- ifstatus  -->
-
-  <div role="tabpanel" class="tab-pane" id="ifactivity">
-    <table class="table">
-      <thead>
-	<tr>
-	  <th>Interface</th>
-	  <th>Admin Status</th>
-	  <th>Last MAT activity date</th>
-	  <th>Vlan</th>
-	  <th>Description</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH if IN iface_info %]
-	<tr>
-	  <td>
-	    [% print_iface(object.id,if.interface) %]
-	  </td>
-	  <td>[% if.up_admin %]</td>
-	  <td>[% date.format(if.last_mat) %]</td>
-	  <td>[% if.vlan || "-" %]</td>
-	  <td>[% if.description | html %]</td>
-	</tr>
-	[% END -%]
-      </tbody>
-    </table>
-  </div> <!-- ifactivity  -->
 
   <div role="tabpanel" class="tab-pane" id="ifunused">
     <table class="table">
@@ -242,56 +154,10 @@ page.title   = 'Device ' _ object.name
   </div> <!-- unused  -->
 
   <div role="tabpanel" class="tab-pane" id="ssid">
-    <table class="table">
-      <thead>
-	<tr>
-	  <th>Interface</th>
-	  <th>SSID</th>
-          <th>Broadcast</th>
-          <th>Channel</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH s IN ssid_list %]
-	<tr>
-          <td><a href="[% c.uri_for_action('interface/view',
-		       [s.ipaddr, s.interface]) %]"> [% s.interface %]</a>
-          </td>
-          <td><a href="#"> [% s.ssid %]</a></td>
-          <td>[% s.broadcast %]</td>
-          <td>[% s.channel %]</td>
-	</tr>
-	[% END %]
-      </tbody>
-    </table>
+
   </div> <!-- end tab -->
 
   <div role="tabpanel" class="tab-pane" id="clients">
-    <table class="table">
-      <thead>
-	<tr>
-	  <th>SSID</th>
-	  <th>Mac Address</th>
-	  <th>IP Address</th>
-	  <th>Vlan</th>
-	  <th>State</th>
-	  <th>Quality</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH s IN dot11_clients %]
-	<tr>
-          <td><a href="#"> [% s.ssid %]</a></td>
-          <td><a href="[% c.uri_for('mac', s.macaddr ) %]"> [% s.macaddr %]</a></td>
-          <td><a href="[% c.uri_for_action('ip', [s.ipaddr] ) %]"> [% s.ipaddr %]</a></td>
-          <td><a href="[% c.uri_for_action('vlan', [s.vlan] ) %]"> [% s.vlan %]</a></td>
-          <td>[% s.state %]</td>
-          <td>[% s.quality %]</td>
-          <!-- <a href="<tmpl_var name=detail_link>">details</a> -->
-        </tr>
-	[% END %]
-      </tbody>
-    </table>
 
   </div> <!-- end tab -->
 
