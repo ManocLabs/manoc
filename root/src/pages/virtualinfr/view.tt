@@ -15,4 +15,6 @@
 <dl class="dl-horizontal">
   <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
+  <dt>Name</dt>
+  <dd>[% object.description | html %]</dd>
  </dl>
