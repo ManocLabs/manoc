@@ -30,7 +30,7 @@ $(function() {
 [% END -%]
    "dom": "<'row'<'col-sm-6'<'toolbar'>><'col-sm-6'f>>" +
           "<'row'<'col-sm-12'tr>>" +
-          "<'row'<'col-sm-6'i><'col-sm-6'p>>",
+          "<'row'<'col-sm-6'i><'col-sm-6'p>>"
    });
 [% IF options.toolbar -%]
    var origin=$("#[% options.toolbar %]");

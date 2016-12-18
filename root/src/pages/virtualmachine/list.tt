@@ -22,13 +22,11 @@
    <tbody>
 [% FOREACH object IN object_list %]
    <tr>
-  	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>[% object.name | html %]View</a></td>
+  	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>[% object.name | html %]</a></td>
  	 <td>[% object.on_virtinfr_id | html %]</td>
  	 <td>[% object.on_hypervisor_id | html %]</td>
  	 <td>[% object.ram_memory | html %]</td>
  	 <td>[% object.vcpus | html %]</td>
- 	 <td>[% object.notes | html %]</td>
-
    </tr>
 [% END %]
    </tbody>

@@ -9,8 +9,6 @@
      <tr>
         <th>Name</th>
         <th>Description</th>
-        <th>Hypervisors</th>
-        <th>Virtual Machines</th>
      </tr>
    </thead>
    <tbody>
