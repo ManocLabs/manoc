@@ -65,7 +65,7 @@ function showDialogForm(url, title, on_close) {
         var currTabTarget = $(e.target).attr('href');
         var remoteUrl = $(this).attr('data-tab-remote');
         var loadedOnce = $(this).data('loaded');
-        if (remoteUrl !== '' && !loadedOnce) {
+        if (remoteUrl && remoteUrl !== '' && !loadedOnce) {
             $(currTabTarget).load(remoteUrl)
             $(this).data('loaded',true);
         }

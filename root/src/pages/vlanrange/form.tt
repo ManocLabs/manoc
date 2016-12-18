@@ -1,6 +1,5 @@
 [%
    page.title='VlanRange'
 -%]
-<div class="buttons">
 [% form.render %]
-</div>
+[% ajax_form(form.name) %]

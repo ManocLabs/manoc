@@ -81,8 +81,10 @@ sub form : Private {
 
         }
         else {
+            my $template_name = $c->stash->{ajax_form_template};
+            $template_name ||= $c->namespace . "/form.tt";
             $json_data->{html} =
-                $c->forward( "View::TT", "render", [ "form.tt", $c->stash ] );
+                $c->forward( "View::TT", "render", [ $template_name, $c->stash ] );
         }
         $c->stash->{json_data} = $json_data;
         $c->detach('View::JSON');

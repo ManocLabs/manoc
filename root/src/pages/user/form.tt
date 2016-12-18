@@ -2,3 +2,4 @@
    page.title = 'Edit user ' _ object.username
 -%]
 [% form.render %]
+[% ajax_form(form.name) %]

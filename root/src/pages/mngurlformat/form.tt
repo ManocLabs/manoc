@@ -2,10 +2,7 @@
   page.title='Management URL Format'
 -%]
 
-<div class="row">
 <p>Use <tt>%h</tt> as a placeholder for device address</p>
-</div>
 
-<div class="row">
 [% form.render %]
-</div>
+[% ajax_form(form.name) %]

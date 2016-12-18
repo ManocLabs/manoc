@@ -1,1 +1,3 @@
+[% page.title = "DCHP Shared Network" -%]
 [% form.render %]
+[% ajax_form(form.name) %]

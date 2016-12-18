@@ -1,1 +1,5 @@
+[%
+page.title = "Rack"
+-%]
 [% form.render %]
+[% ajax_form(form.name) %]

@@ -1,1 +1,5 @@
+[%
+    page.title = 'Virtual Infrastructure'
+    -%]
 [% form.render %]
+[% ajax_form(form.name) %]

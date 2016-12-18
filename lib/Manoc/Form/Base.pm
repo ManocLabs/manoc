@@ -9,11 +9,10 @@ use HTML::FormHandler::Moose;
 
 extends 'HTML::FormHandler::Model::DBIC';
 
-with 'Manoc::Form::TraitFor::Theme';
-with 'Manoc::Form::TraitFor::CSRF';
-
 #required for CSRF
 has '+ctx' => ( required => 1, );
+
+with 'Manoc::Form::TraitFor::Theme', 'Manoc::Form::TraitFor::CSRF';
 
 # with 'HTML::FormHandlerX::Form::JQueryValidator';
 
