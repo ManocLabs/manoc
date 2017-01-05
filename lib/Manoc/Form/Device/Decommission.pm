@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Device::Dismiss;
+package Manoc::Form::Device::Decommission;
 
 use strict;
 use warnings;
@@ -10,15 +10,15 @@ use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
 
-has '+name'        => ( default => 'form-dismiss' );
+has '+name'        => ( default => 'form-decommission' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'dismiss' => (
+has_field 'decommission' => (
     type           => 'Submit',
     widget         => 'ButtonTag',
     element_attr   => { class => [ 'btn', ] },
     widget_wrapper => 'None',
-    value          => "Dismiss",
+    value          => "Decommission",
     order          => 1000,
 );
 
@@ -27,7 +27,7 @@ has_field 'asset_action' => (
     type    => 'Select',
     widget  => 'RadioGroup',
     options => [
-        { value => 'DISMISS',  label => 'Dismiss' },
+        { value => 'DECOMMISSION',   label => 'Decommission' },
         { value => 'WAREHOUSE', label => 'Return to warehouse' },
     ],
 );
@@ -36,23 +36,21 @@ sub update_model {
     my $self   = shift;
     my $values = $self->values;
 
+    my $device  = $self->item;
+    my $hwasset = $device->hwasset;
+
     $self->schema->txn_do(
         sub {
-            my $device = $self->item;
-            $device->dismissed(1);
-
-
-            if (my $hwasset = $device->hwasset) {
+            if ($hwasset) {
                 my $action = $values->{asset_action};
-                $action eq 'DISMISS' and
-                    $hwasset->dismiss(1);
+                $action eq 'DECOMMISSION' and
+                    $hwasset->decommission();
                 $action eq 'WAREHOUSE' and
                     $hwasset->in_warehouse(1);
                 $hwasset->update();
-
-                $device->hwasset(undef);
             }
 
+            $device->decommission();
             $device->update;
         }
     );

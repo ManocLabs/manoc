@@ -19,7 +19,7 @@ use constant {
 };
 
 use constant {
-    LOCATION_DISMISSED => 'd',
+    LOCATION_DECOMMISSIONED   => 'd',
     LOCATION_WAREHOUSE => 'w',
     LOCATION_RACK      => 'r',
     LOCATION_ROOM      => 'o',
@@ -102,6 +102,11 @@ __PACKAGE__->add_columns(
         size        => '16',
         is_nullable => 1,
     },
+    locationchange_ts => {
+        data_type     => 'int',
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
 );
 
 __PACKAGE__->set_primary_key('id');
@@ -138,9 +143,9 @@ sub in_use {
     return defined($self->device) || defined($self->server);
 }
 
-sub is_dismissed {
+sub is_decommissioned {
     my $self = shift;
-    return $self->_location eq LOCATION_DISMISSED;
+    return $self->_location eq LOCATION_DECOMMISSIONED;
 }
 
 sub is_in_warehouse {
@@ -159,7 +164,7 @@ sub sync_location_fields {
     my $location = $self->_location;
 
     if ($location eq LOCATION_WAREHOUSE ||
-            $location eq LOCATION_DISMISSED)
+            $location eq LOCATION_DECOMMISSIONED)
         {
             $self->rack(undef);
             $self->rack_level(undef);
@@ -180,11 +185,14 @@ sub sync_location_fields {
     }
 }
 
-
-sub dismiss {
+sub decommission {
     my $self = shift;
+    my $timestamp = shift || time();
 
-    $self->_location(LOCATION_DISMISSED);
+    $self->_location(LOCATION_DECOMMISSIONED);
+    $self->locationchange_ts ||
+        $self->locationchange_ts($timestamp);
+
     $self->sync_location_fields;
 }
 
@@ -251,8 +259,8 @@ sub display_location {
         return $location;
     }
 
-    if ( $location eq LOCATION_DISMISSED ) {
-        return "Dismissed";
+    if ( $location eq LOCATION_DECOMMISSIONED ) {
+        return "Decommissioned";
     }
 }
 

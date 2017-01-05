@@ -29,7 +29,7 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    dismissed => {
+    decommissioned => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',

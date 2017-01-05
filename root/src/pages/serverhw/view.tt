@@ -40,7 +40,7 @@
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
-  <dt>Dismissed</dt><dd>[% IF object.dismissed %]Yes[% ELSE %]No[%END %]</dd>
+  <dt>Decommissioned</dt><dd>[% IF object.decommissioned %]Yes[% ELSE %]No[%END %]</dd>
   <dt>Used by</dt><dd>[% print_server(object.server) IF object.server %]</dd>
   <dt>RAM</dt>
   <dd>[% object.ram_memory | html %]</dd>

@@ -60,8 +60,8 @@ __PACKAGE__->has_one(
         proxy => [qw/
                         vendor model serial inventory
                         building rack rack_level room
-                        is_dismissed is_in_warehouse is_in_rack move_to_rack
-                        move_to_room move_to_warehouse
+                        is_decommissioned is_in_warehouse is_in_rack move_to_rack
+                        move_to_room move_to_warehouse decommission
                         server
                     /],
     }

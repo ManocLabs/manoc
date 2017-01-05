@@ -5,7 +5,7 @@
 [%
 page.title   = 'Device ' _ object.name
 -%]
-[%- IF !object.dismissed %]
+[%- IF !object.decommissioned %]
 [% page.toolbar = BLOCK -%]
 <div>
   <div class="btn-group">
@@ -19,8 +19,8 @@ page.title   = 'Device ' _ object.name
 	     [% bootstrap_icon('link') %] Uplinks</a>
       </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
-  	     <a href="[% c.uri_for_action('/device/dismiss', [object.id]) %]">
-	     [% bootstrap_icon('remove') %]Dismiss</a>
+  	     <a href="[% c.uri_for_action('/device/decommission', [object.id]) %]">
+	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit_nwinfo') %]">
          <a href="[% c.uri_for_action('/device/nwinfo', [object.id]) %]">

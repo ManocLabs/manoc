@@ -68,13 +68,13 @@ sub on_tick {
     # TODO better check
     my $last_visited = time() - $self->refresh_interval;
 
-    my $dismissed_devices =
-        $self->schema->resultset('Device')->search( { dismissed => 1 } )->get_column('id');
+    my $decommissioned_devices =
+        $self->schema->resultset('Device')->search( { decommissioned => 1 } )->get_column('id');
 
     my @device_ids = $self->schema->resultset('DeviceNWInfo')->search(
         {
             last_visited => { '<='    => $last_visited },
-            device_id    => { -not_in => $dismissed_devices->as_query }
+            device_id    => { -not_in => $decommissioned_devices->as_query }
         }
     )->get_column('device_id')->all();
 

@@ -20,15 +20,23 @@
    </tbody>
 </table>
 
+<div id="statusfilter_wrapper" class="filtermenu">
+<select name="statusfilter" id="statusfilter">
+    <option value="a">All</option>
+    <option value="u">In use</option>
+    <option value="d">Decommisioned</option>
+</select>
+</div>
+
 [% fragment = BLOCK -%]
 $(document).ready(function() {
-  $("#hwasset_list").DataTable( {
+  $("#hwasset_list").dataTable( {
    "serverSide":   true,
    "processing":   true,
    "ajax":  {
       "url":  "[% c.uri_for_action('hwasset/datatable_source') %]",
       "data": function ( d ) {
-         d.extra_search = $('#dismissed').checked;
+         d.search_status = $('#statusfilter').val();
       }
    },
    "columns":      [
@@ -46,11 +54,13 @@ $(document).ready(function() {
    "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
  })
 
- $("div.toolbar").html('<input id="dismissed" data-toggle="toggle" type="checkbox"> Show dismissed');
+$("#statusfilter_wrapper").appendTo($("div.toolbar").first());
+$("#statusfilter").selectize({
+   onChange: function(value) {
+       $( '#hwasset_list' ).dataTable().api().ajax.reload();
+  }
+});
 
- $('#dismissed').on('change', function() {
-   $( '#hwasset_list' ).dataTable().api().ajax.reload();
-  } );
 });
 [% END %]
 [% js_scripts.push(fragment) -%]

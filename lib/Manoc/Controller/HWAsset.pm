@@ -43,8 +43,11 @@ __PACKAGE__->config(
 
     json_columns => [ qw(id serial vendor model inventory rack_id rack_level building_id room label)],
 
-    datatable_row_callback => 'datatable_row',
+    datatable_row_callback   => 'datatable_row',
+    datatable_columns => [  qw(inventory type vendor model serial rack.name) ],
     datatable_search_columns => [  qw(serial vendor model inventory) ],
+    datatable_search_options => { prefetch =>  { 'rack' => 'building' } },
+    datatable_search_callback => 'datatable_search_cb',
 
     object_list_filter_columns => [ qw( type vendor rack_id building_id ) ],
 );
@@ -226,6 +229,24 @@ sub get_form_process_params {
     $qp->{hide_location} and $params{hide_location} = $qp->{hide_location};
 
     return %params;
+}
+
+sub datatable_search_cb {
+    my ($self, $c, $filter, $attr) = @_;
+
+    my $status = $c->request->param('search_status');
+
+    my $extra_filter = {};
+
+    defined($status) && $status eq 'd' and
+        $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
+    defined($status) && $status eq 'u' and
+        $extra_filter->{location} = { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED };
+
+    %$extra_filter and
+        $filter = { -and => [ $filter, $extra_filter ] };
+
+    return ($filter, $attr);
 }
 
 sub datatable_row {

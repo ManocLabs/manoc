@@ -14,7 +14,7 @@ sub unused {
     my $used_vm_ids = $self->result_source->schema->resultset('Server')
         ->search(
             {
-              #  'subquery.dismissed' => 0,
+                'subquery.decommissioned' => 0,
                 'subquery.vm_id'  => { -is_not => undef }
             },
             {

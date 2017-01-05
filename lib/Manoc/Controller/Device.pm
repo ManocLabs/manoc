@@ -16,7 +16,8 @@ use Text::Diff;
 use Manoc::Form::Device::Edit;
 use Manoc::Form::DeviceNWInfo;
 use Manoc::Form::Uplink;
-use Manoc::Form::Device::Dismiss;
+use Manoc::Form::Device::Decommission;
+
 use Manoc::Netwalker::Config;
 use Manoc::Netwalker::ControlClient;
 
@@ -48,6 +49,15 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+
+    object_list_options     => {
+        prefetch => [
+            { 'rack' => 'building' },
+            'mng_url_format',
+            'hwasset',
+            'netwalker_info',
+        ]
+    },
 
     edit_page_title         => 'Edit device',
     create_page_title       => 'New device',
@@ -255,30 +265,6 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     $c->detach();
 }
 
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    return [
-        $c->stash->{resultset}->search(
-            {
-                dismissed => 0
-            },
-            {
-                prefetch => [
-                    { 'rack' => 'building' },
-                    'mng_url_format',
-                    'hwasset',
-                    'netwalker_info',
-                ]
-            }
-        )
-    ];
-}
-
 =head2 show_run
 
 Show running configuration
@@ -331,38 +317,16 @@ before 'create' => sub {
 
 };
 
-
-=head2 list_dismissed
-
-List dismissed devices
+=head2 decommission
 
 =cut
 
-sub list_dismissed : Chained('base') : PathPart('dismissed') {
-    my ( $self, $c ) = @_;
-
-    my $rs      = $c->stash->{resultset};
-    my @dismissed_devices = $rs->search(
-        {
-            "me.dismissed" => 1
-        },
-        {
-            prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'mng_url_format', ]
-        }
-    );
-    $c->stash( dismissed_device_list => \@dismissed_devices );
-}
-
-=head2 dismiss
-
-=cut
-
-sub dismiss : Chained('object') : PathPart('dismiss') : Args(0) {
+sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->require_permission( $c->stash->{object}, 'edit' );
 
-    my $form = Manoc::Form::Device::Dismiss->new( { ctx => $c } );
+    my $form = Manoc::Form::Device::Decommission->new( { ctx => $c } );
 
     $c->stash(
         form   => $form,

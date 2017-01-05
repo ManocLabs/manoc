@@ -2,11 +2,11 @@
    use_table=1
 -%]
 [%
-page.title = 'Dismissed devices'
+page.title = 'Decommissioned devices'
 %]
 
-[% init_table('dismissed_device_list') %]
-    <table class="table" id="dismissed_device_list">
+[% init_table('decommissioned_device_list') %]
+    <table class="table" id="decommissioned_device_list">
      <thead>
 	 <tr>
  	   <th>Name</th>
@@ -16,7 +16,7 @@ page.title = 'Dismissed devices'
      </tr>
      </thead>
      <tbody>
-[% FOREACH d IN dismissed_device_list %]
+[% FOREACH d IN decommissioned_device_list %]
      <tr>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>

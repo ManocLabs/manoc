@@ -37,6 +37,6 @@
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
-  <dt>Dismissed</dt><dd>[% IF object.dismissed %]Yes[% ELSE %]No[%END %]</dd>
+  <dt>Decommissioned</dt><dd>[% IF object.decommissioned %]Yes[% ELSE %]No[%END %]</dd>
   <dt>Used by</dt><dd>[% print_device(object.device) IF object.device %]</dd>
 </dl>

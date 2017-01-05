@@ -7,6 +7,10 @@
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
+       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+  	     <a href="[% c.uri_for_action('/device/decommission', [object.id]) %]">
+	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
          <a href="[%c.uri_for_action('server/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
     </ul>

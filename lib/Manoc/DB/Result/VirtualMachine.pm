@@ -3,12 +3,9 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VirtualMachine;
-use base 'DBIx::Class';
+use Moose;
 
-use strict;
-use warnings;
-
-__PACKAGE__->load_components(qw/PK::Auto Core InflateColumn/);
+extends 'DBIx::Class::Core';
 
 __PACKAGE__->table('virtual_machines');
 
@@ -54,6 +51,18 @@ __PACKAGE__->add_columns(
         default_value => 1
     },
 
+    decommissioned => {
+        data_type     => 'int',
+        size          => '1',
+        default_value => '0',
+    },
+
+    decommission_ts => {
+        data_type     => 'int',
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
     notes => {
         data_type   => 'text',
         is_nullable => 1,
@@ -83,6 +92,10 @@ __PACKAGE__->might_have(
     'vm_id',
 );
 
+=head2 label
+
+=cut
+
 sub label {
     my $self = shift;
 
@@ -94,5 +107,33 @@ sub label {
     }
     return $label;
 }
+
+=head2 decommission
+
+Set decommissioned to true, update timestamp and de associate server if
+needed.
+
+=cut
+
+sub decommission {
+    my $self = shift;
+    my $timestamp = shift // time();
+
+    $self->decommissioned and return 1;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+    $self->decommissioned(1);
+    $self->decommission_ts($timestamp);
+
+    if ( $self->server ) {
+        $self->server->vm_id(undef);
+        $self->server->update();
+    }
+    $self->hypervisor_id(undef);
+    $self->update;
+
+    $guard->commit;
+}
+
 
 1;

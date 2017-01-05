@@ -8,10 +8,12 @@ package Manoc::Controller::Server;
 use Moose;
 use namespace::autoclean;
 
-extends 'Catalyst::Controller';
+BEGIN { extends 'Catalyst::Controller'; }
+
 with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::Server;
+use Manoc::Form::Server::Decommission;
 
 =head1 NAME
 
@@ -61,6 +63,30 @@ before 'create' => sub {
     %form_defaults and
         $c->stash( form_defaults => \%form_defaults );
 };
+
+
+=head2 decommission
+
+=cut
+
+sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{object}, 'edit' );
+
+    my $form = Manoc::Form::Server::Decommission->new( { ctx => $c } );
+
+    $c->stash(
+        form   => $form,
+        action => $c->uri_for( $c->action, $c->req->captures ),
+    );
+    return unless $form->process(
+        item   => $c->stash->{object},
+    );
+
+    $c->response->redirect( $c->uri_for_action('server/list') );
+    $c->detach();
+}
 
 =head1 AUTHOR
 
