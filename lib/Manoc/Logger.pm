@@ -40,6 +40,13 @@ sub init {
     my %args  = ( scalar(@_) == 1 ) ? %{ $_[0] } : @_;
     my $class = $args{class} || '';
 
+    return if Log::Log4perl->initialized();
+
+    if ($ENV{MANOC_SUPPRESS_LOG} ) {
+        Log::Log4perl->init(\ qq{ log4perl.threshold = OFF });
+        return;
+    }
+
     if ( $args{debug} ) {
         _init_screen_logger('');
         return;
