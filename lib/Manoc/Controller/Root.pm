@@ -50,6 +50,10 @@ sub auto : Private {
     $c->stash->{is_api} and
         $c->stash->{skip_csrf} = 1;
 
+    # Disable csrf in tests
+    $c->config->{test_mode} && $ENV{MANOC_SKIP_CSRF} and
+      $c->stash->{skip_csrf} = 1;
+
     ##  XHR detection ##
     if ( my $req_with = $c->req->header('X-Requested-With') ) {
         $c->stash->{is_xhr} = $req_with eq 'XMLHttpRequest';
@@ -99,8 +103,18 @@ sub auto : Private {
 sub check_auth {
     my ( $self, $c ) = @_;
 
-    $c->config->{demo_mode} and
+    # allow access during interactive debugging or from test scripts
+    if ( $c->config->{test_mode} && $ENV{MANOC_TEST_AUTOLOGIN} ) {
+        my $realm = $ENV{MANOC_TEST_REALM} || 'default';
+
+        # auth against built in debug users
+        $c->authenticate(
+            {
+                username => ($ENV{MANOC_TEST_USER} || 'admin' ),
+                password => ($ENV{MANOC_TEST_PASS} || 'pass'  ),
+            }, $realm ) || die "cannot perform debug authentication";
         return 1;
+    }
 
     $c->controller eq $c->controller('Auth') and
         return 1;
