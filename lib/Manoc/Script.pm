@@ -10,6 +10,7 @@ with 'MooseX::Getopt::Dashes';
 with 'Manoc::Logger::Role';
 
 use Config::JFDI;
+use Cwd;
 use FindBin;
 use File::Spec::Functions;
 use Manoc::DB;
@@ -79,7 +80,8 @@ sub _build_config {
         $config = {
             name => 'Manoc',
             'Model::ManocDB' => $Manoc::DB::DEFAULT_CONFIG,
-        }
+        };
+        $self->manoc_config_dir(getcwd());
     }
 
     return $config;
