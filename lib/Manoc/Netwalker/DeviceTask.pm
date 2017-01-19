@@ -407,7 +407,7 @@ sub update_cdp_neighbors {
 
             my @cdp_entries = $self->schema->resultset('CDPNeigh')->search(
                 {
-                    from_device    => $from_dev_id,
+                    from_device_id => $from_dev_id,
                     from_interface => $p,
                     to_device      => $to_dev_obj->padded,
                     to_interface   => $s->{port},
@@ -417,7 +417,7 @@ sub update_cdp_neighbors {
             unless ( scalar(@cdp_entries) ) {
                 $self->schema->resultset('CDPNeigh')->create(
                     {
-                        from_device    => $from_dev_id,
+                        from_device_id => $from_dev_id,
                         from_interface => $p,
                         to_device      => $to_dev_obj,
                         to_interface   => $s->{port},
