@@ -264,7 +264,7 @@ sub _build_mat {
                 version        => $self->version,
             };
 
-            my $subreq = Manoc::Manifold::SNMP->new(
+            my $subreq = Manoc::Manifold::SNMP::Info->new(
                 host          => $self->host,
                 credentials   => $new_credentials,
                 is_subrequest => 1
