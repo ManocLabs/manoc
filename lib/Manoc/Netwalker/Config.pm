@@ -8,6 +8,7 @@ use namespace::autoclean;
 
 use Moose::Util::TypeConstraints;
 use Manoc::Utils::Datetime qw(str2seconds);
+use Cwd;
 
 subtype 'TimeInterval', as 'Int',
     where { $_ > 0 },
@@ -19,7 +20,7 @@ coerce 'TimeInterval', from 'Str', via { str2seconds($_) };
 has manoc_config_dir => (
     is       => 'ro',
     isa      => 'Str',
-    required => 1
+    default  => sub { getcwd() },
 );
 
 has n_procs => (
