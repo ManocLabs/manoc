@@ -1,13 +1,7 @@
 ## Configure manoc via ENV
+$ENV{MANOC_SKIP_CSRF}      = 1;
 
-# default login credentials for all testing code
-$ENV{MANOC_TEST_USER} = 'admin';
-$ENV{MANOC_TEST_PASS} = 'password';
-
-$ENV{MANOC_SKIP_CSRF} = 1;
-$ENV{MANOC_TEST_AUTOLOGIN} = 1;
-
-$ENV{MANOC_SUPPRESS_LOG} = 1
+$ENV{MANOC_SUPPRESS_LOG}   = 1
     unless $ENV{NO_SUPPRESS_LOG};
 
 ## Setup mech
@@ -17,10 +11,32 @@ unless ( eval q{use Test::WWW::Mechanize::Catalyst 0.55; 1} ) {
     exit 0;
 }
 
-use vars qw/ $Mech /;
+use vars qw/ $Mech $ADMIN_USER $ADMIN_PASS /;
+
+$ADMIN_USER = 'admin';
+$ADMIN_PASS = 'password';
 
 ok( $Mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'Manoc' ),
     "Created mech object" );
 
+sub mech_login {
+    my $user = shift || $ADMIN_USER,
+    my $pass = shift || $ADMIN_PASS,
+
+    $Mech->get_ok( '/auth/login' );
+    $Mech->text_contains( "Manoc login", "Make sure we are on the login page" );
+
+    $Mech->submit_form_ok(
+        {
+            fields => {
+                username   => $user,
+                password   => $pass,
+            },
+        },
+        'Submit login form',
+    );
+    $Mech->text_contains( "User: $admin", "Check user name in menubar" );
+
+}
 
 1;

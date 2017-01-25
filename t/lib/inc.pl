@@ -15,5 +15,4 @@ BEGIN {
     $ENV{CATALYST_CONFIG} = "$Bin/lib/manoc_test.conf";
 }
 
-use HTTP::Request::Common;
 1;

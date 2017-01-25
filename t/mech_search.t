@@ -10,6 +10,8 @@ BEGIN {
     require "$FindBin::Bin/lib/mechanize.pl";
 }
 
+mech_login();
+
 $Mech->get_ok( '/search' );
 $Mech->text_contains( 'Search' );
 

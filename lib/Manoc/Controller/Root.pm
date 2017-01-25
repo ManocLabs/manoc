@@ -103,20 +103,7 @@ sub auto : Private {
 sub check_auth {
     my ( $self, $c ) = @_;
 
-    # allow access during interactive debugging or from test scripts
-    if ( $c->config->{test_mode} && $ENV{MANOC_TEST_AUTOLOGIN} ) {
-        my $realm = $ENV{MANOC_TEST_REALM} || 'default';
-
-        # auth against built in debug users
-        $c->authenticate(
-            {
-                username => ($ENV{MANOC_TEST_USER} || 'admin' ),
-                password => ($ENV{MANOC_TEST_PASS} || 'pass'  ),
-            }, $realm ) || die "cannot perform debug authentication";
-        return 1;
-    }
-
-    $c->controller eq $c->controller('Auth') and
+   $c->controller eq $c->controller('Auth') and
         return 1;
 
     # already authenticated by API controller
