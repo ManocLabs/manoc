@@ -10,8 +10,6 @@ BEGIN {
     require "$FindBin::Bin/lib/mechanize.pl";
 }
 
-$Mech->get_ok( '/auth/login' );
-$Mech->text_contains( "Manoc login", "Make sure we are on the login page" );
 mech_login();
 $Mech->follow_link_ok({text => 'Logout'}, "Click on logout");
 $Mech->text_contains( "Manoc login", "Back to login page after login" );

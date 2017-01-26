@@ -4,6 +4,13 @@ use warnings;
 
 use base qw( Manoc::DB );
 
+=head1 NAME
+
+ManocTest::Schema - Library to be used by manoc test scripts.
+
+=cut
+
+
 sub connection {
     my $self = shift;
 
@@ -27,34 +34,25 @@ sub connection {
     my $dbh = $schema->storage->dbh;
     $schema->deploy();
 
-    $self->load_fixtures($schema);
+    $self->load_test_fixtures($schema) unless
+        $ENV{MANOC_TEST_NOFIXTURES};
 
     return $schema;
 }
 
-sub load_fixtures {
+sub load_test_fixtures {
     my $self   = shift;
     my $schema = shift;
 
-    local $schema->storage->{debug}
-        if ( $ENV{TRAVIS} || '' ) eq 'true';
-
-    $schema->populate( 'Role', [ [qw/id role/], [qw/1 admin /], ] );
-
-    # admin_user
-    $schema->resultset('User')->update_or_create(
-        {
-            username => 'admin',
-            fullname => 'Administrator',
-            active   => 1,
-            password => 'password',
-        }
-    );
-    $schema->populate( 'UserRole', [ [qw/role_id user_id/], [qw/1 1/] ] );
-
-    $schema->populate( 'Building',
-        [ [qw/id name description/], [ qw/1  B01/, "Building 1" ], ] );
-
+    $schema->init_admin;
 }
+
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
 
 1;

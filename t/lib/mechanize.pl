@@ -1,4 +1,3 @@
-## Configure manoc via ENV
 $ENV{MANOC_SKIP_CSRF}      = 1;
 
 $ENV{MANOC_SUPPRESS_LOG}   = 1
@@ -13,8 +12,9 @@ unless ( eval q{use Test::WWW::Mechanize::Catalyst 0.55; 1} ) {
 
 use vars qw/ $Mech $ADMIN_USER $ADMIN_PASS /;
 
+use Manoc::DB;
 $ADMIN_USER = 'admin';
-$ADMIN_PASS = 'password';
+$ADMIN_PASS = $Manoc::DB::DEFAULT_ADMIN_PASSWORD;
 
 ok( $Mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'Manoc' ),
     "Created mech object" );
