@@ -180,7 +180,7 @@ sub command_enqueue {
 
     $type = lc($type);
     if ( $type eq 'device' ) {
-        $self->manager->enqueue_device($id);
+        $self->device_manager->enqueue_device($id);
         return "OK added device $id";
     }
     return "ERR unknown object $type";
