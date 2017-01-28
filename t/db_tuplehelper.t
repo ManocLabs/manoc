@@ -2,17 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    use FindBin;
-    require "$FindBin::Bin/lib/inc.pl";
+use lib "t/lib";
 
-    use Manoc::IPAddress::IPv4;
-}
-
-BEGIN {
-    use_ok 'ManocTest::Schema';
-}
-
+use ManocTest::Schema;
 
 my $schema = ManocTest::Schema->connect();
 ok($schema, "Create schema");

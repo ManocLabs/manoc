@@ -10,6 +10,7 @@ ManocTest::Schema - Library to be used by manoc test scripts.
 
 =cut
 
+my $Schema;
 
 sub connection {
     my $self = shift;
@@ -37,8 +38,11 @@ sub connection {
     $self->load_test_fixtures($schema) unless
         $ENV{MANOC_TEST_NOFIXTURES};
 
+    $Schema = $schema;
     return $schema;
 }
+
+sub get_schema { $Schema };
 
 sub load_test_fixtures {
     my $self   = shift;
