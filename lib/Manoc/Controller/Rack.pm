@@ -66,7 +66,7 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $building_id = $c->req->query_parameters->{'building'};
-    $c->log->debug("new rack in $building_id");
+    $building_id and $c->log->debug("new rack in $building_id");
     $c->stash( form_defaults => { building => $building_id } );
 };
 
