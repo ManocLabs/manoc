@@ -501,7 +501,7 @@ sub update_mat {
 
             $self->schema->resultset('Mat')->register_tuple(
                 macaddr   => $m,
-                device    => $device_id,
+                device_id => $device_id,
                 interface => $p,
                 timestamp => $timestamp,
                 vlan      => $vlan,
