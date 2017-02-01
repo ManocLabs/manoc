@@ -41,6 +41,8 @@ around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
 
+    return unless $_[0];
+
     if ( @_ == 1 && !ref $_[0] ) {
         return $class->$orig( numeric => ip2int( $_[0] ) );
     }

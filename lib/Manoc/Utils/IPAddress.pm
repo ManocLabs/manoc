@@ -86,10 +86,12 @@ my %INET_NETMASK = (
 # functions
 
 sub ip2int {
+    return unless defined($_[0]);
     return unpack( 'N', pack( 'C4', split( /\./, $_[0] ) ) );
 }
 
 sub int2ip {
+    return unless defined($_[0]);
     return join ".", unpack( "CCCC", pack( "N", $_[0] ) );
 }
 
