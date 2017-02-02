@@ -46,7 +46,7 @@ sub update_model {
                 $action eq 'DECOMMISSION' and
                     $hwasset->decommission();
                 $action eq 'WAREHOUSE' and
-                    $hwasset->in_warehouse(1);
+                    $hwasset->move_to_warehouse(1);
                 $hwasset->update();
             }
 

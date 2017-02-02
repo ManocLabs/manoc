@@ -253,7 +253,7 @@ Return 0 when decommissioned, 1 otherwise.
 
 =cut
 
-sub in_use { return shift->decommissioned == 0 }
+sub in_use { return !shift->decommissioned }
 
 =head2 decommission([$timestamp])
 

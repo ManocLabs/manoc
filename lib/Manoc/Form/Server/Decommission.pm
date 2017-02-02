@@ -18,7 +18,7 @@ has_field 'decommission' => (
     widget         => 'ButtonTag',
     element_attr   => { class => [ 'btn', ] },
     widget_wrapper => 'None',
-    value          => "decommission",
+    value          => "Decommission",
     order          => 1000,
 );
 
@@ -39,7 +39,7 @@ has_field 'vm_action' => (
     widget  => 'RadioGroup',
     options => [
         { value => 'DECOMMISSION',  label => 'Decommission' },
-        { value => 'KEEP', label => 'Keep ip' },
+        { value => 'KEEP', label => 'Keep' },
     ],
 );
 
@@ -54,7 +54,7 @@ sub build_render_list {
         push @list, 'serverhw_action';
     $self->item->vm and
         push @list, 'vm_action';
-    push @list, "decommission";
+    push @list, "decommission", "csrf_token";
 
     return \@list;
 }
@@ -70,7 +70,7 @@ sub update_model {
     $self->schema->txn_do(
         sub {
             if ($hw) {
-                my $action = $values->{servherhw_action};
+                my $action = $values->{serverhw_action};
                 $action eq 'DECOMMISSION' and
                     $hw->decommission();
                 $action eq 'WAREHOUSE' and
@@ -78,7 +78,7 @@ sub update_model {
                 $hw->update();
 
             } elsif ( $vm ) {
-                my $action = $values->{servherhw_action};
+                my $action = $values->{vm_action};
                 $action eq 'DECOMMISSION' and
                     $vm->decommission;
                 $vm->update();

@@ -39,7 +39,7 @@ has_field 'hostname' => (
     size => 128,
     required => 1,
     label => 'Hostname',
-    element_attr => { placeholder => 'hostname.loca.domain' },
+    element_attr => { placeholder => 'hostname.local.domain' },
     bs_block_field_helper({ label => 2, input => 4 })
 
 );
@@ -168,6 +168,17 @@ has_field 'hosted_virtinfr' => (
     label => 'Virtual Infrastructure',
     bs_block_field_helper({ label => 4, input => 4 })
 );
+
+sub default_type {
+    my $self = shift;
+
+    return unless $self->schema;
+
+    return 'v' if $self->item->vm;
+    return 'p' if $self->item->serverhw;
+    return 'l';
+}
+
 
 sub options_serverhw {
     my $self = shift;

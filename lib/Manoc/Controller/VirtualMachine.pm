@@ -9,6 +9,7 @@ use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
+with 'Manoc::ControllerRole::JSONView';
 
 use Manoc::Form::VirtualMachine;
 
@@ -31,6 +32,8 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::VirtualMachine',
     form_class => 'Manoc::Form::VirtualMachine',
+
+    json_columns => [ 'id', 'name' ],
 );
 
 =head1 AUTHOR

@@ -31,7 +31,7 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    # manifold to be used for getting
+    # manifold to be used to fetch the
     # configuration
     config_manifold => {
         data_type     => 'varchar',

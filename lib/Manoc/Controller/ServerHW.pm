@@ -40,10 +40,14 @@ __PACKAGE__->config(
 
     json_columns            => [ 'id', 'inventory', 'model', 'serial' ],
 
+    object_list_options     => {
+        prefetch =>
+            { 'hwasset' => { 'rack' => 'building' } }
+        },
+
 );
 
 =head1 ACTIONS
-
 
 
 =head2 create
@@ -69,20 +73,6 @@ before 'create' => sub {
     }
 };
 
-
-
-=head2 list_decommissioned
-
-List decommissioned devices
-
-=cut
-
-sub list_decommissioned : Chained('base') : PathPart('decommissioned') {
-    my ( $self, $c ) = @_;
-
-    my $rs      = $c->stash->{resultset};
-    $c->stash( decommissioned_device_list => $self->get_object_list($c, {decommissioned => 1}) );
-}
 
 =head2 import_csv
 
@@ -115,28 +105,6 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     return unless $process_status;
 }
 
-
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c, $opts ) = @_;
-
-    my $decommissioned = $opts->{decommissioned} ? 1 : 0;
-
-    return [
-        $c->stash->{resultset}->search(
-            {
-                decommissioned => $decommissioned
-            },
-            {
-                prefetch =>
-                    { 'hwasset' => { 'rack' => 'building' } }
-                },
-        )
-    ];
-}
 
 =head1 AUTHOR
 
