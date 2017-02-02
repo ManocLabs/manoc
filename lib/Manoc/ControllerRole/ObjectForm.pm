@@ -69,9 +69,12 @@ sub form : Private {
         $json_data->{form_ok} = $process_status ? 1 : 0;
 
         if ($process_status) {
-            $json_data->{message}  = $self->object_updated_message;
-            $json_data->{redirect} = $self->get_form_success_url($c);
-            $json_data->{object_id} = $form->item_id;
+            $json_data->{message}      = $self->object_updated_message;
+            $json_data->{redirect}     = $self->get_form_success_url($c);
+            $json_data->{object_id}    = $form->item_id;
+            $json_data->{object_label} = $form->item->label
+                if $form->item->can('label');
+
         }
         else {
             $json_data->{html} =
