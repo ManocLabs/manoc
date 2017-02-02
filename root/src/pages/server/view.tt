@@ -8,7 +8,7 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
        <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
-  	     <a href="[% c.uri_for_action('/device/decommission', [object.id]) %]">
+  	     <a href="[% c.uri_for_action('server/decommission', [object.id]) %]">
 	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">

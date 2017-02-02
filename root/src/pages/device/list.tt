@@ -8,17 +8,17 @@ page.title = 'Devices'
 <div id="tabletoolbar" class="btn-toolbar" role="toolbar">
 
 [%- IF c.check_permission('device.create') -%]
-  <div class="btn-group  btn-group-sm" role="group">
-  <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-primary">[% bootstrap_icon("plus") %] New device</a>
+  <div class="btn-group" role="group">
+  <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add device</a>
   </div>
 [% END -%]
 
   <div class="btn-group" role="group">
   <div id="statusfilter_wrapper" class="filtermenu">
-  <select name="statusfilter" id="statusfilter" class="btn-sm">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
     <option value="a">Show all</option>
     <option value="u">In use</option>
-    <option value="d">Decommisioned</option>
+    <option value="d">Decommissioned</option>
   </select>
   </div>
   </div>
@@ -69,8 +69,9 @@ var table = $("#device_list").DataTable( {
 
 $("#tabletoolbar").appendTo($("div.toolbar").first());
 
-$("#statusfilter").selectize({
-    onChange: function(value) {
+$("#statusfilter").on('changed.bs.select',
+  function(e) {
+        value = $("#statusfilter").val();
         s = '';
         if (value == 'd') {
             s = '^Decommissioned$';
@@ -80,7 +81,7 @@ $("#statusfilter").selectize({
         }
         table.columns(0).search(s, true, false).draw();
   }
-});
+);
 
 });
 [% END %]
