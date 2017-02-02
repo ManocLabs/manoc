@@ -187,14 +187,17 @@ override validate_model => sub {
     my $rs          = $self->resultset;
 
     my $field = $self->field('mng_address');
-    my %id_clause;
-    $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
-    my $value = Manoc::IPAddress::IPv4->new($field->value);
-    my $count = $rs->search( { mng_address => $value->padded, %id_clause } )->count;
-    if ($count >= 1) {
-        my $field_error = 'Duplicate management address';
-        $field->add_error( $field_error, $field->loc_label );
-        $found_error++;
+    if (my $value = $field->value) {
+        my %id_clause;
+        $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
+
+        $value = Manoc::IPAddress::IPv4->new($value);
+        my $count = $rs->search( { mng_address => $value->padded, %id_clause } )->count;
+        if ($count >= 1) {
+            my $field_error = 'Duplicate management address';
+            $field->add_error( $field_error, $field->loc_label );
+            $found_error++;
+        }
     }
 
     return $found_error || super();
