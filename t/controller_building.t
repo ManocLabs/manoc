@@ -4,37 +4,35 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    use FindBin;
-    require "$FindBin::Bin/lib/inc.pl";
-    require "$FindBin::Bin/lib/mechanize.pl";
-}
+use lib "t/lib";
+
+use ManocTest;
+
+init_manoctest;
+
+my $mech = get_mech();
 
 mech_login();
 
-$Mech->get_ok( '/building' );
-$Mech->text_contains( 'Buildings' );
+$mech->get_ok( '/building' );
+$mech->text_contains( 'Buildings' );
 
 #test accessing create without privileges
-$Mech->get( '/building/create' );
-my $status = $Mech->status();
+$mech->get( '/building/create' );
+my $status = $mech->status();
 cmp_ok( $status, '==', 200, "Accessing building create page");
 
-$Mech->submit_form_ok(
+$mech->submit_form_ok(
         {
             fields => {
-                name       => 'Test',
-		description=> 'Test',
-                notes      => 'Test',
+                name        => 'Test',
+                description => 'Test',
+                notes       => 'Test',
             },
         },
         'Submit create building form',
 );
-$Mech->text_contains("Buildings", "Redirect to the building list page");
-
-
-
-
+$mech->text_contains("Buildings", "Redirect to the building list page");
 
 
 done_testing();
