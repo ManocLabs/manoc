@@ -48,10 +48,11 @@ __PACKAGE__->add_columns(
         size        => 1,
     },
     location => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 1,
-        accessor    => '_location',
+        data_type      => 'varchar',
+        is_nullable    => 0,
+        default_value  => LOCATION_WAREHOUSE,
+        size           => 1,
+        accessor       => '_location',
     },
     vendor => {
         data_type   => 'varchar',

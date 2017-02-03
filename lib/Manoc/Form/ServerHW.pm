@@ -84,6 +84,7 @@ has_field 'cpu_model' => (
     type  => 'Text',
     size  => 32,
     label => 'CPU Model',
+    required => 1,
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
@@ -139,6 +140,7 @@ has_field 'n_cores_proc' => (
 has_field 'ram_memory' => (
     type  => 'Integer',
     label => 'RAM Memory',
+    required => 1,
     element_attr => { placeholder => 'MB' },
 
 );

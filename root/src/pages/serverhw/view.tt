@@ -10,9 +10,14 @@
       <li class="[% 'disabled' UNLESS c.check_permission('serverhw.create') %]">
          <a href=[% c.uri_for_action('serverhw/create', { copy => object.id }) %]>[% bootstrap_icon('duplicate') %] Duplicate</a>
       </li>
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+         <a href=[% c.uri_for_action('serverhw/decommission', [object.id]) %]>
+   	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
          <a href=[% c.uri_for_action('serverhw/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
       </li>
+      <li role="separator" class="divider"></li>
       <li class="[% 'disabled' IF NOT c.check_permission('server.create') OR object.server %]">
          <a href=[% c.uri_for_action('server/create', { serverhw => object.id}) %]>Create server</a>
       </li>

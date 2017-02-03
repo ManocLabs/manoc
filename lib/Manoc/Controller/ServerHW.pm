@@ -105,6 +105,33 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     return unless $process_status;
 }
 
+=head2 decommission
+
+=cut
+
+sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->require_permission( 'serverhw', 'edit' );
+
+
+    if ( $c->req->method eq 'POST' ) {
+        $object->decommission;
+        $object->update();
+        $c->flash( message => "Server decommissioned" );
+        $c->res->redirect( $c->uri_for_action( 'serverhw/list' ));
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Decommission server hardware',
+        confirm_message => 'Decommission server hardware ' . $object->label . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
 
 =head1 AUTHOR
 

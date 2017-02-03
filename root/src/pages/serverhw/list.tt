@@ -64,7 +64,7 @@ $("#statusfilter").on('changed.bs.select',
             s = '^Decommissioned$';
 
         } else if (value == 'u') {
-            s = '^((?!Decommisioned).*)$';
+            s = '^((?!Decommissioned).*)$';
         }
         $('#server_list').DataTable().columns(5).search(s, true, false).draw();
   }
