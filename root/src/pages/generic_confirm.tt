@@ -1,6 +1,6 @@
-<p>Are you sure?</p>
+[% confirm_message = confirm_message || 'Are you sure?' -%]
+<p>[% confirm_message %]</p>
 <form method="POST" >
 <input type="hidden" name="csrf_token" id="csrf_token" value="[% c.get_token %]"  />
-<button type="submit" class="btn btn-primary" name="submit" value="Submit"/>Yes</button>
+<button type="submit" class="btn btn-danger" name="submit" value="Submit"/>Confirm</button>
 </form>
-
