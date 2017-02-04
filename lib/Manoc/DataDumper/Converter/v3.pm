@@ -114,7 +114,8 @@ sub upgrade_Device {
         $_->{hwasset_id}      = $self->device_hwasset_map->{$addr};
 
         # we have changed foreign key name
-        $_->{rack_id}         = $_->{rack};
+        $_->{rack_id}           = $_->{rack};
+        $_->{mng_url_format_id} = $_->{mng_url_format};
 
         # cleanup attributes moved to hwasset and nwinfo
         delete @$_{
@@ -129,6 +130,7 @@ sub upgrade_Device {
                 rack level
                 os os_ver boottime vtp_domain
                 vendor model serial
+                mng_url_format
                 )
         };
     }
@@ -136,6 +138,7 @@ sub upgrade_Device {
     $self->device_id_counter($id);
     $self->device_id_map( \%device_id_map );
 }
+
 
 sub get_table_name_DeviceNWInfo { 'devices' }
 
@@ -214,8 +217,8 @@ sub upgrade_HWAsset {
 
         my $r             = {};
         $r->{id}         = $asset_id;
-        $r->{model}      = $_->{model};
-        $r->{vendor}     = $_->{vendor};
+        $r->{model}      = $_->{model}  || 'Unknown';
+        $r->{vendor}     = $_->{vendor} || 'Unknown';
         $r->{serial}     = $_->{serial};
         $r->{rack_id}    = $_->{rack};
         $r->{rack_level} = $_->{level};
@@ -234,6 +237,21 @@ sub upgrade_HWAsset {
     $self->hwasset_id_counter($id);
     $self->device_hwasset_map( \%device_hwasset_map );
     @$data = @new_data;
+}
+
+
+sub after_import_HWAsset {
+    my ( $self, $source ) = @_;
+
+    my $rs = $source->resultset->search();
+    while ( my $asset = $rs->next ) {
+        if (my $rack = $asset->rack) {
+            $asset->building($rack->building);
+            $asset->floor($rack->floor);
+            $asset->room($rack->room);
+            $asset->update();
+        }
+    }
 }
 
 sub upgrade_if_notes {
