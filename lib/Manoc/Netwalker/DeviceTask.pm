@@ -543,7 +543,7 @@ sub update_vtp_database {
             }
         );
     }
-    my $vtp_last_update = $self->schema->resultset('System')->find("netwalker.vtp_update");
+    my $vtp_last_update = $self->schema->resultset('System')->find_or_create("netwalker.vtp_update");
     $vtp_last_update->value( $self->timestamp );
     $vtp_last_update->update();
 
