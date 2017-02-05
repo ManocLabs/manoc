@@ -59,13 +59,14 @@ __PACKAGE__->set_primary_key('hwasset_id');
 
 my @HWASSET_PROXY_ATTRS = qw(
                                 vendor model serial inventory
-                                 building rack rack_level room
+                                location
+                                building rack rack_level room
                         );
 my  @HWASSET_PROXY_METHODS = qw(
                                    is_decommissioned is_in_warehouse is_in_rack
                                    move_to_rack move_to_room move_to_warehouse
                                    decommission
-                                   server display_location
+                                   display_location
                            );
 __PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
@@ -98,7 +99,6 @@ sub new {
         }
     }
 
-#    use Data::Dumper; print Dumper($new_attrs);
     return $self->next::method($new_attrs, @args);
 }
 
@@ -107,5 +107,14 @@ sub cores {
     return $self->n_procs * $self->n_cores_procs;
 }
 
+
+__PACKAGE__->might_have(
+    server => 'Manoc::DB::Result::Server',
+    'serverhw_id',
+    {
+        cascade_update => 0,
+        cascade_delete => 1,
+    }
+);
 
 1;

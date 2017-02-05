@@ -297,5 +297,4 @@ sub update {
 #TODO
 # - has(service_contract)
 
-no Moose;
 1;
