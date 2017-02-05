@@ -186,7 +186,9 @@ override validate_model => sub {
     my $found_error = 0;
     my $rs          = $self->resultset;
 
-    my $field = $self->field('mng_address');
+    my $field;
+
+    $field = $self->field('mng_address');
     if (my $value = $field->value) {
         my %id_clause;
         $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
@@ -200,17 +202,25 @@ override validate_model => sub {
         }
     }
 
+    $field = $self->field('rack');
+    if (  $self->field('hwasset')->value && !defined($field->value) ) {
+        my $field_error = 'Rack is required when using hardware assets';
+        $field->add_error( $field_error, $field->loc_label );
+        $found_error++;
+    }
+
     return $found_error || super();
 };
 
 override update_model => sub {
     my $self   = shift;
-    my $device = $self->item;
 
     $self->schema->txn_do(
         sub {
-            my $prev_hwasset = $device->hwasset;
+            my $prev_hwasset = $self->item->hwasset;
             super();
+
+            my $device = $self->item;
             my $hwasset = $device->hwasset;
 
             if ($prev_hwasset && $prev_hwasset != $hwasset) {

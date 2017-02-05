@@ -13,7 +13,7 @@ extends 'Manoc::Form::Base';
 has '+name'        => ( default => 'form-decommission' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'decommission' => (
+has_field 'submit' => (
     type           => 'Submit',
     widget         => 'ButtonTag',
     element_attr   => { class => [ 'btn', ] },
@@ -23,10 +23,11 @@ has_field 'decommission' => (
 );
 
 has_field 'asset_action' => (
-    label   => 'Action for associated hardware',
-    type    => 'Select',
-    widget  => 'RadioGroup',
-    options => [
+    label    => 'Action for associated hardware',
+    type     => 'Select',
+    widget   => 'RadioGroup',
+    required => 1,
+    options  => [
         { value => 'DECOMMISSION',   label => 'Decommission' },
         { value => 'WAREHOUSE', label => 'Return to warehouse' },
     ],
@@ -35,6 +36,7 @@ has_field 'asset_action' => (
 sub update_model {
     my $self   = shift;
     my $values = $self->values;
+    my $action = $values->{asset_action};
 
     my $device  = $self->item;
     my $hwasset = $device->hwasset;
@@ -42,11 +44,10 @@ sub update_model {
     $self->schema->txn_do(
         sub {
             if ($hwasset) {
-                my $action = $values->{asset_action};
                 $action eq 'DECOMMISSION' and
                     $hwasset->decommission();
                 $action eq 'WAREHOUSE' and
-                    $hwasset->move_to_warehouse(1);
+                    $hwasset->move_to_warehouse();
                 $hwasset->update();
             }
 
@@ -54,6 +55,7 @@ sub update_model {
             $device->update;
         }
     );
+    return $device;
 }
 
 =head1 AUTHOR
