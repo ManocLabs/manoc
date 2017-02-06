@@ -85,7 +85,9 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
         params => $c->req->parameters,
     );
 
-    $c->response->redirect( $c->uri_for_action('server/list') );
+    $c->response->redirect(
+        $c->uri_for_action('server/view', [ $c->stash->{object_pk} ])
+    );
     $c->detach();
 }
 

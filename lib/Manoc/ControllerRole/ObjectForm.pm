@@ -15,6 +15,11 @@ has 'form_class' => (
     isa => 'ClassName'
 );
 
+has 'form_success_url' => (
+    is  => 'rw',
+    isa => 'Str'
+);
+
 has 'object_updated_message' => (
     is  => 'rw',
     isa => 'Str',
@@ -85,7 +90,9 @@ sub form : Private {
     }
 
     return unless $process_status;
-    $c->stash( message => $self->object_updated_message );
+    $c->stash->{message}   = $self->object_updated_message;
+    $c->stash->{object_id} = $form->item_id;
+
     $c->res->redirect( $self->get_form_success_url($c) );
     $c->detach();
 }
@@ -116,7 +123,13 @@ Get the URL to redirect after successful editing.
 
 sub get_form_success_url {
     my ( $self, $c ) = @_;
-    return $c->uri_for_action( $c->namespace . "/list" );
+
+    my $form_success_url =
+        $c->stash->{form_success_url}
+        || $self->form_success_url
+        || $c->uri_for_action( $c->namespace . "/view", [ $c->stash->{object_id} ] );
+
+    return $form_success_url;
 }
 
 1;

@@ -120,7 +120,9 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
         $object->decommission;
         $object->update();
         $c->flash( message => "Server decommissioned" );
-        $c->res->redirect( $c->uri_for_action( 'serverhw/list' ));
+        $c->response->redirect(
+            $c->uri_for_action('serverhw/view', [ $c->stash->{object_pk} ])
+        );
         $c->detach();
     }
 

@@ -44,14 +44,14 @@ $mech->submit_form_ok(
     },
     "Create device",
 );
-like ( $mech->base(), qr|/device$|, "Redirected to device list");
+$mech->title_is('Manoc - Device Device 01', "Device page");
 
+$mech->get('/device');
 $mech->text_contains('Device 01', "New device in the list");
 $mech->follow_link_ok({ text => 'Device 01'}, "View device page");
 $mech->title_is('Manoc - Device Device 01');
 
-#ok($mech->find_link(text => 'Add netwalker'), "Add server link");
-
+#
 $mech->follow_link_ok({text => 'Delete'}, "Follow delete link");
 # first form is search box
 $mech->submit_form_ok({ form_number => 2 }, "Submit delete form");
@@ -89,16 +89,14 @@ $mech->submit_form_ok(
     },
     "Create device",
 );
-like( $mech->base(), qr|/device$|, "Redirected to device list" );
+$mech->title_is('Manoc - Device Device 02', "Device page");
+$mech->text_contains('Inv001', "HWasset is displayed in list");
 
 $hwasset->discard_changes;
 ok($hwasset->is_in_rack, "HWAsset is in rack");
+
 my $device = $schema->resultset('Device')->find({ name => 'Device 02' });
 ok($device->hwasset, "HWAsset is associated to Device");
-
-$mech->follow_link_ok({ text => 'Device 02' }, "View device page");
-$mech->text_contains('Inv001', "HWasset is displayed in list");
-
 
 $mech->follow_link_ok({text => 'Decommission'}, "Follow decommission link");
 # first form is search box
@@ -111,7 +109,7 @@ $mech->submit_form_ok(
     },
     "Submit decommission form"
 );
-like ( $mech->base(), qr|/device$|, "Redirected to device list");
+$mech->title_is('Manoc - Device Device 02', "Redirected to device page");
 
 
 $device->discard_changes;
