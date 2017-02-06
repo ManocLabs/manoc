@@ -9,11 +9,12 @@ our @EXPORT = qw(
 );
 
 # Include our application dir
-use FindBin qw/$Bin/;
-use lib "$Bin/../lib";
-
+use File::Spec;
 # needed to load the conf
 use ManocTest::Schema;
+
+use File::Basename;
+use File::Spec;
 
 use Test::More;
 
@@ -22,11 +23,14 @@ our $ADMIN_USER = 'admin';
 our $ADMIN_PASS = $Manoc::DB::DEFAULT_ADMIN_PASSWORD;
 
 sub init_manoctest {
-    # test script dir
-    chdir $Bin if -d $Bin;
+
+    my $lib = dirname( $INC{"ManocTest.pm"} );
+    my $config_file = File::Spec->catfile($lib, "manoc_test.conf");
+    -f $config_file or
+         BAIL_OUT "Can't find config file $config_file";;
 
     $ENV{LANG}            = 'C';
-    $ENV{CATALYST_CONFIG} = "$Bin/lib/manoc_test.conf";
+    $ENV{CATALYST_CONFIG} = $config_file;
 
     $ENV{MANOC_SKIP_CSRF}    = 1;
     $ENV{MANOC_SUPPRESS_LOG} = 1
