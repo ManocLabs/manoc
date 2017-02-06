@@ -132,6 +132,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
+
 =haed2 delete
 
 =cut
@@ -237,11 +238,18 @@ sub datatable_search_cb {
     my $status = $c->request->param('search_status');
 
     my $extra_filter = {};
-
-    defined($status) && $status eq 'd' and
-        $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
-    defined($status) && $status eq 'u' and
-        $extra_filter->{location} = { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED };
+    if (defined($status)) {
+        $status eq 'd' and
+            $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
+        $status eq 'w' and
+            $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE;
+        $status eq 'u' and
+            $extra_filter->{location} = [
+                -and =>
+                    { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
+                    { '!=' => Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE }
+                ];
+    }
 
     %$extra_filter and
         $filter = { -and => [ $filter, $extra_filter ] };
@@ -252,6 +260,8 @@ sub datatable_search_cb {
 sub datatable_row {
     my ($self, $c, $row) = @_;
 
+    my $action = 'hwasset/view';
+
     return {
         inventory => $row->inventory,
         type      => $row->display_type,
@@ -259,7 +269,7 @@ sub datatable_row {
         model     => $row->model,
         serial    => $row->serial,
         location  => $row->display_location,
-        link      => $c->uri_for_action('hwasset/view', [ $row->id ]),
+        link      => $c->uri_for_action($action, [ $row->id ]),
     }
 }
 
@@ -267,7 +277,7 @@ sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devi
     my ( $self, $c ) = @_;
 
     $c->stash->{'datatable_resultset'} =
-        $c->stash->{resultset}->search(
+        $c->stash->{resultset}->search_rs(
             {
                 type => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
             }

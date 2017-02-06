@@ -20,10 +20,12 @@
    </tbody>
 </table>
 
-<div id="statusfilter_wrapper">
-<select name="statusfilter" class="selectpicker" id="statusfilter">
+
+<div id="statusfilter_wrapper" class="btn-group" role="group">
+<select name="statusfilter" class="selectpicker" id="statusfilter" data-style="btn-default btn-sm">
     <option value="a">All</option>
     <option value="u">In use</option>
+    <option value="w">Warehouse</option>
     <option value="d">Decommisioned</option>
 </select>
 </div>
