@@ -70,7 +70,6 @@ __PACKAGE__->add_columns(
     },
 );
 
-
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/id/] );
 __PACKAGE__->add_unique_constraint( [qw/mng_address/] );
@@ -93,29 +92,28 @@ sub rack {
     if (@args) {
         my $rack = $args[0];
         if ( $rack && $self->hwasset ) {
-            $self->hwasset->rack( $rack );
+            $self->hwasset->rack($rack);
         }
     }
 
     $self->next::method(@args);
-};
-
+}
 
 __PACKAGE__->has_many(
-    ifstatus     => 'Manoc::DB::Result::IfStatus',
+    ifstatus => 'Manoc::DB::Result::IfStatus',
     'device_id'
 );
 
 __PACKAGE__->has_many(
-    uplinks      => 'Manoc::DB::Result::Uplink',
+    uplinks => 'Manoc::DB::Result::Uplink',
     'device_id'
 );
 __PACKAGE__->has_many(
-    ifnotes      => 'Manoc::DB::Result::IfNotes',
+    ifnotes => 'Manoc::DB::Result::IfNotes',
     'device_id'
 );
 __PACKAGE__->has_many(
-    ssids        => 'Manoc::DB::Result::SSIDList',
+    ssids => 'Manoc::DB::Result::SSIDList',
     'device_id'
 );
 __PACKAGE__->has_many(
@@ -123,11 +121,11 @@ __PACKAGE__->has_many(
     'device_id'
 );
 __PACKAGE__->has_many(
-    dot11assocs  => 'Manoc::DB::Result::Dot11Assoc',
+    dot11assocs => 'Manoc::DB::Result::Dot11Assoc',
     'device_id'
 );
 __PACKAGE__->has_many(
-    mat_assocs   => 'Manoc::DB::Result::Mat',
+    mat_assocs => 'Manoc::DB::Result::Mat',
     'device_id'
 );
 
@@ -164,7 +162,6 @@ __PACKAGE__->belongs_to(
     'mng_url_format_id',
     { join_type => 'LEFT' }
 );
-
 
 sub mng_address {
     my ( $self, $value ) = @_;
@@ -273,7 +270,7 @@ sub decommission {
     $self->decommissioned(1);
     $self->decommission_ts($timestamp);
     $self->hwasset(undef);
-    if ($self->netwalker_info) {
+    if ( $self->netwalker_info ) {
         $self->netwalker_info->delete();
     }
     $self->update;

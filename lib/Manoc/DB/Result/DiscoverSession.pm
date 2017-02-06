@@ -7,11 +7,11 @@ package Manoc::DB::Result::DiscoverSession;
 use parent 'DBIx::Class::Core';
 
 use constant {
-    STATUS_NEW       => 'N',
-    STATUS_RUNNING   => 'R',
-    STATUS_STOPPED   => 'S',
-    STATUS_WAITING   => 'W',
-    STATUS_DONE      => 'D',
+    STATUS_NEW     => 'N',
+    STATUS_RUNNING => 'R',
+    STATUS_STOPPED => 'S',
+    STATUS_WAITING => 'W',
+    STATUS_DONE    => 'D',
 };
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
@@ -28,7 +28,7 @@ __PACKAGE__->add_columns(
         data_type     => 'varchar',
         is_nullable   => 0,
         size          => 1,
-        default_value =>  STATUS_NEW,
+        default_value => STATUS_NEW,
     },
     'from_addr' => {
         data_type    => 'varchar',
@@ -73,7 +73,6 @@ __PACKAGE__->has_many(
     'session_id', { cascade_delete => 1 }
 );
 
-
 sub is_new { return shift->status eq STATUS_NEW }
 
 sub is_done { return shift->status eq STATUS_DONE }
@@ -87,36 +86,34 @@ sub is_waiting { return shift->status eq STATUS_WAITING }
 sub restart {
     my $self = shift;
 
-    $self->status( STATUS_NEW );
-    $self->next_addr ( $self->from_addr );
+    $self->status(STATUS_NEW);
+    $self->next_addr( $self->from_addr );
 }
 
 sub display_status {
-    my $self = shift;
+    my $self   = shift;
     my $status = $self->status;
 
-    $status eq STATUS_NEW       and return 'new';
-    $status eq STATUS_RUNNING   and return 'running';
-    $status eq STATUS_STOPPED   and return 'stopped';
-    $status eq STATUS_WAITING   and return 'waiting';
-    $status eq STATUS_DONE      and return 'done';
+    $status eq STATUS_NEW     and return 'new';
+    $status eq STATUS_RUNNING and return 'running';
+    $status eq STATUS_STOPPED and return 'stopped';
+    $status eq STATUS_WAITING and return 'waiting';
+    $status eq STATUS_DONE    and return 'done';
 }
-
 
 sub progression {
     my $self = shift;
 
-    $self->status eq STATUS_NEW and return 0;
+    $self->status eq STATUS_NEW  and return 0;
     $self->status eq STATUS_DONE and return 100;
 
-    my $current = defined($self->next_addr)
-        ? $self->next_addr->numeric - 1
-        : $self->from_addr->numeric;
+    my $current = defined( $self->next_addr ) ? $self->next_addr->numeric - 1 :
+        $self->from_addr->numeric;
     my $done = $current - $self->from_addr->numeric;
 
     my $total = $self->to_addr->numeric - $self->from_addr->numeric;
 
-    return int($done / $total * 100);
+    return int( $done / $total * 100 );
 }
 
 sub sqlt_deploy_hook {
@@ -127,7 +124,6 @@ sub sqlt_deploy_hook {
         fields => [ 'from_addr', 'to_addr' ]
     );
 }
-
 
 1;
 # Local Variables:

@@ -50,31 +50,29 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
     },
 
-
 );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/name/] );
 
 __PACKAGE__->has_many(
     'dhcp_subnets' => 'Manoc::DB::Result::DHCPSubnet',
-     { 'foreign.dhcp_server_id' => 'self.id' },
+    { 'foreign.dhcp_server_id' => 'self.id' },
 );
 
 __PACKAGE__->has_many(
     'dhcp_shared_networks' => 'Manoc::DB::Result::DHCPSharedNetwork',
-     { 'foreign.dhcp_server_id' => 'self.id' },
+    { 'foreign.dhcp_server_id' => 'self.id' },
 );
 
 __PACKAGE__->has_many(
-      'dhcp_leases' => 'Manoc::DB::Result::DHCPLease',
-     { 'foreign.dhcp_server_id' => 'self.id' },
+    'dhcp_leases' => 'Manoc::DB::Result::DHCPLease',
+    { 'foreign.dhcp_server_id' => 'self.id' },
 );
 
 __PACKAGE__->has_many(
-      'dhcp_reservations' => 'Manoc::DB::Result::DHCPReservation',
-     { 'foreign.dhcp_server_id' => 'self.id' },
+    'dhcp_reservations' => 'Manoc::DB::Result::DHCPReservation',
+    { 'foreign.dhcp_server_id' => 'self.id' },
 );
-
 
 1;
 

@@ -21,15 +21,7 @@ has '+name'        => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
 sub build_render_list {
-    [
-        'name',
-        'mng_block',
-        'hwasset_block',
-        'rack_block',
-        'notes',
-        'save',
-        'csrf_token'
-    ];
+    [ 'name', 'mng_block', 'hwasset_block', 'rack_block', 'notes', 'save', 'csrf_token' ];
 }
 
 has_field 'name' => (
@@ -57,19 +49,19 @@ has_field 'hwasset' => (
     required     => 0,
 
     do_wrapper => 0,
-    tags => {
+    tags       => {
         before_element => '<div class="col-sm-8">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'asset_button' => (
-    type           => 'Button',
-    widget         => 'ButtonTag',
-    element_attr   => {
+    type         => 'Button',
+    widget       => 'ButtonTag',
+    element_attr => {
         class => [ 'btn', 'btn-primary' ],
-        href => '#',
+        href  => '#',
     },
     widget_wrapper => 'None',
     value          => "Add",
@@ -82,17 +74,17 @@ has_block 'mng_block' => (
 );
 
 has_field 'mng_address' => (
-    apply      => [IPAddress],
-    label    => 'Management Address',
-    required => 1,
+    apply        => [IPAddress],
+    label        => 'Management Address',
+    required     => 1,
     element_attr => { placeholder => 'IP Address' },
 
     do_wrapper => 0,
-    tags => {
+    tags       => {
         before_element => '<div class="col-sm-5">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'mng_url_format' => (
@@ -101,11 +93,11 @@ has_field 'mng_url_format' => (
     empty_select => '- None -',
 
     do_wrapper => 0,
-    tags => {
+    tags       => {
         before_element => '<div class="col-sm-3">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_block 'rack_block' => (
@@ -127,19 +119,19 @@ has_field 'rack' => (
         before_element => '<div class="col-sm-6">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'rack_level' => (
-    label    => 'Level',
-    type     => 'Text',
-    required => 0,
+    label      => 'Level',
+    type       => 'Text',
+    required   => 0,
     do_wrapper => 0,
     tags       => {
         before_element => '<div class="col-sm-2">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'notes' => ( type => 'TextArea' );
@@ -158,16 +150,19 @@ sub options_hwasset {
     return unless $self->schema;
 
     my @options;
-    if ( my $hwasset = $self->item->hwasset) {
-        push @options, {
+    if ( my $hwasset = $self->item->hwasset ) {
+        push @options,
+            {
             value => $hwasset->id,
             label => $hwasset->label,
-        };
+            };
     }
-    push @options, map +{
+    push @options,
+        map +{
         value => $_->id,
         label => $_->label,
-    }, $self->schema->resultset('HWAsset')->unused_devices()->all();
+        },
+        $self->schema->resultset('HWAsset')->unused_devices()->all();
 
     return @options;
 }
@@ -189,13 +184,13 @@ override validate_model => sub {
     my $field;
 
     $field = $self->field('mng_address');
-    if (my $value = $field->value) {
+    if ( my $value = $field->value ) {
         my %id_clause;
         $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
 
         $value = Manoc::IPAddress::IPv4->new($value);
         my $count = $rs->search( { mng_address => $value->padded, %id_clause } )->count;
-        if ($count >= 1) {
+        if ( $count >= 1 ) {
             my $field_error = 'Duplicate management address';
             $field->add_error( $field_error, $field->loc_label );
             $found_error++;
@@ -203,7 +198,7 @@ override validate_model => sub {
     }
 
     $field = $self->field('rack');
-    if (  $self->field('hwasset')->value && !defined($field->value) ) {
+    if ( $self->field('hwasset')->value && !defined( $field->value ) ) {
         my $field_error = 'Rack is required when using hardware assets';
         $field->add_error( $field_error, $field->loc_label );
         $found_error++;
@@ -213,22 +208,22 @@ override validate_model => sub {
 };
 
 override update_model => sub {
-    my $self   = shift;
+    my $self = shift;
 
     $self->schema->txn_do(
         sub {
             my $prev_hwasset = $self->item->hwasset;
             super();
 
-            my $device = $self->item;
+            my $device  = $self->item;
             my $hwasset = $device->hwasset;
 
-            if ($prev_hwasset && $prev_hwasset != $hwasset) {
+            if ( $prev_hwasset && $prev_hwasset != $hwasset ) {
                 $prev_hwasset->move_to_warehouse();
                 $prev_hwasset->update();
             }
-            if ( $hwasset ) {
-                $hwasset->move_to_rack($device->rack);
+            if ($hwasset) {
+                $hwasset->move_to_rack( $device->rack );
                 $hwasset->update();
             }
         }

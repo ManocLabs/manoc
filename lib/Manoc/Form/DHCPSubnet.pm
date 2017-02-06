@@ -12,18 +12,12 @@ use HTML::FormHandler::Types ('IPAddress');
 
 sub build_render_list {
     [
-        'name',
-        'dhcp_server',
-        'dhcp_shared_network',
-        'network',
-        'range_block',
-        'max_lease_time',
-        'default_lease_time',
-        'ntp_server',
-        'domain_name',
-        'domain_nameserver',
-        'save',
-        'csrf_token'
+        'name',                'dhcp_server',
+        'dhcp_shared_network', 'network',
+        'range_block',         'max_lease_time',
+        'default_lease_time',  'ntp_server',
+        'domain_name',         'domain_nameserver',
+        'save',                'csrf_token'
     ];
 }
 
@@ -33,9 +27,9 @@ has '+html_prefix' => ( default => 1 );
 has '+item_class' => ( default => 'DHCPSubnet' );
 
 has_field 'name' => (
-    type => 'Text',
+    type     => 'Text',
     required => 1,
-    label => 'Name',
+    label    => 'Name',
     apply    => [
         'Str',
         {
@@ -45,19 +39,17 @@ has_field 'name' => (
     ]
 );
 
-has_field 'dhcp_server' => (
-    type => 'Hidden',
-);
+has_field 'dhcp_server' => ( type => 'Hidden', );
 
 has_field 'dhcp_shared_network' => (
-    type => 'Select',
-    label => 'Shared Network',
+    type         => 'Select',
+    label        => 'Shared Network',
     empty_select => '--- No shared subnet ---',
 );
 
 has_field 'network' => (
-    type => 'Select',
-    label => 'Subnet',
+    type         => 'Select',
+    label        => 'Subnet',
     empty_select => '--- Select a subnet ---',
 );
 
@@ -68,54 +60,54 @@ has_block 'range_block' => (
 );
 
 has_field 'range' => (
-    type => 'Select',
-    label => 'IP Pool',
+    type         => 'Select',
+    label        => 'IP Pool',
     empty_select => '--- Select Ip Pool ---',
-    do_wrapper => 0,
-    tags => {
+    do_wrapper   => 0,
+    tags         => {
         before_element => '<div class="col-sm-8">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'ipblock_button' => (
-    type           => 'Button',
-    widget         => 'ButtonTag',
-    element_attr   => {
+    type         => 'Button',
+    widget       => 'ButtonTag',
+    element_attr => {
         class => [ 'btn', 'btn-primary' ],
-        href => '#',
+        href  => '#',
     },
     widget_wrapper => 'None',
     value          => "Add",
 );
 
 has_field 'max_lease_time' => (
-    type => 'Integer',
+    type  => 'Integer',
     label => 'Maximum Lease Time',
 );
 
 has_field 'default_lease_time' => (
-    type => 'Integer',
+    type  => 'Integer',
     label => 'Default Lease Time',
 );
 
 has_field 'ntp_server' => (
-    type => 'Text',
-    size => 15,
-    apply      => [IPAddress],
+    type  => 'Text',
+    size  => 15,
+    apply => [IPAddress],
     label => 'Ntp Server',
 );
 
 has_field 'domain_nameserver' => (
-    type   => 'Text',
-    size   =>  15,
-    apply  => [IPAddress],
-    label  => 'Domain Nameserver',
+    type  => 'Text',
+    size  => 15,
+    apply => [IPAddress],
+    label => 'Domain Nameserver',
 );
 
 has_field 'domain_name' => (
-    type => 'Text',
+    type  => 'Text',
     label => 'Domain Name',
 );
 
@@ -126,21 +118,18 @@ override validate_model => sub {
 
     super();
 
-    my $network = $self->schema->resultset('IPNetwork')
-        ->find($values->{network});
-    my $range = $self->schema->resultset('IPBlock')
-        ->find($values->{range});
+    my $network = $self->schema->resultset('IPNetwork')->find( $values->{network} );
+    my $range   = $self->schema->resultset('IPBlock')->find( $values->{range} );
 
-    if ($range && $network) {
-        if ( !$network->network->contains_address($range->from_addr) ||
-                 !$network->network->contains_address($range->to_addr) )
-            {
-                $self->field('range')->add_error('Pool must be inside network')
-            }
+    if ( $range && $network ) {
+        if ( !$network->network->contains_address( $range->from_addr ) ||
+            !$network->network->contains_address( $range->to_addr ) )
+        {
+            $self->field('range')->add_error('Pool must be inside network');
+        }
     }
 
 };
-
 
 sub options_dhcp_shared_network {
     my $self = shift;
@@ -148,12 +137,11 @@ sub options_dhcp_shared_network {
     return unless $self->schema;
 
     my $server_id =
-        ($self->item && $self->item->in_storage)
-        ? $self->item->dhcp_server_id
-        : $self->field('dhcp_server')->default;
+        ( $self->item && $self->item->in_storage ) ? $self->item->dhcp_server_id :
+        $self->field('dhcp_server')->default;
 
-    my $rs = $self->schema->resultset('DHCPSharedNetwork')->search(
-        { dhcp_server_id => $server_id });
+    my $rs = $self->schema->resultset('DHCPSharedNetwork')
+        ->search( { dhcp_server_id => $server_id } );
 
     return map +{ value => $_->id, label => $_->name }, $rs->all;
 }
@@ -166,30 +154,30 @@ sub options_network {
     my $server_id;
     my $item_id;
 
-    if ($self->item && $self->item->in_storage) {
+    if ( $self->item && $self->item->in_storage ) {
         $server_id = $self->item->dhcp_server_id;
         $item_id   = $self->item->id;
-    } else {
+    }
+    else {
         $self->field('dhcp_server')->default;
     }
 
-
-    my $server_network_ids =
-        $self->resultset('DHCPSubnet')
-        ->search(
-            {
-                dhcp_server_id => $server_id,
-                -not => { id => $item_id },
-            },
-            {
-                columns => [ 'network_id' ],
-                distinct => 1
-            });
+    my $server_network_ids = $self->resultset('DHCPSubnet')->search(
+        {
+            dhcp_server_id => $server_id,
+            -not           => { id => $item_id },
+        },
+        {
+            columns  => ['network_id'],
+            distinct => 1
+        }
+    );
 
     my $rs = $self->schema->resultset('IPNetwork')->search(
         {
-           id => {  -not_in => $server_network_ids->as_query },
-        });
+            id => { -not_in => $server_network_ids->as_query },
+        }
+    );
 
     return map +{ value => $_->id, label => $_->label }, $rs->all();
 }
@@ -197,7 +185,7 @@ sub options_network {
 before 'update_model' => sub {
     my $self = shift;
 
-    if ($self->item->in_storage) {
+    if ( $self->item->in_storage ) {
         delete $self->values->{dhcp_server};
     }
 };

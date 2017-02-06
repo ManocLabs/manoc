@@ -35,14 +35,14 @@ sub connection {
     my $dbh = $schema->storage->dbh;
     $schema->deploy();
 
-    $self->load_test_fixtures($schema) unless
-        $ENV{MANOC_TEST_NOFIXTURES};
+    $self->load_test_fixtures($schema)
+        unless $ENV{MANOC_TEST_NOFIXTURES};
 
     $Schema = $schema;
     return $schema;
 }
 
-sub get_schema { $Schema };
+sub get_schema { $Schema }
 
 sub load_test_fixtures {
     my $self   = shift;
@@ -50,7 +50,6 @@ sub load_test_fixtures {
 
     $schema->init_admin;
 }
-
 
 # Local Variables:
 # mode: cperl

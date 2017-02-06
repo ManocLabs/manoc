@@ -39,7 +39,7 @@ sub run {
     $self->log->info('Creating admin user.');
     $self->schema->init_admin;
     $self->log->info('Creating roles.');
-    my $conf_roles  = $self->config->{'Manoc::Permission'}->{roles};
+    my $conf_roles = $self->config->{'Manoc::Permission'}->{roles};
     $self->schema->init_roles($conf_roles);
     $self->log->info('Creating vlan.');
     $self->schema->init_vlan;

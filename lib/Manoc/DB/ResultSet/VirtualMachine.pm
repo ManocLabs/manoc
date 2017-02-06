@@ -9,22 +9,21 @@ use strict;
 use warnings;
 
 sub unused {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    my $used_vm_ids = $self->result_source->schema->resultset('Server')
-        ->search(
-            {
-                'subquery.decommissioned' => 0,
-                'subquery.vm_id'  => { -is_not => undef }
-            },
-            {
-                alias => 'subquery',
-            })
-        ->get_column('vm_id');
+    my $used_vm_ids = $self->result_source->schema->resultset('Server')->search(
+        {
+            'subquery.decommissioned' => 0,
+            'subquery.vm_id'          => { -is_not => undef }
+        },
+        {
+            alias => 'subquery',
+        }
+    )->get_column('vm_id');
 
     my $assets = $self->search(
         {
-            'vm.id' =>  {
+            'vm.id' => {
                 -not_in => $used_vm_ids->as_query,
             }
         },

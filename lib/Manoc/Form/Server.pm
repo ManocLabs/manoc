@@ -35,18 +35,21 @@ has_block 'host_ip_block' => (
 );
 
 has_field 'hostname' => (
-    type => 'Text',
-    size => 128,
-    required => 1,
-    label => 'Hostname',
+    type         => 'Text',
+    size         => 128,
+    required     => 1,
+    label        => 'Hostname',
     element_attr => { placeholder => 'hostname.local.domain' },
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 
 );
 has_field 'address' => (
-    type => 'Text', size => 15, required => 1, label => 'IP Address',
+    type         => 'Text',
+    size         => 15,
+    required     => 1,
+    label        => 'IP Address',
     element_attr => { placeholder => 'leave empty to use DNS' },
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_block 'os_type_block' => (
@@ -75,24 +78,26 @@ has_field 'type' => (
         },
     ],
     wrapper_tags => { inline => 1 },
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'os' => (
-    type => 'Text', size => 32, label => 'OS Name',
+    type         => 'Text',
+    size         => 32,
+    label        => 'OS Name',
     element_attr => { placeholder => 'e.g. CentOS' },
 
-    bs_block_field_helper({ label => 1, input => 2 })
+    bs_block_field_helper( { label => 1, input => 2 } )
 );
 
 has_field 'os_ver' => (
-    type => 'Text', size => 32, label => 'Version',
+    type         => 'Text',
+    size         => 32,
+    label        => 'Version',
     element_attr => { placeholder => 'e.g. 7.0' },
 
-    bs_block_field_helper({ label => 1, input => 2 })
+    bs_block_field_helper( { label => 1, input => 2 } )
 );
-
-
 
 has_block 'serverhw_block' => (
     render_list => [ 'serverhw', 'serverhw_btn' ],
@@ -101,18 +106,17 @@ has_block 'serverhw_block' => (
 );
 
 has_field 'serverhw' => (
-    type => 'Select',
+    type  => 'Select',
     label => 'Hardware',
-    bs_block_field_helper({ label => 2, input => 8 })
+    bs_block_field_helper( { label => 2, input => 8 } )
 );
 
-
 has_field 'serverhw_btn' => (
-    type           => 'Button',
-    widget         => 'ButtonTag',
-    element_attr   => {
+    type         => 'Button',
+    widget       => 'ButtonTag',
+    element_attr => {
         class => [ 'btn', 'btn-primary' ],
-        href => '#',
+        href  => '#',
     },
     widget_wrapper => 'None',
     value          => "Add",
@@ -124,25 +128,22 @@ has_block 'vm_block' => (
     class       => ['form-group'],
 );
 
-
 has_field 'vm' => (
-    type => 'Select',
+    type  => 'Select',
     label => 'Virtual Machine',
-    bs_block_field_helper({ label => 2, input => 8 })
+    bs_block_field_helper( { label => 2, input => 8 } )
 );
 
-
 has_field 'vm_btn' => (
-    type           => 'Button',
-    widget         => 'ButtonTag',
-    element_attr   => {
+    type         => 'Button',
+    widget       => 'ButtonTag',
+    element_attr => {
         class => [ 'btn', 'btn-primary' ],
-        href => '#',
+        href  => '#',
     },
     widget_wrapper => 'None',
     value          => "Add",
 );
-
 
 has_block 'virt_block' => (
     render_list => [ 'is_hypervisor', 'hosted_virtinfr' ],
@@ -155,18 +156,15 @@ has_field 'is_hypervisor' => (
     required => 1,
     label    => 'Hypervisor',
     widget   => 'RadioGroup',
-    options  => [
-        { value => 1, label => 'True'},
-        { value => 0, label => 'False' }
-    ],
+    options  => [ { value => 1, label => 'True' }, { value => 0, label => 'False' } ],
     wrapper_tags => { inline => 1 },
-    bs_block_field_helper({ label => 2, input => 2 })
+    bs_block_field_helper( { label => 2, input => 2 } )
 );
 
 has_field 'hosted_virtinfr' => (
-    type => 'Select',
+    type  => 'Select',
     label => 'Virtual Infrastructure',
-    bs_block_field_helper({ label => 4, input => 4 })
+    bs_block_field_helper( { label => 4, input => 4 } )
 );
 
 sub default_type {
@@ -178,7 +176,6 @@ sub default_type {
     return 'p' if $self->item->serverhw;
     return 'l';
 }
-
 
 sub options_serverhw {
     my $self = shift;
@@ -197,16 +194,16 @@ sub options_serverhw {
 
 }
 
-
 sub options_vm {
     my $self = shift;
 
     return unless $self->schema;
-    my @rs = $self->schema->resultset('VirtualMachine')
-        ->unused()
-        ->search({}, {
+    my @rs = $self->schema->resultset('VirtualMachine')->unused()->search(
+        {},
+        {
             prefetch => [ 'virtinfr', 'hypervisor' ]
-        })->all();
+        }
+    )->all();
 
     my @selections;
     foreach my $b (@rs) {
@@ -219,7 +216,6 @@ sub options_vm {
     return @selections;
 
 }
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

@@ -121,7 +121,7 @@ sub _order_sources {
 
     my $connections_to = {};
     while ( my ( $from, $deps ) = each %$SOURCE_DEPENDECIES ) {
-        ref($deps) eq 'ARRAY' or $deps = [ $deps ];
+        ref($deps) eq 'ARRAY' or $deps = [$deps];
         foreach my $to (@$deps) {
             $set{$from} or next;
             $set{$to}   or next;
@@ -189,7 +189,7 @@ sub _load_tables_loop {
         my $tables;
         $converter and $tables = $converter->get_table_name($source_name);
         $tables ||= [ $source->from ];
-        ref($tables) eq 'ARRAY' or $tables = [ $tables ];
+        ref($tables) eq 'ARRAY' or $tables = [$tables];
 
         foreach my $table (@$tables) {
             $self->log->debug("Loading $source_name from $table");

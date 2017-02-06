@@ -50,7 +50,6 @@ has 'diff' => (
     default  => 0
 );
 
-
 has 'backend' => (
     is       => 'rw',
     isa      => 'Str',
@@ -69,7 +68,7 @@ sub _build_backend {
 sub run {
     my $self = shift;
 
-    $self->diff ?  $self->create_diff : $self->create_ddl;
+    $self->diff ? $self->create_diff : $self->create_ddl;
 }
 
 sub create_diff {
@@ -81,18 +80,18 @@ sub create_diff {
     my $translator;
 
     $translator = SQL::Translator->new(
-        debug          => $self->debug,
+        debug       => $self->debug,
         parser      => 'DBI',
         parser_args => {
             dbh => $dbh,
         },
     );
     $translator->translate();
-    my $source_schema = $translator->schema or die SQL::Translator->error;;
+    my $source_schema = $translator->schema or die SQL::Translator->error;
     $source_schema->name("Current");
 
-    $translator  =  SQL::Translator->new(
-        debug          => $self->debug,
+    $translator = SQL::Translator->new(
+        debug       => $self->debug,
         parser      => 'SQL::Translator::Parser::DBIx::Class',
         parser_args => { dbic_schema => $self->schema, },
     );
@@ -100,23 +99,25 @@ sub create_diff {
     my $expected_sql = $translator->translate();
 
     $translator = SQL::Translator->new(
-        debug       => $self->debug,
-        parser      => $be,
-        data        => \$expected_sql,
+        debug  => $self->debug,
+        parser => $be,
+        data   => \$expected_sql,
     );
     $translator->translate();
     my $target_schema = $translator->schema or die SQL::Translator->error;
     $target_schema->name("New");
 
-    my $diff = SQL::Translator::Diff->new({
-        output_db     => $be,
-        source_schema => $source_schema,
-        target_schema => $target_schema,
-        debug         => $self->debug,
+    my $diff = SQL::Translator::Diff->new(
+        {
+            output_db     => $be,
+            source_schema => $source_schema,
+            target_schema => $target_schema,
+            debug         => $self->debug,
 
-        ignore_index_names => 1,
-        ignore_constraint_names => 1,
-    })->compute_differences->produce_diff_sql;
+            ignore_index_names      => 1,
+            ignore_constraint_names => 1,
+        }
+    )->compute_differences->produce_diff_sql;
 
     print $diff;
 }

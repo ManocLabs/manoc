@@ -18,7 +18,7 @@ has '+html_prefix' => ( default => 1 );
 has '+item_class' => ( default => 'DiscoverSession' );
 
 sub build_render_list {
-    [  'range_block', 'snmp_block', 'use_netbios', 'save', 'csrf_token', ];
+    [ 'range_block', 'snmp_block', 'use_netbios', 'save', 'csrf_token', ];
 }
 
 has_block 'range_block' => (
@@ -39,11 +39,10 @@ has_field 'from_addr' => (
         before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 
     element_attr => { placeholder => 'IP Address' }
 );
-
 
 has_field 'to_addr' => (
     size     => 15,
@@ -71,25 +70,22 @@ has_field 'use_snmp' => (
     required => 1,
     label    => 'SNMP',
     widget   => 'RadioGroup',
-    options  => [
-        { value => 1, label => 'Yes'},
-        { value => 0, label => 'No' }
-    ],
+    options  => [ { value => 1, label => 'Yes' }, { value => 0, label => 'No' } ],
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        inline => 1,
+        inline         => 1,
         before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'snmp_community' => (
-    type     => 'Text',
-    size     => 15,
-    label    => 'Community',
+    type  => 'Text',
+    size  => 15,
+    label => 'Community',
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
@@ -101,24 +97,19 @@ has_field 'snmp_community' => (
     element_attr => { placeholder => 'public' },
 );
 
-
 has_field 'use_netbios' => (
     type     => 'Select',
     required => 1,
     label    => 'Netbios',
     widget   => 'RadioGroup',
-    options  => [
-        { value => 1, label => 'Yes'},
-        { value => 0, label => 'No' }
-    ],
+    options  => [ { value => 1, label => 'Yes' }, { value => 0, label => 'No' } ],
 );
-
 
 override 'update_model' => sub {
     my $self   = shift;
     my $values = $self->values;
 
-    $values->{status} = Manoc::DB::Result::DiscoverSession->STATUS_NEW;
+    $values->{status}    = Manoc::DB::Result::DiscoverSession->STATUS_NEW;
     $values->{next_addr} = $values->{from_addr};
     $self->_set_value($values);
 

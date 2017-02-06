@@ -18,18 +18,17 @@ has '+html_prefix' => ( default => 1 );
 
 has '+item_class' => ( default => 'VirtualMachine' );
 
-
 sub build_render_list {
     return [
         qw/
-              name identifier
-              resources_block
-              hyper_block
+            name identifier
+            resources_block
+            hyper_block
 
-              save
-              csrf_token
-          /
-      ];
+            save
+            csrf_token
+            /
+    ];
 }
 
 has_block 'resources_block' => (
@@ -44,57 +43,54 @@ has_block 'hyper_block' => (
     class       => ['form-group'],
 );
 
-
-
 has_field 'name' => (
-    type => 'Text',
-    size => 15,
+    type     => 'Text',
+    size     => 15,
     required => 1,
-    label => 'Name',
+    label    => 'Name',
 );
 
 has_field 'identifier' => (
-    type => 'Text',
-    size => 36,
+    type  => 'Text',
+    size  => 36,
     label => 'Identifier',
 );
 
 has_field 'vcpus' => (
-    type => 'Integer',
+    type     => 'Integer',
     required => 1,
-    label => 'Virtual CPUs',
+    label    => 'Virtual CPUs',
 
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'ram_memory' => (
-    type => 'Integer',
+    type     => 'Integer',
     required => 1,
-    label => 'RAM (Mb)',
+    label    => 'RAM (Mb)',
 
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'virtinfr' => (
-    type => 'Select',
-    label => 'Virtual Infrastructure',
+    type     => 'Select',
+    label    => 'Virtual Infrastructure',
     nullable => 1,
 
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'hypervisor' => (
-    type => 'Select',
-    label => 'Hypervisor',
+    type     => 'Select',
+    label    => 'Hypervisor',
     nullable => 1,
-    bs_block_field_helper({ label => 2, input => 4 })
+    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'notes' => (
-    type => 'TextArea',
+    type  => 'TextArea',
     label => 'Notes',
 );
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

@@ -57,13 +57,12 @@ before 'create' => sub {
     }
     if ( defined($vm_id) ) {
         $c->log->debug("new server using vm $vm_id") if $c->debug;
-        $form_defaults{vm}    = $vm_id;
+        $form_defaults{vm}   = $vm_id;
         $form_defaults{type} = 'v';
     }
     %form_defaults and
         $c->stash( form_defaults => \%form_defaults );
 };
-
 
 =head2 decommission
 
@@ -85,9 +84,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
         params => $c->req->parameters,
     );
 
-    $c->response->redirect(
-        $c->uri_for_action('server/view', [ $c->stash->{object_pk} ])
-    );
+    $c->response->redirect( $c->uri_for_action( 'server/view', [ $c->stash->{object_pk} ] ) );
     $c->detach();
 }
 

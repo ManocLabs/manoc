@@ -360,23 +360,24 @@ sub update {
 sub update_device_info {
     my $self = shift;
 
-    my $source = $self->source;
+    my $source    = $self->source;
     my $dev_entry = $self->device_entry;
     my $nw_entry  = $self->nwinfo;
 
-    my $name  = $source->name;
+    my $name = $source->name;
     $nw_entry->name($name);
     if ( defined($name) && $name ne $dev_entry->name ) {
-        if ($dev_entry->name) {
+        if ( $dev_entry->name ) {
             my $msg = "Name mismatch " . $dev_entry->name . " $name";
             $self->log->warn($msg);
-        } else {
+        }
+        else {
             $dev_entry->name($name);
             $dev_entry->update;
         }
     }
 
-    $nw_entry->model($source->model);
+    $nw_entry->model( $source->model );
     $nw_entry->os( $source->os );
     $nw_entry->os_ver( $source->os_ver );
     $nw_entry->vendor( $source->vendor );
@@ -543,7 +544,8 @@ sub update_vtp_database {
             }
         );
     }
-    my $vtp_last_update = $self->schema->resultset('System')->find_or_create("netwalker.vtp_update");
+    my $vtp_last_update =
+        $self->schema->resultset('System')->find_or_create("netwalker.vtp_update");
     $vtp_last_update->value( $self->timestamp );
     $vtp_last_update->update();
 

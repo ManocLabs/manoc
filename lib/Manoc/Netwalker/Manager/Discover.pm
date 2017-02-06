@@ -34,8 +34,8 @@ has scoreboard => (
 );
 
 has current_session => (
-    is      => 'rw',
-    isa     => 'Maybe[Object]'
+    is  => 'rw',
+    isa => 'Maybe[Object]'
 );
 
 sub BUILD {
@@ -43,8 +43,8 @@ sub BUILD {
     my $self = shift;
 
     $self->schema->resultset('DiscoverSession')
-        ->search({ status => DiscoverSession->STATUS_RUNNING })
-        ->update({ status => DiscoverSession->STATUS_WAITING });
+        ->search( { status => DiscoverSession->STATUS_RUNNING } )
+        ->update( { status => DiscoverSession->STATUS_WAITING } );
 }
 
 =head2 on_tick
@@ -63,26 +63,25 @@ sub on_tick {
 sub schedule_session {
     my $self = shift;
 
-    if ( $self->current_session && ! $self->current_session->is_done) {
+    if ( $self->current_session && !$self->current_session->is_done ) {
         return;
     }
 
-    my $rs = $self->schema->resultset('DiscoverSession');
+    my $rs      = $self->schema->resultset('DiscoverSession');
     my $session = $rs->search(
-        { status => { -in => [
-            DiscoverSession->STATUS_WAITING,
-            DiscoverSession->STATUS_NEW,
-        ] } } )
-        ->first();
+        {
+            status =>
+                { -in => [ DiscoverSession->STATUS_WAITING, DiscoverSession->STATUS_NEW, ] }
+        }
+    )->first();
 
     $self->current_session($session);
     return unless $session;
 
     $self->log->debug( "found waiting discover session " . $session->id );
-    $session->status(DiscoverSession->STATUS_RUNNING);
+    $session->status( DiscoverSession->STATUS_RUNNING );
     $session->update;
 }
-
 
 sub schedule_hosts {
     my $self = shift;
@@ -93,11 +92,11 @@ sub schedule_hosts {
     my $session = $self->current_session;
 
     my $curr_addr = $session->next_addr;
-    my $to_addr = $session->to_addr;
+    my $to_addr   = $session->to_addr;
 
     $curr_addr ||= $session->from_addr;
 
-    while( $curr_addr <= $to_addr ) {
+    while ( $curr_addr <= $to_addr ) {
 
         if ( $self->check_worker_threshold ) {
             $self->log->debug("queue is full, stop scheduling addresses");
@@ -105,21 +104,20 @@ sub schedule_hosts {
         }
 
         $self->scoreboard->{$curr_addr} = 'QUEUED';
-        $self->enqueue( sub { $self->discover_address($session->id, $curr_addr) } );
+        $self->enqueue( sub { $self->discover_address( $session->id, $curr_addr ) } );
         $self->log->debug("enqueued address $curr_addr");
 
-        $curr_addr = Manoc::IPAddress::IPv4->new({ numeric =>  $curr_addr->numeric + 1 });
+        $curr_addr = Manoc::IPAddress::IPv4->new( { numeric => $curr_addr->numeric + 1 } );
     }
 
     $session->next_addr($curr_addr);
-    if ($curr_addr > $to_addr) {
-        $session->status($session->STATUS_DONE);
+    if ( $curr_addr > $to_addr ) {
+        $session->status( $session->STATUS_DONE );
         $self->current_session(undef);
     }
 
     $session->update();
 }
-
 
 sub worker_done {
     my $self = shift;
@@ -130,14 +128,15 @@ sub worker_done {
 
     if ( $session->is_running ) {
         $self->schedule_hosts;
-    } else {
+    }
+    else {
         $self->log->debug("session has been stopped");
         $self->current_session(undef);
     }
 }
 
 sub discover_address {
-    my ($self, $session_id, $address)  = @_;
+    my ( $self, $session_id, $address ) = @_;
 
     my $updater = Manoc::Netwalker::DiscoverTask->new(
         {
@@ -150,12 +149,12 @@ sub discover_address {
     try {
         $self->log->debug("running scanner for $address");
         $updater->scan();
-    } catch {
+    }
+    catch {
         $self->log->debug("Got error $_ while scanning $address");
     };
 
 }
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

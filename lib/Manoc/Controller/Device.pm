@@ -8,9 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView" => {
-    -excludes => 'get_json_object',
-};
+with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
 use Text::Diff;
 
 use Manoc::Form::Device::Edit;
@@ -50,17 +48,12 @@ __PACKAGE__->config(
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
 
-    object_list_options     => {
-        prefetch => [
-            { 'rack' => 'building' },
-            'mng_url_format',
-            'hwasset',
-            'netwalker_info',
-        ]
+    object_list_options => {
+        prefetch => [ { 'rack' => 'building' }, 'mng_url_format', 'hwasset', 'netwalker_info', ]
     },
 
-    edit_page_title         => 'Edit device',
-    create_page_title       => 'New device',
+    edit_page_title   => 'Edit device',
+    create_page_title => 'New device',
 );
 
 =head1 ACTIONS
@@ -191,7 +184,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
     my $device_id = $c->stash->{object}->id;
 
-    my $config = Manoc::Netwalker::Config->new(  $c->config->{Netwalker} || {} );
+    my $config = Manoc::Netwalker::Config->new( $c->config->{Netwalker} || {} );
     my $client = Manoc::Netwalker::ControlClient->new( config => $config );
 
     my $status = $client->enqueue_device($device_id);
@@ -314,7 +307,6 @@ before 'create' => sub {
         $c->stash( form_defaults => { rack => $rack_id } );
     }
 
-
 };
 
 =head2 decommission
@@ -337,9 +329,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
         params => $c->req->parameters,
     );
 
-    $c->response->redirect(
-        $c->uri_for_action('device/view', [ $c->stash->{object_pk} ])
-    );
+    $c->response->redirect( $c->uri_for_action( 'device/view', [ $c->stash->{object_pk} ] ) );
     $c->detach();
 }
 

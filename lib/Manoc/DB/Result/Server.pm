@@ -97,7 +97,7 @@ __PACKAGE__->belongs_to(
     'serverhw_id',
     {
         cascade_update => 1,
-        join_type => 'left',
+        join_type      => 'left',
     }
 );
 
@@ -106,7 +106,7 @@ __PACKAGE__->belongs_to(
     'vm_id',
     {
         cascade_update => 1,
-        join_type => 'left',
+        join_type      => 'left',
     }
 );
 
@@ -140,10 +140,10 @@ sub virtual_servers {
 
 sub num_cpus {
     my ($self) = @_;
-    if ($self->serverhw) {
+    if ( $self->serverhw ) {
         return $self->serverhw->n_procs * $self->serverhw->n_cores_procs;
     }
-    if ($self->vm) {
+    if ( $self->vm ) {
         return $self->vm->vcpus;
     }
     return undef;
@@ -151,14 +151,13 @@ sub num_cpus {
 
 sub ram_memory {
     my ($self) = @_;
-    if ($self->serverhw) {
+    if ( $self->serverhw ) {
         return $self->serverhw->ram_memory;
     }
-    if ($self->vm) {
+    if ( $self->vm ) {
         return $self->vm->ram_memory;
     }
 }
-
 
 =head2 decommission([$timestamp])
 
@@ -179,15 +178,13 @@ sub decommission {
     $self->serverhw_id(undef);
     $self->vm_id(undef);
 
-    foreach my $vm ($self->virtual_machines) {
+    foreach my $vm ( $self->virtual_machines ) {
         $vm->decommission();
     }
     $self->update();
 
     $guard->commit;
 }
-
-
 
 =head1 AUTHOR
 

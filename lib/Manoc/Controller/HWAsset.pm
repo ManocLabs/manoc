@@ -41,15 +41,16 @@ __PACKAGE__->config(
     class      => 'ManocDB::HWAsset',
     form_class => 'Manoc::Form::HWAsset',
 
-    json_columns => [ qw(id serial vendor model inventory rack_id rack_level building_id room label)],
+    json_columns =>
+        [qw(id serial vendor model inventory rack_id rack_level building_id room label)],
 
-    datatable_row_callback   => 'datatable_row',
-    datatable_columns => [  qw(inventory type vendor model serial rack.name) ],
-    datatable_search_columns => [  qw(serial vendor model inventory) ],
-    datatable_search_options => { prefetch =>  { 'rack' => 'building' } },
+    datatable_row_callback    => 'datatable_row',
+    datatable_columns         => [qw(inventory type vendor model serial rack.name)],
+    datatable_search_columns  => [qw(serial vendor model inventory)],
+    datatable_search_options  => { prefetch => { 'rack' => 'building' } },
     datatable_search_callback => 'datatable_search_cb',
 
-    object_list_filter_columns => [ qw( type vendor rack_id building_id ) ],
+    object_list_filter_columns => [qw( type vendor rack_id building_id )],
 );
 
 =head1 ACTIONS
@@ -132,7 +133,6 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-
 =haed2 delete
 
 =cut
@@ -146,11 +146,12 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     if ( $c->req->method eq 'POST' ) {
         if ( $self->delete_object($c) ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $c->uri_for_action( 'hwasset/list' ));
+            $c->res->redirect( $c->uri_for_action('hwasset/list') );
             $c->detach();
         }
         else {
-            $c->res->redirect( $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ]));
+            $c->res->redirect(
+                $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ] ) );
             $c->detach();
         }
     }
@@ -162,7 +163,6 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 Get a list of vendors
 
 =cut
-
 
 sub vendors_js : Chained('base') : PathPart('vendors/js') : Args(0) {
     my ( $self, $c ) = @_;
@@ -177,15 +177,14 @@ sub vendors_js : Chained('base') : PathPart('vendors/js') : Args(0) {
     my @data = $c->stash->{resultset}->search(
         $filter,
         {
-            columns => [ qw/vendor/ ],
+            columns  => [qw/vendor/],
             distinct => 1
         }
     )->get_column('vendor')->all();
     $c->log->error("data=@data");
-    $c->stash( json_data => \@data);
+    $c->stash( json_data => \@data );
     $c->forward('View::JSON');
 }
-
 
 =head2 models_js
 
@@ -193,8 +192,7 @@ Get a list of models optionally filtered by vendor
 
 =cut
 
-
-sub models_js: Chained('base') : PathPart('models/js') : Args(0) {
+sub models_js : Chained('base') : PathPart('models/js') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->require_permission( $c->stash->{resultset}, 'list' );
@@ -210,7 +208,7 @@ sub models_js: Chained('base') : PathPart('models/js') : Args(0) {
     my @data = $c->stash->{resultset}->search(
         $filter,
         {
-            columns => [ qw/model/ ],
+            columns  => [qw/model/],
             distinct => 1
         }
     )->get_column('model')->all();
@@ -226,39 +224,38 @@ sub models_js: Chained('base') : PathPart('models/js') : Args(0) {
 sub get_form_process_params {
     my ( $self, $c, %params ) = @_;
 
-    my $qp =  $c->req->query_parameters;
+    my $qp = $c->req->query_parameters;
     $qp->{hide_location} and $params{hide_location} = $qp->{hide_location};
 
     return %params;
 }
 
 sub datatable_search_cb {
-    my ($self, $c, $filter, $attr) = @_;
+    my ( $self, $c, $filter, $attr ) = @_;
 
     my $status = $c->request->param('search_status');
 
     my $extra_filter = {};
-    if (defined($status)) {
+    if ( defined($status) ) {
         $status eq 'd' and
             $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
         $status eq 'w' and
             $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE;
         $status eq 'u' and
             $extra_filter->{location} = [
-                -and =>
-                    { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
-                    { '!=' => Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE }
-                ];
+            -and => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
+            { '!=' => Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE }
+            ];
     }
 
     %$extra_filter and
         $filter = { -and => [ $filter, $extra_filter ] };
 
-    return ($filter, $attr);
+    return ( $filter, $attr );
 }
 
 sub datatable_row {
-    my ($self, $c, $row) = @_;
+    my ( $self, $c, $row ) = @_;
 
     my $action = 'hwasset/view';
 
@@ -269,30 +266,29 @@ sub datatable_row {
         model     => $row->model,
         serial    => $row->serial,
         location  => $row->display_location,
-        link      => $c->uri_for_action($action, [ $row->id ]),
-    }
+        link      => $c->uri_for_action( $action, [ $row->id ] ),
+    };
 }
 
-sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devices') : Args(0)  {
+sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devices') : Args(0)
+{
     my ( $self, $c ) = @_;
 
-    $c->stash->{'datatable_resultset'} =
-        $c->stash->{resultset}->search_rs(
-            {
-                type => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
-            }
-        );
+    $c->stash->{'datatable_resultset'} = $c->stash->{resultset}->search_rs(
+        {
+            type => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
+        }
+    );
     $c->forward('/hwasset/datatable_source');
 }
 
 sub unused_devices_js : Chained('base') : PathPart('js/device/unused') {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $rs = $c->stash->{resultset};
-    $c->stash(object_list => [ $rs->unused_devices->all() ]);
+    $c->stash( object_list => [ $rs->unused_devices->all() ] );
     $c->detach('/hwasset/list_js');
 }
-
 
 =head1 AUTHOR
 

@@ -13,7 +13,6 @@ BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
 with "Manoc::ControllerRole::JSONView";
 
-
 =head1 NAME
 
 Manoc::Controller::ServerHW - Catalyst Controller
@@ -38,12 +37,11 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
 
-    json_columns            => [ 'id', 'inventory', 'model', 'serial' ],
+    json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
-    object_list_options     => {
-        prefetch =>
-            { 'hwasset' => { 'rack' => 'building' } }
-        },
+    object_list_options => {
+        prefetch => { 'hwasset' => { 'rack' => 'building' } }
+    },
 
 );
 
@@ -64,7 +62,7 @@ before 'create' => sub {
             $c->log->debug("copy server from $copy_id");
             my %cols = $original->get_columns;
             delete $cols{hwasset_id};
-            foreach ( qw(model vendor) ) {
+            foreach (qw(model vendor)) {
                 $cols{$_} = $original->hwasset->get_column($_);
             }
 
@@ -73,13 +71,11 @@ before 'create' => sub {
     }
 };
 
-
 =head2 import_csv
 
 Import a server hardware list from a CSV file
 
 =cut
-
 
 sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     my ( $self, $c ) = @_;
@@ -90,10 +86,9 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     my $upload;
     $c->req->method eq 'POST' and $upload = $c->req->upload('file');
 
-
     my $form = Manoc::Form::CVSImport::ServerHW->new(
-        ctx              => $c,
-        resultset        => $rs,
+        ctx       => $c,
+        resultset => $rs,
     );
     $c->stash->{form} = $form;
 
@@ -115,14 +110,12 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( 'serverhw', 'edit' );
 
-
     if ( $c->req->method eq 'POST' ) {
         $object->decommission;
         $object->update();
         $c->flash( message => "Server decommissioned" );
         $c->response->redirect(
-            $c->uri_for_action('serverhw/view', [ $c->stash->{object_pk} ])
-        );
+            $c->uri_for_action( 'serverhw/view', [ $c->stash->{object_pk} ] ) );
         $c->detach();
     }
 
@@ -133,7 +126,6 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
         template        => 'generic_confirm.tt',
     );
 }
-
 
 =head1 AUTHOR
 

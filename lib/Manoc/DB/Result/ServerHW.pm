@@ -28,12 +28,12 @@ __PACKAGE__->add_columns(
         size        => 32,
     },
     n_procs => {
-        data_type     => 'int',
-        is_nullable   => 1,
+        data_type   => 'int',
+        is_nullable => 1,
     },
     n_cores_proc => {
-        data_type     => 'int',
-        is_nullable   => 1,
+        data_type   => 'int',
+        is_nullable => 1,
     },
     proc_freq => {
         data_type   => 'int',
@@ -58,16 +58,16 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('hwasset_id');
 
 my @HWASSET_PROXY_ATTRS = qw(
-                                vendor model serial inventory
-                                location
-                                building rack rack_level room
-                        );
-my  @HWASSET_PROXY_METHODS = qw(
-                                   is_decommissioned is_in_warehouse is_in_rack
-                                   move_to_rack move_to_room move_to_warehouse
-                                   decommission
-                                   display_location
-                           );
+    vendor model serial inventory
+    location
+    building rack rack_level room
+);
+my @HWASSET_PROXY_METHODS = qw(
+    is_decommissioned is_in_warehouse is_in_rack
+    move_to_rack move_to_room move_to_warehouse
+    decommission
+    display_location
+);
 __PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
     'id',
@@ -76,11 +76,10 @@ __PACKAGE__->has_one(
     }
 );
 
-
 sub label {
     my $self = shift;
 
-    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",
+    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
 
 sub new {
@@ -89,24 +88,24 @@ sub new {
 
     my $new_attrs = {};
 
-    $new_attrs->{hwasset}->{type} =  Manoc::DB::Result::HWAsset->TYPE_SERVER;
+    $new_attrs->{hwasset}->{type} = Manoc::DB::Result::HWAsset->TYPE_SERVER;
     my %proxied_attrs = map { $_ => 1 } @HWASSET_PROXY_ATTRS;
-    foreach my $k (keys %$attrs) {
+    foreach my $k ( keys %$attrs ) {
         if ( $proxied_attrs{$k} ) {
-            $new_attrs->{hwasset}->{$k} = $attrs->{$k}
-        } else {
-            $new_attrs->{$k} = $attrs->{$k}
+            $new_attrs->{hwasset}->{$k} = $attrs->{$k};
+        }
+        else {
+            $new_attrs->{$k} = $attrs->{$k};
         }
     }
 
-    return $self->next::method($new_attrs, @args);
+    return $self->next::method( $new_attrs, @args );
 }
 
 sub cores {
     my ($self) = @_;
     return $self->n_procs * $self->n_cores_procs;
 }
-
 
 __PACKAGE__->might_have(
     server => 'Manoc::DB::Result::Server',

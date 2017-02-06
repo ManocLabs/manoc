@@ -27,19 +27,18 @@ has_field 'serverhw_action' => (
     type    => 'Select',
     widget  => 'RadioGroup',
     options => [
-        { value => 'DECOMMISSION',  label => 'Decommission' },
-        { value => 'WAREHOUSE', label => 'Return to warehouse' },
+        { value => 'DECOMMISSION', label => 'Decommission' },
+        { value => 'WAREHOUSE',    label => 'Return to warehouse' },
     ],
 );
-
 
 has_field 'vm_action' => (
     label   => 'Action for associated hardware',
     type    => 'Select',
     widget  => 'RadioGroup',
     options => [
-        { value => 'DECOMMISSION',  label => 'Decommission' },
-        { value => 'KEEP', label => 'Keep' },
+        { value => 'DECOMMISSION', label => 'Decommission' },
+        { value => 'KEEP',         label => 'Keep' },
     ],
 );
 
@@ -77,7 +76,8 @@ sub update_model {
                     $hw->move_to_warehouse();
                 $hw->update();
 
-            } elsif ( $vm ) {
+            }
+            elsif ($vm) {
                 my $action = $values->{vm_action};
                 $action eq 'DECOMMISSION' and
                     $vm->decommission;

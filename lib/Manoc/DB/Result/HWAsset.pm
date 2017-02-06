@@ -19,10 +19,10 @@ use constant {
 };
 
 use constant {
-    LOCATION_DECOMMISSIONED   => 'd',
-    LOCATION_WAREHOUSE => 'w',
-    LOCATION_RACK      => 'r',
-    LOCATION_ROOM      => 'o',
+    LOCATION_DECOMMISSIONED => 'd',
+    LOCATION_WAREHOUSE      => 'w',
+    LOCATION_RACK           => 'r',
+    LOCATION_ROOM           => 'o',
 };
 
 our %TYPE = (
@@ -48,11 +48,11 @@ __PACKAGE__->add_columns(
         size        => 1,
     },
     location => {
-        data_type      => 'varchar',
-        is_nullable    => 0,
-        default_value  => LOCATION_WAREHOUSE,
-        size           => 1,
-        accessor       => '_location',
+        data_type     => 'varchar',
+        is_nullable   => 0,
+        default_value => LOCATION_WAREHOUSE,
+        size          => 1,
+        accessor      => '_location',
     },
     vendor => {
         data_type   => 'varchar',
@@ -119,13 +119,13 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 __PACKAGE__->belongs_to(
-    rack     => 'Manoc::DB::Result::Rack',
+    rack => 'Manoc::DB::Result::Rack',
     'rack_id',
     { join_type => 'left' }
 );
 
 __PACKAGE__->might_have(
-    device   => 'Manoc::DB::Result::Device',
+    device => 'Manoc::DB::Result::Device',
     'hwasset_id'
 );
 
@@ -138,10 +138,9 @@ __PACKAGE__->might_have(
     }
 );
 
-
 sub in_use {
     my $self = shift;
-    return defined($self->device) || defined($self->server);
+    return defined( $self->device ) || defined( $self->server );
 }
 
 sub is_decommissioned {
@@ -164,25 +163,25 @@ sub sync_location_fields {
 
     my $location = $self->_location;
 
-    if ($location eq LOCATION_WAREHOUSE ||
-            $location eq LOCATION_DECOMMISSIONED)
-        {
-            $self->rack(undef);
-            $self->rack_level(undef);
-            $self->building(undef);
-            $self->floor(undef);
-            $self->room(undef);
-        }
-    if ($location eq LOCATION_ROOM) {
-        $self->rack(undef)
+    if ( $location eq LOCATION_WAREHOUSE ||
+        $location eq LOCATION_DECOMMISSIONED )
+    {
+        $self->rack(undef);
+        $self->rack_level(undef);
+        $self->building(undef);
+        $self->floor(undef);
+        $self->room(undef);
     }
-    if ($location eq LOCATION_RACK) {
+    if ( $location eq LOCATION_ROOM ) {
+        $self->rack(undef);
+    }
+    if ( $location eq LOCATION_RACK ) {
         my $rack = $self->rack;
 
         $rack or croak "Undefined rack field while location is set to rack";
-        $self->building($rack->building);
-        $self->room($rack->room);
-        $self->floor($rack->floor);
+        $self->building( $rack->building );
+        $self->room( $rack->room );
+        $self->floor( $rack->floor );
     }
 }
 
@@ -198,7 +197,7 @@ sub decommission {
 }
 
 sub move_to_rack {
-    my ($self, $rack) = @_;
+    my ( $self, $rack ) = @_;
 
     defined($rack) or croak "move_to_rack called with an undef rack";
     my $rack_id = ref($rack) ? $rack->id : $rack;
@@ -208,7 +207,7 @@ sub move_to_rack {
 }
 
 sub move_to_room {
-    my ($self, $building, $floor, $room) = @_;
+    my ( $self, $building, $floor, $room ) = @_;
 
     defined($building) or croak "Move to room called with an undef building";
 
@@ -231,13 +230,13 @@ sub move_to_warehouse {
 sub label {
     my $self = shift;
 
-    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",
+    return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
 
 sub display_type {
     my $self = shift;
 
-    return $TYPE{$self->type}->{label};
+    return $TYPE{ $self->type }->{label};
 }
 
 sub display_location {
@@ -245,7 +244,7 @@ sub display_location {
 
     my $location = $self->_location;
 
-    if ($location eq LOCATION_WAREHOUSE ) {
+    if ( $location eq LOCATION_WAREHOUSE ) {
         return "Warehouse";
     }
 
@@ -255,8 +254,8 @@ sub display_location {
 
     if ( $location eq LOCATION_ROOM ) {
         my $location = $self->building->label;
-        defined($self->floor) and $location .= " - " . $self->floor;
-        defined($self->room)  and $location .= " - " . $self->room;
+        defined( $self->floor ) and $location .= " - " . $self->floor;
+        defined( $self->room )  and $location .= " - " . $self->room;
         return $location;
     }
 
@@ -268,7 +267,7 @@ sub display_location {
 sub generate_inventory {
     my $self = shift;
 
-    my $inventory = sprintf("%s%06d", $self->type, $self->id);
+    my $inventory = sprintf( "%s%06d", $self->type, $self->id );
     $self->inventory($inventory);
 }
 
@@ -276,7 +275,7 @@ sub insert {
     my ( $self, @args ) = @_;
     $self->next::method(@args);
 
-    if ( ! defined( $self->inventory ) ) {
+    if ( !defined( $self->inventory ) ) {
         $self->generate_inventory;
         $self->update;
     }
@@ -287,7 +286,7 @@ sub update {
     my ( $self, @args ) = @_;
     $self->next::method(@args);
 
-    if ( ! defined( $self->inventory ) ) {
+    if ( !defined( $self->inventory ) ) {
         $self->generate_inventory;
         $self->update;
     }

@@ -52,7 +52,7 @@ sub auto : Private {
 
     # Disable csrf in tests
     $c->config->{test_mode} && $ENV{MANOC_SKIP_CSRF} and
-      $c->stash->{skip_csrf} = 1;
+        $c->stash->{skip_csrf} = 1;
 
     ##  XHR detection ##
     if ( my $req_with = $c->req->header('X-Requested-With') ) {
@@ -103,7 +103,7 @@ sub auto : Private {
 sub check_auth {
     my ( $self, $c ) = @_;
 
-   $c->controller eq $c->controller('Auth') and
+    $c->controller eq $c->controller('Auth') and
         return 1;
 
     # already authenticated by API controller

@@ -54,8 +54,7 @@ sub get_datatable_resultset {
     return $c->stash->{'resultset'};
 }
 
-sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
-    {
+sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $start  = $c->request->param('start') || 0;
@@ -74,7 +73,6 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
 
     my $search_callback = $c->stash->{'datatable_search_callback'} ||
         $self->datatable_search_callback;
-
 
     my $row_callback = $c->stash->{'datatable_row_callback'} ||
         $self->datatable_row_callback;
@@ -114,7 +112,7 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
     }
 
     if ($search_callback) {
-        ($search_filter, $search_attrs ) =
+        ( $search_filter, $search_attrs ) =
             $self->$search_callback( $c, $search_filter, $search_attrs );
     }
 

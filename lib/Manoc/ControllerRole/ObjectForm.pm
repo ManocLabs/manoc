@@ -21,11 +21,10 @@ has 'form_success_url' => (
 );
 
 has 'object_updated_message' => (
-    is  => 'rw',
-    isa => 'Str',
+    is      => 'rw',
+    isa     => 'Str',
     default => 'Updated',
 );
-
 
 =head1 ACTIONS
 
@@ -60,7 +59,7 @@ sub form : Private {
         $process_params{use_defaults_over_obj} = 1;
     }
 
-    if ($self->can("get_form_process_params")) {
+    if ( $self->can("get_form_process_params") ) {
         %process_params = $self->get_form_process_params( $c, %process_params );
     }
     my $process_status = $form->process(%process_params);
@@ -124,10 +123,9 @@ Get the URL to redirect after successful editing.
 sub get_form_success_url {
     my ( $self, $c ) = @_;
 
-    my $form_success_url =
-        $c->stash->{form_success_url}
-        || $self->form_success_url
-        || $c->uri_for_action( $c->namespace . "/view", [ $c->stash->{object_id} ] );
+    my $form_success_url = $c->stash->{form_success_url} ||
+        $self->form_success_url ||
+        $c->uri_for_action( $c->namespace . "/view", [ $c->stash->{object_id} ] );
 
     return $form_success_url;
 }

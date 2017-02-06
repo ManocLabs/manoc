@@ -102,7 +102,8 @@ sub label {
     my $label = $self->name;
     if ( $self->virtinfr ) {
         $label .= ' - ' . $self->virtinfr->name;
-    } elsif ( $self->hypervisor ) {
+    }
+    elsif ( $self->hypervisor ) {
         $label .= ' -' . $self->virtinfr->hostname;
     }
     return $label;
@@ -134,6 +135,5 @@ sub decommission {
 
     $guard->commit;
 }
-
 
 1;

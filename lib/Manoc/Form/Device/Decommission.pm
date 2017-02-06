@@ -28,8 +28,8 @@ has_field 'asset_action' => (
     widget   => 'RadioGroup',
     required => 1,
     options  => [
-        { value => 'DECOMMISSION',   label => 'Decommission' },
-        { value => 'WAREHOUSE', label => 'Return to warehouse' },
+        { value => 'DECOMMISSION', label => 'Decommission' },
+        { value => 'WAREHOUSE',    label => 'Return to warehouse' },
     ],
 );
 

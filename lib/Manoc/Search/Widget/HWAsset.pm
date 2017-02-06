@@ -8,7 +8,7 @@ use Moose::Role;
 sub render {
     my ( $self, $ctx ) = @_;
 
-    my $url = $ctx->uri_for_action( 'hwasset/view', [ $self->id ] );
+    my $url       = $ctx->uri_for_action( 'hwasset/view', [ $self->id ] );
     my $inventory = $self->inventory;
     my $model     = $self->model;
     my $vendor    = $self->vendor;

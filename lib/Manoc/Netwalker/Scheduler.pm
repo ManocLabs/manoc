@@ -11,11 +11,7 @@ use Moose::Util::TypeConstraints;
 with 'Manoc::Logger::Role';
 use POE;
 
-subtype 'ManagerType'
-    => as 'Object'
-    => where sub { $_->does('Manoc::Netwalker::Manager') };
-
-
+subtype 'ManagerType' => as 'Object' => where sub { $_->does('Manoc::Netwalker::Manager') };
 
 has config => (
     is       => 'ro',
@@ -24,14 +20,14 @@ has config => (
 );
 
 has workers_manager => (
-    is       => 'ro',
-    isa      => 'ArrayRef[ManagerType]',
+    is      => 'ro',
+    isa     => 'ArrayRef[ManagerType]',
     default => sub { [] },
     traits  => ['Array'],
 
     handles => {
-        all_workers_manager    => 'elements',
-        add_workers_manager    => 'push',
+        all_workers_manager => 'elements',
+        add_workers_manager => 'push',
     },
 );
 
@@ -62,13 +58,12 @@ has next_alarm_time => (
     isa => 'Int',
 );
 
-
 sub _start {
     my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
     $self->log->debug( "starting scheduler, tick=", $self->tick_interval );
 
-    foreach my $m (@{$self->workers_manager}) {
+    foreach my $m ( @{ $self->workers_manager } ) {
         $m->on_tick($kernel);
     }
 
@@ -79,8 +74,8 @@ sub _start {
 sub tick {
     my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];
 
-    $self->log->debug( "scheduler tick");
-    foreach my $m (@{$self->workers_manager}) {
+    $self->log->debug("scheduler tick");
+    foreach my $m ( @{ $self->workers_manager } ) {
         $m->on_tick($kernel);
     }
     $self->next_alarm_time( $self->next_alarm_time + $self->tick_interval );

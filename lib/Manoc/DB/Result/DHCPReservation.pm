@@ -85,9 +85,8 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.dhcp_subnet_id' },
 );
 
+__PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->set_primary_key( 'id' );
-
-__PACKAGE__->add_unique_constraint( [ 'ipaddr', 'macaddr', 'dhcp_server_id'] );
+__PACKAGE__->add_unique_constraint( [ 'ipaddr', 'macaddr', 'dhcp_server_id' ] );
 
 1;

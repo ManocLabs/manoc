@@ -42,7 +42,7 @@ sub init {
 
     return if Log::Log4perl->initialized();
 
-    if ($ENV{MANOC_SUPPRESS_LOG} ) {
+    if ( $ENV{MANOC_SUPPRESS_LOG} ) {
         Log::Log4perl->easy_init($OFF);
         return;
     }

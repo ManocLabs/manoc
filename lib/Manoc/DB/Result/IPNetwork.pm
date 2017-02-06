@@ -121,7 +121,6 @@ sub broadcast {
     return $self->_broadcast( $self->network->broadcast );
 }
 
-
 sub label {
     my $self = shift;
     return $self->name . " (" . $self->network . ")";
@@ -253,10 +252,9 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->has_many(
-    dhcp_subnets =>
-    'Manoc::DB::Result::DHCPSubnet',
+    dhcp_subnets => 'Manoc::DB::Result::DHCPSubnet',
     { 'foreign.network_id' => 'self.id' },
- );
+);
 
 __PACKAGE__->add_relationship(
     'supernets' => 'IPNetwork',

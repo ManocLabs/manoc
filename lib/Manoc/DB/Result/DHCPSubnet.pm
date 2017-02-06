@@ -22,8 +22,8 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
     },
     'name' => {
-        data_type   => 'varchar',
-        size        => 64,
+        data_type => 'varchar',
+        size      => 64,
     },
     'domain_name' => {
         data_type   => 'varchar',
@@ -47,8 +47,8 @@ __PACKAGE__->add_columns(
         is_nullable => 1,
     },
     'max_lease_time' => {
-        data_type    => 'int',
-        is_nullable  => 1,
+        data_type   => 'int',
+        is_nullable => 1,
     },
     'dhcp_server_id' => {
         data_type      => 'int',
@@ -95,11 +95,9 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->has_many(
-    reservations =>
-    'Manoc::DB::Result::DHCPReservation',
+    reservations => 'Manoc::DB::Result::DHCPReservation',
     { 'foreign.dhcp_subnet_id' => 'self.id' },
-  );
-
+);
 
 1;
 

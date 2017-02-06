@@ -16,13 +16,11 @@ has object_list_filter_columns => (
     default => sub { [] }
 );
 
-
 has object_list_options => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub { {} }
 );
-
 
 =head1 NAME
 
@@ -82,8 +80,8 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
 sub get_object_list {
     my ( $self, $c ) = @_;
 
-    my $rs = $c->stash->{resultset};
-    my $filter = $self->get_object_list_filter($c);
+    my $rs      = $c->stash->{resultset};
+    my $filter  = $self->get_object_list_filter($c);
     my $options = $self->object_list_options;
     return [ $rs->search( $filter, $options ) ];
 }
@@ -98,11 +96,11 @@ sub get_object_list_filter {
     my %filter;
 
     my $qp = $c->req->query_parameters;
-    foreach my $col (@{$self->object_list_filter_columns}) {
+    foreach my $col ( @{ $self->object_list_filter_columns } ) {
         my $param = $qp->{$col};
         defined($param) or next;
         ref($param) eq "ARRAY" and next;
-        $filter{ $col } = $param;
+        $filter{$col} = $param;
         $c->log->debug("filter object list $col = $param") if $c->debug;
     }
 

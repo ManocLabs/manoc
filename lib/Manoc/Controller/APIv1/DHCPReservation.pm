@@ -55,9 +55,9 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
 
     my $req_data = $c->stash->{api_request_data};
 
-    my $server_name   = $req_data->{server};
-    my $server = $c->model('ManocDB::DHCPServer')->find('name');
-    if (!$server) {
+    my $server_name = $req_data->{server};
+    my $server      = $c->model('ManocDB::DHCPServer')->find('name');
+    if ( !$server ) {
         push @{ $c->stash->{api_field_errors} }, 'Unknown server';
         return;
     }
@@ -67,7 +67,7 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
 
     $c->schema->txn_do(
         sub {
-            $server->reservations->update(on_server => 0);
+            $server->reservations->update( on_server => 0 );
 
             foreach my $r (@$records) {
                 my $macaddr = $r->{macaddr}                               or next;
@@ -88,7 +88,8 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
                 );
                 $n_created++;
             }
-        });
+        }
+    );
     my $data = { message => "created $n_created entries", };
 
     $c->stash( api_response_data => $data );

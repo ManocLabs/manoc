@@ -18,9 +18,9 @@ coerce 'TimeInterval', from 'Str', via { str2seconds($_) };
 
 # use to construct default paths
 has manoc_config_dir => (
-    is       => 'ro',
-    isa      => 'Str',
-    default  => sub { getcwd() },
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { getcwd() },
 );
 
 has n_procs => (
@@ -114,8 +114,8 @@ sub _build_default_ssh_key {
     my $self = shift;
 
     my $basedir = $self->manoc_config_dir;
-    foreach ( qw( id_dsa id_ecdsa id_ed25519 id_rsa ) ) {
-        my $file = File::Spec->catfile($basedir, $_);
+    foreach (qw( id_dsa id_ecdsa id_ed25519 id_rsa )) {
+        my $file = File::Spec->catfile( $basedir, $_ );
         -f $file and return $file;
     }
 }

@@ -26,8 +26,6 @@ sub including_address {
     );
 }
 
-
-
 1;
 # Local Variables:
 # mode: cperl

@@ -5,8 +5,8 @@ use warnings;
 
 use base qw(Exporter);
 our @EXPORT = qw(
-                    init_manoctest get_mech mech_login
-    );
+    init_manoctest get_mech mech_login
+);
 
 # Include our application dir
 use FindBin qw/$Bin/;
@@ -25,11 +25,11 @@ sub init_manoctest {
     # test script dir
     chdir $Bin if -d $Bin;
 
-    $ENV{LANG} = 'C';
+    $ENV{LANG}            = 'C';
     $ENV{CATALYST_CONFIG} = "$Bin/lib/manoc_test.conf";
 
-    $ENV{MANOC_SKIP_CSRF}      = 1;
-    $ENV{MANOC_SUPPRESS_LOG}   = 1
+    $ENV{MANOC_SKIP_CSRF}    = 1;
+    $ENV{MANOC_SUPPRESS_LOG} = 1
         unless $ENV{NO_SUPPRESS_LOG};
 }
 
@@ -51,19 +51,18 @@ sub get_mech {
 }
 
 sub mech_login {
-    my $user = shift || $ADMIN_USER,
-    my $pass = shift || $ADMIN_PASS,
+    my $user = shift || $ADMIN_USER, my $pass = shift || $ADMIN_PASS,
 
-    my $mech = get_mech;
+        my $mech = get_mech;
 
-    $mech->get_ok( '/auth/login' );
+    $mech->get_ok('/auth/login');
     $mech->text_contains( "Manoc login", "Make sure we are on the login page" );
 
     $mech->submit_form_ok(
         {
             fields => {
-                username   => $user,
-                password   => $pass,
+                username => $user,
+                password => $pass,
             },
         },
         "Submit login form $user:$pass",
