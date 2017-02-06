@@ -119,7 +119,7 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
     }
 
     my $search_rs = $rs->search_rs( $search_filter, $search_attrs );
-    my $filtered_rows = $rs->search_rs->count();
+    my $filtered_rows = $search_rs->count();
 
     # search
     my @rows;
