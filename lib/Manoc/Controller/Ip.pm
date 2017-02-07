@@ -74,8 +74,8 @@ sub view : Chained('base') : PathPart('') : Args(0) {
     $c->stash(
         logons => [
             $c->model('ManocDB::WinLogon')
-                ->search( { ipaddr => $ipaddress->padded }, { order_by => 'lastseen DESC' }, )
-        ],
+		->search( { ipaddr => $ipaddress->padded }, { order_by => { -desc => ['lastseen']} }, )        
+	],
     );
 
     $c->stash(
