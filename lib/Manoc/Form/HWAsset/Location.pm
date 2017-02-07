@@ -186,10 +186,10 @@ sub update_model_location {
         return;
     }
 
-    delete $values->{location},
-        delete $values->{building},
-        delete $values->{floor},
-        delete $values->{room};
+    delete $values->{location};
+    delete $values->{building};
+    delete $values->{floor};
+    delete $values->{room};
     delete $values->{rack};
     delete $values->{rack_level};
 
