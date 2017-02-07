@@ -5,9 +5,9 @@
 [%
 page.title   = 'Device ' _ object.name
 -%]
-[%- IF !object.dismissed %]
 [% page.toolbar = BLOCK -%]
 <div>
+[%- IF !object.decommissioned %]
   <div class="btn-group">
   	<a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('/device/edit',[object.id]) %]">
 	[% bootstrap_icon('pencil') %] Edit</a>
@@ -19,8 +19,8 @@ page.title   = 'Device ' _ object.name
 	     [% bootstrap_icon('link') %] Uplinks</a>
       </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
-  	     <a href="[% c.uri_for_action('/device/dismiss', [object.id]) %]">
-	     [% bootstrap_icon('remove') %]Dismiss</a>
+  	     <a href="[% c.uri_for_action('/device/decommission', [object.id]) %]">
+	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit_nwinfo') %]">
          <a href="[% c.uri_for_action('/device/nwinfo', [object.id]) %]">
@@ -35,8 +35,13 @@ page.title   = 'Device ' _ object.name
   </div><!-- end btn group -->
   <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]">
     [% bootstrap_icon('refresh') %] Refresh Info</a>
-</div>
+[% ELSE -%]
+[%# decommisioned object -%]
+  <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('/device/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
 [% END -%]
+</div><!-- end toolbar -->
 [% END -%]
 
 

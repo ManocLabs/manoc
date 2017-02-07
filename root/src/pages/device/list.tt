@@ -3,18 +3,32 @@
 -%]
 [%
 page.title = 'Devices'
--%]
+%]
 
-<div id="tabletoolbar">
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+
 [%- IF c.check_permission('device.create') -%]
-      <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+  <div class="btn-group" role="group">
+  <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add device</a>
+  </div>
 [% END -%]
+
+  <div class="btn-group" role="group">
+  <div id="statusfilter_wrapper" class="filtermenu">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+    <option value="a">Show all</option>
+    <option value="u">In use</option>
+    <option value="d">Decommissioned</option>
+  </select>
+  </div>
+  </div>
+
 </div>
 
-[% init_table('device_list', { toolbar="tabletoolbar" } ) %]
     <table class="table" id="device_list">
      <thead>
 	 <tr>
+       <th>In use</th>
  	   <th>Name</th>
 	   <th>Building</th>
    	   <th>Floor</th>
@@ -25,8 +39,9 @@ page.title = 'Devices'
      </tr>
      </thead>
      <tbody>
-[% FOREACH d IN object_list %]
-     <tr>
+[% FOREACH d = object_list %]
+     <tr class="[% 'warning' UNLESS d.in_use %]">
+       <td>[% IF d.in_use %]In use[%ELSE%]Decommissioned[%END%]</td>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>
    	   <td>[% d.rack.floor | html %]</td>
@@ -38,3 +53,36 @@ page.title = 'Devices'
 [% END %]
      </tbody>
     </table>
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+
+var table = $("#device_list").DataTable( {
+   "columnDefs":      [
+                     {
+                     'targets' : [ 0 ],
+                     'visible' : false
+                     }
+   ],
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+ });
+
+$("#tabletoolbar").appendTo($("div.toolbar").first());
+
+$("#statusfilter").on('changed.bs.select',
+  function(e) {
+        value = $("#statusfilter").val();
+        s = '';
+        if (value == 'd') {
+            s = '^Decommissioned$';
+
+        } else if (value == 'u') {
+            s = '^In use$';
+        }
+        table.columns(0).search(s, true, false).draw();
+  }
+);
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

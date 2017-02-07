@@ -56,7 +56,10 @@ sub sqlt_deploy_hook {
     $sqlt_schema->add_index( name => 'idx_mat_device',  fields => ['device_id'] );
     $sqlt_schema->add_index( name => 'idx_mat_macaddr', fields => ['macaddr'] );
 
-    $sqlt_schema->add_index( name => 'idx_mat_dev_iface', fields => [ 'device_id', 'interface' ] );
+    $sqlt_schema->add_index(
+        name   => 'idx_mat_dev_iface',
+        fields => [ 'device_id', 'interface' ]
+    );
 
 }
 

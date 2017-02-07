@@ -33,3 +33,20 @@
 .tab-content {
     padding-top: 10px;
 }
+
+/**********************************************************************/
+/* Reduce margin above page title                                     */
+/**********************************************************************/
+
+
+.page-header {
+    margin-top: 10px;
+}
+
+.filtermenu {
+    width: 150pt;
+}
+
+.filtermenu .selectize-control {
+    padding: 0;
+}

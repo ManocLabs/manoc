@@ -23,16 +23,16 @@ Manoc TT plugin to generate application navigation menu
 
 my @DEFAULT_MENU_ITEMS = (
     {
-        name  => 'Network',
+        name    => 'Network',
         fa_icon => 'globe',
-        submenu  => [
+        submenu => [
             {
                 name   => 'Devices',
                 action => '/device/list',
             },
             {
-                name   => 'IP Address Plan',
-                submenu  => [
+                name    => 'IP Address Plan',
+                submenu => [
                     {
                         name   => "All IP Networks",
                         action => 'ipnetwork/list',
@@ -48,14 +48,14 @@ my @DEFAULT_MENU_ITEMS = (
                 ]
             },
             {
-                name   => 'VLAN',
-                submenu  => [
+                name    => 'VLAN',
+                submenu => [
                     {
                         name   => "VLAN by range",
                         action => 'vlanrange/list',
                     },
                     {
-                        name  => "VTP list",
+                        name   => "VTP list",
                         action => 'vtp/list',
                     },
                     {
@@ -75,7 +75,7 @@ my @DEFAULT_MENU_ITEMS = (
         ],
     },
     {
-        name  => 'Server',
+        name    => 'Server',
         fa_icon => 'server',
         submenu => [
             {
@@ -91,15 +91,15 @@ my @DEFAULT_MENU_ITEMS = (
                 action => '/virtualmachine/list',
             },
             {
-                name   => 'Hypervisors',
-                path   => '#',
-#                action => '/server/hypervisors',
+                name => 'Hypervisors',
+                path => '#',
+                #                action => '/server/hypervisors',
             },
 
         ]
     },
     {
-        name  => 'Assets',
+        name    => 'Assets',
         fa_icon => 'building',
         submenu => [
             {
@@ -126,7 +126,7 @@ my @DEFAULT_MENU_ITEMS = (
         ]
     },
     {
-        name  => 'Config',
+        name    => 'Config',
         fa_icon => 'cogs',
         submenu => [
             {
@@ -161,11 +161,11 @@ sub menu {
     # get Catalyst app
     my $c = $ctx->stash->get('c');
 
-    return process_menu($c, @DEFAULT_MENU_ITEMS);
+    return process_menu( $c, @DEFAULT_MENU_ITEMS );
 }
 
 sub process_menu {
-    my $c = shift;
+    my $c    = shift;
     my @menu = @_;
 
     my @result;
@@ -173,7 +173,7 @@ sub process_menu {
     foreach my $item (@menu) {
         my $new_item = {};
 
-        _permission_check($c, $item) or next;
+        _permission_check( $c, $item ) or next;
 
         $new_item->{name}    = $item->{name};
         $new_item->{icon}    = $item->{icon};
@@ -181,12 +181,13 @@ sub process_menu {
 
         if ( $item->{action} ) {
             $new_item->{path} = $c->uri_for_action( $item->{action} );
-        } else {
+        }
+        else {
             $new_item->{path} = $item->{path};
         }
 
         if ( $item->{submenu} ) {
-            my @submenu = process_menu($c, @{$item->{submenu}});
+            my @submenu = process_menu( $c, @{ $item->{submenu} } );
             next unless @submenu;
             $new_item->{submenu} = \@submenu;
         }
@@ -196,14 +197,12 @@ sub process_menu {
     return @result;
 }
 
-
 sub _permission_check {
     my ( $c, $item ) = @_;
 
     $item->{permission} or return 1;
     return $c->check_permission( $item->{permission} );
 }
-
 
 =head1 SEE ALSO
 

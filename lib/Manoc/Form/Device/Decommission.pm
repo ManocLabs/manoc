@@ -2,7 +2,7 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Form::Device::Dismiss;
+package Manoc::Form::Device::Decommission;
 
 use strict;
 use warnings;
@@ -10,52 +10,52 @@ use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
 
-has '+name'        => ( default => 'form-dismiss' );
+has '+name'        => ( default => 'form-decommission' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'dismiss' => (
+has_field 'submit' => (
     type           => 'Submit',
     widget         => 'ButtonTag',
     element_attr   => { class => [ 'btn', ] },
     widget_wrapper => 'None',
-    value          => "Dismiss",
+    value          => "Decommission",
     order          => 1000,
 );
 
 has_field 'asset_action' => (
-    label   => 'Action for associated hardware',
-    type    => 'Select',
-    widget  => 'RadioGroup',
-    options => [
-        { value => 'DISMISS',  label => 'Dismiss' },
-        { value => 'WAREHOUSE', label => 'Return to warehouse' },
+    label    => 'Action for associated hardware',
+    type     => 'Select',
+    widget   => 'RadioGroup',
+    required => 1,
+    options  => [
+        { value => 'DECOMMISSION', label => 'Decommission' },
+        { value => 'WAREHOUSE',    label => 'Return to warehouse' },
     ],
 );
 
 sub update_model {
     my $self   = shift;
     my $values = $self->values;
+    my $action = $values->{asset_action};
+
+    my $device  = $self->item;
+    my $hwasset = $device->hwasset;
 
     $self->schema->txn_do(
         sub {
-            my $device = $self->item;
-            $device->dismissed(1);
-
-
-            if (my $hwasset = $device->hwasset) {
-                my $action = $values->{asset_action};
-                $action eq 'DISMISS' and
-                    $hwasset->dismiss(1);
+            if ($hwasset) {
+                $action eq 'DECOMMISSION' and
+                    $hwasset->decommission();
                 $action eq 'WAREHOUSE' and
-                    $hwasset->in_warehouse(1);
+                    $hwasset->move_to_warehouse();
                 $hwasset->update();
-
-                $device->hwasset(undef);
             }
 
+            $device->decommission();
             $device->update;
         }
     );
+    return $device;
 }
 
 =head1 AUTHOR

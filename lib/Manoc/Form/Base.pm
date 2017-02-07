@@ -23,7 +23,7 @@ has '+ctx' => ( required => 1, );
 sub html_attributes {
     my ( $self, $field, $type, $attr ) = @_;
     if ( $type eq 'label' && $field->{required} ) {
-       # TODO highlight required fields
+        # TODO highlight required fields
     }
     return $attr;
 }

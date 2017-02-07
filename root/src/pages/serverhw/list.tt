@@ -11,7 +11,18 @@ page.title = 'Server Hardware'
   <a href="[% c.uri_for_action('serverhw/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
   <a href="[% c.uri_for_action('serverhw/import_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("upload") %] Import CSV</a>
 [% END -%]
-</div>
+
+  <div class="btn-group" role="group">
+  <div id="statusfilter_wrapper" class="filtermenu">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+    <option value="a">Show all</option>
+    <option value="u">In use</option>
+    <option value="d">Decommissioned</option>
+  </select>
+  </div>
+  </div>
+
+</div><!-- tabletoolbar -->
 
   [% init_table('server_list', {toolbar='tabletoolbar' }) %]
     <table class="table" id="server_list">
@@ -28,7 +39,7 @@ page.title = 'Server Hardware'
      </thead>
      <tbody>
 [% FOREACH o IN object_list %]
-     <tr>
+     <tr class="[% 'warning' IF o.hwasset.is_decommissioned %]">
  	   <td>[% print_serverhw(o) %]</td>
    	   <td>[% o.vendor | html %]</td>
 	   <td>[% o.model | html%]</td>
@@ -40,3 +51,25 @@ page.title = 'Server Hardware'
 [% END %]
      </tbody>
     </table>
+
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+
+$("#statusfilter").on('changed.bs.select',
+  function(e) {
+        value = $("#statusfilter").val();
+        s = '';
+        if (value == 'd') {
+            s = '^Decommissioned$';
+
+        } else if (value == 'u') {
+            s = '^((?!Decommissioned).*)$';
+        }
+        $('#server_list').DataTable().columns(5).search(s, true, false).draw();
+  }
+);
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

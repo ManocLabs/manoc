@@ -7,8 +7,8 @@ use namespace::autoclean;
 requires 'object', 'object_list';
 
 has json_columns => (
-    is  => 'rw',
-    isa => 'ArrayRef[Str]',
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
     default => sub { [] },
 );
 

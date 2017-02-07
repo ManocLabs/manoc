@@ -19,19 +19,18 @@ sub get_version {
 }
 
 our $DEFAULT_CONFIG = {
-     connect_info => {
-         dsn               => $ENV{MANOC_DB_DSN} || 'dbi:SQLite:manoc.db',
-         user              => $ENV{MANOC_DB_USERNAME} || undef,
-         password          => $ENV{MANOC_DB_PASSWORD} || undef,
+    connect_info => {
+        dsn      => $ENV{MANOC_DB_DSN}      || 'dbi:SQLite:manoc.db',
+        user     => $ENV{MANOC_DB_USERNAME} || undef,
+        password => $ENV{MANOC_DB_PASSWORD} || undef,
 
-         # dbi_attributes
-         quote_names       => 1,
+        # dbi_attributes
+        quote_names => 1,
 
-         # extra attributes
-         AutoCommit        => 1,
-     },
- };
-
+        # extra attributes
+        AutoCommit => 1,
+    },
+};
 
 sub init_admin {
     my ($self) = @_;
@@ -69,7 +68,7 @@ sub init_vlan {
 sub init_ipnetwork {
     my ($self) = @_;
 
-    my $rs     = $self->resultset('IPNetwork');
+    my $rs = $self->resultset('IPNetwork');
 
     $rs->count() > 0 and return;
     $rs->update_or_create(
@@ -117,9 +116,9 @@ sub init_ipnetwork {
 }
 
 sub init_roles {
-    my ($self, $conf_roles) = @_;
+    my ( $self, $conf_roles ) = @_;
 
-    my $rs     = $self->resultset('Role');
+    my $rs = $self->resultset('Role');
 
     my $default_roles = \%Manoc::CatalystRole::Permission::DEFAULT_ROLES;
     my $roles = Catalyst::Utils::merge_hashes( $default_roles, $conf_roles );
@@ -132,7 +131,7 @@ sub init_roles {
 
 sub init_management_url {
     my ($self) = @_;
-    my $rs     = $self->resultset('MngUrlFormat');
+    my $rs = $self->resultset('MngUrlFormat');
     $rs->update_or_create(
         {
             name   => 'telnet',

@@ -25,7 +25,7 @@ sub main {
     my %config_args = %{ $self->config->{Netwalker} || {} };
     $config_args{manoc_config_dir} ||= $self->manoc_config_dir;
 
-    my $config      = Manoc::Netwalker::Config->new(%config_args);
+    my $config = Manoc::Netwalker::Config->new(%config_args);
 
     my $device_manager = Manoc::Netwalker::Manager::Device->new(
         config => $config,
@@ -38,17 +38,16 @@ sub main {
     );
 
     my $scheduler = Manoc::Netwalker::Scheduler->new(
-        config            => $config,
-        schema            => $self->schema,
+        config => $config,
+        schema => $self->schema,
     );
     $scheduler->add_workers_manager($device_manager);
     $scheduler->add_workers_manager($discover_manager);
 
-
     my $control = Manoc::Netwalker::Control->new(
-        config            => $config,
-        device_manager    => $device_manager,
-        discover_manager  => $discover_manager,
+        config           => $config,
+        device_manager   => $device_manager,
+        discover_manager => $discover_manager,
     );
 
     POE::Kernel->run();

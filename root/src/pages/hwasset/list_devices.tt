@@ -5,11 +5,21 @@
    page.title='Device hardware'
 -%]
 
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
 
-<div id="tabletoolbar">
 [%- IF c.check_permission('hwasset.create') -%]
   <a href="[% c.uri_for_action('hwasset/create_device') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
 [% END -%]
+
+<div id="statusfilter_wrapper" class="btn-group" role="group">
+<select name="statusfilter" class="selectpicker" id="statusfilter" data-style="btn-default btn-sm">
+    <option value="a">All</option>
+    <option value="u">In use</option>
+    <option value="w">Warehouse</option>
+    <option value="d">Decommisioned</option>
+</select>
+</div>
+
 </div>
 
 <table class="table" id="hwasset_list">
@@ -30,7 +40,12 @@
 $("#hwasset_list").DataTable( {
    "serverSide":   true,
    "processing":   true,
-   "ajax":         "[% c.uri_for_action('hwasset/datatable_source_devices') %]",
+   "ajax":  {
+      "url":  "[% c.uri_for_action('hwasset/datatable_source_devices') %]",
+      "data": function ( d ) {
+         d.search_status = $('#statusfilter').val();
+      }
+   },
    "columns":      [
                      { 'data' : 'inventory',
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -45,5 +60,8 @@ $("#hwasset_list").DataTable( {
    "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
 });
 $("#tabletoolbar").appendTo($("#hwasset_list_wrapper div.toolbar").first());
+$("#statusfilter").on('changed.bs.select', function (e) {
+       $( '#hwasset_list' ).dataTable().api().ajax.reload();
+  });
 [% END %]
 [% js_scripts.push(fragment) -%]

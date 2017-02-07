@@ -15,10 +15,7 @@ sub search_inventory {
 
     foreach my $col (qw (serial inventory)) {
         my $rs = $schema->resultset('HWAsset')
-            ->search(
-                { $col    => { -like => $pattern } },
-                { order_by => 'name' }
-            );
+            ->search( { $col => { -like => $pattern } }, { order_by => 'name' } );
 
         while ( my $e = $rs->next ) {
             my $item = Manoc::Search::Item::HWAsset->new(
@@ -31,7 +28,6 @@ sub search_inventory {
         }
     }
 }
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

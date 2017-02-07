@@ -15,9 +15,9 @@ has '+html_prefix' => ( default => 1 );
 has '+item_class' => ( default => 'DHCPSharedNetwork' );
 
 has_field 'name' => (
-    type => 'Text',
+    type     => 'Text',
     required => 1,
-    label => 'Name',
+    label    => 'Name',
     apply    => [
         'Str',
         {
@@ -27,43 +27,41 @@ has_field 'name' => (
     ]
 );
 
-has_field 'dhcp_server' => (
-    type  => 'Hidden'
-);
+has_field 'dhcp_server' => ( type => 'Hidden' );
 
 has_field 'max_lease_time' => (
-    type => 'Integer',
+    type  => 'Integer',
     label => 'Maximum Lease Time',
 );
 
 has_field 'default_lease_time' => (
-    type => 'Integer',
+    type  => 'Integer',
     label => 'Default Lease Time',
 );
 
 has_field 'ntp_server' => (
-    type => 'Text',
-    size => 15,
-    apply      => [IPAddress],
+    type  => 'Text',
+    size  => 15,
+    apply => [IPAddress],
     label => 'Ntp Server',
 );
 
 has_field 'domain_nameserver' => (
-    type => 'Text',
-    size => 15,
-    apply      => [IPAddress],
+    type  => 'Text',
+    size  => 15,
+    apply => [IPAddress],
     label => 'Domain Nameserver',
 );
 
 has_field 'domain_name' => (
-    type => 'Text',
+    type  => 'Text',
     label => 'Domain Name',
 );
 
 before 'update_model' => sub {
     my $self = shift;
 
-    if ($self->item->in_storage) {
+    if ( $self->item->in_storage ) {
         delete $self->values->{dhcp_server};
     }
 };

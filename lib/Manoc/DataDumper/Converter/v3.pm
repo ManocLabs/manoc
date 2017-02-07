@@ -64,8 +64,7 @@ sub _build_device_id_map {
 sub _build_hwasset_id_counter {
     my $self = shift;
 
-    my $id = $self->schema->resultset('HWAsset')
-        ->search({})->get_column('id')->max();
+    my $id = $self->schema->resultset('HWAsset')->search( {} )->get_column('id')->max();
 
     return defined($id) ? $id + 1 : 1;
 }
@@ -111,10 +110,11 @@ sub upgrade_Device {
         $_->{id}              = $dev_id;
         $device_id_map{$addr} = $dev_id;
 
-        $_->{hwasset_id}      = $self->device_hwasset_map->{$addr};
+        $_->{hwasset_id} = $self->device_hwasset_map->{$addr};
 
         # we have changed foreign key name
-        $_->{rack_id}         = $_->{rack};
+        $_->{rack_id}           = $_->{rack};
+        $_->{mng_url_format_id} = $_->{mng_url_format};
 
         # cleanup attributes moved to hwasset and nwinfo
         delete @$_{
@@ -129,6 +129,7 @@ sub upgrade_Device {
                 rack level
                 os os_ver boottime vtp_domain
                 vendor model serial
+                mng_url_format
                 )
         };
     }
@@ -160,11 +161,11 @@ sub upgrade_DeviceNWInfo {
         $r->{snmp_password}      = $_->{snmp_password};
         $r->{snmp_version}       = $_->{snmp_ver};
 
-        $r->{model}              = $_->{model};
-        $r->{serial}             = $_->{serial};
-        $r->{os}                 = $_->{os};
-        $r->{os_ver}             = $_->{os_ver};
-        $r->{vtp_domain}         = $_->{vtp_domain};
+        $r->{model}      = $_->{model};
+        $r->{serial}     = $_->{serial};
+        $r->{os}         = $_->{os};
+        $r->{os_ver}     = $_->{os_ver};
+        $r->{vtp_domain} = $_->{vtp_domain};
 
         $r->{device}   = $_->{id};
         $r->{manifold} = 'SNMP::Info';
@@ -204,36 +205,48 @@ sub upgrade_HWAsset {
 
     my %device_hwasset_map = ();
 
-    my $id   = $self->hwasset_id_counter;
-    my $type =  Manoc::DB::Result::HWAsset->TYPE_DEVICE;
+    my $id       = $self->hwasset_id_counter;
+    my $type     = Manoc::DB::Result::HWAsset->TYPE_DEVICE;
     my $location = Manoc::DB::Result::HWAsset->LOCATION_RACK;
 
     foreach (@$data) {
         my $addr     = $_->{id};
         my $asset_id = $id++;
 
-        my $r             = {};
+        my $r = {};
         $r->{id}         = $asset_id;
-        $r->{model}      = $_->{model};
-        $r->{vendor}     = $_->{vendor};
+        $r->{model}      = $_->{model} || 'Unknown';
+        $r->{vendor}     = $_->{vendor} || 'Unknown';
         $r->{serial}     = $_->{serial};
         $r->{rack_id}    = $_->{rack};
         $r->{rack_level} = $_->{level};
         $r->{type}       = $type;
         $r->{location}   = $location;
 
+        $r->{inventory} = sprintf( "%s%06d", $type, $asset_id );
 
-         $r->{inventory}  =
-             sprintf("%s%06d", $type, $asset_id);
+        $device_hwasset_map{$addr} = $asset_id;
 
-         $device_hwasset_map{$addr} = $asset_id;
-
-         push @new_data, $r;
-     }
+        push @new_data, $r;
+    }
 
     $self->hwasset_id_counter($id);
     $self->device_hwasset_map( \%device_hwasset_map );
     @$data = @new_data;
+}
+
+sub after_import_HWAsset {
+    my ( $self, $source ) = @_;
+
+    my $rs = $source->resultset->search();
+    while ( my $asset = $rs->next ) {
+        if ( my $rack = $asset->rack ) {
+            $asset->building( $rack->building );
+            $asset->floor( $rack->floor );
+            $asset->room( $rack->room );
+            $asset->update();
+        }
+    }
 }
 
 sub upgrade_if_notes {
@@ -255,7 +268,7 @@ sub upgrade_racks {
     my ( $self, $data ) = @_;
 
     foreach (@$data) {
-        $_->{room} = '';
+        $_->{room}        = '';
         $_->{building_id} = $_->{building};
         delete $_->{building};
     }
@@ -274,7 +287,7 @@ sub upgrade_ssid_list {
 
 sub upgrade_uplinks {
     my ( $self, $data ) = @_;
-    $self->_rewrite_device_id( $data, 'device' => 'device_id'  );
+    $self->_rewrite_device_id( $data, 'device' => 'device_id' );
 }
 
 sub upgrade_users {

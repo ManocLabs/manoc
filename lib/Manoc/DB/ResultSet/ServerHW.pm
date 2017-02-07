@@ -8,44 +8,48 @@ use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
 
-
 sub new_result {
     my ( $class, $attrs ) = @_;
 
     my $item = $class->next::method($attrs);
 
-    if (! defined($item->hwasset)) {
+    if ( !defined( $item->hwasset ) ) {
         $item->hwasset(
-            $item->new_related('hwasset', {
-                type      => Manoc::DB::Result::HWAsset->TYPE_SERVER,
-                location  => Manoc::DB::Result::HWAsset->LOCATION_WAREHOUSE,
-                model     => $attrs->{model},
-                vendor    => $attrs->{vendor},
-                inventory => $attrs->{inventory},
-            }));
+            $item->new_related(
+                'hwasset',
+                {
+                    type      => Manoc::DB::Result::HWAsset->TYPE_SERVER,
+                    location  => Manoc::DB::Result::HWAsset->LOCATION_WAREHOUSE,
+                    model     => $attrs->{model},
+                    vendor    => $attrs->{vendor},
+                    inventory => $attrs->{inventory},
+                }
+            )
+        );
     }
     return $item;
-};
+}
 
 sub unused {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    my $used_asset_ids = $self->result_source->schema->resultset('Server')
-        ->search({
-            dismissed => 0,
-            serverhw_id  => { -is_not => undef }
-        })
-        ->get_column('serverhw_id');
+    my $used_asset_ids = $self->result_source->schema->resultset('Server')->search(
+        {
+            decommissioned => 0,
+            serverhw_id    => { -is_not => undef }
+        }
+    )->get_column('serverhw_id');
 
     my $assets = $self->search(
         {
-            'hwasset.location' => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DISMISSED },
-            id =>  {
+            'hwasset.location' =>
+                { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
+            id => {
                 -not_in => $used_asset_ids->as_query,
             }
         },
         {
-            join     => 'hwasset',
+            join => 'hwasset',
         }
     );
 

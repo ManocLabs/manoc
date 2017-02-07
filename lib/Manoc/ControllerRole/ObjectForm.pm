@@ -15,12 +15,16 @@ has 'form_class' => (
     isa => 'ClassName'
 );
 
-has 'object_updated_message' => (
+has 'form_success_url' => (
     is  => 'rw',
-    isa => 'Str',
-    default => 'Updated',
+    isa => 'Str'
 );
 
+has 'object_updated_message' => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => 'Updated',
+);
 
 =head1 ACTIONS
 
@@ -55,7 +59,7 @@ sub form : Private {
         $process_params{use_defaults_over_obj} = 1;
     }
 
-    if ($self->can("get_form_process_params")) {
+    if ( $self->can("get_form_process_params") ) {
         %process_params = $self->get_form_process_params( $c, %process_params );
     }
     my $process_status = $form->process(%process_params);
@@ -69,9 +73,12 @@ sub form : Private {
         $json_data->{form_ok} = $process_status ? 1 : 0;
 
         if ($process_status) {
-            $json_data->{message}  = $self->object_updated_message;
-            $json_data->{redirect} = $self->get_form_success_url($c);
-            $json_data->{object_id} = $form->item_id;
+            $json_data->{message}      = $self->object_updated_message;
+            $json_data->{redirect}     = $self->get_form_success_url($c);
+            $json_data->{object_id}    = $form->item_id;
+            $json_data->{object_label} = $form->item->label
+                if $form->item->can('label');
+
         }
         else {
             $json_data->{html} =
@@ -82,7 +89,9 @@ sub form : Private {
     }
 
     return unless $process_status;
-    $c->stash( message => $self->object_updated_message );
+    $c->stash->{message}   = $self->object_updated_message;
+    $c->stash->{object_id} = $form->item_id;
+
     $c->res->redirect( $self->get_form_success_url($c) );
     $c->detach();
 }
@@ -113,7 +122,12 @@ Get the URL to redirect after successful editing.
 
 sub get_form_success_url {
     my ( $self, $c ) = @_;
-    return $c->uri_for_action( $c->namespace . "/list" );
+
+    my $form_success_url = $c->stash->{form_success_url} ||
+        $self->form_success_url ||
+        $c->uri_for_action( $c->namespace . "/view", [ $c->stash->{object_id} ] );
+
+    return $form_success_url;
 }
 
 1;

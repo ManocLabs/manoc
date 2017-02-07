@@ -3,6 +3,10 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Server;
+
+use strict;
+use warnings;
+
 use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
@@ -66,6 +70,23 @@ __PACKAGE__->add_columns(
         is_foreign_key => 1,
     },
 
+    decommissioned => {
+        data_type     => 'int',
+        size          => '1',
+        default_value => '0',
+    },
+
+    decommission_ts => {
+        data_type     => 'int',
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
+    notes => {
+        data_type   => 'text',
+        is_nullable => 1,
+    },
+
 );
 
 __PACKAGE__->set_primary_key('id');
@@ -76,7 +97,7 @@ __PACKAGE__->belongs_to(
     'serverhw_id',
     {
         cascade_update => 1,
-        join_type => 'left',
+        join_type      => 'left',
     }
 );
 
@@ -85,7 +106,7 @@ __PACKAGE__->belongs_to(
     'vm_id',
     {
         cascade_update => 1,
-        join_type => 'left',
+        join_type      => 'left',
     }
 );
 
@@ -101,7 +122,6 @@ __PACKAGE__->has_many(
     virtual_machines => 'Manoc::DB::Result::VirtualMachine',
     { 'foreign.hypervisor_id' => 'self.id' },
 );
-
 
 sub virtual_servers {
     my $self = shift;
@@ -120,10 +140,10 @@ sub virtual_servers {
 
 sub num_cpus {
     my ($self) = @_;
-    if ($self->serverhw) {
+    if ( $self->serverhw ) {
         return $self->serverhw->n_procs * $self->serverhw->n_cores_procs;
     }
-    if ($self->vm) {
+    if ( $self->vm ) {
         return $self->vm->vcpus;
     }
     return undef;
@@ -131,12 +151,56 @@ sub num_cpus {
 
 sub ram_memory {
     my ($self) = @_;
-    if ($self->serverhw) {
+    if ( $self->serverhw ) {
         return $self->serverhw->ram_memory;
     }
-    if ($self->vm) {
+    if ( $self->vm ) {
         return $self->vm->ram_memory;
     }
 }
 
+=head2 decommission([$timestamp])
+
+Set decommissioned to true, update timestamp and decommission hosted VMs.
+
+=cut
+
+sub decommission {
+    my $self = shift;
+    my $timestamp = shift // time();
+
+    $self->decommissioned and return 1;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+
+    $self->decommissioned(1);
+    $self->decommission_ts($timestamp);
+    $self->serverhw_id(undef);
+    $self->vm_id(undef);
+
+    foreach my $vm ( $self->virtual_machines ) {
+        $vm->decommission();
+    }
+    $self->update();
+
+    $guard->commit;
+}
+
+=head1 AUTHOR
+
+The Manoc Team
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

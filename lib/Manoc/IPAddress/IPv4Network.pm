@@ -154,10 +154,11 @@ sub _build_num_hosts {
 }
 
 sub contains_address {
-    my ($self, $address) = @_;
+    my ( $self, $address ) = @_;
 
-    blessed($address) and $address->isa('Manoc::IPAddress::IPv4')
-        and $address = $address->numeric;
+    blessed($address) and
+        $address->isa('Manoc::IPAddress::IPv4') and
+        $address = $address->numeric;
 
     return ( $address & $self->_netmask_i ) == $self->_address_i;
 }

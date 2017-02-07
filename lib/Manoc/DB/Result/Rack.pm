@@ -69,11 +69,9 @@ sub devices {
     return wantarray() ? $rs->all() : $rs;
 }
 
-
 sub label {
     my $self = shift;
     return $self->name . " (" . $self->building->name . ")";
 }
-
 
 1;

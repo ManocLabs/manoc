@@ -13,8 +13,6 @@ with 'Manoc::ControllerRole::CommonCRUD';
 with 'Manoc::ControllerRole::ObjectForm';
 with 'Manoc::ControllerRole::JSONView';
 
-
-
 use Manoc::Form::IPBlock;
 
 use Manoc::Utils::Datetime qw(str2seconds);
@@ -40,7 +38,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::IPBlock',
     enable_permission_check => 1,
     view_object_perm        => undef,
-    json_columns => [ qw( id name from_addr to_addr )],
+    json_columns            => [qw( id name from_addr to_addr )],
 );
 
 before 'view' => sub {
@@ -90,7 +88,6 @@ sub arp_js : Chained('object') {
     $c->detach('/arp/list_js');
 }
 
-
 =head2 create_ipblock
 
 Create a new device using a form. Chained to base.
@@ -106,22 +103,19 @@ sub create_ipblock : Chained('base') : PathPart('create_ipblock') : Args(0) {
     $c->require_permission( $object, 'create' );
 
     $c->stash(
-        object          => $object,
-        form_class      => 'Manoc::Form::IPBlock',
+        object     => $object,
+        form_class => 'Manoc::Form::IPBlock',
     );
     $c->detach('form');
 }
 
-
 sub ipblocks_js : Chained('base') : PathPart('js/ipblock/list') {
-    my ($self, $c) = @_;
+    my ( $self, $c ) = @_;
 
     my $rs = $c->stash->{resultset};
-    $c->stash(object_list => [ $rs->search({})->all() ]);
+    $c->stash( object_list => [ $rs->search( {} )->all() ] );
     $c->detach('/ipblock/list_js');
 }
-
-
 
 =head1 AUTHOR
 

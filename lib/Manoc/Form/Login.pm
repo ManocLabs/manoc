@@ -12,20 +12,19 @@ with 'Manoc::Form::TraitFor::CSRF';
 
 has '+name' => ( default => 'login_form' );
 
-sub build_do_form_wrapper { 0 }
+sub build_do_form_wrapper    { 0 }
 sub build_form_wrapper_class { [] }
 sub build_form_element_class { ['form-vertical'] }
 
 sub build_render_list {
-    [ 'fieldset', 'submit', 'csrf_token' ]
+    [ 'fieldset', 'submit', 'csrf_token' ];
 }
 
 has_block 'fieldset' => (
-    tag => 'fieldset',
-    render_list => ['username', 'password'],
-    tag => 'fieldset',
+    tag         => 'fieldset',
+    render_list => [ 'username', 'password' ],
+    tag         => 'fieldset',
 );
-
 
 has 'login_error_message' => (
     is       => 'ro',
@@ -52,11 +51,8 @@ has_field 'submit' => (
     value        => 'Login',
     widget       => 'ButtonTag',
     do_wrapper   => 0,
-    element_attr => { class => [ qw"btn btn-lg btn-success btn-block" ] },
+    element_attr => { class => [qw"btn btn-lg btn-success btn-block"] },
 );
-
-
-
 
 sub validate {
     my $self = shift;

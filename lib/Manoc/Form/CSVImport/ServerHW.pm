@@ -5,43 +5,39 @@ use namespace::autoclean;
 
 extends 'Manoc::Form::CSVImport';
 
-
-my @optional_columns =
-my %column_names = (
+my @optional_columns = my %column_names = (
 
 );
 
 has '+required_columns' => (
     default => sub {
-        [ qw/model vendor ram_memory cpu_model/ ]
+        [qw/model vendor ram_memory cpu_model/];
     }
 );
 
 has '+optional_columns' => (
-    default => sub { [
-        qw/n_procs n_cores_proc proc_freq  inventory serial/
-    ] }
+    default => sub {
+        [ qw/n_procs n_cores_proc proc_freq  inventory serial/ ];
+    }
 
 );
 
 has '+column_names' => (
-    default => sub { {
-            'cpu'         =>        'cpu_model',
-            'ram'         =>        'ram_memory',
-            'processors'  =>        'n_procs',
-            'cores'       =>        'n_cores_proc',
-            'frequency'   =>        'proc_freq',
-        }
+    default => sub {
+        {
+            'cpu'        => 'cpu_model',
+            'ram'        => 'ram_memory',
+            'processors' => 'n_procs',
+            'cores'      => 'n_cores_proc',
+            'frequency'  => 'proc_freq',
+        };
     }
 );
 
-has '+lookup_columns' => (
-    default => sub { [ "serial", [ qw /vendor inventory/ ] ] }
-);
-
+has '+lookup_columns' => ( default => sub { [ "serial", [qw /vendor inventory/] ] } );
 
 sub find_entry {
-    my ($self, $data) = @_;
+    my ( $self, $data ) = @_;
 
     my $rs = $self->resultset;
     if ( exists $data->{serial} ) {

@@ -43,11 +43,10 @@ sub _build_username {
 }
 
 sub _build_use_ssh_key {
-     my $self = shift;
+    my $self = shift;
 
     return $self->credentials->{use_ssh_key};
 }
-
 
 sub _build_key_path {
     my $self = shift;

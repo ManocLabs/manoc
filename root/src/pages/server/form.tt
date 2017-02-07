@@ -4,21 +4,16 @@
 [% form.render %]
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
-    var hwselect = $("#[% form.name %]\\.vm").selectize();
-    hwselect_control = hwselect[0].selectize;
-
-    var vmselect = $("#[% form.name %]\\.serverhw").selectize();
-    vmselect_control = vmselect[0].selectize;
+    $("#[% form.name %]\\.vm").selectpicker();
+    $("#[% form.name %]\\.serverhw").selectpicker();
 
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
-      showDialogForm("[% c.uri_for_action('/serverhw/create') %]", "Create server hardware",
-                         on_close_hwcreate_form);
+      showDialogForm("[% c.uri_for_action('/serverhw/create') %]", "Create server hardware", on_close_hwcreate_form);
       return false;
     });
 
 	$('#[% form.name %]\\.vm_btn').click(function() {
-      showDialogForm("[% c.uri_for_action('/virtualmachine/create') %]", "Create virtual machine",
-                         on_close_vmcreate_form);
+      showDialogForm("[% c.uri_for_action('/virtualmachine/create') %]", "Create virtual machine", on_close_vmcreate_form);
       return false;
     });
 
@@ -29,27 +24,26 @@ $('#[% form.name %] input').on('change', function() {
  });
 
 function on_close_hwcreate_form(data) {
-  hwselect_control.setValue(data.object_id);
+  $("#[% form.name %]\\.serverhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+  $("#[% form.name %]\\.serverhw").selectpicker('val', data.object_id);
+  $("#[% form.name %]\\.serverhw").selectpicker('refresh');
 }
 
 function on_close_vmcreate_form(data) {
-  vmselect_control.setValue(data.object_id);
+  $("#[% form.name %]\\.vm").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+  $("#[% form.name %]\\.vm").selectpicker('val', data.object_id);
+  $("#[% form.name %]\\.vm").selectpicker('refresh');
 }
 
 
 function form_refresh() {
   l=$('input[name="[% form.name %].type"]:checked').val();
-  if ( l == 'p') {
-    $("#[% form.name %]\\.serverhw")[0].selectize.enable();
-  } else {
-    $("#[% form.name %]\\.serverhw")[0].selectize.disable();
-  }
-  if ( l == 'v') {
-    $("#[% form.name %]\\.vm")[0].selectize.enable();
+  $("#[% form.name %]\\.serverhw").prop('disabled', l != 'p');
+  $("#[% form.name %]\\.serverhw").selectpicker('refresh');
 
-  } else {
-    $("#[% form.name %]\\.vm")[0].selectize.disable();
-  }
+  $("#[% form.name %]\\.vm").prop('disabled', l != 'v');
+  $("#[% form.name %]\\.vm").selectpicker('refresh');
+
 }
 [% END %]
 [% js_scripts.push(fragment) -%]

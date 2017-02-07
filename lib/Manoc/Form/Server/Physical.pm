@@ -71,13 +71,6 @@ has_field 'os_ver' => (
     required => 0,
 );
 
-
-has_field 'dismissed' => (
-    label        => 'Dismissed?',
-    type         => 'Boolean',
-    option_label => ' '
-);
-
 has_field 'rack' => (
     type         => 'Select',
     empty_select => '---Choose a Rack---',

@@ -28,7 +28,7 @@ a resultset.
   extends "Catalyst::Controller";
   with "Manoc::ControllerRole::Object";
 
-  __PACKAGE__->config( 
+  __PACKAGE__->config(
       # define PathPart
       action => {
           setup => {
@@ -41,9 +41,10 @@ a resultset.
   # manages /artist/<id>
   sub view : Chained('object') : PathPart('') : Args(0) {
      my ( $self, $c ) = @_;
-     
+
      # render with default template
      # object will be accessible in $c->{object}
+     # object id in object_pk
   }
 
 =head1 ACTIONS
@@ -70,6 +71,8 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
 =head1 METHODS
 
 =head2 get_object
+
+Search the object in stash->{resultset} using given the pk.
 
 =cut
 

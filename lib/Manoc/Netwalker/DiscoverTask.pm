@@ -65,17 +65,15 @@ has 'ping_handler' => (
 sub _build_credentials {
     my $self = shift;
 
-    my $credentials = {
-        snmp_community => $self->session->snmp_community
-    };
+    my $credentials = { snmp_community => $self->session->snmp_community };
     $credentials->{snmp_community} ||= $self->config->snmp_community;
-    $credentials->{snmp_version}   = $self->config->snmp_version;
+    $credentials->{snmp_version} = $self->config->snmp_version;
 
     return $credentials;
 }
 
 sub _build_session {
-    my $self      = shift;
+    my $self = shift;
 
     return $self->schema->resultset('DiscoverSession')->find( $self->session_id );
 }
@@ -110,41 +108,42 @@ sub scan {
     my $address = $self->address->unpadded;
     $self->log->debug("ping $address");
 
-    if ( ! $self->ping_handler->ping($address) ) {
+    if ( !$self->ping_handler->ping($address) ) {
         $self->log->debug("$address is not alive, skipping");
         return;
     }
 
-    my $discovered_host = $self->session->find_or_create_related('discovered_hosts', {address => $address});
+    my $discovered_host =
+        $self->session->find_or_create_related( 'discovered_hosts', { address => $address } );
 
     try {
-        my $name = gethostbyaddr($address, AF_INET);
+        my $name = gethostbyaddr( $address, AF_INET );
         $self->log->debug("querying dns for $address");
         $discovered_host->hostname($name);
     };
 
-    if ($self->session->use_snmp) {
+    if ( $self->session->use_snmp ) {
         $self->log->debug("snmp scan $address");
         try {
-            my $m = $self->create_manifold('SNMP::Simple',
-                                           credentials => $self->credentials,
-                                           host        => $address
-                                       );
+            my $m = $self->create_manifold(
+                'SNMP::Simple',
+                credentials => $self->credentials,
+                host        => $address
+            );
             $m->connect;
-            $discovered_host->vendor($m->vendor);
-            $discovered_host->os($m->os);
-            $discovered_host->os($m->os_ver);
+            $discovered_host->vendor( $m->vendor );
+            $discovered_host->os( $m->os );
+            $discovered_host->os( $m->os_ver );
 
-            $discovered_host->hostname($m->name);
-        } catch {
+            $discovered_host->hostname( $m->name );
+        }
+        catch {
             $self->log->debug("got error $_ while scanning snmp");
         };
     }
 
     $discovered_host->update();
 }
-
-
 
 1;
 

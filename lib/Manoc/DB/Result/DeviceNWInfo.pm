@@ -31,7 +31,7 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    # manifold to be used for getting
+    # manifold to be used to fetch the
     # configuration
     config_manifold => {
         data_type     => 'varchar',
@@ -115,21 +115,21 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
     vendor => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 32,
+        data_type     => 'varchar',
+        is_nullable   => 1,
+        size          => 32,
         default_value => 'NULL',
     },
     model => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 32,
+        data_type     => 'varchar',
+        is_nullable   => 1,
+        size          => 32,
         default_value => 'NULL',
     },
     serial => {
-        data_type   => 'varchar',
-        is_nullable => 1,
-        size        => 32,
+        data_type     => 'varchar',
+        is_nullable   => 1,
+        size          => 32,
         default_value => 'NULL',
     },
     os => {

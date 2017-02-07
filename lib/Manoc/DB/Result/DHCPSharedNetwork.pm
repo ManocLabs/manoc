@@ -64,12 +64,11 @@ __PACKAGE__->belongs_to(
     { 'foreign.id' => 'self.dhcp_server_id' },
 );
 
- __PACKAGE__->has_many(
-     'dhcp_subnets' => 'Manoc::DB::Result::DHCPSubnet',
-      { 'foreign.dhcp_shared_network_id' => 'self.id' },
-      { cascade_delete => 0}
- );
-
+__PACKAGE__->has_many(
+    'dhcp_subnets' => 'Manoc::DB::Result::DHCPSubnet',
+    { 'foreign.dhcp_shared_network_id' => 'self.id' },
+    { cascade_delete                   => 0 }
+);
 
 1;
 

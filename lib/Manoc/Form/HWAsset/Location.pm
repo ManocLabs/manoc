@@ -20,7 +20,8 @@ has_field 'location' => (
     options  => [
         {
             value => Manoc::DB::Result::HWAsset->LOCATION_WAREHOUSE,
-            label => 'Warehouse' },
+            label => 'Warehouse'
+        },
         {
             value => Manoc::DB::Result::HWAsset->LOCATION_RACK,
             label => 'Rack'
@@ -32,7 +33,6 @@ has_field 'location' => (
     ],
     wrapper_tags => { inline => 1 },
 );
-
 
 has_block 'rack_block' => (
     render_list => [ 'rack', 'rack_level' ],
@@ -53,21 +53,20 @@ has_field 'rack' => (
         before_element => '<div class="col-sm-6">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'rack_level' => (
-    label    => 'Level',
-    type     => 'Text',
-    required => 0,
+    label      => 'Level',
+    type       => 'Text',
+    required   => 0,
     do_wrapper => 0,
     tags       => {
         before_element => '<div class="col-sm-2">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
-
 
 has_block 'location_block' => (
     render_list => [ 'building', 'room', 'floor' ],
@@ -80,14 +79,13 @@ has_field 'building' => (
     empty_select => '---Choose a Building---',
     required     => 0,
     label        => 'Building',
-    do_wrapper => 0,
-    tags       => {
+    do_wrapper   => 0,
+    tags         => {
         before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-2'],
+    label_class => ['col-sm-2'],
 );
-
 
 has_field 'floor' => (
     type  => 'Text',
@@ -99,19 +97,19 @@ has_field 'floor' => (
         before_element => '<div class="col-sm-2">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-1'],
+    label_class => ['col-sm-1'],
 );
 
 has_field 'room' => (
-    type  => 'Text',
-    label => 'Room',
-    size  => 16,
+    type       => 'Text',
+    label      => 'Room',
+    size       => 16,
     do_wrapper => 0,
     tags       => {
         before_element => '<div class="col-sm-2">',
         after_element  => '</div>'
     },
-    label_class  => ['col-sm-1'],
+    label_class => ['col-sm-1'],
 );
 
 sub default_location {
@@ -121,7 +119,7 @@ sub default_location {
     return unless $item;
 
     $item->is_in_warehouse and return DB::HWAsset->LOCATION_WAREHOUSE;
-    $item->is_in_rack and return DB::HWAsset->LOCATION_RACK;
+    $item->is_in_rack      and return DB::HWAsset->LOCATION_RACK;
     return DB::HWAsset->LOCATION_ROOM;
 }
 
@@ -148,15 +146,15 @@ sub options_rack {
 }
 
 before 'validate_form' => sub {
-    my $self   = shift;
-    my $params = $self->params;
+    my $self     = shift;
+    my $params   = $self->params;
     my $location = $params->{location};
 
     my @required;
-    if ($location eq DB::HWAsset->LOCATION_ROOM) {
+    if ( $location eq DB::HWAsset->LOCATION_ROOM ) {
         push @required, 'building';
     }
-    if ($location eq DB::HWAsset->LOCATION_RACK) {
+    if ( $location eq DB::HWAsset->LOCATION_RACK ) {
         push @required, 'rack';
     }
 
@@ -169,29 +167,29 @@ before 'validate_form' => sub {
 };
 
 sub update_model_location {
-    my $self   = shift;
-    my $values = $self->value;
-    my $item   = $self->item;
+    my $self     = shift;
+    my $values   = $self->value;
+    my $item     = $self->item;
     my $location = $values->{location};
 
-    if ($location eq DB::HWAsset->LOCATION_WAREHOUSE) {
+    if ( $location eq DB::HWAsset->LOCATION_WAREHOUSE ) {
         $item->move_to_warehouse();
-    } elsif ($location eq DB::HWAsset->LOCATION_ROOM) {
-        $item->move_to_room(
-            $values->{building},
-            $values->{floor},
-            $values->{room});
-    } elsif ($location eq DB::HWAsset->LOCATION_RACK) {
-        $item->move_to_rack($values->{rack});
-    } else {
+    }
+    elsif ( $location eq DB::HWAsset->LOCATION_ROOM ) {
+        $item->move_to_room( $values->{building}, $values->{floor}, $values->{room} );
+    }
+    elsif ( $location eq DB::HWAsset->LOCATION_RACK ) {
+        $item->move_to_rack( $values->{rack} );
+    }
+    else {
         # unknown value, do nothing
         return;
     }
 
     delete $values->{location},
-    delete $values->{building},
-    delete $values->{floor},
-    delete $values->{room};
+        delete $values->{building},
+        delete $values->{floor},
+        delete $values->{room};
     delete $values->{rack};
     delete $values->{rack_level};
 

@@ -13,9 +13,7 @@ with 'HTML::FormHandler::Widget::Theme::Bootstrap3';
 sub build_do_form_wrapper { 1 }
 
 sub build_form_tags {
-    {
-        wrapper_tag => 'div',
-    };
+    { wrapper_tag => 'div', };
 }
 
 1;

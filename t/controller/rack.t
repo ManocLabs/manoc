@@ -22,7 +22,7 @@ $mech->title_is( 'Manoc - Racks' );
 # building used for test rack
 my $building = $schema->resultset("Building")->create(
     {
-        name => 'Test',
+        name => 'B01',
         description => 'Test building',
   }
 );
@@ -57,8 +57,9 @@ $mech->submit_form_ok(
     },
     "Create rack in building",
 );
-like ( $mech->base(), qr|/rack$|, "Link points to rack list");
+$mech->title_is('Manoc - Rack Rack01', 'Rack page');
 
+$mech->get('/rack');
 $mech->text_contains('Rack01', "New rack in the list");
 $mech->follow_link_ok({ text => 'Rack01'}, "View rack page");
 $mech->title_is('Manoc - Rack Rack01');
@@ -70,7 +71,7 @@ $mech->follow_link_ok({text => 'Delete'}, "Follow delete link");
 # first form is search box
 $mech->submit_form_ok({ form_number => 2 });
 
-like ( $mech->base(), qr|/rack$|, "Link points to rack list");
+$mech->title_is( 'Manoc - Racks', "Back to rack list" );
 $mech->content_lacks('Rack01', "Rack is no longer in the list");
 
 $mech->get_ok('/rack/create?building=' . $building->id, "Rack create page with default building");

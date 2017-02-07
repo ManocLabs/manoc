@@ -40,7 +40,7 @@ __PACKAGE__->has_many(
 );
 
 sub label {
-    my $self = shift;
+    my $self  = shift;
     my $label = $self->name;
     $self->description and $label .= " (" . $self->description . ")";
     return $label;

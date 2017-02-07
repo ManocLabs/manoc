@@ -46,16 +46,17 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     my $server_id = $c->req->query_parameters->{'server_id'};
     my %form_defaults;
 
-    $c->require_permission( 'dhcpserver.edit' );
+    $c->require_permission('dhcpserver.edit');
 
-    if (!defined($server_id) || !$c->model('ManocDB::DHCPServer')->find($server_id)) {
+    if ( !defined($server_id) || !$c->model('ManocDB::DHCPServer')->find($server_id) ) {
         $c->response->redirect( $c->uri_for_action('dhcpserver/list') );
         $c->detach();
-    } else {
+    }
+    else {
         $form_defaults{dhcp_server} = $server_id;
     }
 
-    defined($net_id)    and $form_defaults{network} = $net_id;
+    defined($net_id) and $form_defaults{network} = $net_id;
 
     my $object = $c->stash->{resultset}->new_result( {} );
     $c->stash(
@@ -69,7 +70,6 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     $c->detach('form');
 }
 
-
 =head2 view
 
 Display a single items.
@@ -78,7 +78,7 @@ Display a single items.
 
 sub view : Chained('object') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
-    $c->require_permission( 'dhcpserver.view' );
+    $c->require_permission('dhcpserver.view');
 }
 
 =head2 edit
@@ -90,10 +90,9 @@ Use a form to edit a row.
 sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->require_permission( 'dhcpserver.edit' );
+    $c->require_permission('dhcpserver.edit');
     $c->detach('form');
 }
-
 
 =head2 delete
 
@@ -102,21 +101,22 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
 sub delete : Chained('object') : PathPart('delete') : Args(0) {
     my ( $self, $c ) = @_;
 
-
-    $c->require_permission( 'dhcpserver.edit' );
+    $c->require_permission('dhcpserver.edit');
 
     if ( $c->req->method eq 'POST' ) {
         if ( $c->stash->{object}->delete ) {
             $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $c->uri_for_action('dhcpserver/view', [ $c->stash->{server_id} ] ) );
-        } else {
-            $c->res->redirect( $c->uri_for_action('dhcpsubnet/view', [ $c->stash->{object_pk} ] ) );
+            $c->res->redirect(
+                $c->uri_for_action( 'dhcpserver/view', [ $c->stash->{server_id} ] ) );
+        }
+        else {
+            $c->res->redirect(
+                $c->uri_for_action( 'dhcpsubnet/view', [ $c->stash->{object_pk} ] ) );
         }
 
         $c->detach();
     }
 }
-
 
 =head2 get_form_success_url
 
@@ -124,7 +124,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
 sub get_form_success_url {
     my ( $self, $c ) = @_;
-    return $c->uri_for_action('dhcpserver/view', [ $c->stash->{object}->dhcp_server->id ] );
+    return $c->uri_for_action( 'dhcpserver/view', [ $c->stash->{object}->dhcp_server->id ] );
 }
 
 =head1 AUTHOR

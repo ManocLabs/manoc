@@ -31,7 +31,6 @@ sub BUILD {
     $self->max_workers( $self->config->n_procs );
 }
 
-
 =head2 worker_stderr
 
 Called when a child prints to STDERR
@@ -70,7 +69,6 @@ Returns the POE::Filter to be used for stderr.
 =cut
 
 sub stderr_filter { POE::Filter::Line->new }
-
 
 no Moose::Role;
 1;

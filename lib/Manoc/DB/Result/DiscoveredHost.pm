@@ -18,9 +18,9 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
     },
     session_id => {
-        data_type         => 'int',
-        is_nullable       => 0,
-        is_foreign_key    => 1,
+        data_type      => 'int',
+        is_nullable    => 0,
+        is_foreign_key => 1,
     },
     address => {
         data_type    => 'varchar',
@@ -69,8 +69,10 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/session_id address/] );
 
-__PACKAGE__->belongs_to( session_id =>
-                             'Manoc::DB::Result::DiscoverSession', 'session_id' );
+__PACKAGE__->belongs_to(
+    session_id => 'Manoc::DB::Result::DiscoverSession',
+    'session_id'
+);
 
 1;
 # Local Variables:

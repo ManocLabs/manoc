@@ -55,15 +55,11 @@ sub _build_config {
 
     if ( $ENV{MANOC_CONF} ) {
         $config = Config::JFDI->open( file => $ENV{MANOC_CONF}, );
-        my $path =  catdir( $ENV{MANOC_CONF}, updir());
-        $self->manoc_config_dir( $path );
+        my $path = catdir( $ENV{MANOC_CONF}, updir() );
+        $self->manoc_config_dir($path);
     }
     else {
-        my @config_paths =
-            (
-                catdir( $FindBin::Bin, updir() ),
-                '/etc/manoc',
-            );
+        my @config_paths = ( catdir( $FindBin::Bin, updir() ), '/etc/manoc', );
 
         foreach my $path (@config_paths) {
             $config = Config::JFDI->open(
@@ -71,17 +67,17 @@ sub _build_config {
                 name => 'manoc',
             );
             if ($config) {
-                $self->manoc_config_dir( $path );
+                $self->manoc_config_dir($path);
                 last;
             }
         }
     }
-    if ( ! $config ) {
+    if ( !$config ) {
         $config = {
-            name => 'Manoc',
+            name             => 'Manoc',
             'Model::ManocDB' => $Manoc::DB::DEFAULT_CONFIG,
         };
-        $self->manoc_config_dir(getcwd());
+        $self->manoc_config_dir( getcwd() );
     }
 
     return $config;
@@ -93,7 +89,7 @@ sub _build_schema {
     my $config       = $self->config;
     my $connect_info = $config->{'Model::ManocDB'}->{connect_info};
 
-    my $schema       = Manoc::DB->connect($connect_info);
+    my $schema = Manoc::DB->connect($connect_info);
 
     return $schema;
 }

@@ -30,35 +30,32 @@ has 'inventory' => (
     isa => 'Str',
 );
 
-has 'serial'=> (
+has 'serial' => (
     is  => 'ro',
     isa => 'Str',
 );
-
-
 
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
 
     if ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) {
-        my $args   = $_[0];
+        my $args    = $_[0];
         my $hwasset = $args->{hwasset};
         if ($hwasset) {
-            $args->{id}      = $hwasset->id;
-            $args->{bame}    = $hwasset->label || '';
+            $args->{id} = $hwasset->id;
+            $args->{bame} = $hwasset->label || '';
 
-            $args->{vendor}  = $hwasset->vendor || '';
-            $args->{model}   = $hwasset->model || '';
-            $args->{serial}  = $hwasset->serial || '';
-            $args->{inventory}  = $hwasset->inventory || '';
+            $args->{vendor}    = $hwasset->vendor    || '';
+            $args->{model}     = $hwasset->model     || '';
+            $args->{serial}    = $hwasset->serial    || '';
+            $args->{inventory} = $hwasset->inventory || '';
         }
         return $class->$orig($args);
     }
 
     return $class->$orig(@_);
 };
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -38,6 +38,8 @@ has datatable_search_options => (
     default => sub { {} },
 );
 
+has datatable_search_callback => ( is => 'rw', );
+
 has datatable_row_callback => ( is => 'rw', );
 
 sub _build_datatable_search_columns {
@@ -52,8 +54,7 @@ sub get_datatable_resultset {
     return $c->stash->{'resultset'};
 }
 
-sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
-    {
+sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $start  = $c->request->param('start') || 0;
@@ -70,6 +71,9 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
     my $search_columns = $c->stash->{'datatable_search_columns'} ||
         $self->datatable_search_columns;
 
+    my $search_callback = $c->stash->{'datatable_search_callback'} ||
+        $self->datatable_search_callback;
+
     my $row_callback = $c->stash->{'datatable_row_callback'} ||
         $self->datatable_row_callback;
 
@@ -84,10 +88,9 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
         }
     }
 
-    my $search_attrs = { %{ $self->datatable_search_options } };
-
     my $total_rows = $rs->count();
-    my $filtered_rows = $rs->search( $search_filter, $search_attrs )->count();
+
+    my $search_attrs = { %{ $self->datatable_search_options } };
 
     # paging (LIMIT clause)
     if ($length) {
@@ -105,11 +108,19 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0)
         my $dir = $c->request->param("order[0][dir]") eq 'desc' ? '-desc' : '-asc';
 
         $search_attrs->{order_by} = { $dir => $column };
+        $c->log->debug("order by $column $dir");
     }
+
+    if ($search_callback) {
+        ( $search_filter, $search_attrs ) =
+            $self->$search_callback( $c, $search_filter, $search_attrs );
+    }
+
+    my $search_rs = $rs->search_rs( $search_filter, $search_attrs );
+    my $filtered_rows = $search_rs->count();
 
     # search
     my @rows;
-    my $search_rs = $rs->search( $search_filter, $search_attrs );
     while ( my $item = $search_rs->next ) {
         my $row;
         if ($row_callback) {

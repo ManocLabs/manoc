@@ -12,7 +12,6 @@ BEGIN {
     our @EXPORT_OK = qw/bs_block_field_helper/;
 }
 
-
 sub bs_block_field_helper {
     my $input_width;
     my $label_width;
@@ -20,18 +19,19 @@ sub bs_block_field_helper {
         my $args = shift;
         $input_width = $args->{input};
         $label_width = $args->{label};
-    } else {
+    }
+    else {
         $input_width = shift;
         $label_width = shift;
     }
 
     return (
         do_wrapper => 0,
-        tags => {
-            before_element => '<div class="col-sm-'.$input_width.'">',
+        tags       => {
+            before_element => '<div class="col-sm-' . $input_width . '">',
             after_element  => '</div>'
         },
-        label_class  => [ "col-sm-${label_width}"],
+        label_class => ["col-sm-${label_width}"],
     );
 }
 

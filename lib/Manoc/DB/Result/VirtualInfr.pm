@@ -29,7 +29,7 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    dismissed => {
+    decommissioned => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',
@@ -44,7 +44,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->add_unique_constraint( [ qw/name/ ] );
+__PACKAGE__->add_unique_constraint( [qw/name/] );
 
 __PACKAGE__->has_many(
     virtual_machines => 'Manoc::DB::Result::Server',

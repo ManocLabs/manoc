@@ -33,9 +33,7 @@ $(function() {
           "<'row'<'col-sm-6'i><'col-sm-6'p>>"
    });
 [% IF options.toolbar -%]
-   var origin=$("#[% options.toolbar %]");
-   var dest=$("#[% id %]_wrapper div.toolbar").first();
-   origin.appendTo(dest);
+   $("#[% options.toolbar %]").appendTo($("#[% id %]_wrapper div.toolbar").first());
 [% END -%]
 });
 [% END -%]

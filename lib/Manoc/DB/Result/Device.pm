@@ -3,10 +3,10 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Device;
-use Moose;
+use strict;
+use warnings;
 
-extends 'DBIx::Class::Core';
-
+use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
@@ -51,18 +51,24 @@ __PACKAGE__->add_columns(
         data_type   => 'int',
         is_nullable => 1,
     },
-    dismissed => {
+
+    decommissioned => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',
     },
+
+    decommission_ts => {
+        data_type     => 'int',
+        default_value => 'NULL',
+        is_nullable   => 1,
+    },
+
     notes => {
         data_type   => 'text',
         is_nullable => 1,
     },
 );
-
-
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/id/] );
@@ -80,26 +86,48 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
-around "rack" => sub {
-    my ( $orig, $self ) = ( shift, shift );
+sub rack {
+    my ( $self, @args ) = @_;
 
-    if (@_) {
-        my $rack = $_[0];
+    if (@args) {
+        my $rack = $args[0];
         if ( $rack && $self->hwasset ) {
-            $self->hwasset->rack( $rack );
+            $self->hwasset->rack($rack);
         }
     }
 
-    $self->$orig(@_);
-};
+    $self->next::method(@args);
+}
 
-__PACKAGE__->has_many( ifstatus     => 'Manoc::DB::Result::IfStatus', 'device_id' );
-__PACKAGE__->has_many( uplinks      => 'Manoc::DB::Result::Uplink', 'device_id' );
-__PACKAGE__->has_many( ifnotes      => 'Manoc::DB::Result::IfNotes', 'device_id' );
-__PACKAGE__->has_many( ssids        => 'Manoc::DB::Result::SSIDList', 'device_id' );
-__PACKAGE__->has_many( dot11clients => 'Manoc::DB::Result::Dot11Client', 'device_id' );
-__PACKAGE__->has_many( dot11assocs  => 'Manoc::DB::Result::Dot11Assoc', 'device_id' );
-__PACKAGE__->has_many( mat_assocs   => 'Manoc::DB::Result::Mat', 'device_id' );
+__PACKAGE__->has_many(
+    ifstatus => 'Manoc::DB::Result::IfStatus',
+    'device_id'
+);
+
+__PACKAGE__->has_many(
+    uplinks => 'Manoc::DB::Result::Uplink',
+    'device_id'
+);
+__PACKAGE__->has_many(
+    ifnotes => 'Manoc::DB::Result::IfNotes',
+    'device_id'
+);
+__PACKAGE__->has_many(
+    ssids => 'Manoc::DB::Result::SSIDList',
+    'device_id'
+);
+__PACKAGE__->has_many(
+    dot11clients => 'Manoc::DB::Result::Dot11Client',
+    'device_id'
+);
+__PACKAGE__->has_many(
+    dot11assocs => 'Manoc::DB::Result::Dot11Assoc',
+    'device_id'
+);
+__PACKAGE__->has_many(
+    mat_assocs => 'Manoc::DB::Result::Mat',
+    'device_id'
+);
 
 __PACKAGE__->has_many(
     neighs => 'Manoc::DB::Result::CDPNeigh',
@@ -180,8 +208,9 @@ sub get_config_date {
 
 =head2 update_config( $config_text, [ $timestamp ] )
 
-Create or update the related DeviceConfig object. Check if configuration has changed before rotating the stored one.
-Return 1 if the config object has been refreshed, undef otherwise.
+Create or update the related DeviceConfig object. Check if
+configuration has changed before rotating the stored one.  Return 1 if
+the config object has been refreshed, undef otherwise.
 
 =cut
 
@@ -215,4 +244,55 @@ sub update_config {
     return;
 }
 
+=head2 in_use
+
+Return 0 when decommissioned, 1 otherwise.
+
+=cut
+
+sub in_use { return !shift->decommissioned }
+
+=head2 decommission([$timestamp])
+
+Set decommissioned to true, update timestamp and deassociate nwinfo if
+needed.
+
+=cut
+
+sub decommission {
+    my $self = shift;
+    my $timestamp = shift // time();
+
+    $self->decommissioned and return;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+
+    $self->decommissioned(1);
+    $self->decommission_ts($timestamp);
+    $self->hwasset(undef);
+    if ( $self->netwalker_info ) {
+        $self->netwalker_info->delete();
+    }
+    $self->update;
+
+    $guard->commit;
+}
+
+=head1 AUTHOR
+
+The Manoc Team
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

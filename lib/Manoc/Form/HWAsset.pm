@@ -10,8 +10,8 @@ use aliased 'Manoc::DB::Result::HWAsset' => 'DB::HWAsset';
 
 use namespace::autoclean;
 
-has '+item_class' => ( default => 'HWAsset' );
-has '+name'       => ( default => 'form-hwasset' );
+has '+item_class'  => ( default => 'HWAsset' );
+has '+name'        => ( default => 'form-hwasset' );
 has '+html_prefix' => ( default => 1 );
 
 has hide_location => (
@@ -21,8 +21,8 @@ has hide_location => (
 );
 
 has 'type' => (
-    is   => 'rw',
-    isa  => 'Str',
+    is       => 'rw',
+    isa      => 'Str',
     required => 1,
 );
 
@@ -44,9 +44,9 @@ sub build_render_list {
 }
 
 has_field 'inventory' => (
-    type     => 'Text',
-    size     => 32,
-    label    => 'Inventory',
+    type  => 'Text',
+    size  => 32,
+    label => 'Inventory',
 );
 
 has_field 'vendor' => (
@@ -74,30 +74,29 @@ before 'process' => sub {
 
     my %args = @_;
 
-    if ($args{hide_location}) {
-        push @{ $self->inactive },
-            qw(location building rack rack_level room floor
-               location_block rack_block);
+    if ( $args{hide_location} ) {
+        push @{ $self->inactive }, qw(location building rack rack_level room floor
+            location_block rack_block);
         $self->defaults->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
     }
 };
 
 override validate_model => sub {
-    my $self = shift;
-    my $item = $self->item;
+    my $self        = shift;
+    my $item        = $self->item;
     my $found_error = 0;
 
     # location field are not validating when not entered :D
-    if ( ! $self->hide_location ) {
+    if ( !$self->hide_location ) {
 
         # when moving to warehouse check for in_use
         my $location_field = $self->field('location');
-        if ($location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
-                $item->in_use)
-            {
-                $location_field->( "Asset is in use, cannot be moved to warehouse" );
-                $found_error++;
-            }
+        if ( $location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
+            $item->in_use )
+        {
+            $location_field->("Asset is in use, cannot be moved to warehouse");
+            $found_error++;
+        }
     }
 
     $found_error += super();
@@ -110,7 +109,7 @@ before 'update_model' => sub {
     my $values = $self->value;
     my $item   = $self->item;
 
-    $item->type($self->type);
+    $item->type( $self->type );
 
     $self->hide_location and
         $values->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
