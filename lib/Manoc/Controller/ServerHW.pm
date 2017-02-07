@@ -64,7 +64,8 @@ before 'create' => sub {
         if ($original) {
             $c->log->debug("copy server from $copy_id");
             my %cols = $original->get_columns;
-            delete $cols{hwasset_id};
+            delete $cols{'hwasset_id'};
+            delete $cols{'id'};
             foreach (qw(model vendor)) {
                 $cols{$_} = $original->hwasset->get_column($_);
             }

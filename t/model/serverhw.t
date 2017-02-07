@@ -99,7 +99,20 @@ my $r = $rs->populate([
             address  => '1.1.1.1',
         }
     },
-    {
+
+]);
+
+$schema->resultset("HWAsset")->create(
+        {
+            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            vendor     => 'IQ',
+            model      => 'MegaPort 48',
+            serial     => 'Test04',
+        });
+
+# force scalar context
+$r = $rs->populate([
+  {
         ram_memory => '16000',
         cpu_model  => 'E1234',
         vendor     => 'Moon',
@@ -115,15 +128,6 @@ my $r = $rs->populate([
         serial     => "Test03",
     },
 ]);
-
-$schema->resultset("HWAsset")->create(
-        {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
-            vendor     => 'IQ',
-            model      => 'MegaPort 48',
-            serial     => 'Test04',
-        });
-
 
 my $unused_devices = $rs->unused;
 is($unused_devices->count,  1, "No extra result in unused query");
