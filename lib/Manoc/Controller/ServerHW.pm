@@ -37,6 +37,9 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
 
+    create_page_title       => 'Create server hardware',
+    edit_page_title         => 'Edit server hardware',
+
     json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
