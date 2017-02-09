@@ -183,6 +183,14 @@ sub options_serverhw {
     return unless $self->schema;
     my @rs = $self->schema->resultset('ServerHW')->unused()->all();
     my @selections;
+
+    if (my $s = $self->item->serverhw) {
+        push @selections,  {
+            label => $s->label,
+            value => $s->id
+        };
+    }
+
     foreach my $b (@rs) {
         my $option = {
             label => $b->label,
@@ -190,6 +198,7 @@ sub options_serverhw {
         };
         push @selections, $option;
     }
+
     return @selections;
 
 }
@@ -198,14 +207,22 @@ sub options_vm {
     my $self = shift;
 
     return unless $self->schema;
+
+    my @selections;
+
+    if (my $vm = $self->item->vm) {
+        push @selections,  {
+            label => $vm->label,
+            value => $vm->id
+        };
+    }
+
     my @rs = $self->schema->resultset('VirtualMachine')->unused()->search(
         {},
         {
             prefetch => [ 'virtinfr', 'hypervisor' ]
         }
     )->all();
-
-    my @selections;
     foreach my $b (@rs) {
         my $option = {
             label => $b->label,

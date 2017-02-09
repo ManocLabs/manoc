@@ -25,6 +25,8 @@ use constant {
     LOCATION_ROOM           => 'o',
 };
 
+use constant DEFAULT_LOCATION => LOCATION_WAREHOUSE;
+
 our %TYPE = (
     (TYPE_DEVICE)      => { label => 'Device', class => 'Device' },
     (TYPE_SERVER)      => { label => 'Server', class => 'Server' },
@@ -38,7 +40,7 @@ __PACKAGE__->load_components(qw/PK::Auto InflateColumn/);
 __PACKAGE__->table('hwassets');
 __PACKAGE__->add_columns(
     id => {
-        data_type         => 'int',
+        data_type         => 'integer',
         is_nullable       => 0,
         is_auto_increment => 1,
     },
@@ -50,7 +52,7 @@ __PACKAGE__->add_columns(
     location => {
         data_type     => 'varchar',
         is_nullable   => 0,
-        default_value => LOCATION_WAREHOUSE,
+        default_value => DEFAULT_LOCATION,
         size          => 1,
         accessor      => '_location',
     },
@@ -158,42 +160,45 @@ sub is_in_rack {
     return $self->_location eq LOCATION_RACK;
 }
 
-sub sync_location_fields {
+sub location {
     my $self = shift;
 
-    my $location = $self->_location;
+    if ( @_ ) {
+        my $location = shift;
 
-    if ( $location eq LOCATION_WAREHOUSE ||
-        $location eq LOCATION_DECOMMISSIONED )
-    {
-        $self->rack(undef);
-        $self->rack_level(undef);
-        $self->building(undef);
-        $self->floor(undef);
-        $self->room(undef);
-    }
-    if ( $location eq LOCATION_ROOM ) {
-        $self->rack(undef);
-    }
-    if ( $location eq LOCATION_RACK ) {
-        my $rack = $self->rack;
+        if ( $location eq LOCATION_WAREHOUSE ||
+                 $location eq LOCATION_DECOMMISSIONED )  {
+            $self->rack(undef);
+            $self->rack_level(undef);
+            $self->building(undef);
+            $self->floor(undef);
+            $self->room(undef);
+            $self->_location($location);
+        } elsif ( $location eq LOCATION_ROOM ) {
+            $self->rack(undef);
+            $self->_location($location);
+        } elsif ( $location eq LOCATION_RACK ) {
+            my $rack = $self->rack;
 
-        $rack or croak "Undefined rack field while location is set to rack";
-        $self->building( $rack->building );
-        $self->room( $rack->room );
-        $self->floor( $rack->floor );
+            $rack or croak "Undefined rack field while location is set to rack";
+            $self->building( $rack->building );
+            $self->room( $rack->room );
+            $self->floor( $rack->floor );
+            $self->_location($location);
+        } else {
+            croak "Invalid location value";
+        }
     }
+    return $self->_location;
 }
 
 sub decommission {
     my $self = shift;
     my $timestamp = shift || time();
 
-    $self->_location(LOCATION_DECOMMISSIONED);
+    $self->location(LOCATION_DECOMMISSIONED);
     $self->locationchange_ts ||
         $self->locationchange_ts($timestamp);
-
-    $self->sync_location_fields;
 }
 
 sub move_to_rack {
@@ -201,9 +206,8 @@ sub move_to_rack {
 
     defined($rack) or croak "move_to_rack called with an undef rack";
     my $rack_id = ref($rack) ? $rack->id : $rack;
-    $self->_location(LOCATION_RACK);
     $self->rack_id($rack_id);
-    $self->sync_location_fields();
+    $self->location(LOCATION_RACK);
 }
 
 sub move_to_room {
@@ -212,19 +216,16 @@ sub move_to_room {
     defined($building) or croak "Move to room called with an undef building";
 
     my $building_id = ref($building) ? $building->id : $building;
-    $self->_location(LOCATION_ROOM);
     $self->building_id($building_id);
     $self->floor($floor);
     $self->room($room);
-
-    $self->sync_location_fields;
+    $self->location(LOCATION_ROOM);
 }
 
 sub move_to_warehouse {
     my $self = shift;
 
-    $self->_location(LOCATION_WAREHOUSE);
-    $self->sync_location_fields;
+    $self->location(LOCATION_WAREHOUSE);
 }
 
 sub label {
@@ -273,7 +274,11 @@ sub generate_inventory {
 
 sub insert {
     my ( $self, @args ) = @_;
+
+    $self->location or
+        $self->location( LOCATION_WAREHOUSE );
     $self->next::method(@args);
+
 
     if ( !defined( $self->inventory ) ) {
         $self->generate_inventory;

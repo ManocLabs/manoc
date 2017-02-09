@@ -112,6 +112,13 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
     my $object = $c->stash->{object};
 
+    if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
+        $c->res->redirect(
+            $c->uri_for_action( 'server/view', [ $object->server->id ] )
+        );
+        $c->detach();
+    }
+
     $c->require_permission( $object, 'view' );
 }
 

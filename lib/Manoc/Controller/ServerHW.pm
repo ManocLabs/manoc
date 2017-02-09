@@ -37,6 +37,9 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
 
+    create_page_title       => 'Create server hardware',
+    edit_page_title         => 'Edit server hardware',
+
     json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
@@ -61,7 +64,8 @@ before 'create' => sub {
         if ($original) {
             $c->log->debug("copy server from $copy_id");
             my %cols = $original->get_columns;
-            delete $cols{hwasset_id};
+            delete $cols{'hwasset_id'};
+            delete $cols{'id'};
             foreach (qw(model vendor)) {
                 $cols{$_} = $original->hwasset->get_column($_);
             }

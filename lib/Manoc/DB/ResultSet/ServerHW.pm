@@ -8,28 +8,6 @@ use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
 
-sub new_result {
-    my ( $class, $attrs ) = @_;
-
-    my $item = $class->next::method($attrs);
-
-    if ( !defined( $item->hwasset ) ) {
-        $item->hwasset(
-            $item->new_related(
-                'hwasset',
-                {
-                    type      => Manoc::DB::Result::HWAsset->TYPE_SERVER,
-                    location  => Manoc::DB::Result::HWAsset->LOCATION_WAREHOUSE,
-                    model     => $attrs->{model},
-                    vendor    => $attrs->{vendor},
-                    inventory => $attrs->{inventory},
-                }
-            )
-        );
-    }
-    return $item;
-}
-
 sub unused {
     my ($self) = @_;
 
@@ -44,7 +22,7 @@ sub unused {
         {
             'hwasset.location' =>
                 { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
-            id => {
+            'me.id' => {
                 -not_in => $used_asset_ids->as_query,
             }
         },
