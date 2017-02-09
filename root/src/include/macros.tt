@@ -113,3 +113,9 @@ $( document ).ready(function() {
 [% MACRO print_serverhw(server) BLOCK -%]
 <a href=[% c.uri_for_action('serverhw/view', [ server.id ]) %]>[% server.inventory | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                         Server logical                            -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_server(server) BLOCK -%]
+<a href=[% c.uri_for_action('server/view', [ server.id ]) %]>[% server.hostname | html %]</a>
+[%- END -%]

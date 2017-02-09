@@ -43,7 +43,7 @@ __PACKAGE__->config(
     json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
-        prefetch => { 'hwasset' => { 'rack' => 'building' } }
+        prefetch => [ { 'hwasset' => { 'rack' => 'building' }}, 'server' ]
     },
 
 );
@@ -113,6 +113,12 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
 
     my $object = $c->stash->{object};
     $c->require_permission( 'serverhw', 'edit' );
+
+    if ($object->in_use) {
+        $c->response->redirect(
+            $c->uri_for_action( 'serverhw/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
 
     if ( $c->req->method eq 'POST' ) {
         $object->decommission;

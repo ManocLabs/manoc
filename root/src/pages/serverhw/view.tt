@@ -1,6 +1,8 @@
 [%
    page.title='Server Hardware ' _ object.inventory
 %]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
 [% page.toolbar = BLOCK -%]
  <div class="btn-group">
     <a class="btn btn-primary [% 'disabled' UNLESS  c.check_permission(object, 'delete') %]" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
@@ -10,7 +12,7 @@
       <li class="[% 'disabled' UNLESS c.check_permission('serverhw.create') %]">
          <a href=[% c.uri_for_action('serverhw/create', { copy => object.id }) %]>[% bootstrap_icon('duplicate') %] Duplicate</a>
       </li>
-      <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+      <li class="[% 'disabled' IF !c.check_permission(object, 'edit') || object.in_use %]">
          <a href=[% c.uri_for_action('serverhw/decommission', [object.id]) %]>
    	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
@@ -45,8 +47,11 @@
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
-  <dt>Decommissioned</dt><dd>[% IF object.is_decommissioned %]Yes[% ELSE %]No[%END %]</dd>
-  <dt>Used by</dt><dd>[% print_server(object.server) IF object.server %]</dd>
+  [% IF object.decommissioned -%]
+  <dt>Decommissioned</dt>
+  <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+  [% END -%]
+  <dt>Used by</dt><dd>[% IF object.server %][% print_server(object.server) %][% END %]</dd>
   <dt>RAM</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>CPU</dt>

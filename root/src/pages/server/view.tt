@@ -1,6 +1,8 @@
 [%
    page.title='Server ' _ object.hostname
 -%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
 [% page.toolbar = BLOCK -%]
   <div class="btn-group">
      <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('server/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
@@ -22,6 +24,10 @@
     <dl class="dl-horizontal">
     <dt>Hostname:</dt><dd>[% object.hostname %] </dd>
 	<dt>OS:</dt><dd>[% object.os %] [% object.os_ver %] </dd>
+    [% IF object.decommissioned -%]
+     <dt>Decommissioned</dt>
+     <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+    [% END -%]
     </dl>
   </div><!-- panel body -->
 </div><!-- panel -->
