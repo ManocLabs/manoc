@@ -77,6 +77,7 @@ has_field 'virtinfr' => (
     label    => 'Virtual Infrastructure',
     nullable => 1,
 
+    empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 4 } )
 );
 
@@ -84,6 +85,7 @@ has_field 'hypervisor' => (
     type     => 'Select',
     label    => 'Hypervisor',
     nullable => 1,
+    empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 4 } )
 );
 
@@ -91,6 +93,26 @@ has_field 'notes' => (
     type  => 'TextArea',
     label => 'Notes',
 );
+
+sub options_hypervisor {
+    my $self = shift;
+
+    return unless $self->schema;
+
+    my @options;
+    my @rs = $self->schema->resultset('Server')->hypervisors();
+
+    foreach my $b (@rs) {
+        my $option = {
+            label => $b->label,
+            value => $b->id
+        };
+        push @options, $option;
+    }
+
+    return @options;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

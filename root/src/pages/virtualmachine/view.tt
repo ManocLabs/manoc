@@ -1,15 +1,22 @@
 [%
    page.title='Virtual Machine ' _ object.name
 -%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
 [% page.toolbar = BLOCK -%]
  <div class="btn-group">
     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' IF !c.check_permission(object, 'edit') || object.in_use %]">
+         <a href=[% c.uri_for_action('virtualmachine/decommission', [object.id]) %]>
+   	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
       <li class="[% 'disabled' UNLESS  c.check_permission(object, 'delete') %]">
          <a href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
       </li>
+      <li role="separator" class="divider"></li>
       <li class="[% 'disabled' IF c.check_permission('server.create') %]">
          <a href=[% c.uri_for_action('server/create', { vm => object.id}) %]>Create server</a>
       </li>
@@ -19,6 +26,10 @@
 <dl class="dl-horizontal">
   <dt>Name</dt>
   <dd>[% object.name | html %]</dd>
+  [% IF object.decommissioned -%]
+  <dt>Decommissioned</dt>
+  <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+  [% END -%]
   <dt>Used by</dt>
   <dd>[% print_server(object.server) IF object.server %]</dd>
   <dt>Virtual infrastructure</dt>
