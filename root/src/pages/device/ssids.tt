@@ -1,0 +1,22 @@
+<table class="table">
+    <thead>
+	    <tr>
+	        <th>Interface</th>
+	        <th>SSID</th>
+            <th>Broadcast</th>
+            <th>Channel</th>
+	    </tr>
+      </thead>
+    <tbody>
+	    [% FOREACH s IN ssid_list %]
+	    <tr>
+            <td><a href="[% c.uri_for_action('interface/view',
+		                 [s.ipaddr, s.interface]) %]"> [% s.interface %]</a>
+            </td>
+            <td><a href="#"> [% s.ssid %]</a></td>
+            <td>[% s.broadcast %]</td>
+            <td>[% s.channel %]</td>
+	    </tr>
+	    [% END %]
+    </tbody>
+</table>

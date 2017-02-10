@@ -32,6 +32,7 @@ function showDialogForm(url, title, on_close) {
     return true;
 }
 
+/* Manoc Form plugin */
 (function( $ ) {
     $.fn.manocAjaxForm = function() {
         var submit_func = function(e) {
@@ -56,5 +57,17 @@ function showDialogForm(url, title, on_close) {
         this.submit(submit_func);
         return this;
     };
+}( jQuery ));
 
+/* Remote Tab */
+(function( $ ) {
+    $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+        var currTabTarget = $(e.target).attr('href');
+        var remoteUrl = $(this).attr('data-tab-remote');
+        var loadedOnce = $(this).data('loaded');
+        if (remoteUrl && remoteUrl !== '' && !loadedOnce) {
+            $(currTabTarget).load(remoteUrl)
+            $(this).data('loaded',true);
+        }
+    })
 }( jQuery ));

@@ -2,3 +2,4 @@
   page.title='New Scan'
 -%]
 [% form.render %]
+[% ajax_form(form.name) %]

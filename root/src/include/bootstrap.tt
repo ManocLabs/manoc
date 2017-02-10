@@ -30,6 +30,11 @@
 <a href="#[% name %]" aria-controls="[% name %]" role="tab" data-toggle="tab">[% label %]</a>
 </li>
 [%- END -%]
+[% MACRO bootstrap_nav_tab_remote(name, label, url active) BLOCK -%]
+<li role="presentation" [% IF active %]class="active"[% END %]>
+<a href="#[% name %]" aria-controls="[% name %]" role="tab" data-toggle="tab" data-tab-remote="[% url %]">[% label %]</a>
+</li>
+[%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO bootstrap_progressbar(value, class) BLOCK -%]
  <div class="progress">

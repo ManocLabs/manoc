@@ -1,0 +1,37 @@
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+<table class="table">
+    <thead>
+	    <tr>
+            <th>Interface</th>
+            <th>Adm </th>
+	        <th>Status</th>
+	        <th>Speed</th>
+	        <th>Duplex</th>
+	        <th>Vlan</th>
+	        <th>Sec</th>
+            <th>Last activity</th>
+	        <th>Description</th>
+	    </tr>
+    </thead>
+    <tbody>
+	    [% FOREACH if IN iface_info %]
+	    [% row_class = if.up == 'up' ? 'active' : 'warning' %]
+	    <tr class="[% row_class %]">
+            <td>[% print_iface(object.id, if.interface) %]</td>
+            <td>[% if.up_admin | html %]</td>
+            <td>[% if.up | html %]</td>
+	        <td>[% if.speed | html %]</td>
+	        <td>[% if.duplex | html %]/[% if.duplex_admin | html %]</td>
+	        <td>[% if.vlan | html %]</td>
+	        <td>
+                [% IF if.cps_enable -%]
+	            [% if.cps_status | html %] ([% if.cps_count | html %])
+	            [% ELSE %]
+  	            Disabled
+	            [% END -%]
+	        <td>[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
+	        <td>[% if.description | html %]</td>
+	    </tr>
+	    [% END -%]
+    </tbody>
+</table>

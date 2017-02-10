@@ -1,5 +1,5 @@
 [%
-page.title='Edit Netwalker configuration'
+page.title='Netwalker configuration ' _ object.name
 -%]
-<h3>Device [% object.name %]</h3>
 [% form.render %]
+[% ajax_form(form.name) %]
