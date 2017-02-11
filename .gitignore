@@ -17,3 +17,4 @@ Makefile.old
 /t/var
 /App-Manoc-*
 /nytprof*
+/maint/ansible/site.retry

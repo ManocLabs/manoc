@@ -4,8 +4,10 @@ After=network.target
 
 [Service]
 Type=forking
-Environment="PERL_LOCAL_LIB_ROOT={{ manoc_local_lib}}""
+Environment="PERL_LOCAL_LIB_ROOT={{ manoc_local_lib}}"
 Environment="PERL5LIB={{ manoc_local_lib}}/lib/perl5:{{manoc_home}}/lib"
+Environment="APP_MANOC_CONFIG=/etc/manoc.conf"
+
 ExecStart={{manoc_home}}/script/manoc_netwalker.pl
 ExecStop={{manoc_home}}/script/manoc_netwalker.pl --stop
 RemainAfterExit=yes

@@ -33,10 +33,10 @@
   shell: perl /tmp/cpanmin.pl App::cpanminus
   when: cpanm_result|failed
 
-- name: Install Manoc deps
+- name: MAnoc Install Manoc deps
   environment:
       PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
-      PERL_CPANM_OPT: "--with-feature=mysql --with-feature=arpsniffer --with-feature=snmp --with-feature=devel"
+      PERL_CPANM_OPT: "--recommends"
   cpanm:
       installdeps: true
       from_path: "{{manoc_home}}"
@@ -63,11 +63,24 @@
   with_items:
       - FCGI::ProcManager
       - Net::Pcap
-      - FCGI
+      - NetPacket::Ethernet
+      - DBD::mysql
+
+- name: Manoc | Create manoc config file
+  template: src=manoc.conf dest=/etc mode=644
+
+- name: Manoc | Create manoc log config file
+  template: src=manoc_log.conf dest=/etc mode=644
 
 - name: Manoc | Create run dir
   file:
     path: /var/run/manoc/
+    state: directory
+    mode: 0755
+
+- name: Manoc | Create log dir
+  file:
+    path: /var/log/manoc/
     state: directory
     mode: 0755
 
