@@ -1,0 +1,33 @@
+[% META
+   use_table=1
+-%]
+[%
+page.title='Warehouses'
+-%]
+
+<div id="tabletoolbar">
+[%- IF c.check_permission('warehouse.create') -%]
+     <a href="[% c.uri_for_action('/warehouse/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[%- END -%]
+</div>
+[%-  init_table('warehouse_list', { toolbar="tabletoolbar" }) -%]
+ <table class="table" id="warehouse_list">
+  <thead>
+	 <tr>
+ 	 <th>Name</th>
+ 	 <th>Building</th>
+ 	 <th>Floor</th>
+  	 <th>Room</th>
+     </tr>
+  </thead>
+  <tbody>
+[% FOREACH r IN object_list %]
+         <tr>
+ 	 <td><a href=[% c.uri_for_action('/warehouse/view', [r.id]) %]> [% r.name | html %] </a></td>
+ 	 <td>[% r.building.name | html %]</td>
+ 	 <td>[% r.floor | html %]</td>
+     <td>[% r.room | html %]</td>
+         </tr>
+ [% END %]
+  </tbody>
+</table>

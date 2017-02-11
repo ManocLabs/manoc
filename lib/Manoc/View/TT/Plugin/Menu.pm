@@ -122,6 +122,10 @@ my @DEFAULT_MENU_ITEMS = (
                 name   => 'Racks',
                 action => '/rack/list',
             },
+            {
+                name   => 'Warehouses',
+                action => '/warehouse/list',
+            },
 
         ]
     },

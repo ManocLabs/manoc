@@ -39,6 +39,7 @@ sub build_render_list {
         'inventory',
         'vendor', 'model', 'serial',
         'location',
+        'warehouse',
         'location_block',
         'rack_block',
 

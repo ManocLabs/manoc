@@ -4,24 +4,24 @@
 # it under the same terms as Perl itself.
 use strict;
 
-package Manoc::Controller::Rack;
+package Manoc::Controller::Warehouse;
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'Manoc::ControllerRole::CommonCRUD';
-with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
+with "Manoc::ControllerRole::JSONView";
 
-use Manoc::Form::Rack;
+use Manoc::Form::Warehouse;
 
 __PACKAGE__->config(
     # define PathPart
     action => {
         setup => {
-            PathPart => 'rack',
+            PathPart => 'warehouse',
         }
     },
-    class                   => 'ManocDB::Rack',
-    form_class              => 'Manoc::Form::Rack',
+    class                   => 'ManocDB::Warehouse',
+    form_class              => 'Manoc::Form::Warehouse',
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
@@ -29,7 +29,7 @@ __PACKAGE__->config(
 
 =head1 NAME
 
-Manoc::Controller::Rack - Catalyst Controller
+Manoc::Controller::Warehouse - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -58,18 +58,6 @@ sub get_object_list {
     ];
 }
 
-=head2 create
-
-=cut
-
-before 'create' => sub {
-    my ( $self, $c ) = @_;
-
-    my $building_id = $c->req->query_parameters->{'building'};
-    $building_id and $c->log->debug("new rack in $building_id");
-    $c->stash( form_defaults => { building => $building_id } );
-};
-
 =head2 delete_object
 
 =cut
@@ -77,30 +65,14 @@ before 'create' => sub {
 sub delete_object {
     my ( $self, $c ) = @_;
 
-    my $rack = $c->stash->{'object'};
+    my $warehouse = $c->stash->{'object'};
 
-    if ( $rack->hwassets->count ) {
-        $c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
+    if ( $warehouse->devices->count ) {
+        $c->flash( error_msg => "Warehouse is not empty. Cannot be deleted." );
         return undef;
     }
 
-    return $rack->delete;
-}
-
-=head2 get_json_object
-
-=cut
-
-sub get_json_object {
-    my ( $self, $c, $rack ) = @_;
-
-    my $r = $self->prepare_json_object( $c, $rack );
-    $r->{building} = {
-        id   => $rack->building->id,
-        name => $rack->building->name,
-    };
-    $r->{devices} = [ map +{ id => $_->id, name => $_->name }, $rack->devices ];
-    return $r;
+    return $warehouse->delete;
 }
 
 =head1 AUTHOR

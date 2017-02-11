@@ -2,6 +2,8 @@
 $( document ).ready(function() {
     $("#[% form.name %]\\.rack").selectpicker();
     $("#[% form.name %]\\.building").selectpicker();
+    $("#[% form.name %]\\.warehouse").selectpicker();
+
     form_location_refresh();
 });
 $('#[% form.name %] input').on('change', function() {
@@ -11,22 +13,14 @@ $('#[% form.name %] input').on('change', function() {
 function form_location_refresh() {
   l=$('input[name="[% form.name %].location"]:checked').val();
 
-  if ( l == 'o') {
-    $("#[% form.name %]\\.building").prop('disabled', false).selectpicker('refresh');
-    $("#[% form.name %]\\.room").prop('disabled', false);
-    $("#[% form.name %]\\.floor").prop('disabled', false);
-  } else {
-    $("#[% form.name %]\\.building").prop('disabled', true).selectpicker('refresh');
-    $("#[% form.name %]\\.room").prop('disabled', true);
-    $("#[% form.name %]\\.floor").prop('disabled', true);
-  }
-  if ( l == 'r' ) {
-    $("#[% form.name %]\\.rack").prop('disabled', false).selectpicker('refresh');
-    $("#[% form.name %]\\.rack_level").prop('disabled', false);
-  } else {
-    $("#[% form.name %]\\.rack").prop('disabled', true).selectpicker('refresh');
-    $("#[% form.name %]\\.rack_level").prop('disabled', true);
-  }
+  $("#[% form.name %]\\.building").prop('disabled', l != 'o').selectpicker('refresh');
+  $("#[% form.name %]\\.room").prop('disabled', l != 'o');
+  $("#[% form.name %]\\.floor").prop('disabled', l != 'o');
+
+  $("#[% form.name %]\\.warehouse").prop('disabled', l != 'w').selectpicker('refresh');
+
+  $("#[% form.name %]\\.rack").prop('disabled', l != 'r').selectpicker('refresh');
+  $("#[% form.name %]\\.rack_level").prop('disabled', l != 'r');
 }
 [% END %]
 [% js_scripts.push(fragment) -%]
