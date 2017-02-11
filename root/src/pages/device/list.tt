@@ -8,10 +8,13 @@ page.title = 'Devices'
 <div id="tabletoolbar" class="btn-toolbar" role="toolbar">
 
 [%- IF c.check_permission('device.create') -%]
+<<<<<<< HEAD
   <div class="btn-group" role="group">
   <a href="[% c.uri_for_action('/device/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add device</a>
   </div>
 [% END -%]
+
+  <a href="[% c.uri_for_action('device/list_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("download") %] Export CSV</a>
 
   <div class="btn-group" role="group">
   <div id="statusfilter_wrapper" class="filtermenu">

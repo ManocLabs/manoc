@@ -1,21 +1,26 @@
-package Manoc::Form::CVSImport::ServerHW;
+package Manoc::Form::CVSImport::Server;
 
 use HTML::FormHandler::Moose;
 use namespace::autoclean;
 
 extends 'Manoc::Form::CSVImport';
 
+has_field 'create_vm' => (
+);
+
+has_field 'create_hw' => (
+);
+
 has '+required_columns' => (
     default => sub {
-        [qw/model vendor ram_memory cpu_model/];
+        [ qw/hostname address/ ]
     }
 );
 
 has '+optional_columns' => (
     default => sub { [
         qw/
-          n_procs n_cores_proc proc_freq  inventory serial
-          storage1_size storage2_size notes
+          os os_ver
           /
     ] }
 
@@ -34,13 +39,17 @@ has '+column_names' => (
     }
 );
 
-has '+lookup_columns' => ( default => sub { [ "serial", [qw /vendor inventory/] ] } );
+has '+lookup_columns' => (
+    default => sub { [ "serial", [ qw /vendor inventory/ ] ] }
+);
+
 
 sub find_entry {
-    my ( $self, $data ) = @_;
+    my ($self, $data) = @_;
 
     my $rs = $self->resultset;
     if ( exists $data->{serial} ) {
+        print STDERR "search by serial\n";
         my $entry = $rs->search(
             {
                 'hwasset.serial' => $data->{serial},
@@ -53,6 +62,7 @@ sub find_entry {
     }
 
     if ( exists $data->{inventory} ) {
+        print STDERR "search by inventory\n";
         my $entry = $rs->search(
             {
                 'hwasset.inventory' => $data->{inventory},

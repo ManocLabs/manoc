@@ -31,6 +31,9 @@
     <tr><td>Frequency</td><td>No</td><td>CPU frequency in MHz</td></tr>
     <tr><td>Processors</td><td>No</td><td>Number of processors, default 1</td></tr>
     <tr><td>Cores</td><td>No</td><td>Number of cores per processors, default 1</td></tr>
+    <tr><td>Storage 1</td><td>No</td><td>Primary storage size (GB)</td></tr>
+    <tr><td>Storage 2</td><td>No</td><td>Secondaru storage size (GB)</td></tr>
+    <tr><td>Notes</td><td>No</td><td></td></tr>
   </tbody>
   </table>
 </div><!-- panel -->

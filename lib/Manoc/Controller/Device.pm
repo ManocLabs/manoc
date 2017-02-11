@@ -8,7 +8,11 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
+with "Manoc::ControllerRole::JSONView" => {
+    -excludes => 'get_json_object',
+};
+with "Manoc::ControllerRole::CSVView";
+
 use Text::Diff;
 
 use Manoc::Form::Device::Edit;

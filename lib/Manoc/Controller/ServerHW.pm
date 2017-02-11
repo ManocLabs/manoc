@@ -12,6 +12,7 @@ use Manoc::Form::CSVImport::ServerHW;
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
 with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::CSVView";
 
 =head1 NAME
 
@@ -45,6 +46,12 @@ __PACKAGE__->config(
     object_list_options => {
         prefetch => [ { 'hwasset' => { 'rack' => 'building' }}, 'server' ]
     },
+
+
+    csv_columns             =>
+        [
+            'inventory', 'model', 'vendor', 'serial', 'cpu_model', 'proc_freq',
+        ],
 
 );
 
