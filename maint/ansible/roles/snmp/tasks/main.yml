@@ -1,0 +1,38 @@
+---
+- name: download MIBS
+  get_url:
+      url: http://downloads.sourceforge.net/project/netdisco/netdisco-mibs/latest-snapshot/netdisco-mibs-snapshot.tar.gz
+      dest: /tmp/netdisco-mibs-snapshot.tar.gz
+      force: no
+      checksum: sha1:c9f65eb9a0600033e8fe958ac8fd49e47f7035dd
+
+- name: extract MIBS from archived
+  unarchive:
+    src: /tmp/netdisco-mibs-snapshot.tar.gz
+    dest: "{{mibs_install_dir}}"
+
+- name: create /etc/snmp dir
+  file:
+    path: /etc/snmp/
+    state: directory
+    mode: 0755
+
+- name: copy snmp.conf
+  copy:
+      src:  "{{mibs_install_dir}}/netdisco-mibs-3.1/EXTRAS/contrib/snmp.conf"
+      dest: /etc/snmp/snmp.conf
+      owner: root
+      group: root
+      mode: 0644
+
+- name: comment all mibs but basic ones in snmp.conf
+  replace:
+      dest: /etc/snmp/snmp.conf
+      regexp: '^(mibdirs \+/usr/local/netdisco/mibs/(?!cisco|enterasys|extreme|f5|fortinet|hp|rfc|net-snmp).+)$'
+      replace: '# \1'
+
+- name: replace path in snmp.conf
+  replace:
+      dest: /etc/snmp/snmp.conf
+      regexp: ''
+      replace: "{{mibs_install_dir}}/netdisco-mibs-3.1"

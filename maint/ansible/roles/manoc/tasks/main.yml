@@ -1,0 +1,88 @@
+---
+- name: Manoc | Create a new database
+  mysql_db: name={{manoc_db_name}} state=present
+
+- name: Manoc | Create DB user
+  mysql_user:
+    name: "{{manoc_db_user}}"
+    password: "{{manoc_db_pass}}"
+    priv: "{{manoc_db_name}}.*:ALL,GRANT"
+    state: present
+
+- name: Manoc | Install perl vendor packages and other prereqs
+  yum: name={{item}} state=present
+  with_items:
+    - perl-core
+    - perl-DBD-MySQL
+    - net-snmp-perl
+    - libpcap-devel
+
+- name: Manoc | Test for cpanm
+  shell: perl -MApp::cpanminus -e1
+  register: cpanm_result
+  ignore_errors: true
+
+- name: Manoc | download CPANm installer
+  get_url:
+    url: http://cpanmin.us
+    dest: /tmp/cpanmin.pl
+    force: no
+  when: cpanm_result|failed
+
+- name: Manoc | Install CPANm
+  shell: perl /tmp/cpanmin.pl App::cpanminus
+  when: cpanm_result|failed
+
+- name: Install Manoc deps
+  environment:
+      PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+      PERL_CPANM_OPT: "--with-feature=mysql --with-feature=arpsniffer --with-feature=snmp --with-feature=devel"
+  cpanm:
+      installdeps: true
+      from_path: "{{manoc_home}}"
+      notest: True
+      locallib: "{{manoc_local_lib}}"
+
+- name: Manoc | Install core deps
+  environment:
+      PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+      PERL_CPANM_OPT: "--recommends --with-feature=devel"
+  cpanm:
+      installdeps: true
+      from_path: "{{manoc_home}}"
+      notest: True
+      locallib: "{{manoc_local_lib}}"
+
+- name:  Manoc | Install additiona deps
+  environment:
+      PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+  cpanm:
+      name: "{{item}}"
+      notest: True
+      locallib: "{{manoc_local_lib}}"
+  with_items:
+      - FCGI::ProcManager
+      - Net::Pcap
+      - FCGI
+
+- name: Manoc | Create run dir
+  file:
+    path: /var/run/manoc/
+    state: directory
+    mode: 0755
+
+- name: Manoc | Create Systemd Unit files
+  template: src=manoc-{{item}}.service dest=/lib/systemd/system/ mode=644
+  with_items:
+      - arpsniffer
+      - fcgi
+      - netwalker
+  notify:
+    - reload systemctl
+
+- name: Manoc | Start manoc WebApp
+  service: name=manoc-{{item}}.service state=started enabled=yes
+  with_items:
+      - arpsniffer
+      - fcgi
+      - netwalker

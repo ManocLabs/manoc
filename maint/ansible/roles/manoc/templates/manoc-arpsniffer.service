@@ -1,0 +1,16 @@
+[Unit]
+Description=manoc arp sniffer
+After=network.target
+
+[Service]
+Type=forking
+
+Environment="PERL_LOCAL_LIB_ROOT={{ manoc_local_lib}}""
+Environment="PERL5LIB={{ manoc_local_lib}}/lib/perl5:{{manoc_home}}/lib"
+ExecStart={{manoc_home}}/script/manoc_arpsniffer.pl
+ExecStop={{manoc_home}}/script/manoc_arpsniffer.pl --stop
+RemainAfterExit=yes
+
+
+[Install]
+WantedBy=default.target
