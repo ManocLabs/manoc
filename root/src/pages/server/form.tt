@@ -38,10 +38,14 @@ function on_close_vmcreate_form(data) {
 
 function form_refresh() {
   l=$('input[name="[% form.name %].type"]:checked').val();
+
   $("#[% form.name %]\\.serverhw").prop('disabled', l != 'p');
+  $("#[% form.name %]\\.serverhw_btn").prop('disabled', l != 'p');
   $("#[% form.name %]\\.serverhw").selectpicker('refresh');
 
+
   $("#[% form.name %]\\.vm").prop('disabled', l != 'v');
+  $("#[% form.name %]\\.vm_btn").prop('disabled', l != 'v');
   $("#[% form.name %]\\.vm").selectpicker('refresh');
 
 }

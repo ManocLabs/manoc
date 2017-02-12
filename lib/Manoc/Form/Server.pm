@@ -108,6 +108,7 @@ has_block 'serverhw_block' => (
 has_field 'serverhw' => (
     type  => 'Select',
     label => 'Hardware',
+    empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 8 } )
 );
 
@@ -131,6 +132,7 @@ has_block 'vm_block' => (
 has_field 'vm' => (
     type  => 'Select',
     label => 'Virtual Machine',
+    empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 8 } )
 );
 
@@ -158,13 +160,14 @@ has_field 'is_hypervisor' => (
     widget   => 'RadioGroup',
     options  => [ { value => 1, label => 'True' }, { value => 0, label => 'False' } ],
     wrapper_tags => { inline => 1 },
-    bs_block_field_helper( { label => 2, input => 2 } )
+    bs_block_field_helper( { label => 2, input => 3 } )
 );
 
 has_field 'hosted_virtinfr' => (
     type  => 'Select',
     label => 'Virtual Infrastructure',
-    bs_block_field_helper( { label => 4, input => 4 } )
+    empty_select => '--- Choose ---',
+    bs_block_field_helper( { label => 3, input => 4 } )
 );
 
 sub default_type {

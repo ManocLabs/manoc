@@ -154,4 +154,6 @@ sub label {
     return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
 
+sub in_use { defined( shift->server ); }
+
 1;

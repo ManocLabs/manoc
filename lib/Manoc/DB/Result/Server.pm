@@ -186,6 +186,8 @@ sub decommission {
     $guard->commit;
 }
 
+sub label { shift->hostname }
+
 =head1 AUTHOR
 
 The Manoc Team

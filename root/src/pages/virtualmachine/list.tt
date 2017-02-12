@@ -6,28 +6,76 @@
 -%]
 <div id="tabletoolbar">
 <a href="[% c.uri_for_action('virtualmachine/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
-</div>
 
-[% init_table('virtualmachine_list', { toolbar='tabletoolbar' }) %]
+  <div class="btn-group" role="group">
+  <div id="statusfilter_wrapper" class="filtermenu">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+    <option value="a">Show all</option>
+    <option value="u">In use</option>
+    <option value="d">Decommissioned</option>
+  </select>
+  </div>
+  </div>
+
+</div><!-- toolbar -->
+
 <table class="table" id="virtualmachine_list">
    <thead>
      <tr>
+        <th>Decommissioned</th>
         <th>Name</th>
-        <th>Infastrutcture</th>
+        <th>Infastructure</th>
         <th>Hypervisor</th>
         <th>RAM</th>
         <th>VCPUs</th>
+        <th>Used by</th>
      </tr>
    </thead>
    <tbody>
 [% FOREACH object IN object_list %]
    <tr>
+     <td>[% IF d.decommissioned %]Decommissioned[% ELSE %]In use[%END%]</td>
   	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>[% object.name | html %]</a></td>
  	 <td>[% object.on_virtinfr_id | html %]</td>
  	 <td>[% object.on_hypervisor_id | html %]</td>
  	 <td>[% object.ram_memory | html %]</td>
  	 <td>[% object.vcpus | html %]</td>
+     <td>[% print_server(o.server) %]</td>
    </tr>
 [% END %]
    </tbody>
 </table>
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+
+
+var table = $("#virtualmachine_list").DataTable( {
+   "columnDefs":      [
+                     {
+                     'targets' : [ 0 ],
+                     'visible' : false
+                     }
+   ],
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+ });
+ $("#tabletoolbar").appendTo($("div.toolbar").first());
+
+
+$("#statusfilter").on('changed.bs.select',
+  function(e) {
+        value = $("#statusfilter").val();
+        s = '';
+        if (value == 'd') {
+            s = '^Decommissioned$';
+
+        } else if (value == 'u') {
+            s = '^In use$';
+        }
+        $('#virtualmachine_list').DataTable().columns(0).search(s, true, false).draw();
+  }
+);
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

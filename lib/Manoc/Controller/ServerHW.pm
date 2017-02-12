@@ -12,6 +12,7 @@ use Manoc::Form::CSVImport::ServerHW;
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
 with "Manoc::ControllerRole::JSONView";
+with "Manoc::ControllerRole::CSVView";
 
 =head1 NAME
 
@@ -43,8 +44,14 @@ __PACKAGE__->config(
     json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
-        prefetch => { 'hwasset' => { 'rack' => 'building' } }
+        prefetch => [ { 'hwasset' => { 'rack' => 'building' }}, 'server' ]
     },
+
+
+    csv_columns             =>
+        [
+            'inventory', 'model', 'vendor', 'serial', 'cpu_model', 'proc_freq',
+        ],
 
 );
 
@@ -113,6 +120,12 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
 
     my $object = $c->stash->{object};
     $c->require_permission( 'serverhw', 'edit' );
+
+    if ($object->in_use) {
+        $c->response->redirect(
+            $c->uri_for_action( 'serverhw/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
 
     if ( $c->req->method eq 'POST' ) {
         $object->decommission;

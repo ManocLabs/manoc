@@ -11,7 +11,7 @@ use warnings;
 sub hypervisors {
     my $self = shift;
 
-    my $rs = $self->search( { is_hypervisor => 1 } );
+    my $rs = $self->search( { is_hypervisor => 1, decommissioned => 0 } );
     return wantarray() ? $rs->all() : $rs;
 }
 

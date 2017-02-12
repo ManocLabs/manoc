@@ -104,7 +104,7 @@ sub label {
         $label .= ' - ' . $self->virtinfr->name;
     }
     elsif ( $self->hypervisor ) {
-        $label .= ' -' . $self->virtinfr->hostname;
+        $label .= ' -' . $self->hypervisor->hostname;
     }
     return $label;
 }
@@ -135,5 +135,7 @@ sub decommission {
 
     $guard->commit;
 }
+
+sub in_use { defined( shift->server ); }
 
 1;

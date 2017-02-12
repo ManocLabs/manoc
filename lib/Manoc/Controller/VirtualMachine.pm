@@ -33,8 +33,46 @@ __PACKAGE__->config(
     class      => 'ManocDB::VirtualMachine',
     form_class => 'Manoc::Form::VirtualMachine',
 
+    create_page_title       => 'Create virtual machine',
+    edit_page_title         => 'Edit virtual machine',
+
     json_columns => [ 'id', 'name' ],
 );
+
+
+=head2 decommission
+
+=cut
+
+sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->require_permission( 'virtualmachine', 'edit' );
+
+    if ($object->in_use) {
+        $c->response->redirect(
+            $c->uri_for_action( 'virtualmachine/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $object->decommission;
+        $object->update();
+        $c->flash( message => "Virtual machine decommissioned" );
+        $c->response->redirect(
+            $c->uri_for_action( 'virtualmachine/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Decommission virtual machine',
+        confirm_message => 'Decommission virtual machine ' . $object->label . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
 
 =head1 AUTHOR
 

@@ -21,6 +21,7 @@ requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::View::TT';
 requires 'Catalyst::View::JSON';
+requires 'Catalyst::View::CSV', '1.7';
 requires 'Config::General';
 requires 'DateTime::Format::RFC3339';
 requires 'HTML::FormHandler';
