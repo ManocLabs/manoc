@@ -257,7 +257,7 @@ sub datatable_search_cb {
 
     my $warehouse = $c->request->param('search_warehouse');
     if ( defined($warehouse) ) {
-        $extra_filter->{warehouse_id} => $warehouse;
+        $extra_filter->{warehouse_id} = $warehouse;
     }
 
     %$extra_filter and
