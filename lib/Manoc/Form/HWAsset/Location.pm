@@ -44,7 +44,7 @@ has_block 'rack_block' => (
 has_field 'rack' => (
     type         => 'Select',
     label        => 'Rack',
-    empty_select => '--- Select a rack ---',
+    empty_select => '--- Choose ---',
     required     => 0,
 
     do_wrapper => 0,
@@ -74,9 +74,16 @@ has_block 'location_block' => (
     class       => ['form-group'],
 );
 
+has_field 'warehouse' => (
+    type         => 'Select',
+    empty_select => '--- Choose ---',
+    required     => 0,
+    label        => 'Warehouse',
+);
+
 has_field 'building' => (
     type         => 'Select',
-    empty_select => '---Choose a Building---',
+    empty_select => '--- Choose ---',
     required     => 0,
     label        => 'Building',
     do_wrapper   => 0,
@@ -139,6 +146,24 @@ sub options_building {
     return @selections;
 }
 
+sub options_warehouse {
+    my $self = shift;
+    return unless $self->schema;
+    my @warehouses =
+        $self->schema->resultset('Warehouse')->search( {}, { order_by => 'name' } )->all();
+
+    my @selections;
+    foreach my $b (@warehouses) {
+        my $option = {
+            label => $b->label,
+            value => $b->id
+        };
+        push @selections, $option;
+    }
+    return @selections;
+}
+
+
 sub options_rack {
     my $self = shift;
     return unless $self->schema;
@@ -173,7 +198,7 @@ sub update_model_location {
     my $location = $values->{location};
 
     if ( $location eq DB::HWAsset->LOCATION_WAREHOUSE ) {
-        $item->move_to_warehouse();
+        $item->move_to_warehouse( $values->{warehouse} );
     }
     elsif ( $location eq DB::HWAsset->LOCATION_ROOM ) {
         $item->move_to_room( $values->{building}, $values->{floor}, $values->{room} );
@@ -186,6 +211,7 @@ sub update_model_location {
         return;
     }
 
+    delete $values->{warehouse};
     delete $values->{location};
     delete $values->{building};
     delete $values->{floor};

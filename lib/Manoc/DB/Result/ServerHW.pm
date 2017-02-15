@@ -68,10 +68,10 @@ __PACKAGE__->add_unique_constraints( [qw/hwasset_id/] );
 my @HWASSET_PROXY_ATTRS = qw(
     location
     vendor model serial inventory
-    building_id rack_id rack_level room
+    warehouse_id building_id rack_id rack_level room
 );
 my @HWASSET_PROXY_METHODS = qw(
-    building rack
+    building rack warehouse
     is_decommissioned is_in_warehouse is_in_rack
     move_to_rack move_to_room move_to_warehouse
     decommission

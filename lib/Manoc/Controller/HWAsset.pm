@@ -114,7 +114,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
     if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
         $c->res->redirect(
-            $c->uri_for_action( 'server/view', [ $object->server->id ] )
+            $c->uri_for_action( 'serverhw/view', [ $object->serverhw->id ] )
         );
         $c->detach();
     }
@@ -240,9 +240,9 @@ sub get_form_process_params {
 sub datatable_search_cb {
     my ( $self, $c, $filter, $attr ) = @_;
 
-    my $status = $c->request->param('search_status');
-
     my $extra_filter = {};
+
+    my $status = $c->request->param('search_status');
     if ( defined($status) ) {
         $status eq 'd' and
             $extra_filter->{location} = Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
@@ -253,6 +253,11 @@ sub datatable_search_cb {
             -and => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
             { '!=' => Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE }
             ];
+    }
+
+    my $warehouse = $c->request->param('search_warehouse');
+    if ( defined($warehouse) ) {
+        $extra_filter->{warehouse_id} => $warehouse;
     }
 
     %$extra_filter and

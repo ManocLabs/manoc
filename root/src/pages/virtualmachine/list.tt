@@ -34,7 +34,7 @@
    <tbody>
 [% FOREACH object IN object_list %]
    <tr>
-     <td>[% IF d.decommissioned %]Decommissioned[% ELSE %]In use[%END%]</td>
+     <td>[% IF d.decommissioned %]Decommissioned[% ELSE %]In use[% END %]</td>
   	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>[% object.name | html %]</a></td>
  	 <td>[% object.on_virtinfr_id | html %]</td>
  	 <td>[% object.on_hypervisor_id | html %]</td>

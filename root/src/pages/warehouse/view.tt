@@ -1,0 +1,99 @@
+[%
+
+page.title = 'Warehouse ' _ object.name
+page.no_content_row = 1
+
+-%]
+[% META
+
+use_table = 1
+
+-%]
+[% page.toolbar = BLOCK -%]
+<div class="btn-group">
+  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+        <a href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
+      </li>
+    </ul>
+</div><!-- end btn group -->
+[% END -%]
+
+<div class="row">
+<div class="col-sm-12">
+<div class="panel panel-default">
+  <div class="panel-body">
+    <dl class="pull-left dl-horizontal">
+	<dt>Building</dt><dd>[% print_building(object.building) %]</dd>
+	<dt>Floor</dt><dd>[% object.floor %]</dd>
+	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
+    </dl>
+  </div><!-- panel body -->
+</div><!-- panel -->
+</div><!-- col -->
+</div><!-- row -->
+
+<div class="row">
+
+<div class="col-md-12">
+<div class="panel panel-default">
+  <div class="panel-heading clearfix" style="padding: 5px;">
+     <h4 class="panel-title">Assets</h4>
+  </div>
+
+  <div class="panel-body">
+
+  [% IF object.hwassets -%]
+<table class="table" id="hwasset_list">
+   <thead>
+     <tr>
+        <th>Inventory</th>
+        <th>Type</th>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Serial</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+   </table>
+
+  [% END -%]
+  </div><!-- panel body -->
+</div><!-- panel -->
+</div><!-- col -->
+
+</div><!-- row -->
+
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+  $("#hwasset_list").dataTable( {
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":  {
+      "url":  "[% c.uri_for_action('hwasset/datatable_source') %]",
+      "data": function ( d ) {
+         d.search_warehouse = [% object.id %]
+      }
+   },
+   "columns":      [
+                     { 'data' : 'inventory',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='"+oData.link+"'>"+oData.inventory+"</a>");
+                         }
+                     },
+                     { 'data' : 'type' },
+                     { 'data' : 'vendor' },
+                     { 'data' : 'model' },
+                     { 'data' : 'serial' },
+   ],
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+ })
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

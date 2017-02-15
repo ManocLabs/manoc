@@ -35,6 +35,7 @@ sub build_render_list {
         'inventory',
         'vendor', 'model', 'serial',
         'location',
+        'warehouse',
         'location_block',
         'rack_block',
         'save',
@@ -75,7 +76,7 @@ before 'process' => sub {
     my %args = @_;
 
     if ( $args{hide_location} ) {
-        push @{ $self->inactive }, qw(location building rack rack_level room floor
+        push @{ $self->inactive }, qw(location warehouse building rack rack_level room floor
             location_block rack_block);
         $self->defaults->{location} = DB::HWAsset->LOCATION_WAREHOUSE;
     }

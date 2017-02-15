@@ -81,6 +81,11 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         size        => 1,
     },
+    warehouse_id => {
+        data_type      => 'int',
+        is_nullable    => 1,
+        is_foreign_key => 1,
+    },
     rack_id => {
         data_type      => 'int',
         is_nullable    => 1,
@@ -120,9 +125,16 @@ __PACKAGE__->belongs_to(
     'building_id',
     { join_type => 'left' }
 );
+
 __PACKAGE__->belongs_to(
     rack => 'Manoc::DB::Result::Rack',
     'rack_id',
+    { join_type => 'left' }
+);
+
+__PACKAGE__->belongs_to(
+    warehouse => 'Manoc::DB::Result::Warehouse',
+    'warehouse_id',
     { join_type => 'left' }
 );
 
@@ -132,13 +144,18 @@ __PACKAGE__->might_have(
 );
 
 __PACKAGE__->might_have(
-    server => 'Manoc::DB::Result::Server',
-    'serverhw_id',
+    serverhw => 'Manoc::DB::Result::ServerHW',
+    'hwasset_id',
     {
         cascade_update => 0,
         cascade_delete => 1,
     }
 );
+
+sub server {
+    my $self = shift;
+    $self->serverhw and $self->serverhw->server;
+}
 
 sub in_use {
     my $self = shift;
@@ -165,29 +182,38 @@ sub location {
 
     if ( @_ ) {
         my $location = shift;
-
-        if ( $location eq LOCATION_WAREHOUSE ||
-                 $location eq LOCATION_DECOMMISSIONED )  {
+        if ( $location eq LOCATION_DECOMMISSIONED )  {
             $self->rack(undef);
             $self->rack_level(undef);
             $self->building(undef);
             $self->floor(undef);
             $self->room(undef);
-            $self->_location($location);
+            $self->warehouse(undef);
+        } elsif ( $location eq LOCATION_WAREHOUSE ) {
+            my $warehouse = $self->warehouse;
+            if ($warehouse) {
+                $self->building( $warehouse->building );
+                $self->room( $warehouse->room );
+                $self->floor( $warehouse->floor );
+            }
+            $self->rack(undef);
+            $self->rack_level(undef);
         } elsif ( $location eq LOCATION_ROOM ) {
             $self->rack(undef);
-            $self->_location($location);
+            $self->warehouse(undef);
         } elsif ( $location eq LOCATION_RACK ) {
             my $rack = $self->rack;
-
-            $rack or croak "Undefined rack field while location is set to rack";
-            $self->building( $rack->building );
-            $self->room( $rack->room );
-            $self->floor( $rack->floor );
-            $self->_location($location);
+            if ($rack) {
+                $self->building( $rack->building );
+                $self->room( $rack->room );
+                $self->floor( $rack->floor );
+            }
+            $self->warehouse(undef);
         } else {
             croak "Invalid location value";
+            return;
         }
+        $self->_location($location);
     }
     return $self->_location;
 }
@@ -223,8 +249,11 @@ sub move_to_room {
 }
 
 sub move_to_warehouse {
-    my $self = shift;
+    my ( $self, $warehouse ) = @_;
 
+    my $warehouse_id = ref($warehouse) ? $warehouse->id : $warehouse;
+
+    $self->warehouse_id($warehouse_id);
     $self->location(LOCATION_WAREHOUSE);
 }
 
@@ -246,7 +275,9 @@ sub display_location {
     my $location = $self->_location;
 
     if ( $location eq LOCATION_WAREHOUSE ) {
-        return "Warehouse";
+        return defined($self->warehouse)
+            ? "Warehouse - " . $self->warehouse->name
+            : "Warehouse";
     }
 
     if ( $location eq LOCATION_RACK ) {
