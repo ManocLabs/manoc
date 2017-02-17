@@ -49,8 +49,13 @@ sub delete_object {
     my ( $self, $c ) = @_;
     my $building = $c->stash->{'object'};
 
+    if ( $building->warehouses->count ) {
+        $c->flash( error_msg => 'Building has associated warehouses and cannot be deleted.' );
+        return undef;
+    }
+
     if ( $building->racks->count ) {
-        $c->flash( error_msg => 'Building is not empty and cannot be deleted.' );
+        $c->flash( error_msg => 'Building has associated racks and cannot be deleted.' );
         return undef;
     }
 

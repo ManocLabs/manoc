@@ -41,6 +41,17 @@ Catalyst Controller.
 
 =head1 METHODS
 
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    my $building_id = $c->req->query_parameters->{'building'};
+    $c->stash( form_defaults => { building => $building_id } );
+};
+
 =cut
 
 =head2 get_object_list
