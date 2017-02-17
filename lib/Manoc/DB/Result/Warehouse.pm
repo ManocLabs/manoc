@@ -52,7 +52,7 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->has_many(
     hwassets => 'Manoc::DB::Result::HWAsset',
     'warehouse_id',
-    { cascade_delete => 0 }
+    { cascade_delete => 0,  }
 );
 
 sub label {

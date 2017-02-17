@@ -62,6 +62,9 @@ my $rack = $schema->resultset("Rack")->create({
     room => '00',
     building => $building,
 });
+my $warehouse = $schema->resultset("Warehouse")->create({
+    name => 'W01',
+});
 $hw->move_to_rack($rack);
 ok($hw->is_in_rack, "Move to rack");
 ok(!$hw->is_decommissioned, "if in rack not decommissioned");
@@ -81,6 +84,10 @@ ok($hw->is_in_warehouse, "move to warehouse");
 ok(!$hw->is_decommissioned, "if in w/h not decommissioned");
 ok(!$hw->is_in_rack, "if in room not in rack");
 is($hw->display_location, "Warehouse", "Display location Warehouse");
+
+$hw->move_to_warehouse($warehouse);
+is($hw->display_location, "Warehouse - W01", "Display location Warehouse");
+ok($warehouse->hwassets, "Warehouse has associated assets");
 
 $hw->decommission();
 ok($hw->is_decommissioned, "decommissioned");
