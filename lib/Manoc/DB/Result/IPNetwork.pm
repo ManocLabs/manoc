@@ -60,6 +60,17 @@ __PACKAGE__->add_columns(
         is_nullable    => 1,
         is_foreign_key => 1,
     },
+    'default_gw' => {
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+        ipv4_address => 1,
+    },
+
+    notes => {
+        data_type   => 'text',
+        is_nullable => 1,
+    },
 );
 
 has network => (
