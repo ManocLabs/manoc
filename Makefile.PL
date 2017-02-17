@@ -22,4 +22,6 @@ resources
 # use Module::Install::CPANfile
 cpanfile;
 
+tests 't/*.t t/*/*.t';
+
 WriteAll;
