@@ -44,6 +44,11 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
     cmp_ok( $net->first_host, 'eq', '192.168.1.1',   'first host');
     cmp_ok( $net->last_host,  'eq', '192.168.1.254', 'last host');
     cmp_ok( $net->wildcard,   'eq', '0.0.0.255',     'wildcard');
+
+    ok( $net->contains_address( Manoc::IPAddress::IPv4->new('192.168.1.5'),
+                                '192.168.1.0/24 contains 192.168.1.5') );
+    ok( ! $net->contains_address( Manoc::IPAddress::IPv4->new('192.168.0.5'),
+                                '192.168.1.0/24 does not contain 192.168.0.5') );
 }
 
 {

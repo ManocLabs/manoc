@@ -12,13 +12,22 @@ with 'Manoc::Form::TraitFor::Horizontal';
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
 
+use Manoc::IPAddress::IPv4Network;
+use Manoc::IPAddress::IPv4;
+
 has '+name'        => ( default => 'form-ipnetwork' );
 has '+html_prefix' => ( default => 1 );
 
 has '+item_class' => ( default => 'IPNetwork' );
 
 sub build_render_list {
-    [ 'network_block', 'name', 'vlan_id', 'description', 'save', 'csrf_token' ];
+    [ 'network_block',
+      'name',
+      'vlan_id',
+      'default_gw',
+      'description',
+      'notes',
+      'save', 'csrf_token' ];
 }
 
 has_block 'network_block' => (
@@ -70,10 +79,21 @@ has_field 'vlan_id' => (
     empty_select => '---Choose a VLAN---',
 );
 
+has_field 'default_gw' => (
+    apply      => [IPAddress],
+    size       => 15,
+    required   => 0,
+    label      => 'Default GW',
+    element_attr => { placeholder => 'Default gateway (optional)' }
+
+);
+
 has_field 'description' => (
     type  => 'TextArea',
     label => 'Description',
 );
+
+has_field 'notes' => ( type => 'TextArea' );
 
 sub options_vlan_id {
     my $self = shift;
@@ -108,6 +128,13 @@ override validate_model => sub {
 
         $item->prefix($saved_prefix);
         $item->address($saved_address);
+    }
+
+    if ( $values->{default_gw} && $values->{address} && $values->{prefix} ) {
+        my $net = Manoc::IPAddress::IPv4Network->new( $values->{address}, $values->{prefix} );
+        my $gw  = Manoc::IPAddress::IPv4->new($values->{default_gw});
+        $net->contains_address($gw) or
+            $self->field('default_gw')->add_error('Gateway outside network');
     }
 
 };

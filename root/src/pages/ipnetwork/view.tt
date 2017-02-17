@@ -41,6 +41,8 @@
 	<dd>[% object.network.first_host | html %]</dd>
 	<dt>Last host</dt>
 	<dd>[% object.network.last_host | html %]</dd>
+    <dt>Default GW</dt>
+	<dd>[% object.default_gw | html %]</dd>
 	<dt>Supernets</dt>
 	<dd>[% FOREACH net IN object.supernets_ordered %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
@@ -52,6 +54,8 @@
 	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
+  	<dt>Notes</dt>
+	<dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- end of content -->
   </div><!-- end of panel -->
