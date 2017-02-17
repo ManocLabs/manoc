@@ -161,7 +161,7 @@ sub _build_neighbors {
         my $port = $interfaces->{ $c_if->{$neigh} };
         defined($port) or next;
 
-        my $neigh_ip   = $c_ip->{$neigh}         || Manoc::IpAddress->new("0.0.0.0");
+        my $neigh_ip   = $c_ip->{$neigh}         || "0.0.0.0";
         my $neigh_port = $c_port->{$neigh}       || "";
         my $neigh_id   = $c_id->{$neigh}         || "";
         my $neigh_model= $c_platform->{$neigh}   || "";
@@ -319,12 +319,12 @@ sub device_info {
     my $info = $self->snmp_info or return undef;
  
     return {
-        name   => $info->name,
-        model  => $info->model,
-        os     => $info->os,
-        os_ver => $info->os_ver,
-        vendor => $info->vendor,
-        serial => $info->serial,
+        name   => $info->name || '',
+        model  => $info->model || '',
+        os     => $info->os || '',
+        os_ver => $info->os_ver || '', 
+        vendor => $info->vendor || '',
+        serial => $info->serial || '',
     };
 
 }
