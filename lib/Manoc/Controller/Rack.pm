@@ -80,9 +80,14 @@ sub delete_object {
     my $rack = $c->stash->{'object'};
 
     if ( $rack->hwassets->count ) {
-        $c->flash( error_msg => "Rack is not empty. Cannot be deleted." );
+        $c->flash( error_msg => "Rack contains hardware assets. Cannot be deleted." );
         return undef;
     }
+    if ( $rack->devices->count ) {
+        $c->flash( error_msg => "Rack has associated devices. Cannot be deleted." );
+        return undef;
+    }
+
 
     return $rack->delete;
 }
