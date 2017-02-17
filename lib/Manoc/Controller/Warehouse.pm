@@ -22,6 +22,10 @@ __PACKAGE__->config(
     },
     class                   => 'ManocDB::Warehouse',
     form_class              => 'Manoc::Form::Warehouse',
+
+    edit_page_title         => 'Edit warehouse',
+    create_page_title       => 'New warehouse',
+
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
@@ -67,7 +71,7 @@ sub delete_object {
 
     my $warehouse = $c->stash->{'object'};
 
-    if ( $warehouse->devices->count ) {
+    if ( $warehouse->hwassets->count ) {
         $c->flash( error_msg => "Warehouse is not empty. Cannot be deleted." );
         return undef;
     }

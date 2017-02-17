@@ -12,7 +12,7 @@ extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::Horizontal';
 with 'Manoc::Form::TraitFor::SaveButton';
 
-has '+name'        => ( default => 'form-rack' );
+has '+name'        => ( default => 'form-warehouse' );
 has '+html_prefix' => ( default => 1 );
 
 has_field 'name' => (

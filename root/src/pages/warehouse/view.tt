@@ -11,12 +11,12 @@ use_table = 1
 -%]
 [% page.toolbar = BLOCK -%]
 <div class="btn-group">
-  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('rack/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('warehouse/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
-        <a href="[%c.uri_for_action('rack/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
+        <a href="[%c.uri_for_action('warehouse/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a>
       </li>
     </ul>
 </div><!-- end btn group -->

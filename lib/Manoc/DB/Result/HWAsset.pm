@@ -147,7 +147,7 @@ __PACKAGE__->might_have(
     serverhw => 'Manoc::DB::Result::ServerHW',
     'hwasset_id',
     {
-        cascade_update => 0,
+        cascade_update => 1,
         cascade_delete => 1,
     }
 );
