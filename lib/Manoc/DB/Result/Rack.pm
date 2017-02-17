@@ -54,20 +54,11 @@ __PACKAGE__->has_many(
     { cascade_delete => 0 }
 );
 
-sub devices {
-    my $self = shift;
-
-    my $rs = $self->result_source->schema->resultset('Device');
-    $rs = $rs->search(
-        {
-            'hwasset.rack_id' => $self->id,
-        },
-        {
-            join => 'hwasset',
-        }
-    );
-    return wantarray() ? $rs->all() : $rs;
-}
+__PACKAGE__->has_many(
+    devices => 'Manoc::DB::Result::Device',
+    'rack_id',
+    { cascade_delete => 1 }
+);
 
 sub label {
     my $self = shift;
