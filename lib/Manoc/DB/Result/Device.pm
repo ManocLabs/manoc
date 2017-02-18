@@ -278,6 +278,19 @@ sub decommission {
     $guard->commit;
 }
 
+=head2 reactivate
+
+Set decommissioned to false and reset timestamp.
+
+=cut
+
+sub restore {
+    my $self = shift;
+
+    $self->decommissioned(0);
+    $self->decommission_ts(undef);
+}
+
 =head1 AUTHOR
 
 The Manoc Team

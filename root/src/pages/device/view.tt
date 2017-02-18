@@ -36,7 +36,10 @@ page.title   = 'Device ' _ object.name
   <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]">
     [% bootstrap_icon('refresh') %] Refresh Info</a>
 [% ELSE -%]
-[%# decommisioned object -%]
+[%# decommissioned object -%]
+  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('/device/restore', [object.id]) %]">
+   Restore</a>
   <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
       href="[% c.uri_for_action('/device/delete', [object.id]) %]">
   [% bootstrap_icon('trash') %] Delete</a>
