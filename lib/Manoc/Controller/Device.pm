@@ -371,6 +371,39 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->detach();
 }
 
+=head2 restore
+
+=cut
+
+sub restore : Chained('object') : PathPart('restore') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $device = $c->stash->{object};
+    $c->require_permission( $device, 'edit' );
+
+    if (! $device->decommissioned ) {
+        $c->response->redirect(
+            $c->uri_for_action( 'device/view', [ $device->id ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $device->restore;
+        $device->update();
+        $c->flash( message => "Device restored" );
+        $c->response->redirect(
+            $c->uri_for_action( 'device/view', [ $device->id ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Restore network device',
+        confirm_message => 'Restore decommissione device ' . $device->name . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
 =head1 METHODS
 
 =cut
