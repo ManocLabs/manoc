@@ -154,8 +154,15 @@ __PACKAGE__->might_have(
 
 sub server {
     my $self = shift;
-    return ( defined($self->serverhw) && defined($self->serverhw->server) );
+    $self->serverhw and return $self->serverhw->server;
+    return undef;
 }
+
+=head2 in_use
+
+Return 1 when there is an associated logical item, 0 otherwise.
+
+=cut
 
 sub in_use {
     my $self = shift;
