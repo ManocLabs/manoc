@@ -64,6 +64,24 @@ before 'create' => sub {
         $c->stash( form_defaults => \%form_defaults );
 };
 
+=head2 edit
+
+=cut
+
+
+before 'edit' => sub {
+    my ( $self, $c ) = @_;
+
+    my $object    = $c->stash->{object};
+    my $object_pk = $c->stash->{object_pk};
+
+    # decommissioned objects cannot be edited
+    if ( $object->decommissioned ) {
+        $c->res->redirect( $c->uri_for_action('server/view', [ $object_pk ] ) );
+        $c->detach();
+    }
+};
+
 =head2 decommission
 
 =cut
@@ -86,6 +104,40 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
 
     $c->response->redirect( $c->uri_for_action( 'server/view', [ $c->stash->{object_pk} ] ) );
     $c->detach();
+}
+
+
+=head2 restore
+
+=cut
+
+sub restore : Chained('object') : PathPart('restore') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $server = $c->stash->{object};
+    $c->require_permission( $server, 'edit' );
+
+    if (! $server->decommissioned ) {
+        $c->response->redirect(
+            $c->uri_for_action( 'server/view', [ $server->id ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $server->restore;
+        $server->update();
+        $c->flash( message => "Server restored" );
+        $c->response->redirect(
+            $c->uri_for_action( 'server/view', [ $server->id ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Restore server',
+        confirm_message => 'Restore decommissioned server ' . $server->label . '?',
+        template        => 'generic_confirm.tt',
+    );
 }
 
 =head1 AUTHOR

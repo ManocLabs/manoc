@@ -9,11 +9,12 @@ use warnings;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
+with 'Manoc::Form::TraitFor::Theme';
 
 has '+name'        => ( default => 'form-server-decommission' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'decommission' => (
+has_field 'submit' => (
     type           => 'Submit',
     widget         => 'ButtonTag',
     element_attr   => { class => [ 'btn', ] },
@@ -23,22 +24,35 @@ has_field 'decommission' => (
 );
 
 has_field 'serverhw_action' => (
-    label   => 'Action for associated hardware',
-    type    => 'Select',
-    widget  => 'RadioGroup',
-    options => [
+    label    => 'Action for associated hardware',
+    type     => 'Select',
+    widget   => 'RadioGroup',
+    required => 1,
+    options  => [
         { value => 'DECOMMISSION', label => 'Decommission' },
         { value => 'WAREHOUSE',    label => 'Return to warehouse' },
     ],
 );
 
 has_field 'vm_action' => (
-    label   => 'Action for associated hardware',
-    type    => 'Select',
-    widget  => 'RadioGroup',
-    options => [
+    label    => 'Action for associated virtual machine',
+    type     => 'Select',
+    widget   => 'RadioGroup',
+    required => 1,
+    options  => [
         { value => 'DECOMMISSION', label => 'Decommission' },
-        { value => 'KEEP',         label => 'Keep' },
+        { value => 'KEEP',         label => 'Deassociate' },
+    ],
+);
+
+has_field 'hostedvm_action' => (
+    label    => 'Action for hosted virtual machine',
+    type     => 'Select',
+    widget   => 'RadioGroup',
+    required => 1,
+    options  => [
+        { value => 'KEEP',       label => 'Deassociate' },
+        { value => 'RECURSIVE',  label => 'Decommission VMs and servers' },
     ],
 );
 
@@ -47,13 +61,16 @@ sub build_render_list {
 
     return unless $self->item;
 
+    my $server = $self->item;
     my @list;
 
-    $self->item->serverhw and
+    $server->serverhw and
         push @list, 'serverhw_action';
-    $self->item->vm and
+    $server->vm and
         push @list, 'vm_action';
-    push @list, "decommission", "csrf_token";
+    $server->virtual_machines and
+        push @list, 'hostedvm_action';
+    push @list, "submit", "csrf_token";
 
     return \@list;
 }
@@ -77,14 +94,21 @@ sub update_model {
                 $hw->update();
 
             }
-            elsif ($vm) {
+
+            if ($vm) {
                 my $action = $values->{vm_action};
                 $action eq 'DECOMMISSION' and
                     $vm->decommission;
                 $vm->update();
             }
 
-            $server->decommission();
+            my $recursive = 0;
+            if ($server->virtual_machines) {
+                my $action = $values->{hostedvm_action};
+                $recursive = defined($action) && $action eq 'RECURSIVE';
+            }
+
+            $server->decommission(recursive => $recursive);
             $server->update;
         }
     );
