@@ -82,6 +82,24 @@ before 'create' => sub {
     }
 };
 
+=head2 edit
+
+=cut
+
+
+before 'edit' => sub {
+    my ( $self, $c ) = @_;
+
+    my $object    = $c->stash->{object};
+    my $object_pk = $c->stash->{object_pk};
+
+    # decommissioned objects cannot be edited
+    if ( $object->is_decommissioned ) {
+        $c->res->redirect( $c->uri_for_action('serverhw/view', [ $object_pk ] ) );
+        $c->detach();
+    }
+};
+
 =head2 import_csv
 
 Import a server hardware list from a CSV file
@@ -140,6 +158,40 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->stash(
         title           => 'Decommission server hardware',
         confirm_message => 'Decommission server hardware ' . $object->label . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
+
+=head2 restore
+
+=cut
+
+sub restore : Chained('object') : PathPart('restore') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $serverhw = $c->stash->{object};
+    $c->require_permission( $serverhw, 'edit' );
+
+    if (! $serverhw->is_decommissioned ) {
+        $c->response->redirect(
+            $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $serverhw->restore;
+        $serverhw->update();
+        $c->flash( message => "Asset restored" );
+        $c->response->redirect(
+            $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Restore server hardware',
+        confirm_message => 'Restore ' . $serverhw->label . '?',
         template        => 'generic_confirm.tt',
     );
 }

@@ -74,9 +74,10 @@ my @HWASSET_PROXY_METHODS = qw(
     building rack warehouse
     is_decommissioned is_in_warehouse is_in_rack
     move_to_rack move_to_room move_to_warehouse
-    decommission
+    decommission restore
     display_location
-);
+                          );
+
 __PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
     'id',
