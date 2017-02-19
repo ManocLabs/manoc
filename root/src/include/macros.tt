@@ -126,3 +126,9 @@ $( document ).ready(function() {
 [% MACRO print_server(server) BLOCK -%]
 <a href=[% c.uri_for_action('server/view', [ server.id ]) %]>[% server.hostname | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                         Virtualmachine                            -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_vm(vm) BLOCK -%]
+<a href=[% c.uri_for_action('virtualmachine/view', [ vm.id ]) %]>[% vm.name | html %]</a>
+[%- END -%]
