@@ -40,6 +40,25 @@ __PACKAGE__->config(
 );
 
 
+=head2 edit
+
+=cut
+
+
+before 'edit' => sub {
+    my ( $self, $c ) = @_;
+
+    my $object    = $c->stash->{object};
+    my $object_pk = $c->stash->{object_pk};
+
+    # decommissioned objects cannot be edited
+    if ( $object->decommissioned ) {
+        $c->flash( message => "Cannot edit a decommissioned virtual machine" );
+        $c->res->redirect( $c->uri_for_action('virtualmachine/view', [ $object_pk ] ) );
+        $c->detach();
+    }
+};
+
 =head2 decommission
 
 =cut
@@ -73,6 +92,38 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
+=head2 restore
+
+=cut
+
+sub restore : Chained('object') : PathPart('restore') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $vm = $c->stash->{object};
+    $c->require_permission( $vm, 'edit' );
+
+    if (! $vm->decommissioned ) {
+        $c->response->redirect(
+            $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $vm->restore;
+        $vm->update();
+        $c->flash( message => "Virtual machine restored" );
+        $c->response->redirect(
+            $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Restore  virtual machine',
+        confirm_message => 'Restore decommissioned virtual machine ' . $vm->name . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
 
 =head1 AUTHOR
 

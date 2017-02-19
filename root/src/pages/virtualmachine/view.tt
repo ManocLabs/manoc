@@ -4,6 +4,7 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 
 [% page.toolbar = BLOCK -%]
+[% IF !object.decommissioned -%]
  <div class="btn-group">
     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href=[%c.uri_for_action('virtualmachine/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
@@ -13,7 +14,7 @@
          <a href=[% c.uri_for_action('virtualmachine/decommission', [object.id]) %]>
    	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
-      <li class="[% 'disabled' UNLESS  c.check_permission(object, 'delete') %]">
+      <li class="[% 'disabled' IF  c.check_permission(object, 'delete') || object.in_use %]">
          <a href=[% c.uri_for_action('virtualmachine/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
       </li>
       <li role="separator" class="divider"></li>
@@ -21,6 +22,15 @@
          <a href=[% c.uri_for_action('server/create', { vm => object.id}) %]>Create server</a>
       </li>
  </div>
+ [% ELSE -%]
+[%# decommissioned object -%]
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('virtualmachine/restore', [object.id]) %]">
+   Restore</a>
+  <a class="btn btn-danger [% 'virtualmachine' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('server/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
+[% END -%]
 [% END -%]
 
 <dl class="dl-horizontal">
@@ -33,9 +43,9 @@
   <dt>Used by</dt>
   <dd>[% print_server(object.server) IF object.server %]</dd>
   <dt>Virtual infrastructure</dt>
-  <dd>[% object.on_virtinfr | html %]</dd>
+  <dd>[% object.virtinfr | html %]</dd>
   <dt>Hypervisor</dt>
-  <dd>[% object.on_hypervisor | html %]</dd>
+  <dd>[%  print_server(object.hypervisor) %]</dd>
   <dt>RAM Memory</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>Virtual CPUs</dt>
