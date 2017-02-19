@@ -4,6 +4,7 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 
 [% page.toolbar = BLOCK -%]
+[%- IF !object.is_decommissioned -%]
  <div class="btn-group">
     <a class="btn btn-primary [% 'disabled' UNLESS  c.check_permission(object, 'delete') %]" href=[%c.uri_for_action('serverhw/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
@@ -12,7 +13,7 @@
       <li class="[% 'disabled' UNLESS c.check_permission('serverhw.create') %]">
          <a href=[% c.uri_for_action('serverhw/create', { copy => object.id }) %]>[% bootstrap_icon('duplicate') %] Duplicate</a>
       </li>
-      <li class="[% 'disabled' IF !c.check_permission(object, 'edit') || object.in_use %]">
+      <li class="[% 'disabled' UNLESS ( c.check_permission(object, 'edit') && !object.in_use ) %]">
          <a href=[% c.uri_for_action('serverhw/decommission', [object.id]) %]>
    	     [% bootstrap_icon('remove') %]Decommission</a>
       </li>
@@ -23,7 +24,16 @@
       <li class="[% 'disabled' IF NOT c.check_permission('server.create') OR object.server %]">
          <a href=[% c.uri_for_action('server/create', { serverhw => object.id}) %]>Create server</a>
       </li>
- </div>
+ </div><!-- end toolbar -->
+[% ELSE -%]
+[%# decommissioned object -%]
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('serverhw/restore', [object.id]) %]">
+   Restore</a>
+  <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('serverhw/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
+[% END -%]
 [% END -%]
 
  <dl class="dl-horizontal">
