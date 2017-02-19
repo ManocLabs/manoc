@@ -244,13 +244,6 @@ sub update_config {
     return;
 }
 
-=head2 in_use
-
-Return 0 when decommissioned, 1 otherwise.
-
-=cut
-
-sub in_use { return !shift->decommissioned }
 
 =head2 decommission([$timestamp])
 
@@ -286,6 +279,8 @@ Set decommissioned to false and reset timestamp.
 
 sub restore {
     my $self = shift;
+
+    return unless $self->decommissioned;
 
     $self->decommissioned(0);
     $self->decommission_ts(undef);

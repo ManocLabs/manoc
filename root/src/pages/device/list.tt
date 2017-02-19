@@ -38,8 +38,8 @@ page.title = 'Devices'
      </thead>
      <tbody>
 [% FOREACH d = object_list %]
-     <tr class="[% 'warning' UNLESS d.in_use %]">
-       <td>[% IF d.in_use %]In use[%ELSE%]Decommissioned[%END%]</td>
+     <tr class="[% 'warning' IF d.decommissioned %]">
+       <td>[% d.decommissioned ? "In use" : "Decommissioned" %]</td>
  	   <td>[% print_device(d) %]</td>
 	   <td>[% print_building(d.rack.building) %]</td>
    	   <td>[% d.rack.floor | html %]</td>
