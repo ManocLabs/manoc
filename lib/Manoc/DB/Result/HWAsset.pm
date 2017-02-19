@@ -154,12 +154,14 @@ __PACKAGE__->might_have(
 
 sub server {
     my $self = shift;
-    $self->serverhw and $self->serverhw->server;
+    return ( defined($self->serverhw) && defined($self->serverhw->server) );
 }
 
 sub in_use {
     my $self = shift;
-    return defined( $self->device ) || defined( $self->server );
+    return
+        ( $self->type eq TYPE_DEVICE &&  defined( $self->device ) )
+        || ( $self->type eq TYPE_SERVER && defined( $self->server ) );
 }
 
 sub is_decommissioned {
@@ -225,6 +227,15 @@ sub decommission {
     $self->location(LOCATION_DECOMMISSIONED);
     $self->locationchange_ts ||
         $self->locationchange_ts($timestamp);
+}
+
+sub restore {
+    my $self = shift;
+
+    return unless $self->location eq LOCATION_DECOMMISSIONED;
+
+    $self->location(LOCATION_WAREHOUSE);
+    $self->locationchange_ts(undef);
 }
 
 sub move_to_rack {

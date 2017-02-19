@@ -134,9 +134,21 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( $object, 'edit' );
 
-    $c->stash->{form_parameters}->{type} = $object->type;
+    # redirect serverhw to specific controller
+    if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
+        $c->res->redirect(
+            $c->uri_for_action( 'serverhw/edit', [ $object->serverhw->id ] )
+        );
+        $c->detach();
+    }
 
-    #TODO redirect to specific forms if needed
+    # decommissioned objects cannot be edited
+    if ( $object->is_decommissioned ) {
+        $c->res->redirect( $c->uri_for_action('hwasset/view', [ $object->id ] ) );
+        $c->detach();
+    }
+
+    $c->stash->{form_parameters}->{type} = $object->type;
     $c->detach('form');
 }
 
@@ -164,6 +176,80 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
 
 }
+
+
+=head2 decommission
+
+=cut
+
+
+=head2 decommission
+
+=cut
+
+sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->require_permission( $object, 'edit' );
+
+    if ($object->in_use) {
+        $c->response->redirect(
+            $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $object->decommission;
+        $object->update();
+        $c->flash( message => "Asset decommissioned" );
+        $c->response->redirect(
+            $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Decommission hardware',
+        confirm_message => 'Decommission hardware ' . $object->label . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
+=head2 restore
+
+=cut
+
+sub restore : Chained('object') : PathPart('restore') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $hwasset = $c->stash->{object};
+    $c->require_permission( $hwasset, 'edit' );
+
+    if (! $hwasset->is_decommissioned ) {
+        $c->response->redirect(
+            $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
+        $c->detach();
+    }
+
+    if ( $c->req->method eq 'POST' ) {
+        $hwasset->restore;
+        $hwasset->update();
+        $c->flash( message => "Asset restored" );
+        $c->response->redirect(
+            $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
+        $c->detach();
+    }
+
+    # show confirm page
+    $c->stash(
+        title           => 'Restore hardware asset',
+        confirm_message => 'Restore ' . $hwasset->label . '?',
+        template        => 'generic_confirm.tt',
+    );
+}
+
+
 
 =head2 vendors_js
 
