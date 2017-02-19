@@ -30,7 +30,7 @@ $device->discard_changes;
 cmp_ok(ref($device->mng_address), 'eq', 'Manoc::IPAddress::IPv4',
        "Check mng_address is a Manoc::IPAddress::IPv4" );
 
-ok($device->in_use, "New devices are marked as in use");
+ok(!$device->decommissioned, "New devices are marked as not decommisioned");
 
 ok(!defined($device->get_mng_url), "Default mng url is null");
 
@@ -62,7 +62,6 @@ ok($device->netwalker_info, "Netwalker info");
 
 $device->decommission();
 $device->discard_changes();
-ok(!$device->in_use, "Decommissioned device is no more in use");
 ok($device->decommission_ts, "Decommissioned device has a decommission TS");
 ok(!defined($device->netwalker_info), "No netwalker info for decommissioned device");
 
