@@ -32,8 +32,8 @@ page.title='Servers'
    </thead>
    <tbody>
 [% FOREACH o IN object_list %]
-   <tr>
-     <td>[% IF d.decommissioned %]Decommissioned[% ELSE %]In use[%END%]</td>
+   <tr class="[% 'warning' UNLESS o.decommissioned %]">
+     <td>[% d.decommissioned ? "Decommissioned" : "In use" %]</td>
  	 <td><a href=[% c.uri_for_action('/server/view', [o.id]) %]>[% o.hostname %]</a></td>
  	 <td>[% o.address.unpadded   %]</td>
  	 <td>[% o.os %] - [% o.os_ver %]</td>

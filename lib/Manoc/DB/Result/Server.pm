@@ -102,7 +102,7 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->belongs_to(
-    vm => 'Manoc::DB::Result::ServerHW',
+    vm => 'Manoc::DB::Result::VirtualMachine',
     'vm_id',
     {
         cascade_update => 1,
@@ -159,15 +159,17 @@ sub ram_memory {
     }
 }
 
-=head2 decommission([$timestamp])
+=head2 decommission([timestamp=>$timestamp, recursive=>[0|1]])
 
-Set decommissioned to true, update timestamp and decommission hosted VMs.
+Set decommissioned to true, update timestamp.
+When recursive option is set decommission hosted VMs and servers.
 
 =cut
 
 sub decommission {
     my $self = shift;
-    my $timestamp = shift // time();
+    my %args = @_;
+    my $timestamp = $args{timestamp} // time();
 
     $self->decommissioned and return 1;
 
@@ -178,13 +180,39 @@ sub decommission {
     $self->serverhw_id(undef);
     $self->vm_id(undef);
 
-    foreach my $vm ( $self->virtual_machines ) {
-        $vm->decommission();
+    if ($args{recursive}) {
+        foreach my $vm ( $self->virtual_machines ) {
+            $vm->server and $vm->server->decommission($timestamp);
+            $vm->decommission();
+            $vm->update;
+        }
+    } else {
+        foreach my $vm ( $self->virtual_machines ) {
+            $vm->hypervisor(undef);
+            $vm->update;
+        }
     }
     $self->update();
 
     $guard->commit;
 }
+
+=head2 restore
+
+=cut
+
+sub restore {
+    my $self = shift;
+
+    return unless $self->decommissioned;
+
+    $self->decommissioned(0);
+    $self->decommission_ts(undef);
+}
+
+=head2 label
+
+=cut
 
 sub label { shift->hostname }
 
