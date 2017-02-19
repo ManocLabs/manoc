@@ -104,7 +104,7 @@ sub label {
         $label .= ' - ' . $self->virtinfr->name;
     }
     elsif ( $self->hypervisor ) {
-        $label .= ' -' . $self->hypervisor->hostname;
+        $label .= ' - ' . $self->hypervisor->hostname;
     }
     return $label;
 }
@@ -136,6 +136,27 @@ sub decommission {
     $guard->commit;
 }
 
+=head2 restore
+
+=cut
+
+sub restore {
+    my $self = shift;
+
+    return unless $self->decommissioned;
+
+    $self->decommissioned(0);
+    $self->decommission_ts(undef);
+}
+
+=head2 in_use
+
+Return true if vm is used by a server
+
+=cut
+
 sub in_use { defined( shift->server ); }
+
+
 
 1;

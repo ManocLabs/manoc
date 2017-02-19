@@ -132,3 +132,9 @@ $( document ).ready(function() {
 [% MACRO print_vm(vm) BLOCK -%]
 <a href=[% c.uri_for_action('virtualmachine/view', [ vm.id ]) %]>[% vm.name | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                      Virtual infrastructure                       -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_vinfr(vi) BLOCK -%]
+<a href=[% c.uri_for_action('vinfr/view', [ vi.id ]) %]>[% vi.name | html %]</a>
+[%- END -%]
