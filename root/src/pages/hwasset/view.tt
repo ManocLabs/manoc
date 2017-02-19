@@ -3,16 +3,30 @@
 -%]
 
 [% page.toolbar = BLOCK -%]
+[%- IF !object.is_decommissioned %]
   <div class="btn-group">
      <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('hwasset/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS ( c.check_permission(object, 'edit') AND ! object.in_use ) %]">
+  	     <a href="[% c.uri_for_action('hwasset/decommission', [object.id]) %]">
+	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
       <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
          <a href="[%c.uri_for_action('hwasset/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
     </ul>
   </div><!-- end btn group -->
+  [% ELSE -%]
+[%# decommissioned object -%]
+  <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('hwasset/restore', [object.id]) %]">
+   Restore</a>
+  <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('hwasset/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
 [% END -%]
+[% END -%][%# end toolbar block -%]
 
  <dl class="dl-horizontal">
   <dt>Inventory number</dt>
@@ -37,6 +51,6 @@
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
-  <dt>Decommissioned</dt><dd>[% IF object.decommissioned %]Yes[% ELSE %]No[%END %]</dd>
+  <dt>Decommissioned</dt><dd>[% IF object.is_decommissioned %]Yes[% ELSE %]No[%END %]</dd>
   <dt>Used by</dt><dd>[% print_device(object.device) IF object.device %]</dd>
 </dl>
