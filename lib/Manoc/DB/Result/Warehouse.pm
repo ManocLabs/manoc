@@ -52,14 +52,14 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->has_many(
     hwassets => 'Manoc::DB::Result::HWAsset',
     'warehouse_id',
-    { cascade_delete => 0,  }
+    { cascade_delete => 0, }
 );
 
 sub label {
     my $self = shift;
-    return $self->building
-        ? $self->name . " (" . $self->building->name . ")"
-        : $self->name;
+    return
+        $self->building ? $self->name . " (" . $self->building->name . ")" :
+        $self->name;
 }
 
 1;

@@ -51,8 +51,8 @@ has_field 'hostedvm_action' => (
     widget   => 'RadioGroup',
     required => 1,
     options  => [
-        { value => 'KEEP',       label => 'Deassociate' },
-        { value => 'RECURSIVE',  label => 'Decommission VMs and servers' },
+        { value => 'KEEP',      label => 'Deassociate' },
+        { value => 'RECURSIVE', label => 'Decommission VMs and servers' },
     ],
 );
 
@@ -103,12 +103,12 @@ sub update_model {
             }
 
             my $recursive = 0;
-            if ($server->virtual_machines) {
+            if ( $server->virtual_machines ) {
                 my $action = $values->{hostedvm_action};
                 $recursive = defined($action) && $action eq 'RECURSIVE';
             }
 
-            $server->decommission(recursive => $recursive);
+            $server->decommission( recursive => $recursive );
             $server->update;
         }
     );

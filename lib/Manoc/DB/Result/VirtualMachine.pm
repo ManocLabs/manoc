@@ -157,6 +157,4 @@ Return true if vm is used by a server
 
 sub in_use { defined( shift->server ); }
 
-
-
 1;

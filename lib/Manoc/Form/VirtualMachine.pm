@@ -82,9 +82,9 @@ has_field 'virtinfr' => (
 );
 
 has_field 'hypervisor' => (
-    type     => 'Select',
-    label    => 'Hypervisor',
-    nullable => 1,
+    type         => 'Select',
+    label        => 'Hypervisor',
+    nullable     => 1,
     empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 4 } )
 );
@@ -112,7 +112,6 @@ sub options_hypervisor {
 
     return @options;
 }
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

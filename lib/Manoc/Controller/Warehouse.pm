@@ -20,11 +20,11 @@ __PACKAGE__->config(
             PathPart => 'warehouse',
         }
     },
-    class                   => 'ManocDB::Warehouse',
-    form_class              => 'Manoc::Form::Warehouse',
+    class      => 'ManocDB::Warehouse',
+    form_class => 'Manoc::Form::Warehouse',
 
-    edit_page_title         => 'Edit warehouse',
-    create_page_title       => 'New warehouse',
+    edit_page_title   => 'Edit warehouse',
+    create_page_title => 'New warehouse',
 
     enable_permission_check => 1,
     view_object_perm        => undef,

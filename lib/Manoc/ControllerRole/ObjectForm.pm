@@ -73,7 +73,7 @@ sub form : Private {
         $json_data->{form_ok} = $process_status ? 1 : 0;
 
         if ($process_status) {
-            $c->stash->{object_id}     = $form->item_id;
+            $c->stash->{object_id} = $form->item_id;
 
             $json_data->{message}      = $self->object_updated_message;
             $json_data->{redirect}     = $self->get_form_success_url($c);

@@ -180,8 +180,7 @@ override validate_model => sub {
     my $count = $rs->search($unique_filter)->count;
 
     if ( $count > 0 ) {
-        my $field_error =
-            $field->get_message('unique') ||
+        my $field_error = $field->get_message('unique') ||
             $field->unique_message ||
             'Duplicate value for [_1]';
         $field->add_error( $field_error, $field->loc_label );

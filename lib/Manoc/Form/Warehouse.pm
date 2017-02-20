@@ -54,9 +54,11 @@ has_field 'notes' => (
     row      => 3,
 );
 
-has '+dependency' => ( default => sub { [
-     ['floor', 'building' ],] }
-  );
+has '+dependency' => (
+    default => sub {
+        [ [ 'floor', 'building' ], ];
+    }
+);
 
 sub options_building {
     my $self = shift;
@@ -73,8 +75,6 @@ sub options_building {
     }
     return @selections;
 }
-
-
 
 =head1 AUTHOR
 

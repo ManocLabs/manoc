@@ -39,12 +39,10 @@ __PACKAGE__->has_many(
     'building_id', { cascade_delete => 0 }
 );
 
-
 __PACKAGE__->has_many(
     warehouses => 'Manoc::DB::Result::Warehouse',
     'building_id', { cascade_delete => 0 }
 );
-
 
 sub label {
     my $self  = shift;

@@ -21,13 +21,10 @@ has '+html_prefix' => ( default => 1 );
 has '+item_class' => ( default => 'IPNetwork' );
 
 sub build_render_list {
-    [ 'network_block',
-      'name',
-      'vlan_id',
-      'default_gw',
-      'description',
-      'notes',
-      'save', 'csrf_token' ];
+    [
+        'network_block', 'name',  'vlan_id', 'default_gw',
+        'description',   'notes', 'save',    'csrf_token'
+    ];
 }
 
 has_block 'network_block' => (
@@ -80,10 +77,10 @@ has_field 'vlan_id' => (
 );
 
 has_field 'default_gw' => (
-    apply      => [IPAddress],
-    size       => 15,
-    required   => 0,
-    label      => 'Default GW',
+    apply        => [IPAddress],
+    size         => 15,
+    required     => 0,
+    label        => 'Default GW',
     element_attr => { placeholder => 'Default gateway (optional)' }
 
 );
@@ -132,7 +129,7 @@ override validate_model => sub {
 
     if ( $values->{default_gw} && $values->{address} && $values->{prefix} ) {
         my $net = Manoc::IPAddress::IPv4Network->new( $values->{address}, $values->{prefix} );
-        my $gw  = Manoc::IPAddress::IPv4->new($values->{default_gw});
+        my $gw = Manoc::IPAddress::IPv4->new( $values->{default_gw} );
         $net->contains_address($gw) or
             $self->field('default_gw')->add_error('Gateway outside network');
     }

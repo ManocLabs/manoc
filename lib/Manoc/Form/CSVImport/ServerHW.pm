@@ -12,25 +12,28 @@ has '+required_columns' => (
 );
 
 has '+optional_columns' => (
-    default => sub { [
-        qw/
-          n_procs n_cores_proc proc_freq  inventory serial
-          storage1_size storage2_size notes
-          /
-    ] }
+    default => sub {
+        [
+            qw/
+                n_procs n_cores_proc proc_freq  inventory serial
+                storage1_size storage2_size notes
+                /
+        ];
+    }
 
 );
 
 has '+column_names' => (
-    default => sub { {
-            'cpu'         =>        'cpu_model',
-            'ram'         =>        'ram_memory',
-            'processors'  =>        'n_procs',
-            'cores'       =>        'n_cores_proc',
-            'frequency'   =>        'proc_freq',
-            'storage 1'   =>        'storage1_size',
-            'storage 2'   =>        'storage2_size',
-        }
+    default => sub {
+        {
+            'cpu'        => 'cpu_model',
+            'ram'        => 'ram_memory',
+            'processors' => 'n_procs',
+            'cores'      => 'n_cores_proc',
+            'frequency'  => 'proc_freq',
+            'storage 1'  => 'storage1_size',
+            'storage 2'  => 'storage2_size',
+        };
     }
 );
 

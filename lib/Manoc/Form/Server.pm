@@ -106,8 +106,8 @@ has_block 'serverhw_block' => (
 );
 
 has_field 'serverhw' => (
-    type  => 'Select',
-    label => 'Hardware',
+    type         => 'Select',
+    label        => 'Hardware',
     empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 8 } )
 );
@@ -130,8 +130,8 @@ has_block 'vm_block' => (
 );
 
 has_field 'vm' => (
-    type  => 'Select',
-    label => 'Virtual Machine',
+    type         => 'Select',
+    label        => 'Virtual Machine',
     empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 2, input => 8 } )
 );
@@ -164,8 +164,8 @@ has_field 'is_hypervisor' => (
 );
 
 has_field 'hosted_virtinfr' => (
-    type  => 'Select',
-    label => 'Virtual Infrastructure',
+    type         => 'Select',
+    label        => 'Virtual Infrastructure',
     empty_select => '--- Choose ---',
     bs_block_field_helper( { label => 3, input => 4 } )
 );
@@ -187,11 +187,12 @@ sub options_serverhw {
     my @rs = $self->schema->resultset('ServerHW')->unused()->all();
     my @selections;
 
-    if (my $s = $self->item->serverhw) {
-        push @selections,  {
+    if ( my $s = $self->item->serverhw ) {
+        push @selections,
+            {
             label => $s->label,
             value => $s->id
-        };
+            };
     }
 
     foreach my $b (@rs) {
@@ -213,11 +214,12 @@ sub options_vm {
 
     my @selections;
 
-    if (my $vm = $self->item->vm) {
-        push @selections,  {
+    if ( my $vm = $self->item->vm ) {
+        push @selections,
+            {
             label => $vm->label,
             value => $vm->id
-        };
+            };
     }
 
     my @rs = $self->schema->resultset('VirtualMachine')->unused()->search(

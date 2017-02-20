@@ -88,7 +88,6 @@ sub delete_object {
         return undef;
     }
 
-
     return $rack->delete;
 }
 

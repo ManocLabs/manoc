@@ -244,7 +244,6 @@ sub update_config {
     return;
 }
 
-
 =head2 decommission([$timestamp])
 
 Set decommissioned to true, update timestamp and deassociate nwinfo if

@@ -6,7 +6,7 @@ use warnings;
 
 __PACKAGE__->config(
     sep_char => ",",
-    binary => 1,
+    binary   => 1,
 );
 
 =head1 NAME
