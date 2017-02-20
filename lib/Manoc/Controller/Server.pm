@@ -68,7 +68,6 @@ before 'create' => sub {
 
 =cut
 
-
 before 'edit' => sub {
     my ( $self, $c ) = @_;
 
@@ -77,7 +76,7 @@ before 'edit' => sub {
 
     # decommissioned objects cannot be edited
     if ( $object->decommissioned ) {
-        $c->res->redirect( $c->uri_for_action('server/view', [ $object_pk ] ) );
+        $c->res->redirect( $c->uri_for_action( 'server/view', [$object_pk] ) );
         $c->detach();
     }
 };
@@ -106,7 +105,6 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->detach();
 }
 
-
 =head2 restore
 
 =cut
@@ -117,9 +115,8 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     my $server = $c->stash->{object};
     $c->require_permission( $server, 'edit' );
 
-    if (! $server->decommissioned ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'server/view', [ $server->id ] ) );
+    if ( !$server->decommissioned ) {
+        $c->response->redirect( $c->uri_for_action( 'server/view', [ $server->id ] ) );
         $c->detach();
     }
 
@@ -127,8 +124,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         $server->restore;
         $server->update();
         $c->flash( message => "Server restored" );
-        $c->response->redirect(
-            $c->uri_for_action( 'server/view', [ $server->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'server/view', [ $server->id ] ) );
         $c->detach();
     }
 

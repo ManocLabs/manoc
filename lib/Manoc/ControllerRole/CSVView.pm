@@ -7,17 +7,16 @@ use namespace::autoclean;
 requires 'object', 'object_list';
 
 has csv_columns => (
-    is  => 'rw',
-    isa => 'ArrayRef[Str]',
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
     default => sub { [] },
 );
 
 has csv_column_alias => (
-    is  => 'rw',
-    isa => 'HashRef[Str]',
+    is      => 'rw',
+    isa     => 'HashRef[Str]',
     default => sub { {} },
 );
-
 
 =head2 prepare_json_object
 
@@ -48,10 +47,9 @@ sub list_csv : Chained('object_list') : PathPart('csv') : Args(0) {
     $filename = $c->namespace();
     $filename =~ s|/|_|;
 
-    if ( ! @{$self->csv_columns} ) {
-        my @column_names =
-            $c->stash->{resultset}->result_source->columns;
-        $self->csv_columns(\@column_names);
+    if ( !@{ $self->csv_columns } ) {
+        my @column_names = $c->stash->{resultset}->result_source->columns;
+        $self->csv_columns( \@column_names );
     }
 
     my @headers;
@@ -62,10 +60,10 @@ sub list_csv : Chained('object_list') : PathPart('csv') : Args(0) {
 
     my @data = map { $self->prepare_csv_object( $c, $_ ) } @{ $c->stash->{object_list} };
     $c->stash(
-        columns  => \@headers,
-        data     => \@data,
-        filename => $filename,
-        suffix   => '.csv',
+        columns      => \@headers,
+        data         => \@data,
+        filename     => $filename,
+        suffix       => '.csv',
         current_view => 'CSV',
     );
 }

@@ -163,7 +163,6 @@ sub options_warehouse {
     return @selections;
 }
 
-
 sub options_rack {
     my $self = shift;
     return unless $self->schema;

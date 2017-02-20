@@ -33,17 +33,15 @@ __PACKAGE__->config(
     class      => 'ManocDB::VirtualMachine',
     form_class => 'Manoc::Form::VirtualMachine',
 
-    create_page_title       => 'Create virtual machine',
-    edit_page_title         => 'Edit virtual machine',
+    create_page_title => 'Create virtual machine',
+    edit_page_title   => 'Edit virtual machine',
 
     json_columns => [ 'id', 'name' ],
 );
 
-
 =head2 edit
 
 =cut
-
 
 before 'edit' => sub {
     my ( $self, $c ) = @_;
@@ -54,7 +52,7 @@ before 'edit' => sub {
     # decommissioned objects cannot be edited
     if ( $object->decommissioned ) {
         $c->flash( message => "Cannot edit a decommissioned virtual machine" );
-        $c->res->redirect( $c->uri_for_action('virtualmachine/view', [ $object_pk ] ) );
+        $c->res->redirect( $c->uri_for_action( 'virtualmachine/view', [$object_pk] ) );
         $c->detach();
     }
 };
@@ -69,7 +67,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( 'virtualmachine', 'edit' );
 
-    if ($object->in_use) {
+    if ( $object->in_use ) {
         $c->response->redirect(
             $c->uri_for_action( 'virtualmachine/view', [ $c->stash->{object_pk} ] ) );
         $c->detach();
@@ -102,9 +100,8 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     my $vm = $c->stash->{object};
     $c->require_permission( $vm, 'edit' );
 
-    if (! $vm->decommissioned ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
+    if ( !$vm->decommissioned ) {
+        $c->response->redirect( $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
         $c->detach();
     }
 
@@ -112,8 +109,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         $vm->restore;
         $vm->update();
         $c->flash( message => "Virtual machine restored" );
-        $c->response->redirect(
-            $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'virtualmachine/view', [ $vm->id ] ) );
         $c->detach();
     }
 

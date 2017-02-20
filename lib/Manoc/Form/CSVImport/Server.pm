@@ -5,47 +5,45 @@ use namespace::autoclean;
 
 extends 'Manoc::Form::CSVImport';
 
-has_field 'create_vm' => (
-);
+has_field 'create_vm' => ();
 
-has_field 'create_hw' => (
-);
+has_field 'create_hw' => ();
 
 has '+required_columns' => (
     default => sub {
-        [ qw/hostname address/ ]
+        [qw/hostname address/];
     }
 );
 
 has '+optional_columns' => (
-    default => sub { [
-        qw/
-          os os_ver
-          /
-    ] }
+    default => sub {
+        [
+            qw/
+                os os_ver
+                /
+        ];
+    }
 
 );
 
 has '+column_names' => (
-    default => sub { {
-            'cpu'         =>        'cpu_model',
-            'ram'         =>        'ram_memory',
-            'processors'  =>        'n_procs',
-            'cores'       =>        'n_cores_proc',
-            'frequency'   =>        'proc_freq',
-            'storage 1'   =>        'storage1_size',
-            'storage 2'   =>        'storage2_size',
-        }
+    default => sub {
+        {
+            'cpu'        => 'cpu_model',
+            'ram'        => 'ram_memory',
+            'processors' => 'n_procs',
+            'cores'      => 'n_cores_proc',
+            'frequency'  => 'proc_freq',
+            'storage 1'  => 'storage1_size',
+            'storage 2'  => 'storage2_size',
+        };
     }
 );
 
-has '+lookup_columns' => (
-    default => sub { [ "serial", [ qw /vendor inventory/ ] ] }
-);
-
+has '+lookup_columns' => ( default => sub { [ "serial", [qw /vendor inventory/] ] } );
 
 sub find_entry {
-    my ($self, $data) = @_;
+    my ( $self, $data ) = @_;
 
     my $rs = $self->resultset;
     if ( exists $data->{serial} ) {

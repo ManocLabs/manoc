@@ -167,8 +167,8 @@ When recursive option is set decommission hosted VMs and servers.
 =cut
 
 sub decommission {
-    my $self = shift;
-    my %args = @_;
+    my $self      = shift;
+    my %args      = @_;
     my $timestamp = $args{timestamp} // time();
 
     $self->decommissioned and return 1;
@@ -180,13 +180,14 @@ sub decommission {
     $self->serverhw_id(undef);
     $self->vm_id(undef);
 
-    if ($args{recursive}) {
+    if ( $args{recursive} ) {
         foreach my $vm ( $self->virtual_machines ) {
             $vm->server and $vm->server->decommission($timestamp);
             $vm->decommission();
             $vm->update;
         }
-    } else {
+    }
+    else {
         foreach my $vm ( $self->virtual_machines ) {
             $vm->hypervisor(undef);
             $vm->update;

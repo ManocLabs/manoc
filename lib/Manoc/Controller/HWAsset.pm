@@ -113,9 +113,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my $object = $c->stash->{object};
 
     if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
-        $c->res->redirect(
-            $c->uri_for_action( 'serverhw/view', [ $object->serverhw->id ] )
-        );
+        $c->res->redirect( $c->uri_for_action( 'serverhw/view', [ $object->serverhw->id ] ) );
         $c->detach();
     }
 
@@ -136,15 +134,13 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
 
     # redirect serverhw to specific controller
     if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
-        $c->res->redirect(
-            $c->uri_for_action( 'serverhw/edit', [ $object->serverhw->id ] )
-        );
+        $c->res->redirect( $c->uri_for_action( 'serverhw/edit', [ $object->serverhw->id ] ) );
         $c->detach();
     }
 
     # decommissioned objects cannot be edited
     if ( $object->is_decommissioned ) {
-        $c->res->redirect( $c->uri_for_action('hwasset/view', [ $object->id ] ) );
+        $c->res->redirect( $c->uri_for_action( 'hwasset/view', [ $object->id ] ) );
         $c->detach();
     }
 
@@ -177,11 +173,9 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
 }
 
-
 =head2 decommission
 
 =cut
-
 
 =head2 decommission
 
@@ -193,7 +187,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( $object, 'edit' );
 
-    if ($object->in_use) {
+    if ( $object->in_use ) {
         $c->response->redirect(
             $c->uri_for_action( 'hwasset/view', [ $c->stash->{object_pk} ] ) );
         $c->detach();
@@ -226,9 +220,8 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     my $hwasset = $c->stash->{object};
     $c->require_permission( $hwasset, 'edit' );
 
-    if (! $hwasset->is_decommissioned ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
+    if ( !$hwasset->is_decommissioned ) {
+        $c->response->redirect( $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
         $c->detach();
     }
 
@@ -236,8 +229,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         $hwasset->restore;
         $hwasset->update();
         $c->flash( message => "Asset restored" );
-        $c->response->redirect(
-            $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'hwasset/view', [ $hwasset->id ] ) );
         $c->detach();
     }
 
@@ -248,8 +240,6 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         template        => 'generic_confirm.tt',
     );
 }
-
-
 
 =head2 vendors_js
 

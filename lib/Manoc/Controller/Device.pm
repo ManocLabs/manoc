@@ -8,9 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "Manoc::ControllerRole::CommonCRUD";
-with "Manoc::ControllerRole::JSONView" => {
-    -excludes => 'get_json_object',
-};
+with "Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
 with "Manoc::ControllerRole::CSVView";
 
 use Text::Diff;
@@ -72,11 +70,11 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my $device = $c->stash->{'object'};
 
     # uplinks
-    $c->stash(uplinks => [ map { $_->interface } $device->uplinks->all() ] );
+    $c->stash( uplinks => [ map { $_->interface } $device->uplinks->all() ] );
 
     #Unused interfaces
-    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused($device->id);
-    $c->stash(unused_ifaces => \@unused_ifaces);
+    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused( $device->id );
+    $c->stash( unused_ifaces => \@unused_ifaces );
 
     # prepare template
     $c->stash( template => 'device/view.tt' );
@@ -113,8 +111,8 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
         my $lc_if = lc( $r->interface );
 
         push @iface_info, {
-            controller   => $controller,                # for sorting
-            port         => $port,                      # for sorting
+            controller   => $controller,                                  # for sorting
+            port         => $port,                                        # for sorting
             interface    => $r->interface,
             speed        => $r->speed || 'n/a',
             up           => $r->up || 'n/a',
@@ -130,10 +128,11 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
             has_notes    => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
         };
     }
-    @iface_info = sort { $a->{controller} cmp $b->{controller} || $a->{port} cmp $b->{port} } @iface_info;
+    @iface_info =
+        sort { $a->{controller} cmp $b->{controller} || $a->{port} cmp $b->{port} } @iface_info;
 
-    $c->stash->{no_wrapper}  = 1;
-    $c->stash->{iface_info}  = \@iface_info;
+    $c->stash->{no_wrapper} = 1;
+    $c->stash->{iface_info} = \@iface_info;
 }
 
 =head2 neighs
@@ -141,7 +140,6 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
 Called via xhr by view
 
 =cut
-
 
 sub neighs : Chained('object') : PathPart('neighs') : Args(0) {
     my ( $self, $c ) = @_;
@@ -151,13 +149,13 @@ sub neighs : Chained('object') : PathPart('neighs') : Args(0) {
 
     my @neighs =
         map +{
-            expired        => time - $_->last_seen > $time_limit,
-            local_iface    => $_->from_interface,
-            to_device      => $_->to_device,
-            to_device_info => $_->to_device_info,
-            remote_id      => $_->remote_id,
-            remote_type    => $_->remote_type,
-            date           => $_->last_seen,
+        expired        => time - $_->last_seen > $time_limit,
+        local_iface    => $_->from_interface,
+        to_device      => $_->to_device,
+        to_device_info => $_->to_device_info,
+        remote_id      => $_->remote_id,
+        remote_type    => $_->remote_type,
+        date           => $_->last_seen,
         },
         $device->neighs( {}, { prefetch => 'to_device_info' } )->all();
 
@@ -381,9 +379,8 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     my $device = $c->stash->{object};
     $c->require_permission( $device, 'edit' );
 
-    if (! $device->decommissioned ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'device/view', [ $device->id ] ) );
+    if ( !$device->decommissioned ) {
+        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
         $c->detach();
     }
 
@@ -391,8 +388,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         $device->restore;
         $device->update();
         $c->flash( message => "Device restored" );
-        $c->response->redirect(
-            $c->uri_for_action( 'device/view', [ $device->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
         $c->detach();
     }
 

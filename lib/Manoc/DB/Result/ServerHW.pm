@@ -64,7 +64,6 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraints( [qw/hwasset_id/] );
 
-
 my @HWASSET_PROXY_ATTRS = qw(
     location
     vendor model serial inventory
@@ -76,7 +75,7 @@ my @HWASSET_PROXY_METHODS = qw(
     move_to_rack move_to_room move_to_warehouse
     decommission restore
     display_location
-                          );
+);
 
 __PACKAGE__->has_one(
     hwasset => 'Manoc::DB::Result::HWAsset',
@@ -94,7 +93,6 @@ __PACKAGE__->might_have(
         cascade_delete => 1,
     }
 );
-
 
 sub new {
     my ( $self, @args ) = @_;
@@ -133,16 +131,15 @@ sub insert {
     # pre-create hwasset if needed
     # so that hwasset_id is not null
     my $hwasset = $self->hwasset;
-    if ( ! $hwasset->in_storage ) {
+    if ( !$hwasset->in_storage ) {
         $hwasset->insert;
-        $self->hwasset_id($hwasset->id);
+        $self->hwasset_id( $hwasset->id );
     }
 
     $self->next::method(@args);
     $guard->commit;
     return $self;
 }
-
 
 sub cores {
     my ($self) = @_;

@@ -166,9 +166,8 @@ Return 1 when there is an associated logical item, 0 otherwise.
 
 sub in_use {
     my $self = shift;
-    return
-        ( $self->type eq TYPE_DEVICE &&  defined( $self->device ) )
-        || ( $self->type eq TYPE_SERVER && defined( $self->server ) );
+    return ( $self->type eq TYPE_DEVICE && defined( $self->device ) ) ||
+        ( $self->type eq TYPE_SERVER && defined( $self->server ) );
 }
 
 sub is_decommissioned {
@@ -189,16 +188,17 @@ sub is_in_rack {
 sub location {
     my $self = shift;
 
-    if ( @_ ) {
+    if (@_) {
         my $location = shift;
-        if ( $location eq LOCATION_DECOMMISSIONED )  {
+        if ( $location eq LOCATION_DECOMMISSIONED ) {
             $self->rack(undef);
             $self->rack_level(undef);
             $self->building(undef);
             $self->floor(undef);
             $self->room(undef);
             $self->warehouse(undef);
-        } elsif ( $location eq LOCATION_WAREHOUSE ) {
+        }
+        elsif ( $location eq LOCATION_WAREHOUSE ) {
             my $warehouse = $self->warehouse;
             if ($warehouse) {
                 $self->building( $warehouse->building );
@@ -207,10 +207,12 @@ sub location {
             }
             $self->rack(undef);
             $self->rack_level(undef);
-        } elsif ( $location eq LOCATION_ROOM ) {
+        }
+        elsif ( $location eq LOCATION_ROOM ) {
             $self->rack(undef);
             $self->warehouse(undef);
-        } elsif ( $location eq LOCATION_RACK ) {
+        }
+        elsif ( $location eq LOCATION_RACK ) {
             my $rack = $self->rack;
             if ($rack) {
                 $self->building( $rack->building );
@@ -218,7 +220,8 @@ sub location {
                 $self->floor( $rack->floor );
             }
             $self->warehouse(undef);
-        } else {
+        }
+        else {
             croak "Invalid location value";
             return;
         }
@@ -293,9 +296,9 @@ sub display_location {
     my $location = $self->_location;
 
     if ( $location eq LOCATION_WAREHOUSE ) {
-        return defined($self->warehouse)
-            ? "Warehouse - " . $self->warehouse->name
-            : "Warehouse";
+        return
+            defined( $self->warehouse ) ? "Warehouse - " . $self->warehouse->name :
+            "Warehouse";
     }
 
     if ( $location eq LOCATION_RACK ) {
@@ -325,9 +328,8 @@ sub insert {
     my ( $self, @args ) = @_;
 
     $self->location or
-        $self->location( LOCATION_WAREHOUSE );
+        $self->location(LOCATION_WAREHOUSE);
     $self->next::method(@args);
-
 
     if ( !defined( $self->inventory ) ) {
         $self->generate_inventory;

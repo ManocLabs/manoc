@@ -38,20 +38,16 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
 
-    create_page_title       => 'Create server hardware',
-    edit_page_title         => 'Edit server hardware',
+    create_page_title => 'Create server hardware',
+    edit_page_title   => 'Edit server hardware',
 
     json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
-        prefetch => [ { 'hwasset' => { 'rack' => 'building' }}, 'server' ]
+        prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'server' ]
     },
 
-
-    csv_columns             =>
-        [
-            'inventory', 'model', 'vendor', 'serial', 'cpu_model', 'proc_freq',
-        ],
+    csv_columns => [ 'inventory', 'model', 'vendor', 'serial', 'cpu_model', 'proc_freq', ],
 
 );
 
@@ -86,7 +82,6 @@ before 'create' => sub {
 
 =cut
 
-
 before 'edit' => sub {
     my ( $self, $c ) = @_;
 
@@ -95,7 +90,7 @@ before 'edit' => sub {
 
     # decommissioned objects cannot be edited
     if ( $object->is_decommissioned ) {
-        $c->res->redirect( $c->uri_for_action('serverhw/view', [ $object_pk ] ) );
+        $c->res->redirect( $c->uri_for_action( 'serverhw/view', [$object_pk] ) );
         $c->detach();
     }
 };
@@ -139,7 +134,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     my $object = $c->stash->{object};
     $c->require_permission( 'serverhw', 'edit' );
 
-    if ($object->in_use) {
+    if ( $object->in_use ) {
         $c->response->redirect(
             $c->uri_for_action( 'serverhw/view', [ $c->stash->{object_pk} ] ) );
         $c->detach();
@@ -162,7 +157,6 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
-
 =head2 restore
 
 =cut
@@ -173,9 +167,8 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     my $serverhw = $c->stash->{object};
     $c->require_permission( $serverhw, 'edit' );
 
-    if (! $serverhw->is_decommissioned ) {
-        $c->response->redirect(
-            $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
+    if ( !$serverhw->is_decommissioned ) {
+        $c->response->redirect( $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
         $c->detach();
     }
 
@@ -183,8 +176,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         $serverhw->restore;
         $serverhw->update();
         $c->flash( message => "Asset restored" );
-        $c->response->redirect(
-            $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
+        $c->response->redirect( $c->uri_for_action( 'serverhw/view', [ $serverhw->id ] ) );
         $c->detach();
     }
 
