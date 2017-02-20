@@ -9,6 +9,7 @@ package Manoc::Manifold::SNMP::Info;
 use Moose;
 
 with 'Manoc::ManifoldRole::Base';
+with 'Manoc::ManifoldRole::NetDevice';
 with 'Manoc::Logger::Role';
 
 use SNMP::Info;

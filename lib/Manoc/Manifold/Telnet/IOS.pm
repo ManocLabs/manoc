@@ -10,6 +10,7 @@ package Manoc::Manifold::Telnet::IOS;
 use Moose;
 
 with 'Manoc::ManifoldRole::Base';
+with 'Manoc::ManifoldRole::NetDevice';
 with 'Manoc::Logger::Role';
 
 use Try::Tiny;

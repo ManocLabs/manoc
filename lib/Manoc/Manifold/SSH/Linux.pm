@@ -4,10 +4,11 @@
 # it under the same terms as Perl itself.
 
 package Manoc::Manifold::SSH::Linux;
-
 use Moose;
-
 with 'Manoc::ManifoldRole::SSH';
+with 'Manoc::ManifoldRole::Base';
+
+use Try::Tiny;
 
 around '_build_username' => sub {
     my $orig = shift;
@@ -16,7 +17,6 @@ around '_build_username' => sub {
     return $self->$orig() || 'root';
 };
 
-use Try::Tiny;
 
 sub _build_boottime {
     my $self = shift;

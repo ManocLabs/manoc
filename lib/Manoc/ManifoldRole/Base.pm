@@ -113,30 +113,6 @@ has 'mat' => (
 );
 sub _build_mat { }
 
-has 'neighbors' => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_neighbors',
-);
-sub _build_neighbors { }
-
-has 'vtp_domain' => (
-    is      => 'ro',
-    isa     => 'Maybe[Str]',
-    lazy    => 1,
-    builder => '_build_vtp_domain',
-);
-sub _build_vtp_domain { }
-
-has vtp_database => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_vtp_database'
-);
-sub _build_vtp_database { }
-
 no Moose::Role;
 1;
 # Local Variables:

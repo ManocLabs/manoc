@@ -5,7 +5,6 @@
 package Manoc::ManifoldRole::SSH;
 
 use Moose::Role;
-with 'Manoc::ManifoldRole::Base';
 with 'Manoc::Logger::Role';
 
 use Net::OpenSSH;

@@ -15,9 +15,10 @@ ok(Manoc::Manifold->load_namespace, 'load manifold names');
     my %manifolds = map { $_ => 1 } Manoc::Manifold->manifolds;
 
     ok($manifolds{'SNMP::Simple'}, 'SNMP Simple manifold found');
-    ok($manifolds{'SNMP::Info'}, 'SNMP Info manifold found');
-    ok($manifolds{'Telnet::IOS'}, 'Telnet::IOS manifold found');
-    ok($manifolds{'SSH::Linux'},  'Linux::SSH manifold found');
+    ok($manifolds{'SNMP::Info'},   'SNMP Info manifold found');
+    ok($manifolds{'Telnet::IOS'},  'Telnet::IOS manifold found');
+    ok($manifolds{'SSH::Linux'},   'Linux SSH manifold found');
+    ok($manifolds{'SSH::Linux'},   'Fortinet SSH manifold found');
 }
 
 cmp_ok( Manoc::Manifold->name_mappings->{'SNMP::Info'}, 'eq',
