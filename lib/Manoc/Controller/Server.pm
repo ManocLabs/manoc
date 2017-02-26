@@ -2,8 +2,6 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-use strict;
-
 package Manoc::Controller::Server;
 use Moose;
 use namespace::autoclean;
@@ -14,6 +12,8 @@ with 'Manoc::ControllerRole::CommonCRUD';
 
 use Manoc::Form::Server;
 use Manoc::Form::Server::Decommission;
+use Manoc::Form::ServerNWInfo;
+
 
 =head1 NAME
 
@@ -135,6 +135,62 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         template        => 'generic_confirm.tt',
     );
 }
+
+
+=head2 nwinfo
+
+=cut
+
+sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{object}, 'netwalker_config' );
+
+    my $server_id = $c->stash->{object_pk};
+
+    my $nwinfo = $c->model('ManocDB::ServerNWinfo')->find($server_id);
+    $nwinfo or $nwinfo = $c->model('ManocDB::ServerNWInfo')->new_result( {} );
+
+    my $form = Manoc::Form::ServerNWInfo->new(
+        {
+            server => $server_id,
+            ctx    => $c,
+        }
+    );
+    $c->stash( form => $form );
+    return unless $form->process(
+        params => $c->req->params,
+        item   => $nwinfo
+    );
+
+    $c->response->redirect( $c->uri_for_action( 'server/view', [$server_id] ) );
+    $c->detach();
+}
+
+=head2 refresh
+
+=cut
+
+sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
+    my ( $self, $c ) = @_;
+    my $id = $c->stash->{object}->id;
+
+    my $config = Manoc::Netwalker::Config->new( $c->config->{Netwalker} || {} );
+    my $client = Manoc::Netwalker::ControlClient->new( config => $config );
+
+    my $status = $client->enqueue_server($id);
+
+    if ( !$status ) {
+        $c->flash( error_msg => "An error occurred while scheduling server refresh" );
+    }
+    else {
+        $c->flash( message => "Device refresh scheduled" );
+    }
+
+    $c->response->redirect( $c->uri_for_action( '/server/view', [$id] ) );
+    $c->detach();
+}
+
 
 =head1 AUTHOR
 

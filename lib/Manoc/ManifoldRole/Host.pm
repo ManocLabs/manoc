@@ -11,8 +11,24 @@ has 'installed_sw' => (
     lazy    => 1,
     builder => '_build_installed_sw',
 );
-sub _build_installed_sw { [] }
+requires '_build_installed_sw';
 
+has 'cpu_model' => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_build_cpu_model',
+);
+requires '_build_cpu_model';
+
+
+has 'cpu_count' => (
+    is      => 'ro',
+    isa     => 'Num',
+    lazy    => 1,
+    builder => '_build_cpu_count',
+);
+requires '_build_cpu_count';
 
 
 no Moose::Role;

@@ -17,15 +17,15 @@ has config => (
     required => 1
 );
 
-has device_manager => (
+has poller => (
     is       => 'ro',
-    isa      => 'Manoc::Netwalker::Manager::Device',
+    isa      => 'Manoc::Netwalker::Poller::Workers',
     required => 1,
 );
 
-has discover_manager => (
+has discoverer => (
     is       => 'ro',
-    isa      => 'Manoc::Netwalker::Manager::Discover',
+    isa      => 'Manoc::Netwalker::Discover::Workers',
     required => 1,
 );
 
@@ -165,7 +165,7 @@ sub on_client_error {
 sub command_status {
     my $self = shift;
 
-    my $scoreboard = $self->manager->scoreboard;
+    my $scoreboard = $self->poller->scoreboard_status;
     my $output     = "OK " . scalar( keys(%$scoreboard) ) . " elements";
 
     while ( my ( $k, $v ) = each(%$scoreboard) ) {
@@ -180,9 +180,14 @@ sub command_enqueue {
 
     $type = lc($type);
     if ( $type eq 'device' ) {
-        $self->device_manager->enqueue_device($id);
+        $self->poller->enqueue_device($id);
         return "OK added device $id";
     }
+    if ( $type eq 'server' ) {
+        $self->poller->enqueue_server($id);
+        return "OK added server $id";
+    }
+
     return "ERR unknown object $type";
 }
 

@@ -3,13 +3,13 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::Netwalker::DeviceTask;
+package Manoc::Netwalker::Poller::DeviceTask;
 
 use Moose;
 use Try::Tiny;
 
 with 'Manoc::Logger::Role';
-use Manoc::Netwalker::TaskReport;
+use Manoc::Netwalker::Poller::TaskReport;
 use Manoc::Manifold;
 
 use Manoc::IPAddress::IPv4;

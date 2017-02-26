@@ -123,6 +123,15 @@ __PACKAGE__->has_many(
     { 'foreign.hypervisor_id' => 'self.id' },
 );
 
+__PACKAGE__->might_have(
+    netwalker_info => 'Manoc::DB::Result::ServerNWInfo',
+    { 'foreign.server_id' => 'self.id' },
+    {
+        cascade_delete => 1,
+        cascade_copy   => 1,
+    }
+);
+
 sub virtual_servers {
     my $self = shift;
 

@@ -1,0 +1,4 @@
+[%
+    page.title='Server ' _ object.name _ 'Netwalker Config'
+%]
+[% form.render %]

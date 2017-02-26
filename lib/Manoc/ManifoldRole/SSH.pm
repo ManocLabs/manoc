@@ -16,6 +16,14 @@ has 'username' => (
     builder => '_build_username'
 );
 
+has 'use_ssh_key' => (
+    is      => 'rw',
+    isa     => 'Maybe[Bool]',
+    lazy    => 1,
+    builder => '_build_key_path'
+);
+
+
 has 'key_path' => (
     is      => 'rw',
     isa     => 'Maybe[Str]',
