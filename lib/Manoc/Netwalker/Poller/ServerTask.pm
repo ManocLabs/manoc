@@ -272,7 +272,11 @@ sub update_server_info {
     $nw_entry->serial( $source->serial );
 
     if ( $source->does('Manoc::ManifoldRole::Host') ) {
-        $self->log->debug("Source implements host",  $source->cpu_model);
+        $self->log->debug("Source implements host");
+
+        $nw_entry->kernel( $source->kernel );
+        $nw_entry->kernel_ver( $source->kernel_ver );
+
         $nw_entry->cpu_model( $source->cpu_model );
         $nw_entry->n_procs( $source->cpu_count );
     }

@@ -5,6 +5,14 @@
 package Manoc::ManifoldRole::NetDevice;
 use Moose::Role;
 
+has 'arp_table' => (
+    is      => 'ro',
+    isa     => 'Maybe[HashRef]',
+    lazy    => 1,
+    builder => '_build_arp_table',
+);
+requires '_build_arp_table';
+
 has 'neighbors' => (
     is      => 'ro',
     isa     => 'Maybe[HashRef]',
@@ -28,6 +36,23 @@ has vtp_database => (
     builder => '_build_vtp_database'
 );
 sub _build_vtp_database { }
+
+
+has 'ifstatus_table' => (
+    is      => 'ro',
+    isa     => 'Maybe[HashRef]',
+    lazy    => 1,
+    builder => '_build_ifstatus_table',
+);
+requires '_build_ifstatus_table';
+
+has 'mat' => (
+    is      => 'ro',
+    isa     => 'Maybe[HashRef]',
+    lazy    => 1,
+    builder => '_build_mat',
+);
+requires '_build_mat';
 
 no Moose::Role;
 1;

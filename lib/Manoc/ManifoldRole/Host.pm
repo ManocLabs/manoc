@@ -21,7 +21,6 @@ has 'cpu_model' => (
 );
 requires '_build_cpu_model';
 
-
 has 'cpu_count' => (
     is      => 'ro',
     isa     => 'Num',
@@ -29,6 +28,22 @@ has 'cpu_count' => (
     builder => '_build_cpu_count',
 );
 requires '_build_cpu_count';
+
+has kernel => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_kernel',
+);
+requires '_build_kernel';
+
+has kernel_ver => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_kernel_ver',
+);
+requires '_build_kernel_ver';
 
 
 no Moose::Role;

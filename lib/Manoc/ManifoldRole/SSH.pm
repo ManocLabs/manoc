@@ -72,6 +72,15 @@ sub cmd {
     return $session->capture(@_);
 }
 
+sub cmd_online {
+    my $out = shift->cmd(@_);
+    $out =~ s/\r?\n//o;
+    return $out;
+}
+
+
+
+
 sub connect {
     my $self = shift;
 

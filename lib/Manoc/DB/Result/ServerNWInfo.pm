@@ -98,6 +98,21 @@ __PACKAGE__->add_columns(
         default_value => 'NULL',
     },
 
+    kernel => {
+        data_type     => 'varchar',
+        size          => 32,
+        default_value => 'NULL',
+        is_nullable   => 1,
+        default_value => 'NULL',
+    },
+    kernel_ver => {
+        data_type     => 'varchar',
+        size          => 32,
+        is_nullable   => 1,
+        default_value => 'NULL',
+    },
+
+
     ram_memory => {
         data_type   => 'int',
         is_nullable => 1,

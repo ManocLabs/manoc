@@ -63,6 +63,10 @@
 [% SET nwinfo = object.netwalker_info -%]
 	<dt>Detected OS</dt>
 	<dd>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
+    [% IF nwinfo.kernel -%]
+    <dt>Kernel</dt>
+   	<dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]</dd>
+    [% END -%]
 	<dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
   	<dt>Host name</dt><dd>[% nwinfo.name | html %]</dd>
 	<dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
