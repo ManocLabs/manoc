@@ -35,58 +35,69 @@
 [% END -%]
 [% END -%]
 
-<div class="panel panel-default">
-  <div class="panel-body">
-    <dl class="dl-horizontal">
-    <dt>Hostname</dt><dd>[% object.hostname %] </dd>
-    <dt>Address</dt><dd>[% print_ip(object.address) %] </dd>
-	<dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
-    [% IF object.decommissioned -%]
-     <dt>Decommissioned</dt>
-     <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
-    [% END -%]
-    [% IF object.serverhw -%]
-    <dt>Server Hardware</dt><dd>[% print_serverhw(object.serverhw) %]</dd>
-    <dt>Hypervisor</dt><dd>[% object.is_hypervisor ? "Yes" : "No" %]</dd>
-    [% END -%]
-    [% IF object.vm -%]
-    <dt>On Virtual Machine</dt><dd>[% print_vm(object.vm) %]</dd>
-    [% END -%]
-    </dl>
-  </div><!-- panel body -->
-</div><!-- panel -->
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    [% bootstrap_nav_tab("general", "General", 1) -%]
+    [% bootstrap_nav_tab("vm", "Virtual machines", 0) IF object.virtual_machines -%]
+    [% bootstrap_nav_tab("software", "Software", 0) -%]
+</ul>
 
-<div class="panel panel-default">
-  <div class="panel-body">
-    <dl class="dl-horizontal">
-    [% IF object.netwalker_info -%]
-[% SET nwinfo = object.netwalker_info -%]
-	<dt>Detected OS</dt>
-	<dd>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
-    [% IF nwinfo.kernel -%]
-    <dt>Kernel</dt>
-   	<dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]</dd>
-    [% END -%]
-	<dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
-  	<dt>Host name</dt><dd>[% nwinfo.name | html %]</dd>
-	<dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
-    <dt>Model<dt><dd>[% nwinfo.model | html %]</dd>
-    <dt>Serial<dt><dd>[% nwinfo.serial | html %]</dd>
-    <dt>CPU<dt>
-    <dd>[% IF nwinfo.n_procs %][% nwinfo.n_procs | html %] x [% END %][% nwinfo.cpu_model | html %]</dd>
-	<dt>Fetch packages<dt>
-	<dd>[% nwinfo.get_packages ? 'Yes' : 'No' %]</dd>
-[% ELSE -%]
-       	<dt>Netwalker</dt>
-	<dd>No netwalker configuration found.</dd>
-[% END -%]
-    </dl>
-  </div><!-- panel body -->
-</div><!-- panel -->
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="general">
 
-[% IF object.virtual_machines -%]
-<div class="panel panel-default">
-  <div class="panel-body">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+          <dt>Hostname</dt><dd>[% object.hostname %] </dd>
+          <dt>Address</dt><dd>[% print_ip(object.address) %] </dd>
+	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
+          [% IF object.decommissioned -%]
+          <dt>Decommissioned</dt>
+          <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+          [% END -%]
+          [% IF object.serverhw -%]
+          <dt>Server Hardware</dt><dd>[% print_serverhw(object.serverhw) %]</dd>
+          <dt>Hypervisor</dt><dd>[% object.is_hypervisor ? "Yes" : "No" %]</dd>
+          [% END -%]
+          [% IF object.vm -%]
+          <dt>On Virtual Machine</dt><dd>[% print_vm(object.vm) %]</dd>
+          [% END -%]
+      </dl>
+    </div><!-- panel body -->
+  </div><!-- panel -->
+
+  <div class="panel panel-default">
+      <div class="panel-body">
+          <dl class="dl-horizontal">
+              [% IF object.netwalker_info -%]
+              [% SET nwinfo = object.netwalker_info -%]
+  	          <dt>Host name</dt>
+              <dd  [% 'class="text-warning"' UNLESS nwinfo.name == object.hostname %]>[% nwinfo.name | html %]</dd>
+	          <dt>Detected OS</dt>
+	          <dd [% 'class="text-warning"' UNLESS nwinfo.os == object.os %]>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
+              [% IF nwinfo.kernel -%]
+              <dt>Kernel</dt>
+   	          <dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]</dd>
+              [% END -%]
+	          <dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
+	          <dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
+              <dt>Model<dt><dd>[% nwinfo.model | html %]</dd>
+              <dt>Serial<dt><dd>[% nwinfo.serial | html %]</dd>
+              <dt>CPU<dt>
+                  <dd>[% IF nwinfo.n_procs %][% nwinfo.n_procs | html %] x [% END %][% nwinfo.cpu_model | html %]</dd>
+	          <dt>Fetch packages<dt>
+	              <dd>[% nwinfo.get_packages ? 'Yes' : 'No' %]</dd>
+                  [% ELSE -%]
+       	      <dt>Netwalker</dt>
+	          <dd>No netwalker configuration found.</dd>
+              [% END -%]
+          </dl>
+      </div><!-- panel body -->
+  </div><!-- panel -->
+  </div><!-- tab panel -->
+
+  [% IF object.virtual_machines -%]
+  <div role="tabpanel" class="tab-pane" id="vm">
   <table class="table">
   <thead>
     <th>Name</th>
@@ -105,7 +116,26 @@
   [% END -%]
   </tbody>
   </table>
-  </div><!-- panel body -->
-</div><!-- panel -->
+  </div><!-- tab panel -->
+  [% END -%]
 
-[% END -%]
+  <div role="tabpanel" class="tab-pane" id="software">
+      <table class="table">
+          <thead>
+	          <tr>
+	              <th>Name</th>
+	              <th>Version</th>
+	          </tr>
+          </thead>
+          <tbody>
+	          [% FOREACH p IN object.installed_sw_pkgs  %]
+	          <tr>
+                  <td>[% p.software_pkg.name %]</td>
+                  <td>[% p.version %]</td>
+	          </tr>
+	          [% END %]
+          </tbody>
+      </table>
+  </div> <!-- tab paneò software -->
+
+</div><!-- tab content -->
