@@ -8,8 +8,8 @@ package Manoc::Manifold::SSH::Fortigate;
 use Moose;
 with 'Manoc::ManifoldRole::Base';
 with 'Manoc::ManifoldRole::NetDevice';
+with 'Manoc::ManifoldRole::FetchConfig';
 with 'Manoc::ManifoldRole::SSH';
-
 
 use Try::Tiny;
 use File::Temp qw/ tempfile  /;
