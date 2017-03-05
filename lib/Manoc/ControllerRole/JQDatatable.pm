@@ -77,8 +77,12 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
     my $row_callback = $c->stash->{'datatable_row_callback'} ||
         $self->datatable_row_callback;
 
+    my $total_rows = $rs->count();
+
     # create  search filter (WHERE clause)
     my $search_filter = {};
+    my $search_attrs = { %{ $self->datatable_search_options } };
+
     if ($search) {
         $search_filter = [];
 
@@ -87,10 +91,11 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
             $c->log->debug("$col like $search");
         }
     }
-
-    my $total_rows = $rs->count();
-
-    my $search_attrs = { %{ $self->datatable_search_options } };
+    if ($search_callback) {
+        ( $search_filter, $search_attrs ) =
+            $self->$search_callback( $c, $search_filter, $search_attrs );
+    }
+    my $filtered_rows = $rs->search_rs( $search_filter, $search_attrs )->count();
 
     # paging (LIMIT clause)
     if ($length) {
@@ -102,6 +107,7 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
         $c->log->debug("page = $page length = $length");
     }
 
+    # sorting
     my $sort_column_i = $c->request->param('order[0][column]');
     if ( defined($sort_column_i) ) {
         my $column = $col_names->[$sort_column_i];
@@ -111,15 +117,8 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
         $c->log->debug("order by $column $dir");
     }
 
-    if ($search_callback) {
-        ( $search_filter, $search_attrs ) =
-            $self->$search_callback( $c, $search_filter, $search_attrs );
-    }
-
+    #  execute the search and populate results
     my $search_rs = $rs->search_rs( $search_filter, $search_attrs );
-    my $filtered_rows = $search_rs->count();
-
-    # search
     my @rows;
     while ( my $item = $search_rs->next ) {
         my $row;
