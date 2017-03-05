@@ -1,0 +1,41 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Installed software'
+-%]
+
+<table class="table" id="software_list">
+   <thead>
+     <tr>
+        <th>Name</th>
+        <th>Servers</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+  $("#software_list").dataTable( {
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":  {
+      "url":  "[% c.uri_for_action('softwarepkg/datatable_source') %]",
+   },
+   "columns":      [
+                     { 'data' : 'name',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='"+oData.link+"'>"+oData.name+"</a>");
+                         }
+                     },
+                     { 'data' : 'n_servers' },
+   ],
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+ });
+});
+
+[% END %]
+[% js_scripts.push(fragment) -%]

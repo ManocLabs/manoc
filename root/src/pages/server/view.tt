@@ -1,3 +1,6 @@
+[% META
+   use_table=1
+-%]
 [%
    page.title='Server ' _ object.hostname
 -%]
@@ -120,7 +123,7 @@
   [% END -%]
 
   <div role="tabpanel" class="tab-pane" id="software">
-      <table class="table">
+      <table class="table" id="software_list">
           <thead>
 	          <tr>
 	              <th>Name</th>
@@ -130,12 +133,28 @@
           <tbody>
 	          [% FOREACH p IN object.installed_sw_pkgs  %]
 	          <tr>
-                  <td>[% p.software_pkg.name %]</td>
+                  <td>[% print_softwarepkg(p.software_pkg) %]</td>
                   <td>[% p.version %]</td>
 	          </tr>
 	          [% END %]
           </tbody>
       </table>
-  </div> <!-- tab paneò software -->
+  </div> <!-- tab panel software -->
+
 
 </div><!-- tab content -->
+[% capture = BLOCK -%]
+ $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+    } );
+ $('#software_list').DataTable( {
+       "responsive" : true,
+        scrollY:        400,
+        scrollCollapse: true,
+         "dom": "<'row'<'col-sm-8'<'toolbar'>><'col-sm-4'f>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-6'i><'col-sm-6'p>>"
+    } );
+
+[% END -%]
+[% js_scripts.push(capture) -%]
