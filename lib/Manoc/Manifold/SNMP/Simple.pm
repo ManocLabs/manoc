@@ -9,6 +9,8 @@ package Manoc::Manifold::SNMP::Simple;
 use Moose;
 
 with 'Manoc::ManifoldRole::Base';
+with 'Manoc::ManifoldRole::Host';
+
 with 'Manoc::Logger::Role';
 
 use Net::SNMP 6.0 qw( :snmp DEBUG_ALL ENDOFMIBVIEW );
@@ -111,6 +113,15 @@ sub connect {
     return 1;
 }
 
+
+
+#----------------------------------------------------------------------#
+#
+#                 SNMP scalar and table declaration
+#
+#----------------------------------------------------------------------#
+
+
 sub has_snmp_scalar {
     my ( $name, %options ) = @_;
 
@@ -155,7 +166,7 @@ sub has_snmp_table {
         has $attr_name => (
             is      => 'ro',
             lazy    => 1,
-            builder => "_build_${attr_name}"
+            builder => $builder_name,
         );
 
         {
@@ -163,7 +174,7 @@ sub has_snmp_table {
             *{$builder_name} = sub {
                 my $self = shift;
                 $self->_mib_read_tablerow( $col_oid, $munger );
-                }
+            }
         }
     }
 }
@@ -203,6 +214,14 @@ has_snmp_table 'hrDeviceTable' => (
             }
         ],
         'hrDeviceErrors' => 6,
+    },
+);
+
+has_snmp_table 'hrProcessorTable' => (
+    oid     => "$HOST_RESOURCES_MIB_OID.3.3",
+    index   => 'hrDeviceIndex',
+    columns => {
+        'hrProcessorLoad'  => 2,
     },
 );
 
@@ -330,9 +349,59 @@ sub _build_vendor {
 
 sub _build_serial {
     my $self = shift;
-    my $info = $self->snmp_info;
-    return $info->serial;
+    return undef;
 }
+
+sub  _build_cpu_count {
+    my $self = shift;
+
+    my $procLoad = $self->snmp_hrProcessorLoad;
+
+    return scalar(keys(%$procLoad));
+}
+
+sub _build_cpu_model { "Unkown" }
+
+sub _build_kernel { undef }
+
+sub _build_kernel_ver { undef }
+
+
+has 'package_name_parser' => (
+    is       => 'rw',
+    isa      => 'Ref',
+    lazy     => 1,
+    builder  => '_build_package_name_parser',
+);
+
+sub _build_package_name_parser {
+    my $self = shift;
+
+    my $os = $self->os;
+
+    if ( $os eq 'Linux' ) {
+        return sub {
+            my $pkg = shift;
+
+            # redhat name, version release platform
+            $pkg =~ /^(.+)-([^-]+)-([^-]+)\.(.*)$/ and
+                return [ $1, $2 ];
+            return [ $pkg, undef ];
+        };
+    }
+
+    return sub { [ shift, undef ] };
+}
+
+sub _build_installed_sw {
+    my $self = shift;
+
+    my $installed = $self->snmp_hrSWInstalledName;
+    my $parser = $self->package_name_parser;
+
+    return [ map  { $parser->($_) } values(%$installed) ];
+}
+
 
 #----------------------------------------------------------------------#
 #

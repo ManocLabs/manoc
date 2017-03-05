@@ -197,9 +197,33 @@ sub _build_arp_table {
     return \%arp_table;
 }
 
-# TODO use local package manager
+
 sub _build_installed_sw {
-    return [];
+    my $self = shift;
+
+    my @list;
+
+    if ( $self->session->test('rpm --version') ) {
+        $self->log->debug("Using rpm to fetch installed software");
+
+        my @data = $self->cmd('rpm --queryformat "%{NAME} %{VERSION}\n" -qa');
+        foreach my $line (@data) {
+            chomp($line);
+            my ($pkg, $version) = split /\s+/, $line;
+            push @list, [ $pkg, $version ];
+        }
+    } elsif ( $self->session->test('opkg info opkg') ) {
+        $self->log->debug("Using opkg to fetch installed software");
+
+        my @data = $self->cmd('opkg list');
+        foreach my $line (@data) {
+            chomp($line);
+            my ($pkg, $version) = split /\s+-\s+/, $line;
+            push @list, [ $pkg, $version ];
+        }
+    }
+
+    return \@list;
 }
 
 no Moose;

@@ -15,7 +15,7 @@ requires '_build_installed_sw';
 
 has 'cpu_model' => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => 'Maybe[Str]',
     lazy    => 1,
     builder => '_build_cpu_model',
 );
@@ -23,7 +23,7 @@ requires '_build_cpu_model';
 
 has 'cpu_count' => (
     is      => 'ro',
-    isa     => 'Num',
+    isa     => 'Maybe[Num]',
     lazy    => 1,
     builder => '_build_cpu_count',
 );

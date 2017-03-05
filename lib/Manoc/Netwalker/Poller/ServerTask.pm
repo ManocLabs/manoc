@@ -238,6 +238,8 @@ sub update {
 
     $self->update_server_info;
 
+    $nwinfo->get_packages and
+        $self->update_packages;
 
     $nwinfo->update();
     return 1;
@@ -279,6 +281,7 @@ sub update_server_info {
 
         $nw_entry->cpu_model( $source->cpu_model );
         $nw_entry->n_procs( $source->cpu_count );
+
     }
 
     $nw_entry->boottime( $source->boottime || 0 );
@@ -292,9 +295,22 @@ sub update_packages {
     my $self = shift;
 
     my $source = $self->source;
-    my $entry  = $self->server_entry;
-    my $schema = $self->schema;
+    return unless $source->does('Manoc::ManifoldRole::Host');
 
+    my $schema  = $self->schema;
+    my $server  = $self->server_entry;
+
+    my $pkgs    = $source->installed_sw;
+
+    $server->installed_sw_pkgs->delete;
+    foreach my $p (@$pkgs) {
+        my ($name, $version) = @$p;
+
+        my $pkg = $schema->resultset('SoftwarePkg')->find_or_create({name => $name});
+        $server->update_or_create_related(
+            installed_sw_pkgs => { software_pkg => $pkg, version => $version }
+        );
+    }
 }
 
 
