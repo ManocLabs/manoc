@@ -25,8 +25,29 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( ['name'] );
 
-__PACKAGE__->has_many( server_swpkg  => 'Manoc::DB::Result::ServerSWPkg', 'software_pkg_id' );
-__PACKAGE__->many_to_many( servers => 'map_user_role', 'server' );
+__PACKAGE__->has_many(
+    server_swpkg  => 'Manoc::DB::Result::ServerSWPkg',
+    'software_pkg_id'
+);
+
+sub count_servers_by_version {
+    my $self = shift;
+
+    $self->server_swpkg->search(
+        {},
+        {
+            select   => [
+                'version',
+                {
+                    count => 'server_id',
+                }
+            ],
+            as       => [qw/ version n_servers /],
+            group_by => [ 'version' ],
+        });
+}
+
+__PACKAGE__->many_to_many( servers => 'server_swpkg', 'server' );
 
 =head1 NAME
 

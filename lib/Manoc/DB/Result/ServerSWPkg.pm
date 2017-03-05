@@ -42,13 +42,14 @@ __PACKAGE__->belongs_to(
 
 =head1 NAME
 
-Manoc::DB::Result::UserRole - A model object representing the JOIN between Users and
-Roles.
+Manoc::DB::Result::ServerSWPkg - A model object representing the JOIN
+between Software and Server.
 
 =head1 DESCRIPTION
 
-This is an object that represents a row in the 'user_roles' table of your
-application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
+This is an object that represents a mapping between servers and
+softwarepkg in the application database.  It uses DBIx::Class (aka,
+DBIC) to do ORM.
 
 =cut
 
