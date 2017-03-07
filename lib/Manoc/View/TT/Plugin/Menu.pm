@@ -209,7 +209,7 @@ sub _permission_check {
     my ( $c, $item ) = @_;
 
     $item->{permission} or return 1;
-    return $c->check_permission( $item->{permission} );
+    return $c->user && $c->check_permission( $item->{permission} );
 }
 
 =head1 SEE ALSO
