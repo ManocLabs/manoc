@@ -61,8 +61,7 @@ __PACKAGE__->config(
 before 'create' => sub {
     my ( $self, $c ) = @_;
 
-    my $copy_id = $c->req->query_parameters->{'copy'};
-    if ($copy_id) {
+    if ( my $copy_id = $c->req->query_parameters->{'copy'} ) {
         my $original = $c->stash->{resultset}->find($copy_id);
         if ($original) {
             $c->log->debug("copy server from $copy_id");
@@ -76,6 +75,23 @@ before 'create' => sub {
             $c->stash( form_defaults => \%cols );
         }
     }
+
+    if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
+        my $nwinfo = $c->model('ManocDB::ServerNWInfo')->find($nwinfo_id);
+        if ( $nwinfo ) {
+            my %cols;
+            $cols{model}      = $nwinfo->model;
+            $cols{vendor}     = $nwinfo->vendor;
+            $cols{serial}     = $nwinfo->serial;
+            $cols{n_procs}    = $nwinfo->n_procs;
+            $cols{cpu_model}  = $nwinfo->cpu_model;
+            $cols{ram_memory} = $nwinfo->ram_memory;
+
+            $c->stash( form_defaults => \%cols );
+        }
+    }
+
+
 };
 
 =head2 edit

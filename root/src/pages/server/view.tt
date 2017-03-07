@@ -17,6 +17,7 @@
          <a href="[% c.uri_for_action('/server/nwinfo', [object.id]) %]">
 	     [% bootstrap_icon('cog') %] Netwalker config</a>
       </li>
+
        <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
   	     <a href="[% c.uri_for_action('server/decommission', [object.id]) %]">
 	     [% bootstrap_icon('remove') %]Decommission</a>
@@ -74,13 +75,31 @@
           <dl class="dl-horizontal">
               [% IF object.netwalker_info -%]
               [% SET nwinfo = object.netwalker_info -%]
+
+              [% SET mismatch =  nwinfo.name != object.hostname -%]
   	          <dt>Host name</dt>
-              <dd  [% 'class="text-warning"' UNLESS nwinfo.name == object.hostname %]>[% nwinfo.name | html %]</dd>
+              <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.name | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="hostname">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
+
+              [% SET mismatch = nwinfo.os != object.os -%]
 	          <dt>Detected OS</dt>
-	          <dd [% 'class="text-warning"' UNLESS nwinfo.os == object.os %]>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
+	          <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.os | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
+
+             [% SET mismatch = nwinfo.os_ver != object.os_ver -%]
+	          <dt>Detected OS Version</dt>
+              <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.os_ver | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os_ver">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
               [% IF nwinfo.kernel -%]
               <dt>Kernel</dt>
-   	          <dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]</dd>
+   	          <dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]
+              </dd>
               [% END -%]
 	          <dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
 	          <dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
@@ -88,9 +107,10 @@
               <dt>Serial<dt><dd>[% nwinfo.serial | html %]</dd>
               <dt>CPU<dt>
                   <dd>[% IF nwinfo.n_procs %][% nwinfo.n_procs | html %] x [% END %][% nwinfo.cpu_model | html %]</dd>
+              <dt>RAM</dt><dd>[% nwinfo.ram_memory | html %]</dd>
 	          <dt>Fetch packages<dt>
 	              <dd>[% nwinfo.get_packages ? 'Yes' : 'No' %]</dd>
-                  [% ELSE -%]
+              [% ELSE -%]
        	      <dt>Netwalker</dt>
 	          <dd>No netwalker configuration found.</dd>
               [% END -%]
@@ -144,11 +164,14 @@
 
 </div><!-- tab content -->
 [% capture = BLOCK -%]
- $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+$(function() {
+
+$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
         $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
     } );
+
  $('#software_list').DataTable( {
-       "responsive" : true,
+       "responsive"  : true,
         scrollY:        400,
         scrollCollapse: true,
          "dom": "<'row'<'col-sm-8'<'toolbar'>><'col-sm-4'f>>" +
@@ -156,5 +179,20 @@
           "<'row'<'col-sm-6'i><'col-sm-6'p>>"
     } );
 
+
+$('a[data-manoc-action="from-nwinfo"]').on( 'click', function (e) {
+  $.post({
+    url: '[% c.uri_for_action("/server/update_from_nwinfo", [object.id]) %]',
+    data: {
+      'what': $(this).attr('data-manoc-what'),
+      ['csrf_token']: '[% c.get_token %]'
+    },
+    success: function() {
+        $('#content-wrapper').load(" #content");
+    }
+  });
+});
+
+});
 [% END -%]
 [% js_scripts.push(capture) -%]

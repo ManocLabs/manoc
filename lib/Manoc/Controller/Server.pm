@@ -37,6 +37,8 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+
+    find_object_options     => { prefetch => { installed_sw_pkgs => 'software_pkg' } }
 );
 
 =head2 create
@@ -189,6 +191,35 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
 
     $c->response->redirect( $c->uri_for_action( '/server/view', [$id] ) );
     $c->detach();
+}
+
+=head2 update_fromnwinfo
+
+=cut
+
+sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $server = $c->stash->{object};
+    $c->require_permission( $server, 'edit' );
+
+    my $response = {};
+    $response->{success} = 0;
+
+    if ( !$server->decommissioned && defined( $server->netwalker_info ) &&
+             $c->req->method eq 'POST' )
+        {
+        my $nwinfo = $server->netwalker_info;
+        my $what   = lc($c->req->params->{what});
+        $what eq 'hostname' and $server->hostname($nwinfo->name);
+        $what eq 'os'       and $server->os($nwinfo->os);
+        $what eq 'os_ver'   and $server->os_ver($nwinfo->os_ver);
+        $server->update();
+        $response->{success} = 1;
+    }
+
+    $c->stash( json_data => $response );
+    $c->forward('View::JSON');
 }
 
 
