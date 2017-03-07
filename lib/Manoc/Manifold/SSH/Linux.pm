@@ -159,18 +159,38 @@ sub _build_cpuinfo {
 
     my $count = 0;
     my $model = 'Unknwown';
+    my $freq  = 0;
 
     foreach my $line (@data) {
         $count++     if $line =~ /processor\s+:\s+(\d+)/;
         $model = $1  if $line =~ /model name\s+:\s+(.+?)$/;
+        $freq  = $1  if $line =~ /cpu MHz\s+:\s+(\d+)(\.\d+)=$/
     }
 
     return {
         count => $count,
-        model => $model
+        model => $model,
+        freq  => $freq,
     };
 }
 
+sub _build_ram_memory {
+    my $self = shift;
+
+    my @data;
+    try {
+        @data = $self->cmd('/bin/cat /proc/meminfo');
+    }
+    catch {
+        $self->log->error( 'Error fetching cpuinfo: ', $self->get_error );
+    };
+
+    foreach my $line (@data) {
+        $line =~ /^MemTotal:\s+(\d+)\s+kB$/ and return int($1/1024);
+    }
+
+    return 0;
+}
 
 sub _build_arp_table {
     my $self = shift;

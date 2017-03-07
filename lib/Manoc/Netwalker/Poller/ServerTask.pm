@@ -281,6 +281,7 @@ sub update_server_info {
 
         $nw_entry->cpu_model( $source->cpu_model );
         $nw_entry->n_procs( $source->cpu_count );
+        $nw_entry->ram_memory( $source->ram_memory );
 
     }
 

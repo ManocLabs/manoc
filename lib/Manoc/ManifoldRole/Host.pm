@@ -45,6 +45,13 @@ has kernel_ver => (
 );
 requires '_build_kernel_ver';
 
+has ram_memory => (
+    is      => 'ro',
+    isa     => 'Maybe[Int]',
+    lazy    => 1,
+    builder => '_build_ram_memory',
+);
+requires '_build_ram_memory';
 
 no Moose::Role;
 1;

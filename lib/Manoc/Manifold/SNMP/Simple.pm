@@ -225,6 +225,14 @@ has_snmp_table 'hrProcessorTable' => (
     },
 );
 
+my $UCD_SNMP_MIB_OID = '.1.3.6.1.4.1.2021';
+has_snmp_scalar 'memTotalReal' => (
+    oid     => "${UCD_SNMP_MIB_OID}.4.5",
+);
+
+
+#----------------------------------------------------------------------#
+
 sub _build_boottime {
     my $self = shift;
     return time() - int( $self->snmp_sysUpTime / 100 );
@@ -361,6 +369,12 @@ sub  _build_cpu_count {
 }
 
 sub _build_cpu_model { "Unkown" }
+
+sub _build_ram_memory {
+    my $self = shift;
+
+    return int($self->snmp_memTotalReal) / 1024;
+}
 
 sub _build_kernel { undef }
 
