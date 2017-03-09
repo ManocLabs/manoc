@@ -25,21 +25,13 @@ has 'extra_params' => (
     default => sub { {} }
 );
 
-has 'arp_table' => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_arp_table',
-);
-sub _build_arp_table { }
-
 has name => (
     is      => 'ro',
     isa     => 'Maybe[Str]',
     lazy    => 1,
     builder => '_build_name',
 );
-sub _build_name { undef }
+requires '_build_name';
 
 has model => (
     is      => 'ro',
@@ -47,7 +39,7 @@ has model => (
     lazy    => 1,
     builder => '_build_model',
 );
-sub _build_model { undef }
+requires '_build_model';
 
 has vendor => (
     is      => 'ro',
@@ -55,7 +47,7 @@ has vendor => (
     lazy    => 1,
     builder => '_build_vendor',
 );
-sub _build_vendor { undef }
+requires '_build_vendor';
 
 has serial => (
     is      => 'ro',
@@ -63,7 +55,7 @@ has serial => (
     lazy    => 1,
     builder => '_build_serial',
 );
-sub _build_serial { undef }
+requires '_build_serial';
 
 has os => (
     is      => 'ro',
@@ -71,7 +63,7 @@ has os => (
     lazy    => 1,
     builder => '_build_os',
 );
-sub _build_os { undef }
+requires '_build_os';
 
 has os_ver => (
     is      => 'ro',
@@ -79,7 +71,7 @@ has os_ver => (
     lazy    => 1,
     builder => '_build_os_ver',
 );
-sub _build_os_ver { undef }
+requires '_build_os_ver';
 
 has 'boottime' => (
     is      => 'ro',
@@ -87,55 +79,7 @@ has 'boottime' => (
     lazy    => 1,
     builder => '_build_boottime',
 );
-sub _build_boottime { undef }
-
-has 'configuration' => (
-    is      => 'ro',
-    isa     => 'Maybe[Str]',
-    lazy    => 1,
-    builder => '_build_configuration',
-);
-sub _build_configuration { }
-
-has 'ifstatus_table' => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_ifstatus_table',
-);
-sub _build_ifstatus_table { }
-
-has 'mat' => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_mat',
-);
-sub _build_mat { }
-
-has 'neighbors' => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_neighbors',
-);
-sub _build_neighbors { }
-
-has 'vtp_domain' => (
-    is      => 'ro',
-    isa     => 'Maybe[Str]',
-    lazy    => 1,
-    builder => '_build_vtp_domain',
-);
-sub _build_vtp_domain { }
-
-has vtp_database => (
-    is      => 'ro',
-    isa     => 'Maybe[HashRef]',
-    lazy    => 1,
-    builder => '_build_vtp_database'
-);
-sub _build_vtp_database { }
+requires '_build_boottime'; { undef }
 
 no Moose::Role;
 1;

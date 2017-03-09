@@ -10,6 +10,13 @@ use namespace::autoclean;
 
 requires 'base';
 
+
+has find_object_options => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
 =head1 NAME
 
 Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
@@ -78,7 +85,8 @@ Search the object in stash->{resultset} using given the pk.
 
 sub get_object {
     my ( $self, $c, $pk ) = @_;
-    return $c->stash->{resultset}->find($pk);
+    my $options = $c->stash->{find_object_options} || $self->find_object_options;
+    return $c->stash->{resultset}->find($pk, $options);
 }
 
 1;

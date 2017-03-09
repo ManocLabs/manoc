@@ -1,0 +1,51 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Software package ' _ object.name
+-%]
+
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+
+<div id="versionfilter_wrapper" class="btn-group" role="group">
+<select name="versionfilter" class="selectpicker" id="statusfilter" data-style="btn-default btn-sm">
+[% FOREACH s IN object.count_servers_by_version -%]
+  <option value="[% s.get_column('version') | html %]">
+  [% s.get_column('version') | html%] ([% s.get_column('n_servers') | html%])
+  </option>
+[% END -%]
+</select>
+</div>
+
+</div>
+
+<table class="table" id="software_list">
+   <thead>
+     <tr>
+        <th>Version</th>
+        <th>Servers</th>
+     </tr>
+   </thead>
+   <tbody>
+[% FOREACH s IN object.server_swpkg %]
+   <tr>
+      <td>[% s.version %]</td>
+      <td>[% print_server(s.server) %]</td>
+   </tr>
+[% END %]
+   </tbody>
+</table>
+[% fragment = BLOCK -%]
+$("#software_list").DataTable( {
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+});
+$("#tabletoolbar").appendTo($("#software_list_wrapper div.toolbar").first());
+$("#versionfilter").on('changed.bs.select',
+  function(e) {
+    value = '^' +  $("#statusfilter").val() + '$';
+    value = $("#versionfilter").
+    $('#software_list').DataTable().columns(0).search(value, true, false).draw();
+  }
+);
+[% END %]
+[% js_scripts.push(fragment) -%]

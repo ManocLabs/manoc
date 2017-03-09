@@ -3,7 +3,7 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::Netwalker::DiscoverTask;
+package Manoc::Netwalker::Discover::Task;
 
 use Moose;
 with 'Manoc::Logger::Role';

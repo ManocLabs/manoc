@@ -5,7 +5,6 @@
 package Manoc::ManifoldRole::SSH;
 
 use Moose::Role;
-with 'Manoc::ManifoldRole::Base';
 with 'Manoc::Logger::Role';
 
 use Net::OpenSSH;
@@ -16,6 +15,14 @@ has 'username' => (
     lazy    => 1,
     builder => '_build_username'
 );
+
+has 'use_ssh_key' => (
+    is      => 'rw',
+    isa     => 'Maybe[Bool]',
+    lazy    => 1,
+    builder => '_build_key_path'
+);
+
 
 has 'key_path' => (
     is      => 'rw',
@@ -64,6 +71,15 @@ sub cmd {
     my $session = $self->session;
     return $session->capture(@_);
 }
+
+sub cmd_online {
+    my $out = shift->cmd(@_);
+    $out =~ s/\r?\n//o;
+    return $out;
+}
+
+
+
 
 sub connect {
     my $self = shift;

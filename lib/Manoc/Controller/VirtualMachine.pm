@@ -39,6 +39,25 @@ __PACKAGE__->config(
     json_columns => [ 'id', 'name' ],
 );
 
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
+        my $nwinfo = $c->model('ManocDB::ServerNWInfo')->find($nwinfo_id);
+        if ( $nwinfo ) {
+            my %cols;
+            $cols{vcpus}    = $nwinfo->n_procs;
+            $cols{ram_memory} = $nwinfo->ram_memory;
+            $c->stash( form_defaults => \%cols );
+        }
+    }
+};
+
+
 =head2 edit
 
 =cut

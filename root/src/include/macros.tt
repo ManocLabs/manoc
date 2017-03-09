@@ -138,3 +138,9 @@ $( document ).ready(function() {
 [% MACRO print_vinfr(vi) BLOCK -%]
 <a href=[% c.uri_for_action('vinfr/view', [ vi.id ]) %]>[% vi.name | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                         Software Pkg                              -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_softwarepkg(s) BLOCK -%]
+<a href=[% c.uri_for_action('softwarepkg/view', [ s.id ]) %]>[% s.name | html %]</a>
+[%- END -%]

@@ -13,8 +13,8 @@ use POE;
 use Manoc::Netwalker::Config;
 use Manoc::Netwalker::Control;
 use Manoc::Netwalker::Scheduler;
-use Manoc::Netwalker::Manager::Discover;
-use Manoc::Netwalker::Manager::Device;
+use Manoc::Netwalker::Poller::Workers;
+use Manoc::Netwalker::Discover::Workers;
 
 sub main {
     my $self = shift;
@@ -27,12 +27,12 @@ sub main {
 
     my $config = Manoc::Netwalker::Config->new(%config_args);
 
-    my $device_manager = Manoc::Netwalker::Manager::Device->new(
+    my $poller_workers = Manoc::Netwalker::Poller::Workers->new(
         config => $config,
         schema => $self->schema,
     );
 
-    my $discover_manager = Manoc::Netwalker::Manager::Discover->new(
+    my $discover_workers = Manoc::Netwalker::Discover::Workers->new(
         config => $config,
         schema => $self->schema,
     );
@@ -41,13 +41,13 @@ sub main {
         config => $config,
         schema => $self->schema,
     );
-    $scheduler->add_workers_manager($device_manager);
-    $scheduler->add_workers_manager($discover_manager);
+    $scheduler->add_workers($poller_workers);
+    $scheduler->add_workers($discover_workers);
 
     my $control = Manoc::Netwalker::Control->new(
-        config           => $config,
-        device_manager   => $device_manager,
-        discover_manager => $discover_manager,
+        config     => $config,
+        poller     => $poller_workers,
+        discoverer => $discover_workers,
     );
 
     POE::Kernel->run();

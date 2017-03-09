@@ -3,13 +3,13 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 
-package Manoc::Netwalker::DeviceTask;
+package Manoc::Netwalker::Poller::DeviceTask;
 
 use Moose;
 use Try::Tiny;
 
 with 'Manoc::Logger::Role';
-use Manoc::Netwalker::TaskReport;
+use Manoc::Netwalker::Poller::TaskReport;
 use Manoc::Manifold;
 
 use Manoc::IPAddress::IPv4;
@@ -589,10 +589,16 @@ sub update_config {
     my $config_date     = $device_entry->get_config_date;
     my $update_interval = $self->config->config_update_interval;
     my $timestamp       = $self->timestamp;
+    my $config_source   = $self->config_source;
+
+    unless ( $config_source->does('Manoc::ManifoldRole::FetchConfig') ) {
+        $self->log->warnings( "Config source does not support fetchconfig" );
+        return;
+    }
 
     if ( !defined($config_date) || $timestamp > $config_date + $update_interval ) {
         $self->log->info( "Fetching configuration from ", $device_entry->mng_address );
-        my $config_text = $self->config_source->configuration;
+        my $config_text = $config_source->configuration;
         if ( !defined($config_text) ) {
             $self->log->error( "Cannot fetch configuration from ", $device_entry->mng_address );
             return;

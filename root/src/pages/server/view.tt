@@ -1,3 +1,6 @@
+[% META
+   use_table=1
+-%]
 [%
    page.title='Server ' _ object.hostname
 -%]
@@ -10,6 +13,11 @@
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit_nwinfo') %]">
+         <a href="[% c.uri_for_action('/server/nwinfo', [object.id]) %]">
+	     [% bootstrap_icon('cog') %] Netwalker config</a>
+      </li>
+
        <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
   	     <a href="[% c.uri_for_action('server/decommission', [object.id]) %]">
 	     [% bootstrap_icon('remove') %]Decommission</a>
@@ -18,6 +26,8 @@
          <a href="[%c.uri_for_action('server/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
     </ul>
   </div><!-- end btn group -->
+    <a class="btn btn-default" href="[% c.uri_for_action('/server/refresh', [object.id]) %]">
+    [% bootstrap_icon('refresh') %] Refresh Info</a>
 [% ELSE -%]
 [%# decommissioned object -%]
    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
@@ -29,30 +39,88 @@
 [% END -%]
 [% END -%]
 
-<div class="panel panel-default">
-  <div class="panel-body">
-    <dl class="dl-horizontal">
-    <dt>Hostname</dt><dd>[% object.hostname %] </dd>
-    <dt>Address</dt><dd>[% print_ip(object.address) %] </dd>
-	<dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
-    [% IF object.decommissioned -%]
-     <dt>Decommissioned</dt>
-     <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
-    [% END -%]
-    [% IF object.serverhw -%]
-    <dt>Server Hardware</dt><dd>[% print_serverhw(object.serverhw) %]</dd>
-    <dt>Hypervisor</dt><dd>[% object.is_hypervisor ? "Yes" : "No" %]</dd>
-    [% END -%]
-    [% IF object.vm -%]
-    <dt>On Virtual Machine</dt><dd>[% print_vm(object.vm) %]</dd>
-    [% END -%]
-    </dl>
-  </div><!-- panel body -->
-</div><!-- panel -->
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    [% bootstrap_nav_tab("general", "General", 1) -%]
+    [% bootstrap_nav_tab("vm", "Virtual machines", 0) IF object.virtual_machines -%]
+    [% bootstrap_nav_tab("software", "Software", 0) -%]
+</ul>
 
-[% IF object.virtual_machines -%]
-<div class="panel panel-default">
-  <div class="panel-body">
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="general">
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+          <dt>Hostname</dt><dd>[% object.hostname %] </dd>
+          <dt>Address</dt><dd>[% print_ip(object.address) %] </dd>
+	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
+          [% IF object.decommissioned -%]
+          <dt>Decommissioned</dt>
+          <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+          [% END -%]
+          [% IF object.serverhw -%]
+          <dt>Server Hardware</dt><dd>[% print_serverhw(object.serverhw) %]</dd>
+          <dt>Hypervisor</dt><dd>[% object.is_hypervisor ? "Yes" : "No" %]</dd>
+          [% END -%]
+          [% IF object.vm -%]
+          <dt>On Virtual Machine</dt><dd>[% print_vm(object.vm) %]</dd>
+          [% END -%]
+      </dl>
+    </div><!-- panel body -->
+  </div><!-- panel -->
+
+  <div class="panel panel-default">
+      <div class="panel-body">
+          <dl class="dl-horizontal">
+              [% IF object.netwalker_info -%]
+              [% SET nwinfo = object.netwalker_info -%]
+
+              [% SET mismatch =  nwinfo.name != object.hostname -%]
+  	          <dt>Host name</dt>
+              <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.name | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="hostname">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
+
+              [% SET mismatch = nwinfo.os != object.os -%]
+	          <dt>Detected OS</dt>
+	          <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.os | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
+
+             [% SET mismatch = nwinfo.os_ver != object.os_ver -%]
+	          <dt>Detected OS Version</dt>
+              <dd [% 'class="text-warning"' IF mismatch %]>
+                [% nwinfo.os_ver | html %]
+                [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os_ver">[% fa_icon('exchange') %]</a>[%END-%]
+              </dd>
+              [% IF nwinfo.kernel -%]
+              <dt>Kernel</dt>
+   	          <dd>[% nwinfo.kernel | html %] [% nwinfo.kernel_ver | html %]
+              </dd>
+              [% END -%]
+	          <dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
+	          <dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
+              <dt>Model<dt><dd>[% nwinfo.model | html %]</dd>
+              <dt>Serial<dt><dd>[% nwinfo.serial | html %]</dd>
+              <dt>CPU<dt>
+                  <dd>[% IF nwinfo.n_procs %][% nwinfo.n_procs | html %] x [% END %][% nwinfo.cpu_model | html %]</dd>
+              <dt>RAM</dt><dd>[% nwinfo.ram_memory | html %]</dd>
+	          <dt>Fetch packages<dt>
+	              <dd>[% nwinfo.get_packages ? 'Yes' : 'No' %]</dd>
+              [% ELSE -%]
+       	      <dt>Netwalker</dt>
+	          <dd>No netwalker configuration found.</dd>
+              [% END -%]
+          </dl>
+      </div><!-- panel body -->
+  </div><!-- panel -->
+  </div><!-- tab panel -->
+
+  [% IF object.virtual_machines -%]
+  <div role="tabpanel" class="tab-pane" id="vm">
   <table class="table">
   <thead>
     <th>Name</th>
@@ -71,7 +139,60 @@
   [% END -%]
   </tbody>
   </table>
-  </div><!-- panel body -->
-</div><!-- panel -->
+  </div><!-- tab panel -->
+  [% END -%]
 
+  <div role="tabpanel" class="tab-pane" id="software">
+      <table class="table" id="software_list">
+          <thead>
+	          <tr>
+	              <th>Name</th>
+	              <th>Version</th>
+	          </tr>
+          </thead>
+          <tbody>
+	          [% FOREACH p IN object.installed_sw_pkgs  %]
+	          <tr>
+                  <td>[% print_softwarepkg(p.software_pkg) %]</td>
+                  <td>[% p.version %]</td>
+	          </tr>
+	          [% END %]
+          </tbody>
+      </table>
+  </div> <!-- tab panel software -->
+
+
+</div><!-- tab content -->
+[% capture = BLOCK -%]
+$(function() {
+
+$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+    } );
+
+ $('#software_list').DataTable( {
+       "responsive"  : true,
+        scrollY:        400,
+        scrollCollapse: true,
+         "dom": "<'row'<'col-sm-8'<'toolbar'>><'col-sm-4'f>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-6'i><'col-sm-6'p>>"
+    } );
+
+
+$('a[data-manoc-action="from-nwinfo"]').on( 'click', function (e) {
+  $.post({
+    url: '[% c.uri_for_action("/server/update_from_nwinfo", [object.id]) %]',
+    data: {
+      'what': $(this).attr('data-manoc-what'),
+      ['csrf_token']: '[% c.get_token %]'
+    },
+    success: function() {
+        $('#content-wrapper').load(" #content");
+    }
+  });
+});
+
+});
 [% END -%]
+[% js_scripts.push(capture) -%]

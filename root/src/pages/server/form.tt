@@ -1,6 +1,15 @@
 [%
     page.title='Server'
 %]
+[% SET createhw_url =
+   object.netwalker_info ?
+   c.uri_for_action('/serverhw/create', { nwinfo => object.netwalker_info.id } ) :
+   c.uri_for_action('/serverhw/create')
+-%]
+[% SET createvm_url = object.netwalker_info ?
+   c.uri_for_action('/virtualmachine/create', { nwinfo => object.netwalker_info.id } ) :
+   c.uri_for_action('/virtualmachine/create')
+-%]
 [% form.render %]
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
@@ -8,12 +17,12 @@ $( document ).ready(function() {
     $("#[% form.name %]\\.serverhw").selectpicker();
 
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
-      showDialogForm("[% c.uri_for_action('/serverhw/create') %]", "Create server hardware", on_close_hwcreate_form);
+      showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
       return false;
     });
 
 	$('#[% form.name %]\\.vm_btn').click(function() {
-      showDialogForm("[% c.uri_for_action('/virtualmachine/create') %]", "Create virtual machine", on_close_vmcreate_form);
+      showDialogForm("[% createvm_url %]", "Create virtual machine", on_close_vmcreate_form);
       return false;
     });
 

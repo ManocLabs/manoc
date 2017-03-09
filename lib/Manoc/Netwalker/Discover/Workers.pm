@@ -2,14 +2,14 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::Netwalker::Manager::Discover;
+package Manoc::Netwalker::Discover::Workers;
 use Moose;
 use namespace::autoclean;
 
-with 'Manoc::Netwalker::Manager';
+with 'Manoc::Netwalker::WorkersRole';
 with 'Manoc::Logger::Role';
 
-use Manoc::Netwalker::DiscoverTask;
+use Manoc::Netwalker::Discover::Task;
 
 use Try::Tiny;
 use POE qw(Filter::Reference Filter::Line);

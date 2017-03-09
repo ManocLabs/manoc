@@ -102,6 +102,21 @@ sub enqueue_device {
     return $self->check_response($response);
 }
 
+sub enqueue_server {
+    my ( $self, $id ) = @_;
+
+    my $handle = $self->socket;
+    $handle or return undef;
+
+    $self->log->debug("Enqueue server $id");
+    print $handle "ENQUEUE SERVER $id\n";
+    my $response = <$handle>;
+    $self->log->debug("Got response from netwalker: $response");
+
+    return $self->check_response($response);
+}
+
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

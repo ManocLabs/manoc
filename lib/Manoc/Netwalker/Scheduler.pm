@@ -11,7 +11,7 @@ use Moose::Util::TypeConstraints;
 with 'Manoc::Logger::Role';
 use POE;
 
-subtype 'ManagerType' => as 'Object' => where sub { $_->does('Manoc::Netwalker::Manager') };
+subtype 'ManagerType' => as 'Object' => where sub { $_->does('Manoc::Netwalker::WorkersRole') };
 
 has config => (
     is       => 'ro',
@@ -26,8 +26,8 @@ has workers_manager => (
     traits  => ['Array'],
 
     handles => {
-        all_workers_manager => 'elements',
-        add_workers_manager => 'push',
+        all_workers => 'elements',
+        add_workers => 'push',
     },
 );
 

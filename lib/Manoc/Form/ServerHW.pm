@@ -26,11 +26,19 @@ has hide_location => (
     default => 0,
 );
 
-has_block 'processor_block' => (
-    render_list => [ 'cpu_model', 'proc_freq', 'n_procs', 'n_cores_proc' ],
+has_block 'processor_block1' => (
+    render_list => [ 'cpu_model', 'proc_freq' ],
     tag         => 'div',
     class       => ['form-group'],
 );
+
+
+has_block 'processor_block2' => (
+    render_list => [ 'n_procs', 'n_cores_proc' ],
+    tag         => 'div',
+    class       => ['form-group'],
+);
+
 
 sub build_render_list {
     my $self = shift;
@@ -43,7 +51,7 @@ sub build_render_list {
         'location_block',
         'rack_block',
 
-        'processor_block',
+        'processor_block1',  'processor_block2',
         'ram_memory',
         'storage1_size', 'storage2_size',
 
@@ -87,7 +95,7 @@ has_field 'cpu_model' => (
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-2">',
+        before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
     label_class => ['col-sm-2'],
@@ -103,23 +111,23 @@ has_field 'proc_freq' => (
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-2">',
+        before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-1'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'n_procs' => (
     type  => 'Integer',
-    label => 'Number',
+    label => 'Num CPUs',
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-1">',
+        before_element => '<div class="col-sm-4">',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-1'],
+    label_class => ['col-sm-2'],
 );
 
 has_field 'n_cores_proc' => (
@@ -129,10 +137,10 @@ has_field 'n_cores_proc' => (
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
     tags => {
-        before_element => '<div class="col-sm-1">',
+        before_element => '<div class="col-sm-3">',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-2'],
+    label_class => ['col-sm-3'],
 );
 
 has_field 'ram_memory' => (
@@ -151,7 +159,7 @@ has_field 'storage1_size' => (
 
 has_field 'storage2_size' => (
     type         => 'Integer',
-    label        => 'Secondary storage (GB)',
+    label        => 'Secondary storage',
     element_attr => { placeholder => 'GB' },
 );
 

@@ -95,6 +95,10 @@ my @DEFAULT_MENU_ITEMS = (
                 path => '#',
                 #                action => '/server/hypervisors',
             },
+            {
+                name   => 'Software',
+                action => '/softwarepkg/list'
+            }
 
         ]
     },
@@ -103,7 +107,7 @@ my @DEFAULT_MENU_ITEMS = (
         fa_icon => 'building',
         submenu => [
             {
-                name   => 'Complete Inventory',
+                name   => 'Hardware Inventory',
                 action => '/hwasset/list',
             },
             {
@@ -205,7 +209,7 @@ sub _permission_check {
     my ( $c, $item ) = @_;
 
     $item->{permission} or return 1;
-    return $c->check_permission( $item->{permission} );
+    return $c->user && $c->check_permission( $item->{permission} );
 }
 
 =head1 SEE ALSO
