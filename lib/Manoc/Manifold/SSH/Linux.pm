@@ -73,10 +73,10 @@ elif test -e '/etc/fedora-release'; then
   echo 'Fedora'
 elif test -e '/etc/centos-release'; then
   echo 'CentOs'
-  sed /etc/centos-release -ne 's/.*\([0-9]\.[0-9]\).*/\1/p'
+  sed /etc/centos-release -ne 's/.* \([0-9]\{1,\}\.[0-9]\{1,\}\).*/\1/p'
 elif test -e '/etc/redhat-release'; then
   echo 'RedHat'
-  sed /etc/redhat-release -ne 's/.*\([0-9]\.[0-9]\).*/\1/p'
+  sed /etc/redhat-release -ne 's/.* \([0-9]\{1,\}\.[0-9]\{1,\}\).*/\1/p'
 elif test -e '/etc/SuSE-release'; then
   echo 'SuSE'
 elif test -e '/etc/openwrt_version'; then
