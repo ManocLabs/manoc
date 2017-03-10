@@ -179,7 +179,7 @@ sub schedule_servers {
     my @server_ids = $self->schema->resultset('ServerNWInfo')->search(
         {
             last_visited => { '<='    => $last_visited },
-            device_id    => { -not_in => $decommissioned_servers->as_query }
+            server_id    => { -not_in => $decommissioned_servers->as_query }
         }
     )->get_column('server_id')->all();
 
