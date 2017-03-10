@@ -258,7 +258,7 @@ sub _build_task_report {
 
     $self->device_entry or return undef;
     my $device_address = $self->device_entry->mng_address->address;
-    return Manoc::Netwalker::TaskReport->new( host => $device_address );
+    return Manoc::Netwalker::Poller::TaskReport->new( host => $device_address );
 }
 
 sub _build_uplinks {
