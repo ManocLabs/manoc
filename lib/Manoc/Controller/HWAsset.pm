@@ -74,6 +74,18 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
         form_class      => 'Manoc::Form::HWAsset',
         form_parameters => { type => Manoc::DB::Result::HWAsset->TYPE_DEVICE },
     );
+
+    if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
+        my $nwinfo = $c->model('ManocDB::DeviceNWInfo')->find($nwinfo_id);
+        if ( $nwinfo ) {
+            my %cols;
+            $cols{model}      = $nwinfo->model;
+            $cols{vendor}     = $nwinfo->vendor;
+            $cols{serial}     = $nwinfo->serial;
+            $c->stash( form_defaults => \%cols );
+        }
+    }
+
     $c->detach('form');
 }
 

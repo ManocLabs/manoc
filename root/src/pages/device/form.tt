@@ -1,36 +1,48 @@
 [% form.render %]
+[% SET createhw_url =
+   object.netwalker_info
+    ? c.uri_for_action('/hwasset/create_device', { hide_location => 1,  nwinfo => object.netwalker_info.id } )
+    : c.uri_for_action('/hwasset/create_device', { hide_location => 1 } )
+-%]
+
 [% fragment = BLOCK -%]
 var rack_select;
 var asset_select;
 
 function on_close_create_form(data) {
-  refresh_assets();
-  asset_select.selectpicker('val', data.object_id);
+  refresh_assets({
+    success: function() {
+      asset_select.selectpicker('val', data.object_id);
+    }}
+  );
 }
 
-function refresh_assets() {
-  asset_select.find('option').remove();
+function refresh_assets(options) {
   $.ajax({
     url: '[% c.uri_for_action('/hwasset/unused_devices_js') %]',
     dataType: 'json',
     success: function (res) {
+      asset_select.find('option').remove();
       $.each(res, function(index, item) {
         asset_select.append('<option value="' + item.id + '">' + item.label + '</option>');
       });
+      if (options.success && typeof options.success === "function") {
+        options.success();
+      }
+      asset_select.selectpicker('refresh');
     }
   });
-  asset_select.selectpicker('refresh');
 }
 
 $( document ).ready(function() {
-    rack_select = $('#form-device\\.rack');
+    rack_select = $('#[% form.name %]\\.rack');
     rack_select.selectpicker();
 
-    asset_select = $('#form-device\\.hwasset');
+    asset_select = $('#[% form.name %]\\.hwasset');
     asset_select.selectpicker();
 
 	$('#form-device\\.asset_button').click(function() {
-      showDialogForm("[% c.uri_for_action('/hwasset/create_device', { hide_location => 1 }) %]", "Create asset", on_close_create_form);
+      showDialogForm("[% createhw_url  %]", "Create asset", on_close_create_form);
       return false;
     });
 });
