@@ -103,7 +103,7 @@ sub _start {
             ReuseAddr => 1,
         );
     }
-    $handle or $self->log->logdie("Cannot create control socket");
+    $handle or $self->log->logdie("Cannot create control socket $port: $!");
 
     # Start the server.
     my $server = POE::Wheel::ListenAccept->new(
