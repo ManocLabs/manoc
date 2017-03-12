@@ -19,12 +19,30 @@ around '_build_username' => sub {
     return $self->$orig() || 'root';
 };
 
+has 'use_sudo' => (
+    is      => 'rw',
+    isa     => 'Maybe[Bool]',
+);
+
+has 'sudo_password' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    builder => '_build_sudo_password'
+
+);
+
+sub _build_sudo_password {
+    my $self = shift;
+    return $self->credentials->{password2};
+}
+
 has has_perl => (
     is      => 'ro',
     isa     => 'Bool',
     lazy    => 1,
     builder => '_build_has_perl',
 );
+
 
 sub _build_has_perl {
     my $self = shift;
@@ -35,11 +53,59 @@ sub _build_has_perl {
     return 0;
 }
 
+has uuid => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_uuid'
+);
+
+sub _build_uuid {
+    my $self = shift;
+    my $r = $self->dmidecode("system-uuid");
+}
+
+
+has cpuinfo => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    lazy    => 1,
+    builder => '_build_cpuinfo'
+);
+
+sub _build_cpuinfo {
+    my $self = shift;
+
+    my @data;
+    try {
+        @data = $self->cmd('/bin/cat /proc/cpuinfo');
+    }
+    catch {
+        $self->log->error( 'Error fetching cpuinfo: ', $self->get_error );
+    };
+
+    my $count = 0;
+    my $model = 'Unknwown';
+    my $freq  = 0;
+
+    foreach my $line (@data) {
+        $count++     if $line =~ /processor\s+:\s+(\d+)/;
+        $model = $1  if $line =~ /model name\s+:\s+(.+?)$/;
+        $freq  = $1  if $line =~ /cpu MHz\s+:\s+(\d+)(\.\d+)=$/
+    }
+
+    return {
+        count => $count,
+        model => $model,
+        freq  => $freq,
+    };
+}
 
 sub _build_boottime {
     my $self = shift;
 
-    my $data = $self->cmd_online('cat /proc/uptime');
+    my $data = $self->cmd('cat /proc/uptime');
+    chomp($data);
     my ( $seconds, undef ) = split /\s+/, $data;
     return time() - int($seconds);
 
@@ -47,7 +113,9 @@ sub _build_boottime {
 
 sub _build_name {
     my $self = shift;
-    return $self->cmd_online('uname -n');
+    my $r = $self->cmd('uname -n');
+    chomp($r);
+    return $r || undef;
 }
 
 has osinfo => (
@@ -107,30 +175,31 @@ sub _build_os_ver {
 sub _build_kernel {
     my $self = shift;
 
-    return $self->cmd_online('uname -s');
+    my $kernel = $self->cmd('uname -s');
+    chomp($kernel);
+    return $kernel;
 }
 
 sub _build_kernel_ver {
     my $self = shift;
+    my $kernel_ver = $self->cmd('uname -r');
+    chomp($kernel_ver);
+    return $kernel_ver;
+}
 
-    return $self->cmd_online('uname -r');
+sub _build_vendor {
+    my $self = shift;
+    return $self->dmidecode("system-manufacturer");
 }
 
 sub _build_model {
     my $self = shift;
-
-    my $model = $self->cmd_online("/bin/uname -m");
-    return $model;
+    return $self->dmidecode("system-product-name");
 }
 
-sub _build_serial { undef }
-
-sub _build_vendor { undef }
-
-sub _build_cpu_count {
+sub _build_serial {
     my $self = shift;
-
-    return $self->cpuinfo->{count} || 1;
+    return $self->dmidecode("system-serial-number");
 }
 
 sub _build_cpu_model {
@@ -139,39 +208,10 @@ sub _build_cpu_model {
     return $self->cpuinfo->{model};
 }
 
-has cpuinfo => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_cpuinfo'
-);
-
-sub _build_cpuinfo {
+sub _build_cpu_count {
     my $self = shift;
 
-    my @data;
-    try {
-        @data = $self->cmd('/bin/cat /proc/cpuinfo');
-    }
-    catch {
-        $self->log->error( 'Error fetching cpuinfo: ', $self->get_error );
-    };
-
-    my $count = 0;
-    my $model = 'Unknwown';
-    my $freq  = 0;
-
-    foreach my $line (@data) {
-        $count++     if $line =~ /processor\s+:\s+(\d+)/;
-        $model = $1  if $line =~ /model name\s+:\s+(.+?)$/;
-        $freq  = $1  if $line =~ /cpu MHz\s+:\s+(\d+)(\.\d+)=$/
-    }
-
-    return {
-        count => $count,
-        model => $model,
-        freq  => $freq,
-    };
+    return $self->cpuinfo->{count} || 1;
 }
 
 sub _build_ram_memory {
@@ -223,7 +263,7 @@ sub _build_installed_sw {
 
     my @list;
 
-    if ( $self->session->test('rpm --version') ) {
+    if ( $self->system('rpm --version') ) {
         $self->log->debug("Using rpm to fetch installed software");
 
         my @data = $self->cmd('rpm --queryformat "%{NAME} %{VERSION}\n" -qa');
@@ -232,7 +272,16 @@ sub _build_installed_sw {
             my ($pkg, $version) = split /\s+/, $line;
             push @list, [ $pkg, $version ];
         }
-    } elsif ( $self->session->test('opkg info opkg') ) {
+    } elsif (  $self->system('dpkg-query --version')  ) {
+        $self->log->debug("Using dpkg to fetch installed software");
+
+        my @data = $self->cmd("dpkg-query -f '\${binary:Package} \${Version}\n' -W");
+         foreach my $line (@data) {
+            chomp($line);
+            my ($pkg, $version) = split /\s+/, $line;
+            push @list, [ $pkg, $version ];
+        }
+    } elsif ( $self->system('opkg info opkg') ) {
         $self->log->debug("Using opkg to fetch installed software");
 
         my @data = $self->cmd('opkg list');
@@ -244,6 +293,51 @@ sub _build_installed_sw {
     }
 
     return \@list;
+}
+
+
+sub dmidecode {
+    my ($self, $keyword) = @_;
+    my @out = $self->root_cmd("dmidecode", "-s", $keyword);
+
+    defined($out[0]) or return undef;
+
+    my $ret = undef;
+    foreach my $line (@out) {
+        next if $line =~ /^#/;
+        chomp($line);
+        return $line;
+    }
+    return undef;
+}
+
+
+sub root_cmd {
+    my $self = shift;
+
+    my $opts = ref($_[0]) eq 'ARRAY' ? shift : {};
+    my @cmd = @_;
+
+    if ( $self->username ne 'root' ) {
+        if ( $self->use_sudo ) {
+            my $sudo_passwd = $self->credentials->{password2};
+
+            if ($sudo_passwd) {
+                $opts->{stdin_data} = $sudo_passwd;
+                $opts->{tty} = 1;
+
+                @cmd = ( 'sudo', '-k', '-p', '', '--', @cmd );
+            } else {
+                @cmd = ( 'sudo', '--', @cmd );
+            }
+            $self->log->debug("using sudo: " . join(' ', @cmd));
+        } else {
+            return undef;
+        }
+    }
+
+    return $self->cmd( $opts, @cmd );
+
 }
 
 no Moose;
