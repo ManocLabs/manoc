@@ -19,6 +19,8 @@ use Manoc::Netwalker::Discover::Workers;
 sub main {
     my $self = shift;
 
+    $ENV{LANG} = 'C';
+
     $self->log->info("Starting netwalker");
 
     # get configuration and store it in a Config object
