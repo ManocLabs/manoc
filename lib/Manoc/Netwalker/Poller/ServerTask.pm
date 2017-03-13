@@ -278,8 +278,13 @@ sub update_vm {
     my $nw_entry  = $self->nwinfo;
     my $vm = $server_entry->vm;
 
-    defined($source->uuid) or return;
     my $uuid = $source->uuid;
+    return unless defined($uuid);
+
+    # nothing to change
+    defined($vm->identifier)
+        and lc($uuid) eq lc($vm->identifier)
+        and return;
 
     if ( defined($vm) && !defined ($vm->identifier) ) {
         $self->log->debug("Setting related vm uuid $uuid");

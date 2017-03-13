@@ -21,18 +21,15 @@ sub unused {
         }
     )->get_column('vm_id');
 
-    my $assets = $self->search(
+    my $rs = $self->search(
         {
-            'vm.id' => {
+            'id' => {
                 -not_in => $used_vm_ids->as_query,
             }
         },
-        {
-            alias => 'vm'
-        }
     );
 
-    return $assets;
+    return wantarray() ? $rs->all() : $rs;
 }
 
 1;
