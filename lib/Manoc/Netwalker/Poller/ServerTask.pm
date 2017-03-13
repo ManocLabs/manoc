@@ -141,6 +141,7 @@ sub _build_source {
     my %params = (
         host         => $host,
         credentials  => $self->credentials,
+        use_sudo     => $nwinfo->use_sudo,
     );
 
     my $source = $self->_create_manifold( $manifold_name, %params );
@@ -168,39 +169,6 @@ sub _build_task_report {
     $self->server_entry or return undef;
     my $server_address = $self->server_entry->address->address;
     return Manoc::Netwalker::Poller::TaskReport->new( host => $server_address );
-}
-
-sub _build_uplinks {
-    my $self = shift;
-
-    my $entry      = $self->server_entry;
-    my $source     = $self->source;
-    my $server_set = $self->server_set;
-
-    my %uplinks;
-
-    # get uplink from CDP
-    my $neighbors = $source->neighbors;
-
-    # filter CDP links
-    while ( my ( $p, $n ) = each(%$neighbors) ) {
-        foreach my $s (@$n) {
-
-            # only links to a switch
-            next unless $s->{type}->{'Switch'};
-            # only links to a kwnown server
-            next unless $server_set->{ $s->{addr} };
-
-            $uplinks{$p} = 1;
-        }
-    }
-
-    # get uplinks from DB and merge them
-    foreach ( $entry->uplinks->all ) {
-        $uplinks{ $_->interface } = 1;
-    }
-
-    return \%uplinks;
 }
 
 #----------------------------------------------------------------------#
@@ -233,19 +201,24 @@ sub update {
         $self->nwinfo->offline(1);
         return undef;
     }
-    $nwinfo->last_visited( $self->timestamp );
-    $nwinfo->offline(0);
 
     $self->update_server_info;
 
     $nwinfo->get_packages and
         $self->update_packages;
 
+    $nwinfo->get_vms and
+        $self->update_virtual_machines;
+
+    $nwinfo->last_visited( $self->timestamp );
+    $nwinfo->offline(0);
     $nwinfo->update();
     return 1;
 }
 
-#----------------------------------------------------------------------#
+=head2 update_server_info
+
+=cut
 
 sub update_server_info {
     my $self = shift;
@@ -283,6 +256,7 @@ sub update_server_info {
         $nw_entry->n_procs( $source->cpu_count );
         $nw_entry->ram_memory( $source->ram_memory );
 
+        $nw_entry->update_vm and $self->update_vm;
     }
 
     $nw_entry->boottime( $source->boottime || 0 );
@@ -291,6 +265,131 @@ sub update_server_info {
 }
 
 #----------------------------------------------------------------------#
+
+=head2 update_vm
+
+=cut
+
+sub update_vm {
+    my $self = shift;
+
+    my $source    = $self->source;
+    my $server_entry = $self->server_entry;
+    my $nw_entry  = $self->nwinfo;
+    my $vm = $server_entry->vm;
+
+    defined($source->uuid) or return;
+    my $uuid = $source->uuid;
+
+    if ( defined($vm) && !defined ($vm->identifier) ) {
+        $self->log->debug("Setting related vm uuid $uuid");
+        $vm->identifier($uuid);
+        $vm->update;
+    } else {
+        my @virtual_machines;
+
+        if (defined($vm) &&  defined($vm->hypervisor) ) {
+            $self->log->debug("Searching for vm with $uuid in the same hypervisor or infrastructure");
+
+            # check if there is already an unused vm with the given uuid in the same hypervisor
+            # or infrastructure
+            my $hypervisor = $vm->hypervisor;
+            my $vm_rs = (
+                $hypervisor->virtinfr
+                    ? $hypervisor->virtinfr->virtual_machines
+                    : $hypervisor->virtual_machines
+                );
+            @virtual_machines = $vm_rs->unused->search( {
+                identifier => { -in => [ lc($uuid), uc($uuid) ] }
+            } );
+        }
+        elsif ( !defined($server_entry->serverhw) ) {
+            $self->log->debug("Searching for vm with $uuid and compatible name");
+
+            my @names;
+            my $hostname = $server_entry->hostname;
+            push @names, $hostname;
+            $hostname =~ /^([^.]+)\./ and push @names, $1;
+
+            @virtual_machines = $self->schema->resultset('VirtualMachine')
+                ->unused->search( {
+                    identifier => { -in => [ lc($uuid), uc($uuid) ] },
+                    name => { -in => \@names }
+                } ) ;
+        }
+        if (@virtual_machines == 1) {
+            my $new_vm = $virtual_machines[0];
+            $self->log->debug("Associating vm $uuid");
+            $server_entry->vm($new_vm);
+            $server_entry->update;
+        }
+    }
+}
+
+=head2 update_virtual_machines
+
+=cut
+
+sub update_virtual_machines {
+    my $self = shift;
+
+    my $source = $self->source;
+    return unless $source->does('Manoc::ManifoldRole::Hypervisor');
+
+    my $server  = $self->server_entry;
+    return unless $server->is_hypervisor;
+
+    my $server_id = $server->id;
+    my $timestamp = $self->timestamp;
+
+    my $vm_rs = (
+        $server->virtinfr
+            ? $server->virtinfr->virtual_machines
+            : $server->virtual_machines
+        );
+
+    my $vm_list = $source->virtual_machines;
+
+    return unless $vm_list;
+
+    foreach my $vm_info (@$vm_list) {
+        my $uuid = $vm_info->{uuid};
+        my @vms = $vm_rs->search({ identifier => $uuid });
+
+        if (@vms > 1) {
+            $self->log->warn("More than a vm with the same uuid $uuid. Info will not be updated.");
+            next;
+        }
+
+        my $vm;
+        if (@vms == 1) {
+            $vm = $vms[0];
+        } else {
+            $self->log->info("Creating new vm $uuid.");
+
+            $vm =  $self->schema->resultset('VirtualMachine')->new_result({});
+            $vm->identifier( $uuid );
+            $vm->hypervisor( $server );
+        }
+
+        # update vm info
+        $vm->name($vm_info->{name});
+        $vm->vcpus($vm_info->{vcpus});
+        $vm->ram_memory($vm_info->{memsize});
+        $vm->update_or_insert();
+
+        $self->schema->resultset('HostedVm')->register_tuple(
+            hypervisor_id => $server_id,
+            vm_id         => $vm->id,
+            timestamp     => $timestamp,
+        );
+    }  # end of virtual machines loop
+
+}
+
+=head2 update_packages
+
+=cut
 
 sub update_packages {
     my $self = shift;
@@ -313,7 +412,6 @@ sub update_packages {
         );
     }
 }
-
 
 1;
 
