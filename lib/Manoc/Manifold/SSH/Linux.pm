@@ -5,12 +5,13 @@
 
 package Manoc::Manifold::SSH::Linux;
 use Moose;
-with 'Manoc::ManifoldRole::SSH';
-
-with 'Manoc::ManifoldRole::Base';
-with 'Manoc::ManifoldRole::Host';
+with 'Manoc::ManifoldRole::SSH',
+    'Manoc::ManifoldRole::Base',
+    'Manoc::ManifoldRole::Host',
+    'Manoc::ManifoldRole::Hypervisor';
 
 use Try::Tiny;
+use Manoc::Utils::Units qw(parse_storage_size);
 
 around '_build_username' => sub {
     my $orig = shift;
@@ -43,7 +44,6 @@ has has_perl => (
     builder => '_build_has_perl',
 );
 
-
 sub _build_has_perl {
     my $self = shift;
 
@@ -53,18 +53,10 @@ sub _build_has_perl {
     return 0;
 }
 
-has uuid => (
-    is      => 'ro',
-    isa     => 'Maybe[Str]',
-    lazy    => 1,
-    builder => '_build_uuid'
-);
-
 sub _build_uuid {
     my $self = shift;
     my $r = $self->dmidecode("system-uuid");
 }
-
 
 has cpuinfo => (
     is      => 'ro',
@@ -294,6 +286,57 @@ sub _build_installed_sw {
 
     return \@list;
 }
+
+sub _build_virtual_machines {
+    my $self = shift;
+
+    $self->log->warn("Using virsh to get uuid list");
+    my @data = $self->root_cmd('virsh', 'list', '--uuid' );
+
+    if ( !defined($data[0]) ) {
+        $self->log->warn("Error using virsh");
+        return;
+    }
+
+    my @uuids;
+    foreach my $line (@data) {
+        chomp ($line);
+        $line or last;
+
+        $line =~ /^([\da-fA-F-]+)$/ and push @uuids, $1;
+    }
+
+    my @result;
+
+    foreach my $uuid (@uuids) {
+        my $vm_info = {};
+
+        $self->log->debug("Using virsh to get dominfo for $uuid");
+        my @data = $self->root_cmd('virsh', 'dominfo', $uuid );
+
+        foreach my $line (@data) {
+            chomp($line);
+            $line or last;
+
+            $line =~ /^([^:]+):\s+(.*)$/o or
+                $self->log->warn("cannot parse virsh output line $line"), next;
+
+            my ($key, $value) = ($1, $2);
+            $key eq 'Name' and
+                $vm_info->{name}    = $value;
+            $key eq 'UUID' and
+                $vm_info->{uuid}    = $value;
+            $key eq 'CPU(s)' and
+                $vm_info->{vcpus} = $value;
+            $key eq 'Max memory' and
+                $vm_info->{memsize} = parse_storage_size($value)/(1024*1024);
+        }
+        push @result, $vm_info;
+
+    }
+    return \@result;
+}
+
 
 
 sub dmidecode {
