@@ -1,0 +1,66 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Hardware assets'
+-%]
+
+<table class="table" id="hwasset_list">
+   <thead>
+     <tr>
+        <th>Inventory</th>
+        <th>Type</th>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Serial</th>
+        <th>Location</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+
+
+<div id="statusfilter_wrapper" class="btn-group" role="group">
+<select name="statusfilter" class="selectpicker" id="statusfilter" data-style="btn-default btn-sm">
+    <option value="a">All</option>
+    <option value="u">In use</option>
+    <option value="w">Warehouse</option>
+    <option value="d">Decommisioned</option>
+</select>
+</div>
+
+[% fragment = BLOCK -%]
+$(document).ready(function() {
+  $("#hwasset_list").dataTable( {
+   "serverSide":   true,
+   "processing":   true,
+   "ajax":  {
+      "url":  "[% c.uri_for_action('hwasset/datatable_source') %]",
+      "data": function ( d ) {
+         d.search_status = $('#statusfilter').val();
+      }
+   },
+   "columns":      [
+                     { 'data' : 'inventory',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='"+oData.link+"'>"+oData.inventory+"</a>");
+                         }
+                     },
+                     { 'data' : 'type' },
+                     { 'data' : 'vendor' },
+                     { 'data' : 'model' },
+                     { 'data' : 'serial' },
+                     { 'data' : 'location' },
+   ],
+   "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+ })
+
+$("#statusfilter_wrapper").appendTo($("div.toolbar").first());
+$("#statusfilter").on('changed.bs.select', function (e) {
+       $( '#hwasset_list' ).dataTable().api().ajax.reload();
+  });
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

@@ -20,7 +20,7 @@ has 'use_ssh_key' => (
     is      => 'rw',
     isa     => 'Maybe[Bool]',
     lazy    => 1,
-    builder => '_build_key_path'
+    builder => '_build_use_ssh_key'
 );
 
 
@@ -42,6 +42,13 @@ has 'session' => (
     is  => 'rw',
     isa => 'Object'
 );
+
+has 'connection_timeout' => (
+    is  => 'rw',
+    isa => 'Num',
+    default => 4,
+);
+
 
 sub _build_username {
     my $self = shift;
@@ -72,13 +79,11 @@ sub cmd {
     return $session->capture(@_);
 }
 
-sub cmd_online {
-    my $out = shift->cmd(@_);
-    $out =~ s/\r?\n//o;
-    return $out;
+sub system {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->system(@_);
 }
-
-
 
 
 sub connect {
@@ -91,13 +96,20 @@ sub connect {
     my %opts;
     $opts{user} = $self->username;
     if ( $self->use_ssh_key ) {
-        $opts{key_path} = $self->key_path;
+        my $key_path = $self->key_path;
+        $self->log->error( "Connecting to $host using key $key_path" );
+        $opts{key_path} = $key_path;
+        $self->password and
+            $opts{passphrase} = $self->password;
     }
     else {
         $opts{password} = $self->password;
     }
+
     # Disables querying the user for password and passphrases.
     $opts{batch_mode} = 1;
+
+    $opts{timeout} = $self->connection_timeout;
 
     my $ssh = Net::OpenSSH->new( $host, %opts );
     if ( $ssh->error ) {

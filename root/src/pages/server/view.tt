@@ -76,21 +76,22 @@
               [% IF object.netwalker_info -%]
               [% SET nwinfo = object.netwalker_info -%]
 
-              [% SET mismatch =  nwinfo.name != object.hostname -%]
+              [% SET mismatch = nwinfo.name && (nwinfo.name != object.hostname) -%]
   	          <dt>Host name</dt>
               <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.name | html %]
                 [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="hostname">[% fa_icon('exchange') %]</a>[%END-%]
               </dd>
 
-              [% SET mismatch = nwinfo.os != object.os -%]
+
+              [% SET mismatch = nwinfo.os && nwinfo.os != object.os -%]
 	          <dt>Detected OS</dt>
 	          <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.os | html %]
                 [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os">[% fa_icon('exchange') %]</a>[%END-%]
               </dd>
 
-             [% SET mismatch = nwinfo.os_ver != object.os_ver -%]
+             [% SET mismatch =  nwinfo.os_ver && nwinfo.os_ver != object.os_ver -%]
 	          <dt>Detected OS Version</dt>
               <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.os_ver | html %]
@@ -103,7 +104,7 @@
               [% END -%]
 	          <dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
 	          <dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
-              <dt>Model<dt><dd>[% nwinfo.model | html %]</dd>
+              <dt>Model<dt><dd>[% nwinfo.vendor | html %] [% nwinfo.model | html %]</dd>
               <dt>Serial<dt><dd>[% nwinfo.serial | html %]</dd>
               <dt>CPU<dt>
                   <dd>[% IF nwinfo.n_procs %][% nwinfo.n_procs | html %] x [% END %][% nwinfo.cpu_model | html %]</dd>

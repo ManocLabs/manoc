@@ -148,7 +148,7 @@ sub virtual_servers {
     my $rs = $self->result_source->schema->resultset('Server');
     $rs = $rs->search(
         {
-            'mv.hypervisor_id' => $self->id,
+            'vm.hypervisor_id' => $self->id,
         },
         {
             join => 'vm',

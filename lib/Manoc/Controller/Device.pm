@@ -400,6 +400,33 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
+=head2 update_fromnwinfo
+
+=cut
+
+sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $device = $c->stash->{object};
+    $c->require_permission( $device, 'edit' );
+
+    my $response = {};
+    $response->{success} = 0;
+
+    if ( !$device->decommissioned && defined( $device->netwalker_info ) &&
+             $c->req->method eq 'POST' )
+        {
+        my $nwinfo = $device->netwalker_info;
+        my $what   = lc($c->req->params->{what});
+        $what eq 'name'     and $device->name($nwinfo->name);
+        $device->update();
+        $response->{success} = 1;
+    }
+
+    $c->stash( json_data => $response );
+    $c->forward('View::JSON');
+}
+
 =head1 METHODS
 
 =cut

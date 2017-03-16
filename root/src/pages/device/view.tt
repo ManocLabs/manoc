@@ -2,6 +2,8 @@
    use_table = 1
 -%]
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+[% SET nwinfo = object.netwalker_info   -%]
+[% SET hwasset = object.hwasset         -%]
 [%
 page.title   = 'Device ' _ object.name
 -%]
@@ -65,7 +67,20 @@ page.title   = 'Device ' _ object.name
   <div role="tabpanel" class="tab-pane active" id="general">
     <div class="row">
       <dl class="dl-horizontal">
-	<dt>Name</dt><dd>[% object.name %]</dd>
+
+    <dt>Name</dt>
+    <dd [% 'class="text-warning"' IF mismatch %]>
+     [% object.name %]
+     [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="name">[% fa_icon('exchange') %]</a>[%END-%]
+    </dd>
+
+[% IF nwinfo && nwinfo.name != object.name -%]
+    <dt>Detected name</dt>
+    <dd class="text-warning">
+     [% nwinfo.name %]
+     <a href="#" data-manoc-action="from-nwinfo" data-manoc-what="name">[% fa_icon('exchange') %]</a>
+    </dd>
+[% END -%]
 
 	<dt>Management Address</dt>
 	<dd><a href="[% object.get_mng_url %]">[% object.mng_address %]</a></dd>
@@ -76,19 +91,39 @@ page.title   = 'Device ' _ object.name
 	<dt>Rack</dt>
 	<dd>[% print_rack(object.rack) %]</dd>
 
-[% IF object.hwasset -%]
+[% IF hwasset -%]
 	<dt>Asset</dt>
-	<dd><a href="[% c.uri_for_action('hwasset/view', [object.hwasset.id]) %]">[% object.hwasset.inventory | html %]</a></dd>
+	<dd><a href="[% c.uri_for_action('hwasset/view', [hwasset.id]) %]">[% hwasset.inventory | html %]</a></dd>
+
+    <dt>Model</dt>
+	<dd [% 'class="text-warning"' IF mismatch %]>
+        [% hwasset.vendor | html %] [% hwasset.model  | html %]
+    </dd>
+[% END -%]
 
 
-	<dt>Model</dt>
-	<dd>[% object.hwasset.vendor | html %] [% object.hwasset.model  | html %]</dd>
-
-	<dt>Serial</dt>
-	<dd>[% object.hwasset.serial | html %]</dd>
+[% IF nwinfo && nwinfo.vendor != hwasset.vendor || nwinfo.model != hwasset.model -%]
+	<dt>Detected Model</dt>
+	<dd class="text-warning">
+        [% nwinfo.vendor | html %] [% nwinfo.model  | html %]
+    </dd>
 [% END %]
-[% IF object.netwalker_info -%]
-[% SET nwinfo = object.netwalker_info -%]
+
+[% IF hwasset -%]
+	<dt>Serial</dt>
+	<dd>
+        [% hwasset.serial | html %]
+    </dd>
+[% END %]
+
+[% IF nwinfo && nwinfo.serial != hwasset.serial -%]
+	<dt>Detected Serial</dt>
+	<dd class="text-warning">
+        [% nwinfo.serial | html %]
+    </dd>
+[% END %]
+
+[% IF nwinfo -%]
 	<dt>OS</dt>
 	<dd>[% nwinfo.os | html %] [% nwinfo.os_ver | html %]</dd>
 
@@ -165,3 +200,23 @@ page.title   = 'Device ' _ object.name
   </div> <!-- end tab -->
 
 </div>
+
+[% capture = BLOCK -%]
+$(function() {
+
+$('a[data-manoc-action="from-nwinfo"]').on( 'click', function (e) {
+  $.post({
+    url: '[% c.uri_for_action("/device/update_from_nwinfo", [object.id]) %]',
+    data: {
+      'what': $(this).attr('data-manoc-what'),
+      ['csrf_token']: '[% c.get_token %]'
+    },
+    success: function() {
+        $('#content-wrapper').load(" #content");
+    }
+  });
+});
+
+});
+[% END -%]
+[% js_scripts.push(capture) -%]

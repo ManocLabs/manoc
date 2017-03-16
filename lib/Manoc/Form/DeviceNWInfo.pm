@@ -11,6 +11,9 @@ use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
 with 'Manoc::Form::TraitFor::SaveButton';
 
+use constant EMPTY_PASSWORD => '######';
+
+
 use Manoc::Manifold;
 
 has '+name'        => ( default => 'form-devicenwinfo' );
@@ -80,20 +83,40 @@ has_field 'nw_username' => (
     accessor => 'username',
 );
 
+
 has_field 'nw_password' => (
     type      => 'Text',
     label     => 'First level password',
-    accessor  => 'password',
     widget    => 'Password',
     writeonly => 1,
 );
 
-has_field 'password2' => (
+sub default_nw_password {
+    my $self = shift;
+    my $item = $self->item;
+
+    return unless $item;
+
+    $item->password and return EMPTY_PASSWORD;
+    return '';
+};
+has_field 'nw_password2' => (
     type      => 'Text',
-    label     => 'Second level password',
+    label     => 'Sudo password',
     widget    => 'Password',
     writeonly => 1,
 );
+
+
+sub default_nw_password2 {
+    my $self = shift;
+    my $item = $self->item;
+
+    return unless $item;
+
+    $item->password2 and return EMPTY_PASSWORD;
+    return '';
+}
 
 has_field 'use_ssh_key' => (
     type  => 'Checkbox',
@@ -177,12 +200,11 @@ override 'update_model' => sub {
     my $values = $self->values;
 
     # do not overwrite passwords when are not edited
-    foreach my $k (qw/password password2/) {
-        exists $values->{$k} or next;
+    $values->{nw_password} ne EMPTY_PASSWORD
+        and $values->{password} = $values->{nw_password};
+    $values->{nw_password2} ne EMPTY_PASSWORD
+        and $values->{password2} = $values->{nw_password2};
 
-        defined( $values->{$k} ) or
-            delete $values->{$k};
-    }
 
     $values->{device} = $self->{device};
     $self->_set_value($values);

@@ -146,6 +146,12 @@ sub has_snmp_scalar {
     }
 }
 
+=head 2 has_snmp_table
+
+Creates a snmp_<columnname> accessor for each defined column.
+
+=cut
+
 sub has_snmp_table {
     my ( $name, %options ) = @_;
     my $table_oid = $options{oid};
@@ -230,6 +236,30 @@ has_snmp_scalar 'memTotalReal' => (
     oid     => "${UCD_SNMP_MIB_OID}.4.5",
 );
 
+my $VMWARE_SYSTEM_MIB = '.1.3.6.1.4.1.6876.1';
+has_snmp_scalar 'vmwProdName' => (
+    oid     => "${VMWARE_SYSTEM_MIB}.1",
+);
+has_snmp_scalar 'vmwProdVersion' => (
+    oid     => "${VMWARE_SYSTEM_MIB}.1",
+);
+
+
+my $VMWARE_VMINFO_MIB_OID = '.1.3.6.1.4.1.6876.2';
+has_snmp_table 'vmwVmTable' =>(
+    oid     => "$VMWARE_VMINFO_MIB_OID.1",
+    index   => "vmwVmIdx",
+    columns => {
+         vmwVmIdx          => 1,
+         vmwVmDisplayName  => 2,
+         vmwVmGuestOS      => 4,
+         vmwVmMemSize      => 5,
+         vmwVmState        => 6,
+         vmwVmCpus         => 9,
+         vmwVmUUID         => 10
+     },
+);
+
 
 #----------------------------------------------------------------------#
 
@@ -256,6 +286,7 @@ sub _build_os {
     my $vendor = $self->vendor;
 
     $vendor eq 'Microsoft' and $descr =~ /Software: Windows/ and return "Windows";
+
     if ( $vendor eq 'NetSNMP' ) {
         my @fields = split /\s+/, $descr;
         return $fields[0];
@@ -271,6 +302,11 @@ sub _build_os {
         return 'pix'      if ( $descr =~ /Cisco PIX Security Appliance/ );
         return 'asa'      if ( $descr =~ /Cisco Adaptive Security Appliance/ );
         return 'san-os'   if ( $descr =~ /Cisco SAN-OS/ );
+    }
+
+    if ( $vendor eq 'VMWare') {
+        my $prodname = $self->vmwProdName;
+        return $prodname if defined($prodname);
     }
 
     return '';
@@ -346,6 +382,11 @@ sub _build_os_ver {
         }
     }    # end of Cisco
 
+    if ( $vendor eq 'VMWare') {
+        my $prodver = $self->vmwProdVersion;
+        return $prodver if defined($prodver);
+    }
+
     return '';
 }
 
@@ -414,6 +455,34 @@ sub _build_installed_sw {
     my $parser = $self->package_name_parser;
 
     return [ map  { $parser->($_) } values(%$installed) ];
+}
+
+
+sub _build_virtual_machines {
+    my $self = shift;
+
+    if ( $self->vendor eq 'VMWare') {
+        my @result;
+
+        $self->log->warn("Using vmware MIB to retrieve vm list ");
+
+        my $names = $self->snmp_vmwVmDisplayName;
+        my $uuids = $self->smmp_vmwVmUUID;
+        my $memsizes = $self->snmp_vmwVmMemSize;
+        my $vcpus = $self->snmp_vmwVmCpus;
+
+        while ( my ($idx, $uuid) = each (%$uuids) ) {
+            my $vm_info = {};
+            $vm_info->{uuid}    = $uuid;
+            $vm_info->{name}    = $names->{$idx};
+            $vm_info->{vcpus}   = $vcpus->{$idx};
+            $vm_info->{memsize} = $memsizes->{$idx};
+
+            push @result, $vm_info;
+        }
+
+        return \@result;
+    }
 }
 
 
@@ -600,6 +669,7 @@ my %ID_VENDOR_MAP = (
     6027  => 'Force10',
     6486  => 'AlcatelLucent',
     6527  => 'Timetra',
+    6876  => 'VMware',
     8072  => 'NetSNMP',
     9303  => 'PacketFront',
     10002 => 'Ubiquiti',

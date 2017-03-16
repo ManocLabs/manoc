@@ -13,6 +13,8 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use Manoc::Manifold;
 
+use constant EMPTY_PASSWORD => '######';
+
 has '+name'        => ( default => 'form-servernwinfo' );
 has '+html_prefix' => ( default => 1 );
 
@@ -35,6 +37,16 @@ has_field 'get_packages' => (
     label => 'Get installed software',
 );
 
+has_field 'get_vms' => (
+    type  => 'Checkbox',
+    label => 'Get virtual machines',
+);
+
+has_field 'update_vm' =>  (
+    type  => 'Checkbox',
+    label => 'Update Virtual Machine info',
+);
+
 #Credentials, don't use username/password to avoid autofilling
 
 has_field 'nw_username' => (
@@ -46,17 +58,43 @@ has_field 'nw_username' => (
 has_field 'nw_password' => (
     type      => 'Text',
     label     => 'First level password',
-    accessor  => 'password',
     widget    => 'Password',
     writeonly => 1,
 );
 
-has_field 'password2' => (
+sub default_nw_password {
+    my $self = shift;
+    my $item = $self->item;
+
+    return unless $item;
+
+    $item->password and return EMPTY_PASSWORD;
+    return '';
+}
+
+has_field 'use_sudo' => (
+    type  => 'Checkbox',
+    label => 'Use sudo for privileged commands',
+);
+
+has_field 'nw_password2' => (
     type      => 'Text',
-    label     => 'Second level password',
+    label     => 'Sudo password',
     widget    => 'Password',
     writeonly => 1,
 );
+
+
+sub default_nw_password2 {
+    my $self = shift;
+    my $item = $self->item;
+
+    return unless $item;
+
+    $item->password2 and return EMPTY_PASSWORD;
+    return '';
+}
+
 
 has_field 'use_ssh_key' => (
     type  => 'Checkbox',
@@ -107,12 +145,10 @@ override 'update_model' => sub {
     my $values = $self->values;
 
     # do not overwrite passwords when are not edited
-    foreach my $k (qw/password password2/) {
-        exists $values->{$k} or next;
-
-        defined( $values->{$k} ) or
-            delete $values->{$k};
-    }
+    $values->{nw_password} ne EMPTY_PASSWORD
+        and $values->{password} = $values->{nw_password};
+    $values->{nw_password2} ne EMPTY_PASSWORD
+        and $values->{password2} = $values->{nw_password2};
 
     $values->{server} = $self->{server};
     $self->_set_value($values);

@@ -33,15 +33,19 @@ $('#[% form.name %] input').on('change', function() {
  });
 
 function on_close_hwcreate_form(data) {
-  $("#[% form.name %]\\.serverhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
-  $("#[% form.name %]\\.serverhw").selectpicker('val', data.object_id);
-  $("#[% form.name %]\\.serverhw").selectpicker('refresh');
+  if (data.object_id) {
+    $("#[% form.name %]\\.serverhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+    $("#[% form.name %]\\.serverhw").selectpicker('val', data.object_id);
+    $("#[% form.name %]\\.serverhw").selectpicker('refresh');
+  }
 }
 
 function on_close_vmcreate_form(data) {
-  $("#[% form.name %]\\.vm").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
-  $("#[% form.name %]\\.vm").selectpicker('val', data.object_id);
-  $("#[% form.name %]\\.vm").selectpicker('refresh');
+  if (data.object_id) {
+    $("#[% form.name %]\\.vm").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+    $("#[% form.name %]\\.vm").selectpicker('val', data.object_id);
+    $("#[% form.name %]\\.vm").selectpicker('refresh');
+  }
 }
 
 

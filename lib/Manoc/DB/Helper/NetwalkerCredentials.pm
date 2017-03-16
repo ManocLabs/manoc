@@ -76,6 +76,7 @@ sub get_credentials_hash {
         username       => $self->username,
         password       => $self->password,
         password2      => $self->password2,
+        use_ssh_key    => $self->use_ssh_key,
         key_path       => $self->key_path,
         snmp_community => $self->snmp_community,
         snmp_user      => $self->snmp_user,

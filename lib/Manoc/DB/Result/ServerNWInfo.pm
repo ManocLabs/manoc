@@ -49,13 +49,29 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
+    use_sudo => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => 0,
+    },
+
     get_packages => {
         data_type     => 'int',
         size          => 1,
-        default_value => '0',
+        default_value => 0,
     },
 
+    get_vms => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => 0,
+    },
 
+    update_vm => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => 0,
+    },
 
     # these fields are populated by netwalker
     # and can be compared with hwasset ones

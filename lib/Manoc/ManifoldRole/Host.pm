@@ -53,6 +53,16 @@ has ram_memory => (
 );
 requires '_build_ram_memory';
 
+
+has uuid => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_uuid',
+);
+sub _build_uuid { undef }
+
+
 no Moose::Role;
 1;
 # Local Variables:

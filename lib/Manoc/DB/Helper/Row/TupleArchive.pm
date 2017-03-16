@@ -7,7 +7,7 @@ package Manoc::DB::Helper::Row::TupleArchive;
 use strict;
 use warnings;
 
-use Carp 'carp';
+use Carp 'croak';
 use parent 'DBIx::Class::Row';
 
 __PACKAGE__->mk_group_accessors( inherited => '_tuple_archive_columns' );
@@ -51,13 +51,21 @@ sub set_tuple_archive_columns {
     my $colinfo = $self->columns_info( \@cols );
 
     for my $col (@cols) {
-        carp(
-            sprintf(
-                "Tuple archive columns source '%s' includes the column '%s' which has its " .
-                    "'is_nullable' attribute set to true. This is a mistake.",
-                $self->source_name || $self->name || 'Unknown source...?', $col,
-            )
-        ) if $colinfo->{$col}{is_nullable};
+        if ( $colinfo->{$col}{is_nullable} ) {
+            my $source_name = (
+                $self->can("source_name")
+                    ?  $self->source_name
+                    : ( $self->can("name")
+                        ? $self->name
+                        : 'Unknown source...?'));
+            croak(
+                sprintf(
+                    "Tuple archive columns source '%s' includes the column '%s' which has its " .
+                        "'is_nullable' attribute set to true. This is a mistake.",
+                    $source_name, $col,
+                )
+            );
+        }
     }
 
     # check existence of lastseen and firstseen columns
