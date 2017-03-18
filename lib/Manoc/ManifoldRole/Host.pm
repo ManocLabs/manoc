@@ -53,7 +53,6 @@ has ram_memory => (
 );
 requires '_build_ram_memory';
 
-
 has uuid => (
     is      => 'ro',
     isa     => 'Maybe[Str]',
@@ -61,7 +60,6 @@ has uuid => (
     builder => '_build_uuid',
 );
 sub _build_uuid { undef }
-
 
 no Moose::Role;
 1;

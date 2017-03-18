@@ -23,7 +23,6 @@ has 'use_ssh_key' => (
     builder => '_build_use_ssh_key'
 );
 
-
 has 'key_path' => (
     is      => 'rw',
     isa     => 'Maybe[Str]',
@@ -44,11 +43,10 @@ has 'session' => (
 );
 
 has 'connection_timeout' => (
-    is  => 'rw',
-    isa => 'Num',
+    is      => 'rw',
+    isa     => 'Num',
     default => 4,
 );
-
 
 sub _build_username {
     my $self = shift;
@@ -85,7 +83,6 @@ sub system {
     return $session->system(@_);
 }
 
-
 sub connect {
     my $self = shift;
 
@@ -97,7 +94,7 @@ sub connect {
     $opts{user} = $self->username;
     if ( $self->use_ssh_key ) {
         my $key_path = $self->key_path;
-        $self->log->error( "Connecting to $host using key $key_path" );
+        $self->log->error("Connecting to $host using key $key_path");
         $opts{key_path} = $key_path;
         $self->password and
             $opts{passphrase} = $self->password;

@@ -32,13 +32,11 @@ has_block 'processor_block1' => (
     class       => ['form-group'],
 );
 
-
 has_block 'processor_block2' => (
     render_list => [ 'n_procs', 'n_cores_proc' ],
     tag         => 'div',
     class       => ['form-group'],
 );
-
 
 sub build_render_list {
     my $self = shift;
@@ -51,7 +49,7 @@ sub build_render_list {
         'location_block',
         'rack_block',
 
-        'processor_block1',  'processor_block2',
+        'processor_block1', 'processor_block2',
         'ram_memory',
         'storage1_size', 'storage2_size',
 

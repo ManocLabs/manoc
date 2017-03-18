@@ -133,7 +133,7 @@ __PACKAGE__->might_have(
 );
 
 __PACKAGE__->has_many(
-    installed_sw_pkgs  => 'Manoc::DB::Result::ServerSWPkg',
+    installed_sw_pkgs => 'Manoc::DB::Result::ServerSWPkg',
     'server_id'
 );
 

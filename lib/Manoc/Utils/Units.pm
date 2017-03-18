@@ -9,12 +9,11 @@ use warnings;
 BEGIN {
     use Exporter 'import';
     our @EXPORT_OK = qw/
-                 parse_storage_size
+        parse_storage_size
         /;
 }
 
 use Carp;
-
 
 =head1 DESCRIPTION
 
@@ -45,44 +44,44 @@ sub parse_storage_size {
 
     # use uppercase keys
     my %map = (
-        'B'  => 1,
+        'B' => 1,
         # kilobyte
         'KB' => 1000,
         # kibibyte
         'KIB' => 1024,
         # megabite
-        'MB'  => 1_000_000,
+        'MB' => 1_000_000,
         # mebibyte
         'M'   => 1_048_576,
         'MiB' => 1_048_576,
         # gigabyte
-        'GB'  => 1_000_000_000,
+        'GB' => 1_000_000_000,
         # gibibyte
         'G'   => 1_073_741_824,
         'GiB' => 1_073_741_824,
         # terabyte
-        'TB'  => 1_000_000_000_000,
+        'TB' => 1_000_000_000_000,
         # tebibyte
-        'T'   =>  1_099_511_627_776,
-        'TiB' =>  1_099_511_627_776,
+        'T'   => 1_099_511_627_776,
+        'TiB' => 1_099_511_627_776,
         # petabyte
-        'PB'  => 1_000_000_000_000_000,
+        'PB' => 1_000_000_000_000_000,
         # pebibyte
-        'P'   =>  1_125_899_906_842_624,
-        'PiB' =>  1_125_899_906_842_624,
+        'P'   => 1_125_899_906_842_624,
+        'PiB' => 1_125_899_906_842_624,
         #exabyte
-        'EB'  =>  1_000_000_000_000_000_000,
+        'EB' => 1_000_000_000_000_000_000,
         # exbibyte
-        'B'   =>  1_152_921_504_606_846_976,
-        'EiB' =>  1_152_921_504_606_846_976,
+        'B'   => 1_152_921_504_606_846_976,
+        'EiB' => 1_152_921_504_606_846_976,
     );
-    exists $map{uc($unit)} or
+    exists $map{ uc($unit) } or
         carp "Couldn't parse '$str'. Unknown unit $unit.";
 
     defined($num) or
         carp "Couldn't parse '$str'. Possible invalid syntax.";
 
-    return $num * $map{uc($unit)};
+    return $num * $map{ uc($unit) };
 }
 
 =head1 LICENSE

@@ -128,7 +128,6 @@ __PACKAGE__->add_columns(
         default_value => 'NULL',
     },
 
-
     ram_memory => {
         data_type   => 'int',
         is_nullable => 1,
@@ -158,8 +157,6 @@ __PACKAGE__->belongs_to(
     server => 'Manoc::DB::Result::Server',
     { 'foreign.id' => 'self.server_id' }
 );
-
-
 
 =head1 NAME
 

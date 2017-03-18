@@ -81,7 +81,7 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
 
     # create  search filter (WHERE clause)
     my $search_filter = {};
-    my $search_attrs = { %{ $self->datatable_search_options } };
+    my $search_attrs  = { %{ $self->datatable_search_options } };
 
     if ($search) {
         $search_filter = [];

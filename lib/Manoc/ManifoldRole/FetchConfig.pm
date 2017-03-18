@@ -13,7 +13,6 @@ has 'configuration' => (
 );
 requires '_build_configuration';
 
-
 no Moose::Role;
 1;
 # Local Variables:

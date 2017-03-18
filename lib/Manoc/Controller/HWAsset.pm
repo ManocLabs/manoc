@@ -77,11 +77,11 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
 
     if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
         my $nwinfo = $c->model('ManocDB::DeviceNWInfo')->find($nwinfo_id);
-        if ( $nwinfo ) {
+        if ($nwinfo) {
             my %cols;
-            $cols{model}      = $nwinfo->model;
-            $cols{vendor}     = $nwinfo->vendor;
-            $cols{serial}     = $nwinfo->serial;
+            $cols{model}  = $nwinfo->model;
+            $cols{vendor} = $nwinfo->vendor;
+            $cols{serial} = $nwinfo->serial;
             $c->stash( form_defaults => \%cols );
         }
     }

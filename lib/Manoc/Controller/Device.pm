@@ -413,12 +413,13 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     my $response = {};
     $response->{success} = 0;
 
-    if ( !$device->decommissioned && defined( $device->netwalker_info ) &&
-             $c->req->method eq 'POST' )
-        {
+    if ( !$device->decommissioned &&
+        defined( $device->netwalker_info ) &&
+        $c->req->method eq 'POST' )
+    {
         my $nwinfo = $device->netwalker_info;
-        my $what   = lc($c->req->params->{what});
-        $what eq 'name'     and $device->name($nwinfo->name);
+        my $what   = lc( $c->req->params->{what} );
+        $what eq 'name' and $device->name( $nwinfo->name );
         $device->update();
         $response->{success} = 1;
     }

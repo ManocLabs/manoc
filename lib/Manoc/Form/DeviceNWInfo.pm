@@ -13,7 +13,6 @@ with 'Manoc::Form::TraitFor::SaveButton';
 
 use constant EMPTY_PASSWORD => '######';
 
-
 use Manoc::Manifold;
 
 has '+name'        => ( default => 'form-devicenwinfo' );
@@ -83,7 +82,6 @@ has_field 'nw_username' => (
     accessor => 'username',
 );
 
-
 has_field 'nw_password' => (
     type      => 'Text',
     label     => 'First level password',
@@ -99,14 +97,13 @@ sub default_nw_password {
 
     $item->password and return EMPTY_PASSWORD;
     return '';
-};
+}
 has_field 'nw_password2' => (
     type      => 'Text',
     label     => 'Sudo password',
     widget    => 'Password',
     writeonly => 1,
 );
-
 
 sub default_nw_password2 {
     my $self = shift;
@@ -200,11 +197,10 @@ override 'update_model' => sub {
     my $values = $self->values;
 
     # do not overwrite passwords when are not edited
-    $values->{nw_password} ne EMPTY_PASSWORD
-        and $values->{password} = $values->{nw_password};
-    $values->{nw_password2} ne EMPTY_PASSWORD
-        and $values->{password2} = $values->{nw_password2};
-
+    $values->{nw_password} ne EMPTY_PASSWORD and
+        $values->{password} = $values->{nw_password};
+    $values->{nw_password2} ne EMPTY_PASSWORD and
+        $values->{password2} = $values->{nw_password2};
 
     $values->{device} = $self->{device};
     $self->_set_value($values);

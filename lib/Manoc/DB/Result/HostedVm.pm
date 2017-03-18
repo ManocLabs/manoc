@@ -33,7 +33,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_tuple_archive_columns(qw(vm_id hypervisor_id));
 
-__PACKAGE__->set_primary_key( qw(vm_id hypervisor_id firstseen) );
+__PACKAGE__->set_primary_key(qw(vm_id hypervisor_id firstseen));
 
 __PACKAGE__->belongs_to(
     vm => 'Manoc::DB::Result::VirtualMachine',
@@ -48,8 +48,8 @@ __PACKAGE__->belongs_to(
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 
-    $sqlt_schema->add_index( name => 'idx_hostedvm_vm',   fields => ['vm_id'] );
-    $sqlt_schema->add_index( name => 'idx_hostedvm_hyperv',   fields => ['hypervisor_id'] );
+    $sqlt_schema->add_index( name => 'idx_hostedvm_vm',     fields => ['vm_id'] );
+    $sqlt_schema->add_index( name => 'idx_hostedvm_hyperv', fields => ['hypervisor_id'] );
 
 }
 

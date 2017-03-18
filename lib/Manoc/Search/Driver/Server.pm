@@ -69,6 +69,5 @@ sub _search_name {
         ->search( { hostname => { -like => $pattern } }, { order_by => 'name' }, );
 }
 
-
 no Moose;
 __PACKAGE__->meta->make_immutable;

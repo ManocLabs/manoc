@@ -14,7 +14,6 @@ use Manoc::Form::Server;
 use Manoc::Form::Server::Decommission;
 use Manoc::Form::ServerNWInfo;
 
-
 =head1 NAME
 
 Manoc::Controller::Server - Catalyst Controller
@@ -38,7 +37,7 @@ __PACKAGE__->config(
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
 
-    find_object_options     => { prefetch => { installed_sw_pkgs => 'software_pkg' } }
+    find_object_options => { prefetch => { installed_sw_pkgs => 'software_pkg' } }
 );
 
 =head2 create
@@ -138,7 +137,6 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-
 =head2 nwinfo
 
 =cut
@@ -206,14 +204,15 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     my $response = {};
     $response->{success} = 0;
 
-    if ( !$server->decommissioned && defined( $server->netwalker_info ) &&
-             $c->req->method eq 'POST' )
-        {
+    if ( !$server->decommissioned &&
+        defined( $server->netwalker_info ) &&
+        $c->req->method eq 'POST' )
+    {
         my $nwinfo = $server->netwalker_info;
-        my $what   = lc($c->req->params->{what});
-        $what eq 'hostname' and $server->hostname($nwinfo->name);
-        $what eq 'os'       and $server->os($nwinfo->os);
-        $what eq 'os_ver'   and $server->os_ver($nwinfo->os_ver);
+        my $what   = lc( $c->req->params->{what} );
+        $what eq 'hostname' and $server->hostname( $nwinfo->name );
+        $what eq 'os'       and $server->os( $nwinfo->os );
+        $what eq 'os_ver'   and $server->os_ver( $nwinfo->os_ver );
         $server->update();
         $response->{success} = 1;
     }
@@ -221,7 +220,6 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     $c->stash( json_data => $response );
     $c->forward('View::JSON');
 }
-
 
 =head1 AUTHOR
 

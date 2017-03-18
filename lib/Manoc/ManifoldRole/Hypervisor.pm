@@ -5,7 +5,6 @@
 package Manoc::ManifoldRole::Hypervisor;
 use Moose::Role;
 
-
 # expected map:
 #  - uuid
 #  - name
@@ -19,7 +18,6 @@ has 'virtual_machines' => (
     builder => '_build_virtual_machines',
 );
 requires '_build_virtual_machines';
-
 
 no Moose::Role;
 1;

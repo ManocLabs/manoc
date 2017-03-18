@@ -79,7 +79,8 @@ has 'boottime' => (
     lazy    => 1,
     builder => '_build_boottime',
 );
-requires '_build_boottime'; { undef }
+requires '_build_boottime';
+{ undef }
 
 no Moose::Role;
 1;

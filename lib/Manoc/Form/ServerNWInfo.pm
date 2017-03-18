@@ -42,7 +42,7 @@ has_field 'get_vms' => (
     label => 'Get virtual machines',
 );
 
-has_field 'update_vm' =>  (
+has_field 'update_vm' => (
     type  => 'Checkbox',
     label => 'Update Virtual Machine info',
 );
@@ -84,7 +84,6 @@ has_field 'nw_password2' => (
     writeonly => 1,
 );
 
-
 sub default_nw_password2 {
     my $self = shift;
     my $item = $self->item;
@@ -94,7 +93,6 @@ sub default_nw_password2 {
     $item->password2 and return EMPTY_PASSWORD;
     return '';
 }
-
 
 has_field 'use_ssh_key' => (
     type  => 'Checkbox',
@@ -145,10 +143,10 @@ override 'update_model' => sub {
     my $values = $self->values;
 
     # do not overwrite passwords when are not edited
-    $values->{nw_password} ne EMPTY_PASSWORD
-        and $values->{password} = $values->{nw_password};
-    $values->{nw_password2} ne EMPTY_PASSWORD
-        and $values->{password2} = $values->{nw_password2};
+    $values->{nw_password} ne EMPTY_PASSWORD and
+        $values->{password} = $values->{nw_password};
+    $values->{nw_password2} ne EMPTY_PASSWORD and
+        $values->{password2} = $values->{nw_password2};
 
     $values->{server} = $self->{server};
     $self->_set_value($values);

@@ -78,7 +78,7 @@ before 'create' => sub {
 
     if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
         my $nwinfo = $c->model('ManocDB::ServerNWInfo')->find($nwinfo_id);
-        if ( $nwinfo ) {
+        if ($nwinfo) {
             my %cols;
             $cols{model}      = $nwinfo->model;
             $cols{vendor}     = $nwinfo->vendor;
@@ -90,7 +90,6 @@ before 'create' => sub {
             $c->stash( form_defaults => \%cols );
         }
     }
-
 
 };
 

@@ -15,8 +15,7 @@ sub search_inventory {
 
     my $it =
         $schema->resultset('VirtualMachine')
-        ->search(
-        [ { uuid => { -like => $pattern } }, { name => { -like => $pattern } } ],
+        ->search( [ { uuid => { -like => $pattern } }, { name => { -like => $pattern } } ],
         { order_by => 'name' } );
 
     while ( my $v = $it->next ) {
@@ -24,8 +23,6 @@ sub search_inventory {
         $result->add_item($item);
     }
 }
-
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

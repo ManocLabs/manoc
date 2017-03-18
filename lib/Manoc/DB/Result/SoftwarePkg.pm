@@ -26,7 +26,7 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( ['name'] );
 
 __PACKAGE__->has_many(
-    server_swpkg  => 'Manoc::DB::Result::ServerSWPkg',
+    server_swpkg => 'Manoc::DB::Result::ServerSWPkg',
     'software_pkg_id'
 );
 
@@ -36,15 +36,16 @@ sub count_servers_by_version {
     $self->server_swpkg->search(
         {},
         {
-            select   => [
+            select => [
                 'version',
                 {
                     count => 'server_id',
                 }
             ],
             as       => [qw/ version n_servers /],
-            group_by => [ 'version' ],
-        });
+            group_by => ['version'],
+        }
+    );
 }
 
 __PACKAGE__->many_to_many( servers => 'server_swpkg', 'server' );

@@ -8,21 +8,19 @@ use Moose::Role;
 sub render {
     my ( $self, $ctx ) = @_;
 
-    return $self->render_heading($ctx)
-        . " "
-        . $self->render_items($ctx);
+    return $self->render_heading($ctx) . " " . $self->render_items($ctx);
 }
 
 sub render_heading {
     my ( $self, $ctx ) = @_;
-    return "" if (  @{ $self->items} == 1 );
+    return "" if ( @{ $self->items } == 1 );
     return $self->match();
 }
 
 sub render_items {
     my ( $self, $ctx ) = @_;
 
-    if (  @{ $self->items} == 1 ) {
+    if ( @{ $self->items } == 1 ) {
         my $item = $self->items->[0];
         return $item->render($ctx);
     }

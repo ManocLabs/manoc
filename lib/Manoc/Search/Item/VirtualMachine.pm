@@ -29,8 +29,8 @@ around BUILDARGS => sub {
         my $args = $_[0];
         my $v    = $args->{vm};
         if ($v) {
-            $args->{id}    = $v->id;
-            $args->{name}  = $v->name;
+            $args->{id}   = $v->id;
+            $args->{name} = $v->name;
             $args->{match} ||= $v->name;
         }
         return $class->$orig($args);

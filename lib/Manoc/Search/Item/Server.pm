@@ -20,7 +20,6 @@ has 'hostname' => (
     isa => 'Str',
 );
 
-
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -29,9 +28,9 @@ around BUILDARGS => sub {
         my $args   = $_[0];
         my $server = $args->{server};
         if ($server) {
-            $args->{id}         = $server->id;
-            $args->{hostname}   = $server->hostname || '';
-            $args->{match}    ||= $server->hostname;
+            $args->{id} = $server->id;
+            $args->{hostname} = $server->hostname || '';
+            $args->{match} ||= $server->hostname;
 
         }
         return $class->$orig($args);

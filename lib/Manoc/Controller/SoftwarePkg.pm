@@ -15,7 +15,6 @@ with
     'Manoc::ControllerRole::Object',
     'Manoc::ControllerRole::JQDatatable';
 
-
 =head1 NAME
 
 Manoc::Controller::Building - Catalyst Controller
@@ -32,29 +31,28 @@ __PACKAGE__->config(
     # define PathPart
     action => {
         setup => {
-           PathPart => 'softwarepkg',
+            PathPart => 'softwarepkg',
         }
     },
     class                   => 'ManocDB::SoftwarePkg',
     enable_permission_check => 1,
     view_object_perm        => undef,
 
-    datatable_columns         => [ 'name', 'n_servers' ],
-    datatable_row_callback    => 'datatable_row',
-    datatable_search_columns  => [ 'name' ],
-    datatable_search_options  => {
-        '+select' =>  [
+    datatable_columns        => [ 'name', 'n_servers' ],
+    datatable_row_callback   => 'datatable_row',
+    datatable_search_columns => ['name'],
+    datatable_search_options => {
+        '+select' => [
             {
                 count => 'server_swpkg.server_id',
-                -as => 'n_servers',
-          }
+                -as   => 'n_servers',
+            }
         ],
-        group_by => [ 'id' ],
-        join =>  'server_swpkg',
+        group_by => ['id'],
+        join     => 'server_swpkg',
     },
     # datatable_search_callback => 'datatable_search_cb',
 );
-
 
 sub datatable_row {
     my ( $self, $c, $row ) = @_;
@@ -67,7 +65,6 @@ sub datatable_row {
         link      => $c->uri_for_action( $action, [ $row->id ] ),
     };
 }
-
 
 =head2 view
 

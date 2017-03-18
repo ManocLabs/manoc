@@ -10,7 +10,6 @@ use namespace::autoclean;
 
 requires 'base';
 
-
 has find_object_options => (
     is      => 'rw',
     isa     => 'HashRef',
@@ -86,7 +85,7 @@ Search the object in stash->{resultset} using given the pk.
 sub get_object {
     my ( $self, $c, $pk ) = @_;
     my $options = $c->stash->{find_object_options} || $self->find_object_options;
-    return $c->stash->{resultset}->find($pk, $options);
+    return $c->stash->{resultset}->find( $pk, $options );
 }
 
 1;
