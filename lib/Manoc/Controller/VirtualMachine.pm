@@ -48,15 +48,14 @@ before 'create' => sub {
 
     if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
         my $nwinfo = $c->model('ManocDB::ServerNWInfo')->find($nwinfo_id);
-        if ( $nwinfo ) {
+        if ($nwinfo) {
             my %cols;
-            $cols{vcpus}    = $nwinfo->n_procs;
+            $cols{vcpus}      = $nwinfo->n_procs;
             $cols{ram_memory} = $nwinfo->ram_memory;
             $c->stash( form_defaults => \%cols );
         }
     }
 };
-
 
 =head2 edit
 

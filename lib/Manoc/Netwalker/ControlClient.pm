@@ -116,7 +116,6 @@ sub enqueue_server {
     return $self->check_response($response);
 }
 
-
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

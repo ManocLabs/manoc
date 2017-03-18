@@ -10,8 +10,8 @@ use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Model::DBIC';
 
 #required for CSRF
-has '+ctx' => ( required => 1, );
-has '+is_html5' => ( default => 1 );
+has '+ctx'      => ( required => 1, );
+has '+is_html5' => ( default  => 1 );
 
 with 'Manoc::Form::TraitFor::Theme', 'Manoc::Form::TraitFor::CSRF';
 
@@ -24,7 +24,7 @@ sub html_attributes {
     my ( $self, $field, $type, $attr ) = @_;
     if ( $type eq 'label' && $field->{required} ) {
         # highlight required fields
-        push @{$attr->{class}}, 'required-label';
+        push @{ $attr->{class} }, 'required-label';
     }
     return $attr;
 }

@@ -99,7 +99,7 @@ sub _build_server_entry {
     my $self = shift;
     my $id   = $self->server_id;
 
-    return $self->schema->resultset('Server')->find( $id );
+    return $self->schema->resultset('Server')->find($id);
 }
 
 sub _build_nwinfo {
@@ -139,9 +139,9 @@ sub _build_source {
     $self->log->debug("Using Manifold $manifold_name");
 
     my %params = (
-        host         => $host,
-        credentials  => $self->credentials,
-        use_sudo     => $nwinfo->use_sudo,
+        host        => $host,
+        credentials => $self->credentials,
+        use_sudo    => $nwinfo->use_sudo,
     );
 
     my $source = $self->_create_manifold( $manifold_name, %params );
@@ -223,9 +223,9 @@ sub update {
 sub update_server_info {
     my $self = shift;
 
-    my $source    = $self->source;
+    my $source       = $self->source;
     my $server_entry = $self->server_entry;
-    my $nw_entry  = $self->nwinfo;
+    my $nw_entry     = $self->nwinfo;
 
     my $name = $source->name;
     $nw_entry->name($name);
@@ -273,42 +273,45 @@ sub update_server_info {
 sub update_vm {
     my $self = shift;
 
-    my $source    = $self->source;
+    my $source       = $self->source;
     my $server_entry = $self->server_entry;
-    my $nw_entry  = $self->nwinfo;
-    my $vm = $server_entry->vm;
+    my $nw_entry     = $self->nwinfo;
+    my $vm           = $server_entry->vm;
 
     my $uuid = $source->uuid;
     return unless defined($uuid);
 
     # nothing to change
-    defined($vm->identifier)
-        and lc($uuid) eq lc($vm->identifier)
-        and return;
+    defined( $vm->identifier ) and
+        lc($uuid) eq lc( $vm->identifier ) and
+        return;
 
-    if ( defined($vm) && !defined ($vm->identifier) ) {
+    if ( defined($vm) && !defined( $vm->identifier ) ) {
         $self->log->debug("Setting related vm uuid $uuid");
         $vm->identifier($uuid);
         $vm->update;
-    } else {
+    }
+    else {
         my @virtual_machines;
 
-        if (defined($vm) &&  defined($vm->hypervisor) ) {
-            $self->log->debug("Searching for vm with $uuid in the same hypervisor or infrastructure");
+        if ( defined($vm) && defined( $vm->hypervisor ) ) {
+            $self->log->debug(
+                "Searching for vm with $uuid in the same hypervisor or infrastructure");
 
             # check if there is already an unused vm with the given uuid in the same hypervisor
             # or infrastructure
             my $hypervisor = $vm->hypervisor;
-            my $vm_rs = (
-                $hypervisor->virtinfr
-                    ? $hypervisor->virtinfr->virtual_machines
-                    : $hypervisor->virtual_machines
-                );
-            @virtual_machines = $vm_rs->unused->search( {
-                identifier => { -in => [ lc($uuid), uc($uuid) ] }
-            } );
+            my $vm_rs      = (
+                $hypervisor->virtinfr ? $hypervisor->virtinfr->virtual_machines :
+                    $hypervisor->virtual_machines
+            );
+            @virtual_machines = $vm_rs->unused->search(
+                {
+                    identifier => { -in => [ lc($uuid), uc($uuid) ] }
+                }
+            );
         }
-        elsif ( !defined($server_entry->serverhw) ) {
+        elsif ( !defined( $server_entry->serverhw ) ) {
             $self->log->debug("Searching for vm with $uuid and compatible name");
 
             my @names;
@@ -316,13 +319,14 @@ sub update_vm {
             push @names, $hostname;
             $hostname =~ /^([^.]+)\./ and push @names, $1;
 
-            @virtual_machines = $self->schema->resultset('VirtualMachine')
-                ->unused->search( {
+            @virtual_machines = $self->schema->resultset('VirtualMachine')->unused->search(
+                {
                     identifier => { -in => [ lc($uuid), uc($uuid) ] },
-                    name => { -in => \@names }
-                } ) ;
+                    name       => { -in => \@names }
+                }
+            );
         }
-        if (@virtual_machines == 1) {
+        if ( @virtual_machines == 1 ) {
             my $new_vm = $virtual_machines[0];
             $self->log->debug("Associating vm $uuid");
             $server_entry->vm($new_vm);
@@ -341,17 +345,16 @@ sub update_virtual_machines {
     my $source = $self->source;
     return unless $source->does('Manoc::ManifoldRole::Hypervisor');
 
-    my $server  = $self->server_entry;
+    my $server = $self->server_entry;
     return unless $server->is_hypervisor;
 
     my $server_id = $server->id;
     my $timestamp = $self->timestamp;
 
     my $vm_rs = (
-        $server->virtinfr
-            ? $server->virtinfr->virtual_machines
-            : $server->virtual_machines
-        );
+        $server->virtinfr ? $server->virtinfr->virtual_machines :
+            $server->virtual_machines
+    );
 
     my $vm_list = $source->virtual_machines;
 
@@ -359,28 +362,30 @@ sub update_virtual_machines {
 
     foreach my $vm_info (@$vm_list) {
         my $uuid = $vm_info->{uuid};
-        my @vms = $vm_rs->search({ identifier => $uuid });
+        my @vms = $vm_rs->search( { identifier => $uuid } );
 
-        if (@vms > 1) {
-            $self->log->warn("More than a vm with the same uuid $uuid. Info will not be updated.");
+        if ( @vms > 1 ) {
+            $self->log->warn(
+                "More than a vm with the same uuid $uuid. Info will not be updated.");
             next;
         }
 
         my $vm;
-        if (@vms == 1) {
+        if ( @vms == 1 ) {
             $vm = $vms[0];
-        } else {
+        }
+        else {
             $self->log->info("Creating new vm $uuid.");
 
-            $vm =  $self->schema->resultset('VirtualMachine')->new_result({});
-            $vm->identifier( $uuid );
-            $vm->hypervisor( $server );
+            $vm = $self->schema->resultset('VirtualMachine')->new_result( {} );
+            $vm->identifier($uuid);
+            $vm->hypervisor($server);
         }
 
         # update vm info
-        $vm->name($vm_info->{name});
-        $vm->vcpus($vm_info->{vcpus});
-        $vm->ram_memory($vm_info->{memsize});
+        $vm->name( $vm_info->{name} );
+        $vm->vcpus( $vm_info->{vcpus} );
+        $vm->ram_memory( $vm_info->{memsize} );
         $vm->update_or_insert();
 
         $self->schema->resultset('HostedVm')->register_tuple(
@@ -388,7 +393,7 @@ sub update_virtual_machines {
             vm_id         => $vm->id,
             timestamp     => $timestamp,
         );
-    }  # end of virtual machines loop
+    }    # end of virtual machines loop
 
 }
 
@@ -402,19 +407,18 @@ sub update_packages {
     my $source = $self->source;
     return unless $source->does('Manoc::ManifoldRole::Host');
 
-    my $schema  = $self->schema;
-    my $server  = $self->server_entry;
+    my $schema = $self->schema;
+    my $server = $self->server_entry;
 
-    my $pkgs    = $source->installed_sw;
+    my $pkgs = $source->installed_sw;
 
     $server->installed_sw_pkgs->delete;
     foreach my $p (@$pkgs) {
-        my ($name, $version) = @$p;
+        my ( $name, $version ) = @$p;
 
-        my $pkg = $schema->resultset('SoftwarePkg')->find_or_create({name => $name});
+        my $pkg = $schema->resultset('SoftwarePkg')->find_or_create( { name => $name } );
         $server->update_or_create_related(
-            installed_sw_pkgs => { software_pkg => $pkg, version => $version }
-        );
+            installed_sw_pkgs => { software_pkg => $pkg, version => $version } );
     }
 }
 

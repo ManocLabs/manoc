@@ -20,7 +20,7 @@ has _scoreboard => (
     is      => 'ro',
     isa     => 'Manoc::Netwalker::Poller::Scoreboard',
     default => sub { Manoc::Netwalker::Poller::Scoreboard->new() },
-    handles     => {
+    handles => {
         'scoreboard_get_device' => 'get_device',
         'scoreboard_set_device' => 'set_device',
         'scoreboard_get_server' => 'get_server',
@@ -49,16 +49,16 @@ workers processes.
 sub worker_stdout {
     my ( $self, $task_info ) = @_;
 
-    my $class   = $task_info->{class};
-    my $id      = $task_info->{id};
-    my $status  = $task_info->{status};
+    my $class  = $task_info->{class};
+    my $id     = $task_info->{id};
+    my $status = $task_info->{status};
 
     $self->log->debug("got feedback class=$class, id=$id status=$status");
 
     $class eq 'device' and
-        $self->scoreboard_set_device($id, $status);
+        $self->scoreboard_set_device( $id, $status );
     $class eq 'server' and
-        $self->scoreboard_set_server($id, $status);
+        $self->scoreboard_set_server( $id, $status );
 
     if ( $status eq 'DONE' ) {
         my $report = Manoc::Netwalker::Poller::TaskReport->thaw( $task_info->{report} );
@@ -123,7 +123,7 @@ sub schedule_devices {
 sub enqueue_device {
     my ( $self, $device_id ) = @_;
 
-    $self->scoreboard_set_device($device_id, 'QUEUED');
+    $self->scoreboard_set_device( $device_id, 'QUEUED' );
     $self->enqueue( sub { $self->visit_device($device_id) } );
     $self->log->debug("Enqueued device $device_id");
 }
@@ -162,7 +162,6 @@ sub visit_device {
     print @{ POE::Filter::Reference->new->put( [$task_info] ) };
 }
 
-
 =head2 schedule_servers
 
 =cut
@@ -197,7 +196,6 @@ sub schedule_servers {
     }
 }
 
-
 =head2 enqueue_server
 
 =cut
@@ -205,7 +203,7 @@ sub schedule_servers {
 sub enqueue_server {
     my ( $self, $server_id ) = @_;
 
-    $self->scoreboard_set_server($server_id, 'QUEUED');
+    $self->scoreboard_set_server( $server_id, 'QUEUED' );
     $self->enqueue( sub { $self->visit_server($server_id) } );
     $self->log->debug("Enqueued server $server_id");
 }

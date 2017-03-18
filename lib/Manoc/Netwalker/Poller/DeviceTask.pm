@@ -592,7 +592,7 @@ sub update_config {
     my $config_source   = $self->config_source;
 
     unless ( $config_source->does('Manoc::ManifoldRole::FetchConfig') ) {
-        $self->log->warnings( "Config source does not support fetchconfig" );
+        $self->log->warnings("Config source does not support fetchconfig");
         return;
     }
 

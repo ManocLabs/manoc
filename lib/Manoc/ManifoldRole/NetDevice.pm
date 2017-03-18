@@ -37,7 +37,6 @@ has vtp_database => (
 );
 sub _build_vtp_database { }
 
-
 has 'ifstatus_table' => (
     is      => 'ro',
     isa     => 'Maybe[HashRef]',

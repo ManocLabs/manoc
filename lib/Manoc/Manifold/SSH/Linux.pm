@@ -21,8 +21,8 @@ around '_build_username' => sub {
 };
 
 has 'use_sudo' => (
-    is      => 'rw',
-    isa     => 'Maybe[Bool]',
+    is  => 'rw',
+    isa => 'Maybe[Bool]',
 );
 
 has 'sudo_password' => (
@@ -55,7 +55,7 @@ sub _build_has_perl {
 
 sub _build_uuid {
     my $self = shift;
-    my $r = $self->dmidecode("system-uuid");
+    my $r    = $self->dmidecode("system-uuid");
 }
 
 has cpuinfo => (
@@ -81,9 +81,9 @@ sub _build_cpuinfo {
     my $freq  = 0;
 
     foreach my $line (@data) {
-        $count++     if $line =~ /processor\s+:\s+(\d+)/;
-        $model = $1  if $line =~ /model name\s+:\s+(.+?)$/;
-        $freq  = $1  if $line =~ /cpu MHz\s+:\s+(\d+)(\.\d+)=$/
+        $count++ if $line =~ /processor\s+:\s+(\d+)/;
+        $model = $1 if $line =~ /model name\s+:\s+(.+?)$/;
+        $freq  = $1 if $line =~ /cpu MHz\s+:\s+(\d+)(\.\d+)=$/;
     }
 
     return {
@@ -105,7 +105,7 @@ sub _build_boottime {
 
 sub _build_name {
     my $self = shift;
-    my $r = $self->cmd('uname -n');
+    my $r    = $self->cmd('uname -n');
     chomp($r);
     return $r || undef;
 }
@@ -148,12 +148,14 @@ EOS
         ;
 
     my @out = $self->cmd( { stdin_data => $os_script }, "sh" );
-    my $os  = $out[0]; $os  =~ s/\r?\n//o;
-    my $ver = $out[1]; $ver =~ s/\r?\n//o;
+    my $os = $out[0];
+    $os =~ s/\r?\n//o;
+    my $ver = $out[1];
+    $ver =~ s/\r?\n//o;
     return {
         os  => $os,
         ver => $ver
-    }
+    };
 }
 
 sub _build_os {
@@ -173,7 +175,7 @@ sub _build_kernel {
 }
 
 sub _build_kernel_ver {
-    my $self = shift;
+    my $self       = shift;
     my $kernel_ver = $self->cmd('uname -r');
     chomp($kernel_ver);
     return $kernel_ver;
@@ -218,7 +220,7 @@ sub _build_ram_memory {
     };
 
     foreach my $line (@data) {
-        $line =~ /^MemTotal:\s+(\d+)\s+kB$/ and return int($1/1024);
+        $line =~ /^MemTotal:\s+(\d+)\s+kB$/ and return int( $1 / 1024 );
     }
 
     return 0;
@@ -249,7 +251,6 @@ sub _build_arp_table {
     return \%arp_table;
 }
 
-
 sub _build_installed_sw {
     my $self = shift;
 
@@ -261,25 +262,27 @@ sub _build_installed_sw {
         my @data = $self->cmd('rpm --queryformat "%{NAME} %{VERSION}\n" -qa');
         foreach my $line (@data) {
             chomp($line);
-            my ($pkg, $version) = split /\s+/, $line;
+            my ( $pkg, $version ) = split /\s+/, $line;
             push @list, [ $pkg, $version ];
         }
-    } elsif (  $self->system('dpkg-query --version')  ) {
+    }
+    elsif ( $self->system('dpkg-query --version') ) {
         $self->log->debug("Using dpkg to fetch installed software");
 
         my @data = $self->cmd("dpkg-query -f '\${binary:Package} \${Version}\n' -W");
-         foreach my $line (@data) {
+        foreach my $line (@data) {
             chomp($line);
-            my ($pkg, $version) = split /\s+/, $line;
+            my ( $pkg, $version ) = split /\s+/, $line;
             push @list, [ $pkg, $version ];
         }
-    } elsif ( $self->system('opkg info opkg') ) {
+    }
+    elsif ( $self->system('opkg info opkg') ) {
         $self->log->debug("Using opkg to fetch installed software");
 
         my @data = $self->cmd('opkg list');
         foreach my $line (@data) {
             chomp($line);
-            my ($pkg, $version) = split /\s+-\s+/, $line;
+            my ( $pkg, $version ) = split /\s+-\s+/, $line;
             push @list, [ $pkg, $version ];
         }
     }
@@ -291,16 +294,16 @@ sub _build_virtual_machines {
     my $self = shift;
 
     $self->log->warn("Using virsh to get uuid list");
-    my @data = $self->root_cmd('virsh', 'list', '--uuid' );
+    my @data = $self->root_cmd( 'virsh', 'list', '--uuid' );
 
-    if ( !defined($data[0]) ) {
+    if ( !defined( $data[0] ) ) {
         $self->log->warn("Error using virsh");
         return;
     }
 
     my @uuids;
     foreach my $line (@data) {
-        chomp ($line);
+        chomp($line);
         $line or last;
 
         $line =~ /^([\da-fA-F-]+)$/ and push @uuids, $1;
@@ -312,7 +315,7 @@ sub _build_virtual_machines {
         my $vm_info = {};
 
         $self->log->debug("Using virsh to get dominfo for $uuid");
-        my @data = $self->root_cmd('virsh', 'dominfo', $uuid );
+        my @data = $self->root_cmd( 'virsh', 'dominfo', $uuid );
 
         foreach my $line (@data) {
             chomp($line);
@@ -321,15 +324,15 @@ sub _build_virtual_machines {
             $line =~ /^([^:]+):\s+(.*)$/o or
                 $self->log->warn("cannot parse virsh output line $line"), next;
 
-            my ($key, $value) = ($1, $2);
+            my ( $key, $value ) = ( $1, $2 );
             $key eq 'Name' and
-                $vm_info->{name}    = $value;
+                $vm_info->{name} = $value;
             $key eq 'UUID' and
-                $vm_info->{uuid}    = $value;
+                $vm_info->{uuid} = $value;
             $key eq 'CPU(s)' and
                 $vm_info->{vcpus} = $value;
             $key eq 'Max memory' and
-                $vm_info->{memsize} = parse_storage_size($value)/(1024*1024);
+                $vm_info->{memsize} = parse_storage_size($value) / ( 1024 * 1024 );
         }
         push @result, $vm_info;
 
@@ -337,13 +340,11 @@ sub _build_virtual_machines {
     return \@result;
 }
 
-
-
 sub dmidecode {
-    my ($self, $keyword) = @_;
-    my @out = $self->root_cmd("dmidecode", "-s", $keyword);
+    my ( $self, $keyword ) = @_;
+    my @out = $self->root_cmd( "dmidecode", "-s", $keyword );
 
-    defined($out[0]) or return undef;
+    defined( $out[0] ) or return undef;
 
     my $ret = undef;
     foreach my $line (@out) {
@@ -354,11 +355,10 @@ sub dmidecode {
     return undef;
 }
 
-
 sub root_cmd {
     my $self = shift;
 
-    my $opts = ref($_[0]) eq 'ARRAY' ? shift : {};
+    my $opts = ref( $_[0] ) eq 'ARRAY' ? shift : {};
     my @cmd = @_;
 
     if ( $self->username ne 'root' ) {
@@ -367,14 +367,16 @@ sub root_cmd {
 
             if ($sudo_passwd) {
                 $opts->{stdin_data} = $sudo_passwd;
-                $opts->{tty} = 1;
+                $opts->{tty}        = 1;
 
                 @cmd = ( 'sudo', '-k', '-p', '', '--', @cmd );
-            } else {
+            }
+            else {
                 @cmd = ( 'sudo', '--', @cmd );
             }
-            $self->log->debug("using sudo: " . join(' ', @cmd));
-        } else {
+            $self->log->debug( "using sudo: " . join( ' ', @cmd ) );
+        }
+        else {
             return undef;
         }
     }

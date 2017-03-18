@@ -113,14 +113,11 @@ sub connect {
     return 1;
 }
 
-
-
 #----------------------------------------------------------------------#
 #
 #                 SNMP scalar and table declaration
 #
 #----------------------------------------------------------------------#
-
 
 sub has_snmp_scalar {
     my ( $name, %options ) = @_;
@@ -180,7 +177,7 @@ sub has_snmp_table {
             *{$builder_name} = sub {
                 my $self = shift;
                 $self->_mib_read_tablerow( $col_oid, $munger );
-            }
+                }
         }
     }
 }
@@ -227,39 +224,31 @@ has_snmp_table 'hrProcessorTable' => (
     oid     => "$HOST_RESOURCES_MIB_OID.3.3",
     index   => 'hrDeviceIndex',
     columns => {
-        'hrProcessorLoad'  => 2,
+        'hrProcessorLoad' => 2,
     },
 );
 
 my $UCD_SNMP_MIB_OID = '.1.3.6.1.4.1.2021';
-has_snmp_scalar 'memTotalReal' => (
-    oid     => "${UCD_SNMP_MIB_OID}.4.5",
-);
+has_snmp_scalar 'memTotalReal' => ( oid => "${UCD_SNMP_MIB_OID}.4.5", );
 
 my $VMWARE_SYSTEM_MIB = '.1.3.6.1.4.1.6876.1';
-has_snmp_scalar 'vmwProdName' => (
-    oid     => "${VMWARE_SYSTEM_MIB}.1",
-);
-has_snmp_scalar 'vmwProdVersion' => (
-    oid     => "${VMWARE_SYSTEM_MIB}.1",
-);
-
+has_snmp_scalar 'vmwProdName'    => ( oid => "${VMWARE_SYSTEM_MIB}.1", );
+has_snmp_scalar 'vmwProdVersion' => ( oid => "${VMWARE_SYSTEM_MIB}.1", );
 
 my $VMWARE_VMINFO_MIB_OID = '.1.3.6.1.4.1.6876.2';
-has_snmp_table 'vmwVmTable' =>(
+has_snmp_table 'vmwVmTable' => (
     oid     => "$VMWARE_VMINFO_MIB_OID.1",
     index   => "vmwVmIdx",
     columns => {
-         vmwVmIdx          => 1,
-         vmwVmDisplayName  => 2,
-         vmwVmGuestOS      => 4,
-         vmwVmMemSize      => 5,
-         vmwVmState        => 6,
-         vmwVmCpus         => 9,
-         vmwVmUUID         => 10
-     },
+        vmwVmIdx         => 1,
+        vmwVmDisplayName => 2,
+        vmwVmGuestOS     => 4,
+        vmwVmMemSize     => 5,
+        vmwVmState       => 6,
+        vmwVmCpus        => 9,
+        vmwVmUUID        => 10
+    },
 );
-
 
 #----------------------------------------------------------------------#
 
@@ -304,7 +293,7 @@ sub _build_os {
         return 'san-os'   if ( $descr =~ /Cisco SAN-OS/ );
     }
 
-    if ( $vendor eq 'VMWare') {
+    if ( $vendor eq 'VMWare' ) {
         my $prodname = $self->vmwProdName;
         return $prodname if defined($prodname);
     }
@@ -382,7 +371,7 @@ sub _build_os_ver {
         }
     }    # end of Cisco
 
-    if ( $vendor eq 'VMWare') {
+    if ( $vendor eq 'VMWare' ) {
         my $prodver = $self->vmwProdVersion;
         return $prodver if defined($prodver);
     }
@@ -401,12 +390,12 @@ sub _build_serial {
     return undef;
 }
 
-sub  _build_cpu_count {
+sub _build_cpu_count {
     my $self = shift;
 
     my $procLoad = $self->snmp_hrProcessorLoad;
 
-    return scalar(keys(%$procLoad));
+    return scalar( keys(%$procLoad) );
 }
 
 sub _build_cpu_model { "Unkown" }
@@ -414,19 +403,18 @@ sub _build_cpu_model { "Unkown" }
 sub _build_ram_memory {
     my $self = shift;
 
-    return int($self->snmp_memTotalReal) / 1024;
+    return int( $self->snmp_memTotalReal ) / 1024;
 }
 
 sub _build_kernel { undef }
 
 sub _build_kernel_ver { undef }
 
-
 has 'package_name_parser' => (
-    is       => 'rw',
-    isa      => 'Ref',
-    lazy     => 1,
-    builder  => '_build_package_name_parser',
+    is      => 'rw',
+    isa     => 'Ref',
+    lazy    => 1,
+    builder => '_build_package_name_parser',
 );
 
 sub _build_package_name_parser {
@@ -440,8 +428,8 @@ sub _build_package_name_parser {
 
             # redhat name, version release platform
             $pkg =~ /^(.+)-([^-]+)-([^-]+)\.(.*)$/ and
-                return [ $1, $2 ];
-            return [ $pkg, undef ];
+                return [ $1,   $2 ];
+            return     [ $pkg, undef ];
         };
     }
 
@@ -452,26 +440,25 @@ sub _build_installed_sw {
     my $self = shift;
 
     my $installed = $self->snmp_hrSWInstalledName;
-    my $parser = $self->package_name_parser;
+    my $parser    = $self->package_name_parser;
 
-    return [ map  { $parser->($_) } values(%$installed) ];
+    return [ map { $parser->($_) } values(%$installed) ];
 }
-
 
 sub _build_virtual_machines {
     my $self = shift;
 
-    if ( $self->vendor eq 'VMWare') {
+    if ( $self->vendor eq 'VMWare' ) {
         my @result;
 
         $self->log->warn("Using vmware MIB to retrieve vm list ");
 
-        my $names = $self->snmp_vmwVmDisplayName;
-        my $uuids = $self->smmp_vmwVmUUID;
+        my $names    = $self->snmp_vmwVmDisplayName;
+        my $uuids    = $self->smmp_vmwVmUUID;
         my $memsizes = $self->snmp_vmwVmMemSize;
-        my $vcpus = $self->snmp_vmwVmCpus;
+        my $vcpus    = $self->snmp_vmwVmCpus;
 
-        while ( my ($idx, $uuid) = each (%$uuids) ) {
+        while ( my ( $idx, $uuid ) = each(%$uuids) ) {
             my $vm_info = {};
             $vm_info->{uuid}    = $uuid;
             $vm_info->{name}    = $names->{$idx};
@@ -484,7 +471,6 @@ sub _build_virtual_machines {
         return \@result;
     }
 }
-
 
 #----------------------------------------------------------------------#
 #
