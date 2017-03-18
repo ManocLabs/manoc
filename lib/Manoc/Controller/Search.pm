@@ -53,6 +53,8 @@ sub index : Path : Args(0) {
         device   => '/device/view',
         rack     => '/rack/view',
         building => '/building/view',
+        server   => '/server/view',
+        hwasset  => '/hwasset/view',
     };
 
     if ( $q =~ /\S/ ) {

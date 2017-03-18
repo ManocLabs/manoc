@@ -8,13 +8,18 @@ BEGIN {
 
     use_ok 'Manoc::Search::Item';
     use_ok 'Manoc::Search::Item::Group';
+
     use_ok 'Manoc::Search::Item::IpAddr';
     use_ok 'Manoc::Search::Item::MacAddr';
     use_ok 'Manoc::Search::Item::IPNetwork';
     use_ok 'Manoc::Search::Item::IPRange';
     use_ok 'Manoc::Search::Item::Rack';
-    use_ok 'Manoc::Search::Item::Device';	
+    use_ok 'Manoc::Search::Item::Device';
     use_ok 'Manoc::Search::Item::Building';
+    use_ok 'Manoc::Search::Item::Server';
+    use_ok 'Manoc::Search::Item::HWAsset';
+    use_ok 'Manoc::Search::Item::VirtualMachine';
+
 
     use_ok 'Manoc::Search::Engine';
     use_ok 'Manoc::Search::Query';
