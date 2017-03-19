@@ -7,11 +7,115 @@
    c.uri_for_action('/virtualmachine/create', { nwinfo => object.netwalker_info.id } ) :
    c.uri_for_action('/virtualmachine/create')
 -%]
-[% form.render %]
+<form class="form-horizontal" id="form-server" method="post">
+    <fieldset>
+        <div class="form-group">
+            <label class="col-sm-2 required-label control-label" for="form-server.hostname">Hostname</label>
+            <div class="col-sm-10">
+                [% form.field('hostname').render %]
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 required-label control-label" for="form-server.address">IP Address</label>
+            <div class="col-sm-10">
+                [% form.field('address').render %]
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="form-server.os">OS Name</label>
+            <div class="col-sm-4">
+                [% form.field('os').render %]
+            </div>
+            <label class="col-sm-2 control-label" for="form-server.os_ver">OS Version</label>
+            <div class="col-sm-4">
+                [% form.field('os_ver').render %]
+            </div>
+        </div>
+        <div class="form-group">
+            [% SET f = form.field('type') -%]
+            <label class="col-sm-2 required-label control-label" for="[% f.id %]">Type</label>
+            <div class="col-sm-8">
+            [% FOR option IN f.options %]
+                <label class="radio radio-inline" for="[% f.id  %].[% loop.index %]">
+                  <input type="radio" name="[% f.id %]" id="[% f.id %].[% loop.index %]" value="[% option.value %]"
+                       [%- IF option.value == f.fif %] checked="checked"[% END -%]
+                  />
+                  [% option.label %]
+                </label>
+            [% END %]
+            </div>
+        </div>
+        <div class="form-group" id="form-server.vm-group">
+            <label class="col-sm-2 control-label" for="form-server.vm">Virtual Machine</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    [% form.field('vm').render %]
+                    <span class="input-group-btn">
+                        <button type="button" name="form-server.vm_btn" id="form-server.vm_btn" class="btn btn-primary" href="#">Add</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" id="form-server.serverhw-group">
+            <label class="col-sm-2 control-label" for="form-server.serverhw">Hardware</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    [% form.field('serverhw').render %]
+                    <span class="input-group-btn">
+                        <button type="brn" name="form-server.serverhw_btn" id="form-server.serverhw_btn" class="btn btn-primary" href="#">Add</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+             [% SET f = form.field('is_hypervisor') -%]
+            <label class="col-sm-2 required-label control-label" for="[% f.id %]">Hypervisor?</label>
+            <div class="col-sm-3">
+            [% FOR option IN f.options %]
+                <label class="radio radio-inline" for="[% f.id  %].[% loop.index %]">
+                  <input type="radio" name="[% f.id %]" id="[% f.id %].[% loop.index %]" value="[% option.value %]"
+                       [%- IF option.value == f.fif %] checked="checked"[% END -%]
+                  />
+                  [% option.label %]
+                </label>
+            [% END %]
+            </div>
+            <label class="col-sm-3 control-label" for="form-server.hosted_virtinfr">Virtual Infrastructure</label>
+           <div class="col-sm-4">
+                [% form.field('hosted_virtinfr').render %]
+            </div>
+        </div>
+        <div id="form-server.nics">
+            [% FOR element IN form.field('nics').fields -%]
+            [% SET i = element.name %]
+            <div class="form-group hfh-repinst" id="form-server.nics.[% i %]">
+                [% element.field('id').render %]
+                <label class="col-sm-2 control-label" for="[% element.field('macaddr').id %]">NIC</label>
+
+                <div class="col-sm-8">
+                    [% element.field('macaddr').render %]
+                    [% element.field('ipaddr').render %]
+                        <button data-rep-id="form-server.nics" data-rep-count="[% i %]"
+                                class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
+                            <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
+                        </button>
+                </div>
+             </div>
+            [% END %]
+        </div>
+        <div class="form-group">
+            <button type="submit" name="form-server.save" id="form-server.save" class="btn btn-primary">Save</button>
+        </div>
+        [% form.field('csrf_token').render %]
+    </fieldset>
+</form>
+
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
     $("#[% form.name %]\\.vm").selectpicker();
     $("#[% form.name %]\\.serverhw").selectpicker();
+    $("#[% form.name %]\\.hosted_virtinfr").selectpicker();
 
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
       showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
@@ -24,10 +128,51 @@ $( document ).ready(function() {
     });
 
     form_refresh();
+
+    $(document).on('click', '.form-btn-add', function(e)
+    {
+        e.preventDefault();
+
+        var containerId = $(this).attr('data-rep-id');
+        var container = $('#' + $.escapeSelector(containerId));
+
+        var lastEntry = $('.hfh-repinst:last');
+
+        var entryClone = lastEntry.clone().wrap('<div>').parent();
+        var newEntryHtml = entryClone.html();
+        alert(newEntryHtml);
+
+        var lastIndex = $(this).attr('data-rep-count');
+        var newIndex  = parseInt(lastIndex) + 1;
+
+        newEntryHtml = newEntryHtml.replace(
+            new RegExp( containerId + '.' + lastIndex,  'g'),
+            containerId + '.' + newIndex);
+
+        container.append(newEntryHtml);
+
+        $('#' + $.escapeSelector(containerId + '.' + newIndex)).find('input').val('');
+
+        container.find('.form-btn-add:not(:last)')
+            .removeClass('form-btn-add').addClass('form-btn-remove')
+            .removeClass('btn-success').addClass('btn-danger')
+            .html('<span class="glyphicon glyphicon-minus"></span>');
+        return false;
+    });
+
+    $(document).on('click', '.form-btn-remove', function(e)
+    {
+        alert("HELO");
+		$(this).parents('.hfh-repinst:first').remove();
+
+		e.preventDefault();
+		return false;
+	});
+
+    $('#[% form.name %] input').on('change', function() {
+      form_refresh();
+     });
 });
-$('#[% form.name %] input').on('change', function() {
-    form_refresh();
- });
 
 function on_close_hwcreate_form(data) {
   if (data.object_id) {
@@ -53,11 +198,22 @@ function form_refresh() {
   $("#[% form.name %]\\.serverhw_btn").prop('disabled', l != 'p');
   $("#[% form.name %]\\.serverhw").selectpicker('refresh');
 
-
   $("#[% form.name %]\\.vm").prop('disabled', l != 'v');
   $("#[% form.name %]\\.vm_btn").prop('disabled', l != 'v');
   $("#[% form.name %]\\.vm").selectpicker('refresh');
 
+  if ( l == 'v') {
+      $("#[% form.name %]\\.vm-group").show();
+  } else {
+      $("#[% form.name %]\\.vm-group").hide();
+  }
+
+  if ( l == 'p') {
+      $("#[% form.name %]\\.serverhw-group").show();
+  } else {
+     $("#[% form.name %]\\.serverhw-group").hide();
+  }
 }
+
 [% END %]
 [% js_scripts.push(fragment) -%]

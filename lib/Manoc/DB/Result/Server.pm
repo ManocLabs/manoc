@@ -42,13 +42,11 @@ __PACKAGE__->add_columns(
         default_value => 'NULL',
         is_nullable   => 1,
     },
-
     is_hypervisor => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',
     },
-
     # the server is an hypervisor in a virtual infrastructure
     virtinfr_id => {
         data_type      => 'int',
@@ -121,6 +119,12 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->has_many(
     virtual_machines => 'Manoc::DB::Result::VirtualMachine',
     { 'foreign.hypervisor_id' => 'self.id' },
+);
+
+__PACKAGE__->has_many(
+    nics => 'Manoc::DB::Result::ServerNIC',
+    { 'foreign.server_id' => 'self.id' },
+    { cascade_delete => 1 }
 );
 
 __PACKAGE__->might_have(

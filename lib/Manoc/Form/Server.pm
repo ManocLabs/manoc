@@ -2,60 +2,38 @@ package Manoc::Form::Server;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::TraitFor::Horizontal';
 with 'Manoc::Form::TraitFor::SaveButton';
 
+
+use HTML::FormHandler::Types ('IPAddress');
+
 use namespace::autoclean;
-use Manoc::Form::Helper qw/bs_block_field_helper/;
 
 has '+item_class' => ( default => 'Server' );
 
 has '+name'        => ( default => 'form-server' );
 has '+html_prefix' => ( default => 1 );
 
-sub build_render_list {
-    my $self = shift;
-
-    return [
-        'host_ip_block',
-        'os_type_block',
-        'vm_block',
-        'serverhw_block',
-        'virt_block',
-
-        'save',
-        'csrf_token',
-    ];
-}
-
-has_block 'host_ip_block' => (
-    render_list => [ 'hostname', 'address' ],
-    tag         => 'div',
-    class       => ['form-group'],
-);
+has '+widget_wrapper' => ( default => 'None' );
 
 has_field 'hostname' => (
     type         => 'Text',
-    size         => 128,
     required     => 1,
     label        => 'Hostname',
-    element_attr => { placeholder => 'hostname.local.domain' },
-    bs_block_field_helper( { label => 2, input => 4 } )
-
+    element_attr => {
+        placeholder => 'hostname.local.domain',
+        size         => '100%',
+    },
 );
 has_field 'address' => (
     type         => 'Text',
-    size         => 15,
     required     => 1,
     label        => 'IP Address',
-    element_attr => { placeholder => 'leave empty to use DNS' },
-    bs_block_field_helper( { label => 2, input => 4 } )
-);
-
-has_block 'os_type_block' => (
-    render_list => [ 'type', 'os', 'os_ver' ],
-    tag         => 'div',
-    class       => ['form-group'],
+    apply        => [IPAddress],
+    element_attr => {
+#        placeholder => 'leave empty to use DNS',
+        size        => '100%',
+    },
 );
 
 has_field 'type' => (
@@ -63,6 +41,7 @@ has_field 'type' => (
     required => 1,
     label    => 'Type',
     widget   => 'RadioGroup',
+    noupdate => 1,
     options  => [
         {
             value => 'l',
@@ -78,7 +57,6 @@ has_field 'type' => (
         },
     ],
     wrapper_tags => { inline => 1 },
-    bs_block_field_helper( { label => 2, input => 4 } )
 );
 
 has_field 'os' => (
@@ -86,8 +64,6 @@ has_field 'os' => (
     size         => 32,
     label        => 'OS Name',
     element_attr => { placeholder => 'e.g. CentOS' },
-
-    bs_block_field_helper( { label => 1, input => 2 } )
 );
 
 has_field 'os_ver' => (
@@ -95,45 +71,18 @@ has_field 'os_ver' => (
     size         => 32,
     label        => 'Version',
     element_attr => { placeholder => 'e.g. 7.0' },
-
-    bs_block_field_helper( { label => 1, input => 2 } )
-);
-
-has_block 'serverhw_block' => (
-    render_list => [ 'serverhw', 'serverhw_btn' ],
-    tag         => 'div',
-    class       => ['form-group'],
 );
 
 has_field 'serverhw' => (
     type         => 'Select',
     label        => 'Hardware',
     empty_select => '--- Choose ---',
-    bs_block_field_helper( { label => 2, input => 8 } )
-);
-
-has_field 'serverhw_btn' => (
-    type         => 'Button',
-    widget       => 'ButtonTag',
-    element_attr => {
-        class => [ 'btn', 'btn-primary' ],
-        href  => '#',
-    },
-    widget_wrapper => 'None',
-    value          => "Add",
-);
-
-has_block 'vm_block' => (
-    render_list => [ 'vm', 'vm_btn' ],
-    tag         => 'div',
-    class       => ['form-group'],
 );
 
 has_field 'vm' => (
     type         => 'Select',
     label        => 'Virtual Machine',
     empty_select => '--- Choose ---',
-    bs_block_field_helper( { label => 2, input => 8 } )
 );
 
 has_field 'vm_btn' => (
@@ -147,12 +96,6 @@ has_field 'vm_btn' => (
     value          => "Add",
 );
 
-has_block 'virt_block' => (
-    render_list => [ 'is_hypervisor', 'hosted_virtinfr' ],
-    tag         => 'div',
-    class       => ['form-group'],
-);
-
 has_field 'is_hypervisor' => (
     type     => 'Select',
     required => 1,
@@ -160,15 +103,36 @@ has_field 'is_hypervisor' => (
     widget   => 'RadioGroup',
     options  => [ { value => 1, label => 'True' }, { value => 0, label => 'False' } ],
     wrapper_tags => { inline => 1 },
-    bs_block_field_helper( { label => 2, input => 3 } )
 );
 
-has_field 'hosted_virtinfr' => (
+has_field 'virtinfr' => (
     type         => 'Select',
     label        => 'Virtual Infrastructure',
     empty_select => '--- Choose ---',
-    bs_block_field_helper( { label => 3, input => 4 } )
 );
+
+has_field 'nics' => (
+    type => 'Repeatable',
+    do_wrapper => 0,
+    num_extra => 1,
+);
+
+has_field 'nics.id' => ( type => 'PrimaryKey' );
+has_field 'nics.macaddr' => (
+    type         => 'Text',
+    element_attr => {
+        placeholder => 'mac addr',
+    },
+);
+has_field 'nics.ipaddr' => (
+    type         => 'Text',
+    label        => 'IP Address',
+    apply        => [IPAddress],
+    element_attr => {
+        placeholder => 'ip addr',
+    },
+);
+
 
 sub default_type {
     my $self = shift;
@@ -239,5 +203,52 @@ sub options_vm {
 
 }
 
+
+override validate_model => sub {
+    my ($self) = @_;
+
+    my $found_error = 0;
+    my $rs          = $self->resultset;
+
+    my $field;
+
+    $field = $self->field('address');
+    if ( my $value = $field->value ) {
+        my %id_clause;
+        $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
+
+        $value = Manoc::IPAddress::IPv4->new($value);
+        my $count = $rs->search( { address => $value->padded, %id_clause } )->count;
+        if ( $count >= 1 ) {
+            my $field_error = 'Duplicate address';
+            $field->add_error( $field_error, $field->loc_label );
+            $found_error++;
+        }
+    }
+
+    return $found_error || super();
+};
+
+before update_model => sub {
+    my ($self) = @_;
+
+    my $values = $self->values;
+
+    foreach my $nic (@{$values->{nics}}) {
+        my $addr = $nic->{ipaddr};
+        defined($addr) and
+            $nic->{ipaddr} =  Manoc::IPAddress::IPv4->new($addr);
+    }
+    $self->_set_value($values);
+};
+
+
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
+1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
