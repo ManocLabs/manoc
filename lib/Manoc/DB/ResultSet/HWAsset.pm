@@ -16,16 +16,20 @@ sub unused_devices {
 
     my $used_asset_ids = $self->result_source->schema->resultset('Device')->search(
         {
-            decommissioned => 0,
-            hwasset_id     => { -is_not => undef }
+            'subquery.decommissioned' => 0,
+            'subquery.hwasset_id'     => { -is_not => undef }
+        },
+        {
+            alias => 'subquery',
         }
     )->get_column('hwasset_id');
 
+    my $me = $self->current_source_alias;
     my $assets = $self->search(
         {
-            type     => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
-            location => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
-            id       => {
+            "$me.type"     => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
+            "$me.location" => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
+            "$me.id"       => {
                 -not_in => $used_asset_ids->as_query,
             }
         },
