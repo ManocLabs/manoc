@@ -184,6 +184,8 @@ sub update {
     $nwinfo->offline(0);
 
     $nwinfo->update();
+    $self->log->debug( "Server ", $entry->hostname, " ", $entry->address, " updated" );
+
     return 1;
 }
 
@@ -374,6 +376,7 @@ sub fetch_virtual_machines {
         }
 
         # update vm info
+        $self->log->debug("Updated vm $uuid.");
         $vm->name( $vm_info->{name} );
         $vm->vcpus( $vm_info->{vcpus} );
         $vm->ram_memory( $vm_info->{memsize} );

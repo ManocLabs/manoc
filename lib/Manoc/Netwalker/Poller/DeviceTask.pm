@@ -322,6 +322,8 @@ sub update {
     $nwinfo->last_visited( $self->timestamp );
     $nwinfo->offline(0);
     $nwinfo->update();
+
+    $self->log->debug( "Device ", $entry->name, " ", $entry->mng_address, "updated" );
     return 1;
 }
 
