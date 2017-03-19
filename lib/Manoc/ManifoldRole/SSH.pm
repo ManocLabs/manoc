@@ -94,7 +94,7 @@ sub connect {
     $opts{user} = $self->username;
     if ( $self->use_ssh_key ) {
         my $key_path = $self->key_path;
-        $self->log->error("Connecting to $host using key $key_path");
+        $self->log->info("Connecting to $host using key $key_path");
         $opts{key_path} = $key_path;
         $self->password and
             $opts{passphrase} = $self->password;
