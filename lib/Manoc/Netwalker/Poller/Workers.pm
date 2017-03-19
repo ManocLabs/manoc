@@ -6,8 +6,8 @@ package Manoc::Netwalker::Poller::Workers;
 use Moose;
 use namespace::autoclean;
 
-with 'Manoc::Netwalker::WorkersRole';
-with 'Manoc::Logger::Role';
+with 'Manoc::Netwalker::WorkersRole',
+    'Manoc::Logger::Role';
 
 use Try::Tiny;
 use POE qw(Filter::Reference Filter::Line);
@@ -28,16 +28,6 @@ has _scoreboard => (
     }
 );
 
-has refresh_interval => (
-    is      => 'ro',
-    isa     => 'Int',
-    lazy    => 1,
-    builder => '_build_refresh_interval',
-);
-
-sub _build_refresh_interval {
-    shift->config->refresh_interval;
-}
 
 =head2 worker_stdout
 
@@ -90,15 +80,15 @@ sub schedule_devices {
     my $self = shift;
 
     # TODO better check
-    my $last_visited = time() - $self->refresh_interval;
+    my $now = time();
 
     my $decommissioned_devices =
         $self->schema->resultset('Device')->search( { decommissioned => 1 } )->get_column('id');
 
     my @device_ids = $self->schema->resultset('DeviceNWInfo')->search(
         {
-            last_visited => { '<='    => $last_visited },
-            device_id    => { -not_in => $decommissioned_devices->as_query }
+            scheduled_attempt => { '<='    => $now },
+            device_id         => { -not_in => $decommissioned_devices->as_query }
         }
     )->get_column('device_id')->all();
 
@@ -169,16 +159,15 @@ sub visit_device {
 sub schedule_servers {
     my $self = shift;
 
-    # TODO better check
-    my $last_visited = time() - $self->refresh_interval;
+    my $now = time();
 
     my $decommissioned_servers =
         $self->schema->resultset('Server')->search( { decommissioned => 1 } )->get_column('id');
 
     my @server_ids = $self->schema->resultset('ServerNWInfo')->search(
         {
-            last_visited => { '<='    => $last_visited },
-            server_id    => { -not_in => $decommissioned_servers->as_query }
+            scheduled_attempt => { '<='    => $now },
+            server_id         => { -not_in => $decommissioned_servers->as_query }
         }
     )->get_column('server_id')->all();
 

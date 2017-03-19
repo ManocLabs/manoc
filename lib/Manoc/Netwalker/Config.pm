@@ -104,6 +104,20 @@ has config_update_interval => (
     default => '1d',
 );
 
+has min_backoff_time => (
+    is      => 'rw',
+    isa     => 'TimeInterval',
+    coerce  => 1,
+    default => '5m',
+);
+
+has max_backoff_time => (
+    is      => 'rw',
+    isa     => 'TimeInterval',
+    coerce  => 1,
+    default => '1d',
+);
+
 has 'default_ssh_key' => (
     is      => 'rw',
     isa     => 'Str',
