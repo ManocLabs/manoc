@@ -92,6 +92,32 @@ __PACKAGE__->might_have(
     'vm_id',
 );
 
+sub hypervisor {
+    my ( $self, @args ) = @_;
+
+    if (my $hypervisor = $args[0]) {
+        # use virtinfr_id instead of virtinfr to avoid loops
+        $self->virtinfr_id($hypervisor->virtinfr);
+    }
+
+    return $self->next::method( @args );
+}
+
+sub virtinfr {
+    my ( $self, @args ) = @_;
+
+    if (my $virtinfr = $args[0]) {
+        if ($self->hypervisor && $self->hypervisor->virtinfr_id != $self->virtinfr_id ) {
+            # use hypervisor_id instead of hypervisor to avoid loops
+            $self->hypervisor_id(undef);
+        }
+    }
+
+    return $self->next::method( @args );
+}
+
+
+
 =head2 label
 
 =cut
