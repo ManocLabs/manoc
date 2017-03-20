@@ -115,7 +115,7 @@ has max_backoff_time => (
     is      => 'rw',
     isa     => 'TimeInterval',
     coerce  => 1,
-    default => '1d',
+    default => '30m',
 );
 
 has 'default_ssh_key' => (
