@@ -6,8 +6,8 @@ package Manoc::Netwalker::Poller::Workers;
 use Moose;
 use namespace::autoclean;
 
-with 'Manoc::Netwalker::WorkersRole';
-with 'Manoc::Logger::Role';
+with 'Manoc::Netwalker::WorkersRole',
+    'Manoc::Logger::Role';
 
 use Try::Tiny;
 use POE qw(Filter::Reference Filter::Line);
@@ -16,28 +16,12 @@ use Manoc::Netwalker::Poller::Scoreboard;
 use Manoc::Netwalker::Poller::DeviceTask;
 use Manoc::Netwalker::Poller::ServerTask;
 
-has _scoreboard => (
+has scoreboard => (
     is      => 'ro',
     isa     => 'Manoc::Netwalker::Poller::Scoreboard',
     default => sub { Manoc::Netwalker::Poller::Scoreboard->new() },
-    handles => {
-        'scoreboard_get_device' => 'get_device',
-        'scoreboard_set_device' => 'set_device',
-        'scoreboard_get_server' => 'get_server',
-        'scoreboard_set_server' => 'set_server'
-    }
 );
 
-has refresh_interval => (
-    is      => 'ro',
-    isa     => 'Int',
-    lazy    => 1,
-    builder => '_build_refresh_interval',
-);
-
-sub _build_refresh_interval {
-    shift->config->refresh_interval;
-}
 
 =head2 worker_stdout
 
@@ -47,8 +31,7 @@ workers processes.
 =cut
 
 sub worker_stdout {
-    my ( $self, $task_info ) = @_;
-
+    my ( $self, $task_info, $job_id ) = @_;
     my $class  = $task_info->{class};
     my $id     = $task_info->{id};
     my $status = $task_info->{status};
@@ -56,17 +39,50 @@ sub worker_stdout {
     $self->log->debug("got feedback class=$class, id=$id status=$status");
 
     $class eq 'device' and
-        $self->scoreboard_set_device( $id, $status );
+        $self->scoreboard->set_device_info( $id, $status, $job_id );
     $class eq 'server' and
-        $self->scoreboard_set_server( $id, $status );
+        $self->scoreboard->set_server_info( $id, $status, $job_id );
 
     if ( $status eq 'DONE' ) {
         my $report = Manoc::Netwalker::Poller::TaskReport->thaw( $task_info->{report} );
         my $host   = $report->host;
         # TODO check status
         my $has_errors = $report->has_error();
-        $self->log->debug("Device $host $status $has_errors");
+        $self->log->debug("$class $host $status $has_errors");
     }
+}
+
+=head2 worker_error
+
+=cut
+
+sub worker_error   {
+    my ($self, $job_id) = @_;
+
+    $self->log->warn("Worker error job $job_id");
+    $self->scoreboard->delete_job_info($job_id);
+}
+
+=head2 worker_finished
+
+=cut
+
+sub worker_finished {
+    my ($self, $job_id) = @_;
+
+    $self->log->debug("Job $job_id finished");
+
+    my $info = $self->scoreboard->get_job_info($job_id);
+    $info or return;
+    my $status =
+        $info->[0] eq 'device'
+        ?  $self->scoreboard->get_device_status( $info->[1] )
+        : $self->scoreboard->get_server_status( $info->[1] );
+
+    defined($status) && $status eq 'RUNNING'
+        and $self->log->warn("Job $job_id finished but status was still RUNNING");
+
+    $self->scoreboard->delete_job_info($job_id);
 }
 
 =head2 on_tick
@@ -90,15 +106,15 @@ sub schedule_devices {
     my $self = shift;
 
     # TODO better check
-    my $last_visited = time() - $self->refresh_interval;
+    my $now = time();
 
     my $decommissioned_devices =
         $self->schema->resultset('Device')->search( { decommissioned => 1 } )->get_column('id');
 
     my @device_ids = $self->schema->resultset('DeviceNWInfo')->search(
         {
-            last_visited => { '<='    => $last_visited },
-            device_id    => { -not_in => $decommissioned_devices->as_query }
+            scheduled_attempt => { '<='    => $now },
+            device_id         => { -not_in => $decommissioned_devices->as_query }
         }
     )->get_column('device_id')->all();
 
@@ -106,7 +122,7 @@ sub schedule_devices {
     foreach my $id (@device_ids) {
 
         # check if it's already scheduled
-        my $status = $self->scoreboard_get_device($id);
+        my $status = $self->scoreboard->get_device_status($id);
         if ( defined($status) && ( $status eq 'QUEUED' || $status eq 'RUNNING' ) ) {
             $self->log->debug("Device $id is $status, skipping");
             next;
@@ -123,7 +139,7 @@ sub schedule_devices {
 sub enqueue_device {
     my ( $self, $device_id ) = @_;
 
-    $self->scoreboard_set_device( $device_id, 'QUEUED' );
+    $self->scoreboard->set_device_info( $device_id, 'QUEUED' );
     $self->enqueue( sub { $self->visit_device($device_id) } );
     $self->log->debug("Enqueued device $device_id");
 }
@@ -152,14 +168,18 @@ sub visit_device {
         );
         $updater->update;
 
+
         $task_info->{status} = 'DONE';
         $task_info->{report} = $updater->task_report->freeze;
+
+        undef $updater;
     }
     catch {
         $self->log->error("caught error in device updater: $_");
         $task_info->{status} = 'ERROR';
     };
     print @{ POE::Filter::Reference->new->put( [$task_info] ) };
+    $self->log->debug("device updater job for $device_id finished");
 }
 
 =head2 schedule_servers
@@ -169,16 +189,15 @@ sub visit_device {
 sub schedule_servers {
     my $self = shift;
 
-    # TODO better check
-    my $last_visited = time() - $self->refresh_interval;
+    my $now = time();
 
     my $decommissioned_servers =
         $self->schema->resultset('Server')->search( { decommissioned => 1 } )->get_column('id');
 
     my @server_ids = $self->schema->resultset('ServerNWInfo')->search(
         {
-            last_visited => { '<='    => $last_visited },
-            server_id    => { -not_in => $decommissioned_servers->as_query }
+            scheduled_attempt => { '<='    => $now },
+            server_id         => { -not_in => $decommissioned_servers->as_query }
         }
     )->get_column('server_id')->all();
 
@@ -186,7 +205,7 @@ sub schedule_servers {
     foreach my $id (@server_ids) {
 
         # check if it's already scheduled
-        my $status = $self->scoreboard_get_server($id);
+        my $status = $self->scoreboard->get_server_status($id);
         if ( defined($status) && ( $status eq 'QUEUED' || $status eq 'RUNNING' ) ) {
             $self->log->debug("Server $id is $status, skipping");
             next;
@@ -203,7 +222,7 @@ sub schedule_servers {
 sub enqueue_server {
     my ( $self, $server_id ) = @_;
 
-    $self->scoreboard_set_server( $server_id, 'QUEUED' );
+    $self->scoreboard->set_server_info( $server_id, 'QUEUED' );
     $self->enqueue( sub { $self->visit_server($server_id) } );
     $self->log->debug("Enqueued server $server_id");
 }
@@ -234,12 +253,17 @@ sub visit_server {
 
         $task_info->{status} = 'DONE';
         $task_info->{report} = $updater->task_report->freeze;
+
+        undef $updater;
     }
     catch {
-        $self->log->error("caught error in device updater: $_");
+        $self->log->error("caught error in server updater: $_");
         $task_info->{status} = 'ERROR';
     };
     print @{ POE::Filter::Reference->new->put( [$task_info] ) };
+
+    $self->log->debug("server updater job for $server_id finished");
+
 }
 
 no Moose;

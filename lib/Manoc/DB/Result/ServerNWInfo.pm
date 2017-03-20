@@ -8,7 +8,10 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw'+Manoc::DB::Helper::NetwalkerCredentials');
+__PACKAGE__->load_components(
+    qw/+Manoc::DB::Helper::NetwalkerCredentials
+       +Manoc::DB::Helper::NetwalkerPoller/
+);
 
 __PACKAGE__->table('server_nwinfo');
 __PACKAGE__->add_columns(
@@ -31,25 +34,7 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
-    offline => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-
-    last_visited => {
-        data_type     => 'int',
-        default_value => '0',
-    },
-
-    netwalker_status => {
-        data_type     => 'varchar',
-        size          => 255,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
-
-    use_sudo => {
+     use_sudo => {
         data_type     => 'int',
         size          => 1,
         default_value => 0,
@@ -150,6 +135,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->make_credentials_columns;
+__PACKAGE__->make_poller_columns;
 
 __PACKAGE__->set_primary_key("server_id");
 

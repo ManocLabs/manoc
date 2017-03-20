@@ -21,9 +21,10 @@ sub unused {
         }
     )->get_column('vm_id');
 
+    my $me = $self->current_source_alias;
     my $rs = $self->search(
         {
-            'id' => {
+            "$me.id" => {
                 -not_in => $used_vm_ids->as_query,
             }
         },

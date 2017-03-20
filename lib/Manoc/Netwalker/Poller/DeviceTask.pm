@@ -8,7 +8,9 @@ package Manoc::Netwalker::Poller::DeviceTask;
 use Moose;
 use Try::Tiny;
 
-with 'Manoc::Logger::Role';
+with 'Manoc::Netwalker::Poller::BaseTask',
+    'Manoc::Logger::Role';
+
 use Manoc::Netwalker::Poller::TaskReport;
 use Manoc::Manifold;
 
@@ -20,43 +22,11 @@ has 'device_id' => (
     required => 1
 );
 
-has 'schema' => (
-    is       => 'ro',
-    isa      => 'Object',
-    required => 1
-);
-
-has 'config' => (
-    is       => 'ro',
-    isa      => 'Manoc::Netwalker::Config',
-    required => 1
-);
-
 has 'device_entry' => (
     is      => 'ro',
     isa     => 'Maybe[Object]',
     lazy    => 1,
     builder => '_build_device_entry',
-);
-
-has 'nwinfo' => (
-    is      => 'ro',
-    isa     => 'Object',
-    lazy    => 1,
-    builder => '_build_nwinfo',
-);
-
-has 'credentials' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_credentials',
-);
-
-has 'timestamp' => (
-    is      => 'ro',
-    isa     => 'Int',
-    default => sub { time },
 );
 
 # a set of all mng_address known to Manoc
@@ -119,16 +89,6 @@ sub _build_arp_vlan {
     return defined($vlan) ? $vlan : 1;
 }
 
-sub _build_credentials {
-    my $self = shift;
-
-    my $credentials = $self->nwinfo->get_credentials_hash;
-    $credentials->{snmp_community} ||= $self->config->snmp_community;
-    $credentials->{snmp_version}   ||= $self->config->snmp_version;
-
-    return $credentials;
-}
-
 sub _build_device_entry {
     my $self      = shift;
     my $device_id = $self->device_id;
@@ -152,6 +112,13 @@ sub _build_native_vlan {
         $self->config->default_vlan;
     return defined($vlan) ? $vlan : 1;
 }
+
+has 'nwinfo' => (
+    is      => 'ro',
+    isa     => 'Object',
+    lazy    => 1,
+    builder => '_build_nwinfo',
+);
 
 sub _build_nwinfo {
     my $self = shift;
@@ -320,12 +287,13 @@ sub update {
     # try to connect and update nwinfo accordingly
     $self->log->info( "Connecting to device ", $entry->name, " ", $entry->mng_address );
     if ( !$self->source ) {
+
         # TODO update nwinfo with connection messages
-        $self->nwinfo->offline(1);
+        $self->reschedule_on_failure();
+        $nwinfo->offline(1);
+        $nwinfo->update();
         return undef;
     }
-    $nwinfo->last_visited( $self->timestamp );
-    $nwinfo->offline(0);
 
     $self->update_device_info;
 
@@ -350,8 +318,12 @@ sub update {
 
     $nwinfo->get_config and $self->update_config;
 
-    # TODO update nwinfo
+    $self->reschedule_on_success;
+    $nwinfo->last_visited( $self->timestamp );
+    $nwinfo->offline(0);
     $nwinfo->update();
+
+    $self->log->debug( "Device ", $entry->name, " ", $entry->mng_address, "updated" );
     return 1;
 }
 

@@ -37,7 +37,10 @@ __PACKAGE__->config(
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
 
-    find_object_options => { prefetch => { installed_sw_pkgs => 'software_pkg' } }
+    find_object_options => { prefetch => { installed_sw_pkgs => 'software_pkg' } },
+
+    create_page_title => 'Create server',
+    edit_page_title   => 'Edit server',
 );
 
 =head2 create

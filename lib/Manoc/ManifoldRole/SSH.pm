@@ -80,7 +80,11 @@ sub cmd {
 sub system {
     my $self    = shift;
     my $session = $self->session;
-    return $session->system(@_);
+
+    my $opts = ref($_[0]) eq 'ARRAY' ? shift @_ : {};
+    $opts->{stdout_discard} = 1;
+
+    return $session->system($opts, @_);
 }
 
 sub connect {
@@ -94,7 +98,7 @@ sub connect {
     $opts{user} = $self->username;
     if ( $self->use_ssh_key ) {
         my $key_path = $self->key_path;
-        $self->log->error("Connecting to $host using key $key_path");
+        $self->log->info("Connecting to $host using key $key_path");
         $opts{key_path} = $key_path;
         $self->password and
             $opts{passphrase} = $self->password;
@@ -107,6 +111,11 @@ sub connect {
     $opts{batch_mode} = 1;
 
     $opts{timeout} = $self->connection_timeout;
+
+    # kill the local slave SSH process when some operation times out.
+    $opts{kill_ssh_on_timeout} = 1;
+
+    $opts{master_stdout_discard} = 1;
 
     my $ssh = Net::OpenSSH->new( $host, %opts );
     if ( $ssh->error ) {

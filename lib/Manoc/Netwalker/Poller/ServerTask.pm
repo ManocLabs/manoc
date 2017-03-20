@@ -8,7 +8,10 @@ package Manoc::Netwalker::Poller::ServerTask;
 use Moose;
 use Try::Tiny;
 
-with 'Manoc::Logger::Role';
+with
+    'Manoc::Netwalker::Poller::BaseTask',
+    'Manoc::Logger::Role';
+
 use Manoc::Netwalker::Poller::TaskReport;
 use Manoc::Manifold;
 
@@ -17,18 +20,6 @@ use Manoc::IPAddress::IPv4;
 has 'server_id' => (
     is       => 'ro',
     isa      => 'Int',
-    required => 1
-);
-
-has 'schema' => (
-    is       => 'ro',
-    isa      => 'Object',
-    required => 1
-);
-
-has 'config' => (
-    is       => 'ro',
-    isa      => 'Manoc::Netwalker::Config',
     required => 1
 );
 
@@ -44,19 +35,6 @@ has 'nwinfo' => (
     isa     => 'Object',
     lazy    => 1,
     builder => '_build_nwinfo',
-);
-
-has 'credentials' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    builder => '_build_credentials',
-);
-
-has 'timestamp' => (
-    is      => 'ro',
-    isa     => 'Int',
-    default => sub { time },
 );
 
 # the source for information
@@ -84,16 +62,6 @@ has 'task_report' => (
 #              A t t r i b u t e s   B u i l d e r                     #
 #                                                                      #
 #----------------------------------------------------------------------#
-
-sub _build_credentials {
-    my $self = shift;
-
-    my $credentials = $self->nwinfo->get_credentials_hash;
-    $credentials->{snmp_community} ||= $self->config->snmp_community;
-    $credentials->{snmp_version}   ||= $self->config->snmp_version;
-
-    return $credentials;
-}
 
 sub _build_server_entry {
     my $self = shift;
@@ -197,8 +165,9 @@ sub update {
     # try to connect and update nwinfo accordingly
     $self->log->info( "Connecting to server ", $entry->hostname, " ", $entry->address );
     if ( !$self->source ) {
-        # TODO update nwinfo with connection messages
-        $self->nwinfo->offline(1);
+        $self->reschedule_on_failure;
+        $nwinfo->offline(1);
+        $nwinfo->update();
         return undef;
     }
 
@@ -208,11 +177,15 @@ sub update {
         $self->update_packages;
 
     $nwinfo->get_vms and
-        $self->update_virtual_machines;
+        $self->fetch_virtual_machines;
 
+    $self->reschedule_on_success;
     $nwinfo->last_visited( $self->timestamp );
     $nwinfo->offline(0);
+
     $nwinfo->update();
+    $self->log->debug( "Server ", $entry->hostname, " ", $entry->address, " updated" );
+
     return 1;
 }
 
@@ -335,11 +308,11 @@ sub update_vm {
     }
 }
 
-=head2 update_virtual_machines
+=head2 fetch_virtual_machines
 
 =cut
 
-sub update_virtual_machines {
+sub fetch_virtual_machines {
     my $self = shift;
 
     my $source = $self->source;
@@ -362,19 +335,39 @@ sub update_virtual_machines {
 
     foreach my $vm_info (@$vm_list) {
         my $uuid = $vm_info->{uuid};
-        my @vms = $vm_rs->search( { identifier => $uuid } );
 
+        my $vm;
+
+        # search for uuid in hypervisor/virtualinfr
+        my @vms = $vm_rs->search( { identifier => $uuid } );
         if ( @vms > 1 ) {
             $self->log->warn(
                 "More than a vm with the same uuid $uuid. Info will not be updated.");
             next;
         }
-
-        my $vm;
         if ( @vms == 1 ) {
             $vm = $vms[0];
         }
-        else {
+
+        # search for uuid among detached vms
+        if (!$vm) {
+            $self->log->debug("Searching detached vm with $uuid.");
+            my @detached_vms = $self->schema->resultset('VirtualMachine')->search(
+                {
+                    identifier => $uuid,
+                    hypervisor_id => undef,
+                    virtinfr_id=>undef
+                }
+            );
+            if ( @detached_vms == 1) {
+                $vm = $detached_vms[0];
+                $self->log->info("Reclaimed detached vm $uuid.");
+                $vm->hypervisor($server);
+            }
+        }
+
+        # create a new vm
+        if (!$vm) {
             $self->log->info("Creating new vm $uuid.");
 
             $vm = $self->schema->resultset('VirtualMachine')->new_result( {} );
@@ -383,6 +376,7 @@ sub update_virtual_machines {
         }
 
         # update vm info
+        $self->log->debug("Updated vm $uuid.");
         $vm->name( $vm_info->{name} );
         $vm->vcpus( $vm_info->{vcpus} );
         $vm->ram_memory( $vm_info->{memsize} );

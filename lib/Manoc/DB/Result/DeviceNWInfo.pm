@@ -8,7 +8,10 @@ use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw'+Manoc::DB::Helper::NetwalkerCredentials');
+__PACKAGE__->load_components(
+    qw/+Manoc::DB::Helper::NetwalkerCredentials
+       +Manoc::DB::Helper::NetwalkerPoller/
+);
 
 __PACKAGE__->table('device_nwinfo');
 __PACKAGE__->add_columns(
@@ -38,17 +41,6 @@ __PACKAGE__->add_columns(
         size          => 64,
         default_value => 'NULL',
         is_nullable   => 1,
-    },
-
-    offline => {
-        data_type     => 'int',
-        size          => 1,
-        default_value => '0',
-    },
-
-    last_visited => {
-        data_type     => 'int',
-        default_value => '0',
     },
 
     last_full_update => {
@@ -158,6 +150,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->make_credentials_columns;
+__PACKAGE__->make_poller_columns;
 
 __PACKAGE__->set_primary_key("device_id");
 

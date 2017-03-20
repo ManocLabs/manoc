@@ -27,7 +27,6 @@ has_field 'serverhw_action' => (
     label    => 'Action for associated hardware',
     type     => 'Select',
     widget   => 'RadioGroup',
-    required => 1,
     options  => [
         { value => 'DECOMMISSION', label => 'Decommission' },
         { value => 'WAREHOUSE',    label => 'Return to warehouse' },
@@ -38,7 +37,6 @@ has_field 'vm_action' => (
     label    => 'Action for associated virtual machine',
     type     => 'Select',
     widget   => 'RadioGroup',
-    required => 1,
     options  => [
         { value => 'DECOMMISSION', label => 'Decommission' },
         { value => 'KEEP',         label => 'Deassociate' },
@@ -49,7 +47,6 @@ has_field 'hostedvm_action' => (
     label    => 'Action for hosted virtual machine',
     type     => 'Select',
     widget   => 'RadioGroup',
-    required => 1,
     options  => [
         { value => 'KEEP',      label => 'Deassociate' },
         { value => 'RECURSIVE', label => 'Decommission VMs and servers' },
@@ -68,12 +65,28 @@ sub build_render_list {
         push @list, 'serverhw_action';
     $server->vm and
         push @list, 'vm_action';
-    $server->virtual_machines and
+    $server->virtual_machines->count and
         push @list, 'hostedvm_action';
     push @list, "submit", "csrf_token";
 
     return \@list;
 }
+
+before update_fields => sub {
+    my $self = shift;
+    return unless $self->item;
+
+    my $server = $self->item;
+
+    $server->serverhw and
+        $self->field('serverhw_action')->required(1);
+
+    $server->vm and
+        $self->field('vm_action')->required(1);
+
+    $server->virtual_machines->count and
+         $self->field('hostedvm_action')->required(1);
+};
 
 sub update_model {
     my $self   = shift;
