@@ -8,10 +8,10 @@
 package Manoc::Manifold::SNMP::Simple;
 use Moose;
 
-with 'Manoc::ManifoldRole::Base';
-with 'Manoc::ManifoldRole::Host';
-
-with 'Manoc::Logger::Role';
+with 'Manoc::ManifoldRole::Base',
+    'Manoc::ManifoldRole::Host',
+    'Manoc::ManifoldRole::Hypervisor',
+    'Manoc::Logger::Role';
 
 use Net::SNMP 6.0 qw( :snmp DEBUG_ALL ENDOFMIBVIEW );
 
@@ -655,7 +655,7 @@ my %ID_VENDOR_MAP = (
     6027  => 'Force10',
     6486  => 'AlcatelLucent',
     6527  => 'Timetra',
-    6876  => 'VMware',
+    6876  => 'VMWare',
     8072  => 'NetSNMP',
     9303  => 'PacketFront',
     10002 => 'Ubiquiti',
