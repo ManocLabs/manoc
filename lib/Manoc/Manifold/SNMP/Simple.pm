@@ -294,7 +294,7 @@ sub _build_os {
     }
 
     if ( $vendor eq 'VMWare' ) {
-        my $prodname = $self->vmwProdName;
+        my $prodname = $self->snmp_vmwProdName;
         return $prodname if defined($prodname);
     }
 
@@ -372,8 +372,8 @@ sub _build_os_ver {
     }    # end of Cisco
 
     if ( $vendor eq 'VMWare' ) {
-        my $prodver = $self->vmwProdVersion;
-        return $prodver if defined($prodver);
+        my $prodver = $self->snmp_vmwProdVersion;
+	return $prodver if defined($prodver);
     }
 
     return '';
@@ -402,8 +402,9 @@ sub _build_cpu_model { "Unkown" }
 
 sub _build_ram_memory {
     my $self = shift;
-
-    return int( $self->snmp_memTotalReal ) / 1024;
+    my $memTot = $self->snmp_memTotalReal;
+    $memTot eq 'noSuchObject' and return undef; 
+    return int( $memTot ) / 1024;
 }
 
 sub _build_kernel { undef }
@@ -454,7 +455,7 @@ sub _build_virtual_machines {
         $self->log->warn("Using vmware MIB to retrieve vm list ");
 
         my $names    = $self->snmp_vmwVmDisplayName;
-        my $uuids    = $self->smmp_vmwVmUUID;
+        my $uuids    = $self->snmp_vmwVmUUID;
         my $memsizes = $self->snmp_vmwVmMemSize;
         my $vcpus    = $self->snmp_vmwVmCpus;
 
