@@ -20,17 +20,23 @@ use_table=1
   <div role="tabpanel" class="tab-pane active" id="info">
     <div class="row">
       <dl class="dl-horizontal">
-  	<dt>IP Address</dt>	
+  	<dt>IP Address</dt>
   	<dd>[% ipaddress.address %]</dd>
 
-	<dt>Related networks</dt>
+	<dt>Servers</dt>
+	<dd>[% FOREACH s IN servers %][% print_server(s) -%] [% END -%]</dd>
+
+	<dt>Devices</dt>
+	<dd>[% FOREACH d IN devices %][% print_device(d) -%] [% END -%]
+
+	<dt>Metworks</dt>
 	<dd>[% FOREACH net IN networks %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
 	</dd>
 
-	<dt>Related blocks</td>	
+	<dt>IP Blocks</td>
 	<dd>[% FOREACH block IN ipblocks %]
 	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
@@ -52,7 +58,7 @@ use_table=1
 	<dt>Description</dt>
   	<dd>[% object.description %]</dd>
 
-  	<dt>Assigned to</dt>	
+  	<dt>Assigned to</dt>
 	<dd>[% object.assigned_to %]</dd>
 
 	<dt>Phone</dt>
@@ -60,7 +66,7 @@ use_table=1
 
 	<dt>Email</dt>
   	<dd>[% object.email %]</dd>
- 	
+
 	<dt>Notes</dt>
   	<dd>[% object.notes %]</dd>
       </dl>
@@ -78,14 +84,14 @@ use_table=1
   <div role="tabpanel" class="tab-pane" id="mac">
     [% IF arp_entries.size %]
     <table class="table">
-      <thead>  
+      <thead>
          <tr>
  	 <th>Mac Address</th>
  	 <th>Vlan</th>
  	 <th>From</th>
          <th>To</th>
          </tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH r IN arp_entries %]
         <tr>
@@ -99,17 +105,17 @@ use_table=1
     </table>
   [% END %]
   </div>
-  
+
   <div role="tabpanel" class="tab-pane" id="adhost">
     [% IF hostnames.size %]
        <table class="table" id="hostname">
-         <thead>  
+         <thead>
          	<tr>
  	 	 <th>Name</th>
  	 	<th>From</th>
  	 	<th>To</th>
            </tr>
-           </thead>  
+           </thead>
          <tbody>
           [% FOREACH h IN hostnames %]
             <tr>
@@ -126,18 +132,18 @@ use_table=1
   <div role="tabpanel" class="tab-pane" id="adlogons">
     [% IF logons.size %]
     <table class="table" id="logons">
-      <thead>  
+      <thead>
         <tr>
  	  <th>Name</th>
  	  <th>From</th>
  	  <th>To</th>
         </tr>
-      </thead>  
+      </thead>
       <tbody>
         [% FOREACH h IN logons %]
         <tr>
  	  <td>[% h.user %]</td>
-	  <td>[% date.format(h.firstseen) %]</td>	
+	  <td>[% date.format(h.firstseen) %]</td>
  	  <td>[% date.format(h.lastseen) %]</td>
 	</tr>
 	[% END %]
@@ -149,7 +155,7 @@ use_table=1
   <div role="tabpanel" class="tab-pane" id="dhcplease">
     [% IF leases.size %]
     <table class="table">
-      <thead>  
+      <thead>
         <tr>
  	  <th>Server</th>
  	  <th>Mac Address</th>
@@ -158,7 +164,7 @@ use_table=1
  	  <th>Status</th>
  	  <th>Hostname</th>
         </tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH r IN leases %]
          <tr>
@@ -172,20 +178,20 @@ use_table=1
 	 [% END %]
       </tbody>
     </table>
-[% END %] 
+[% END %]
   </div><!-- end tab dhcpleases -->
 
   <div role="tabpanel" class="tab-pane" id="dhcpres">
     [% IF reservations.0 %]
     <table class="table">
-      <thead>  
+      <thead>
         <tr>
  	  <th>Server</th>
  	  <th>Mac Address</th>
  	  <th>Name</th>
  	  <th>Hostname</th>
         </tr>
-      </thead>  
+      </thead>
       <tbody>
 	[% FOREACH r IN reservations %]
         <tr>
@@ -202,5 +208,5 @@ use_table=1
 </div><!-- end of tab -->
 
 
-  
+
 </div><!-- end tabs -->

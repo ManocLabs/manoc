@@ -49,8 +49,10 @@ sub view : Chained('base') : PathPart('') : Args(0) {
 
     my $ipaddress = $c->stash->{ipaddress};
 
-    $c->stash( device =>
-            $c->model('ManocDB::Device')->search( { mng_address => $ipaddress } )->first );
+    $c->stash(
+        devices =>
+            $c->model('ManocDB::Device')->search( { mng_address => $ipaddress->padded } )->first
+        );
 
     $c->stash(
         ipblocks => [ $c->model('ManocDB::IPBlock')->including_address_ordered($ipaddress) ] );
@@ -61,6 +63,21 @@ sub view : Chained('base') : PathPart('') : Args(0) {
 
     $c->stash(
         arp_entries => [ $c->model('ManocDB::Arp')->search_by_ipaddress_ordered($ipaddress) ] );
+
+    $c->stash(
+        servers => [
+            $c->model('ManocDB::Server')->search(
+                { -or =>
+                      [
+                          { addr => $ipaddress->padded },
+                          { 'nics.ipaddr' => $ipaddress->padded },
+                      ]
+                  },
+                { join => 'nics' }
+            )
+        ],
+    );
+
 
     $c->stash(
         hostnames => [
