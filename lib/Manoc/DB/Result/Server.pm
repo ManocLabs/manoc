@@ -127,6 +127,13 @@ __PACKAGE__->has_many(
     { cascade_delete => 1 }
 );
 
+
+__PACKAGE__->has_many(
+    addresses => 'Manoc::DB::Result::ServerAddr',
+    { 'foreign.server_id' => 'self.id' },
+    { cascade_delete => 1 }
+);
+
 __PACKAGE__->might_have(
     netwalker_info => 'Manoc::DB::Result::ServerNWInfo',
     { 'foreign.server_id' => 'self.id' },

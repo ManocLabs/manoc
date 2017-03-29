@@ -69,11 +69,11 @@ sub view : Chained('base') : PathPart('') : Args(0) {
             $c->model('ManocDB::Server')->search(
                 { -or =>
                       [
-                          { addr => $ipaddress->padded },
-                          { 'nics.ipaddr' => $ipaddress->padded },
+                          { address => $ipaddress->padded },
+                          { 'addresses.ipaddr' => $ipaddress->padded },
                       ]
                   },
-                { join => 'nics' }
+                { join => 'addresses' }
             )
         ],
     );
