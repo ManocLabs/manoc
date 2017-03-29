@@ -11,9 +11,10 @@ use HTML::FormHandler::Moose;
 use Manoc::DB::Result::HWAsset;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::TraitFor::SaveButton';
-with 'Manoc::Form::TraitFor::RackOptions';
-with 'Manoc::Form::TraitFor::Horizontal';
+with 'Manoc::Form::TraitFor::SaveButton',
+    'Manoc::Form::TraitFor::RackOptions',
+    'Manoc::Form::TraitFor::Horizontal',
+    'Manoc::Form::TraitFor::IPAddr';
 
 use HTML::FormHandler::Types ('IPAddress');
 
@@ -78,6 +79,7 @@ has_field 'mng_address' => (
     label        => 'Management Address',
     required     => 1,
     element_attr => { placeholder => 'IP Address' },
+    inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,
     tags       => {
@@ -182,20 +184,6 @@ override validate_model => sub {
     my $rs          = $self->resultset;
 
     my $field;
-
-    $field = $self->field('mng_address');
-    if ( my $value = $field->value ) {
-        my %id_clause;
-        $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
-
-        $value = Manoc::IPAddress::IPv4->new($value);
-        my $count = $rs->search( { mng_address => $value->padded, %id_clause } )->count;
-        if ( $count >= 1 ) {
-            my $field_error = 'Duplicate management address';
-            $field->add_error( $field_error, $field->loc_label );
-            $found_error++;
-        }
-    }
 
     $field = $self->field('rack');
     if ( $self->field('hwasset')->value && !defined( $field->value ) ) {
