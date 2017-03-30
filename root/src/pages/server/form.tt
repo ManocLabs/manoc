@@ -99,9 +99,9 @@
             [% END %]
             [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
-            <label class="col-sm-3 control-label" for="form-server.hosted_virtinfr">Virtual Infrastructure</label>
-           <div class="col-sm-4">
-                [% SET f = form.field('hosted_virtinfr') %]
+            <label class="col-sm-3 control-label" for="form-server.virtinfr">Virtual Infrastructure</label>
+            <div class="col-sm-4">
+                [% SET f = form.field('virtinfr') %]
                 [% f.render %]
                 [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
@@ -153,7 +153,7 @@
 $( document ).ready(function() {
     $("#[% form.name %]\\.vm").selectpicker();
     $("#[% form.name %]\\.serverhw").selectpicker();
-    $("#[% form.name %]\\.hosted_virtinfr").selectpicker();
+    $("#[% form.name %]\\.virtinfr").selectpicker();
 
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
       showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
