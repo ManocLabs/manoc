@@ -71,6 +71,7 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
 
     $c->stash(
         object          => $object,
+	 title           => 'Create device hardware',
         form_class      => 'Manoc::Form::HWAsset',
         form_parameters => { type => Manoc::DB::Result::HWAsset->TYPE_DEVICE },
     );
