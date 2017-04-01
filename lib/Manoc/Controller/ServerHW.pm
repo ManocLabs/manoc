@@ -47,7 +47,7 @@ __PACKAGE__->config(
         prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'server' ]
     },
 
-    csv_columns => [ 'inventory', 'model', 'vendor', 'serial', 'cpu_model', 'proc_freq', ],
+    csv_columns => [  'model', 'vendor', 'inventory', 'serial', 'ram_memory', 'cpu_model', 'proc_freq', 'n_procs', 'n_cores_proc', 'storage1_size', 'storage2_size', 'notes'],
 
 );
 
