@@ -2,13 +2,15 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::Result::ServerNIC;
+package Manoc::DB::Result::ServerAddr;
 
 use parent 'DBIx::Class::Core';
 use strict;
 use warnings;
 
-__PACKAGE__->table('server_nic');
+__PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
+
+__PACKAGE__->table('server_addr');
 __PACKAGE__->add_columns(
    id => {
         data_type         => 'int',
@@ -22,17 +24,17 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
 
-    macaddr => {
-        data_type   => 'varchar',
-        is_nullable => 0,
-        size        => 17
+   ipaddr => {
+        data_type    => 'varchar',
+        is_nullable  => 1,
+        size         => 15,
+        ipv4_address => 1,
     },
-
 );
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->add_unique_constraint( ['server_id', 'macaddr'] );
+__PACKAGE__->add_unique_constraint( ['server_id', 'ipaddr'] );
 
 __PACKAGE__->belongs_to(
     server => 'Manoc::DB::Result::Server',
@@ -41,7 +43,7 @@ __PACKAGE__->belongs_to(
 
 =head1 NAME
 
-Manoc::DB::Result::ServerNIC - Server additional network interface
+Manoc::DB::Result::ServerAddr - Server additional network addresses
 
 =head1 DESCRIPTION
 

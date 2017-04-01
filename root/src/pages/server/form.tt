@@ -7,28 +7,42 @@
    c.uri_for_action('/virtualmachine/create', { nwinfo => object.netwalker_info.id } ) :
    c.uri_for_action('/virtualmachine/create')
 -%]
+
+[% IF  form.has_errors -%]
+<div class="alert alert-danger">
+  <span class="error-message">
+    [% form.error_message || 'There were errors in your form' -%]
+  </span>
+</div>
+[% END -%]
+
 <form class="form-horizontal" id="form-server" method="post">
     <fieldset>
-        <div class="form-group">
+         [% SET f = form.field('hostname') -%]
+        <div class="form-group [% 'has-error' IF f.has_errors %]">
             <label class="col-sm-2 required-label control-label" for="form-server.hostname">Hostname</label>
             <div class="col-sm-10">
                 [% form.field('hostname').render %]
             </div>
         </div>
-        <div class="form-group">
+        [% SET f = form.field('address') -%]
+        <div class="form-group [% 'has-error' IF f.has_errors %]">
             <label class="col-sm-2 required-label control-label" for="form-server.address">IP Address</label>
             <div class="col-sm-10">
-                [% form.field('address').render %]
+                [% f.render %]
+                [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group [% 'has-error' IF  form.field('os').has_errors ||  form.field('os_ver').has_errors %]">
             <label class="col-sm-2 control-label" for="form-server.os">OS Name</label>
             <div class="col-sm-4">
                 [% form.field('os').render %]
+                [% FOR err IN form.field('os').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
             <label class="col-sm-2 control-label" for="form-server.os_ver">OS Version</label>
             <div class="col-sm-4">
                 [% form.field('os_ver').render %]
+                [% FOR err IN form.field('os_ver').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
         <div class="form-group">
@@ -43,6 +57,7 @@
                   [% option.label %]
                 </label>
             [% END %]
+            [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
         <div class="form-group" id="form-server.vm-group">
@@ -54,6 +69,7 @@
                         <button type="button" name="form-server.vm_btn" id="form-server.vm_btn" class="btn btn-primary" href="#">Add</button>
                     </span>
                 </div>
+               [% FOR err IN form.field('vm').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
 
@@ -66,6 +82,7 @@
                         <button type="brn" name="form-server.serverhw_btn" id="form-server.serverhw_btn" class="btn btn-primary" href="#">Add</button>
                     </span>
                 </div>
+               [% FOR err IN form.field('serverhw').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
         <div class="form-group">
@@ -80,10 +97,13 @@
                   [% option.label %]
                 </label>
             [% END %]
+            [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
-            <label class="col-sm-3 control-label" for="form-server.hosted_virtinfr">Virtual Infrastructure</label>
-           <div class="col-sm-4">
-                [% form.field('hosted_virtinfr').render %]
+            <label class="col-sm-3 control-label" for="form-server.virtinfr">Virtual Infrastructure</label>
+            <div class="col-sm-4">
+                [% SET f = form.field('virtinfr') %]
+                [% f.render %]
+                [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
         <div id="form-server.nics">
@@ -95,11 +115,29 @@
 
                 <div class="col-sm-8">
                     [% element.field('macaddr').render %]
-                    [% element.field('ipaddr').render %]
                         <button data-rep-id="form-server.nics" data-rep-count="[% i %]"
                                 class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
                             <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
                         </button>
+                    [% FOR err IN element.field('macaddr').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
+                </div>
+             </div>
+            [% END %]
+        </div>
+         <div id="form-server.addresses">
+            [% FOR element IN form.field('addresses').fields -%]
+            [% SET i = element.name %]
+            <div class="form-group hfh-repinst" id="form-server.addresses.[% i %]">
+                [% element.field('id').render %]
+                <label class="col-sm-2 control-label" for="[% element.field('ipaddr').id %]">IP Address</label>
+
+                <div class="col-sm-8">
+                    [% element.field('ipaddr').render %]
+                        <button data-rep-id="form-server.addresses" data-rep-count="[% i %]"
+                                class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
+                            <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
+                        </button>
+                    [% FOR err IN element.field('ipaddr').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
                 </div>
              </div>
             [% END %]
@@ -115,7 +153,7 @@
 $( document ).ready(function() {
     $("#[% form.name %]\\.vm").selectpicker();
     $("#[% form.name %]\\.serverhw").selectpicker();
-    $("#[% form.name %]\\.hosted_virtinfr").selectpicker();
+    $("#[% form.name %]\\.virtinfr").selectpicker();
 
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
       showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
@@ -136,11 +174,10 @@ $( document ).ready(function() {
         var containerId = $(this).attr('data-rep-id');
         var container = $('#' + $.escapeSelector(containerId));
 
-        var lastEntry = $('.hfh-repinst:last');
+        var lastEntry = container.find('.hfh-repinst:last');
 
         var entryClone = lastEntry.clone().wrap('<div>').parent();
         var newEntryHtml = entryClone.html();
-        alert(newEntryHtml);
 
         var lastIndex = $(this).attr('data-rep-count');
         var newIndex  = parseInt(lastIndex) + 1;
@@ -162,7 +199,6 @@ $( document ).ready(function() {
 
     $(document).on('click', '.form-btn-remove', function(e)
     {
-        alert("HELO");
 		$(this).parents('.hfh-repinst:first').remove();
 
 		e.preventDefault();

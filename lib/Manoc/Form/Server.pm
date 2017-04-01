@@ -2,9 +2,11 @@ package Manoc::Form::Server;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::TraitFor::SaveButton';
 
+with 'Manoc::Form::TraitFor::SaveButton',
+    'Manoc::Form::TraitFor::IPAddr';
 
+use Manoc::Form::Types ('MacAddress');
 use HTML::FormHandler::Types ('IPAddress');
 
 use namespace::autoclean;
@@ -30,10 +32,12 @@ has_field 'address' => (
     required     => 1,
     label        => 'IP Address',
     apply        => [IPAddress],
+    inflate_method => \&inflate_ipv4,
     element_attr => {
 #        placeholder => 'leave empty to use DNS',
         size        => '100%',
     },
+
 );
 
 has_field 'type' => (
@@ -120,19 +124,28 @@ has_field 'nics' => (
 has_field 'nics.id' => ( type => 'PrimaryKey' );
 has_field 'nics.macaddr' => (
     type         => 'Text',
+    apply        => [MacAddress],
     element_attr => {
         placeholder => 'mac addr',
     },
 );
-has_field 'nics.ipaddr' => (
+
+has_field 'addresses' => (
+    type => 'Repeatable',
+    do_wrapper => 0,
+    num_extra => 1,
+);
+
+has_field 'addresses.id' => ( type => 'PrimaryKey' );
+has_field 'addresses.ipaddr' => (
     type         => 'Text',
     label        => 'IP Address',
     apply        => [IPAddress],
+    inflate_method => \&inflate_ipv4,
     element_attr => {
         placeholder => 'ip addr',
     },
 );
-
 
 sub default_type {
     my $self = shift;
@@ -203,44 +216,6 @@ sub options_vm {
 
 }
 
-
-override validate_model => sub {
-    my ($self) = @_;
-
-    my $found_error = 0;
-    my $rs          = $self->resultset;
-
-    my $field;
-
-    $field = $self->field('address');
-    if ( my $value = $field->value ) {
-        my %id_clause;
-        $id_clause{id} = { '!=' => $self->item_id } if defined $self->item;
-
-        $value = Manoc::IPAddress::IPv4->new($value);
-        my $count = $rs->search( { address => $value->padded, %id_clause } )->count;
-        if ( $count >= 1 ) {
-            my $field_error = 'Duplicate address';
-            $field->add_error( $field_error, $field->loc_label );
-            $found_error++;
-        }
-    }
-
-    return $found_error || super();
-};
-
-before update_model => sub {
-    my ($self) = @_;
-
-    my $values = $self->values;
-
-    foreach my $nic (@{$values->{nics}}) {
-        my $addr = $nic->{ipaddr};
-        defined($addr) and
-            $nic->{ipaddr} =  Manoc::IPAddress::IPv4->new($addr);
-    }
-    $self->_set_value($values);
-};
 
 
 __PACKAGE__->meta->make_immutable;
