@@ -53,7 +53,9 @@
     <div class="panel-body">
       <dl class="dl-horizontal">
           <dt>Hostname</dt><dd>[% object.hostname %] </dd>
-          <dt>Address</dt><dd>[% print_ip(object.address) %] </dd>
+          <dt>Primary Address</dt><dd>[% print_ip(object.address) %] </dd>
+          <dt>Aliases</dt><dd>[% FOREACH a IN object.addresses %][% print_ip(a.ipaddr) -%] [% END -%]</dd>
+          <dt>NICs</dt><dd>[% FOREACH n IN object.nics %][% print_mac(n.macaddr) -%] [% END -%]</dd>
 	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
           [% IF object.decommissioned -%]
           <dt>Decommissioned</dt>
@@ -72,12 +74,13 @@
 
   <div class="panel panel-default">
       <div class="panel-body">
+        <div class="panel-heading">Netwalker info</div>
           <dl class="dl-horizontal">
               [% IF object.netwalker_info -%]
               [% SET nwinfo = object.netwalker_info -%]
 
               [% SET mismatch = nwinfo.name && (nwinfo.name != object.hostname) -%]
-  	          <dt>Host name</dt>
+  	          <dt>Hostname</dt>
               <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.name | html %]
                 [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="hostname">[% fa_icon('exchange') %]</a>[%END-%]
@@ -85,14 +88,14 @@
 
 
               [% SET mismatch = nwinfo.os && nwinfo.os != object.os -%]
-	          <dt>Detected OS</dt>
+	          <dt>OS</dt>
 	          <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.os | html %]
                 [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os">[% fa_icon('exchange') %]</a>[%END-%]
               </dd>
 
              [% SET mismatch =  nwinfo.os_ver && nwinfo.os_ver != object.os_ver -%]
-	          <dt>Detected OS Version</dt>
+	          <dt>OS Version</dt>
               <dd [% 'class="text-warning"' IF mismatch %]>
                 [% nwinfo.os_ver | html %]
                 [% IF mismatch %]<a href="#" data-manoc-action="from-nwinfo" data-manoc-what="os_ver">[% fa_icon('exchange') %]</a>[%END-%]
