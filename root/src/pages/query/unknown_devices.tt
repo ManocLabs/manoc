@@ -5,7 +5,7 @@
 title='Unknown CDP hosts'
 %]
 [% init_table('devs') %]
-[% FOREACH u IN unknown_devices %]
+[% FOREACH u IN unknown_devices.all %]
    [% IF loop.first %]
 
     <table class="display" id="devs">

@@ -82,7 +82,7 @@
       </tr>
     </thead>
     <tbody>
-      [% FOREACH s IN object.dhcp_subnets -%]
+      [% FOREACH s IN object.dhcp_subnets.all -%]
       <tr>
 	<td>[% print_dhcpsubnet(s) %]</td>
 	<td>[% s.network.address | html %]/[% s.network.prefix  | html %]</td>

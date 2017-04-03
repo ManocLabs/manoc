@@ -2,17 +2,47 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
+package Manoc::DB;
+
 use strict;
 use warnings;
-
-package Manoc::DB;
 
 our $VERSION = 4;
 
 our $DEFAULT_ADMIN_PASSWORD = 'admin';
 
-use base qw/DBIx::Class::Schema/;
-__PACKAGE__->load_namespaces();
+use parent 'DBIx::Class::Schema';
+
+__PACKAGE__->load_components(qw(
+    Helper::Schema::LintContents
+    Helper::Schema::QuoteNames
+    Helper::Schema::DidYouMean
+
+    Helper::Schema::Verifier::ColumnInfo
+    Helper::Schema::Verifier::RelationshipColumnName
+    Helper::Schema::Verifier::Parent
+));
+
+__PACKAGE__->load_namespaces(
+    default_resultset_class => '+Manoc::DB::ResultSet',
+);
+
+
+# add some non-standard allowed keys
+ sub allowed_column_keys {
+   my $self = shift;
+   my @keys = $self->next::method;
+   push @keys, qw(encode_class encode_check_method encode_args encode_column
+                  ipv4_address
+                  extras
+                  _inflate_info);
+   return @keys;
+ }
+
+sub base_result { 'Manoc::DB::Result' }
+
+sub base_resultset { 'Manoc::DB::ResultSet' }
+
 
 sub get_version {
     return $VERSION;

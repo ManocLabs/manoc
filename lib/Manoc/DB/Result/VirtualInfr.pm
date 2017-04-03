@@ -3,9 +3,11 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VirtualInfr;
-use base 'DBIx::Class';
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
+use parent 'Manoc::DB::Result';
+
+use strict;
+use warnings;
 
 __PACKAGE__->table('virtual_infr');
 

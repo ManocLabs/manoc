@@ -4,7 +4,8 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VlanVtp;
 
-use parent qw(DBIx::Class::Core);
+
+use parent 'Manoc::DB::Result';
 use strict;
 use warnings;
 

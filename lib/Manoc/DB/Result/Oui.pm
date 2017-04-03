@@ -4,11 +4,11 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Oui;
 
-use base 'DBIx::Class';
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
 
-__PACKAGE__->load_components(qw/PK::Auto Core/);
 __PACKAGE__->table('oui');
 
 # prefix must be lowercase!

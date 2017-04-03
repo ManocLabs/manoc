@@ -6,7 +6,8 @@ package Manoc::DB::Result::Vlan;
 use strict;
 use warnings;
 
-use parent 'DBIx::Class::Core';
+
+use parent 'Manoc::DB::Result';
 
 __PACKAGE__->table('vlan');
 

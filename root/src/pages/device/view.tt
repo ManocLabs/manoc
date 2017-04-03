@@ -181,7 +181,7 @@ page.title   = 'Device ' _ object.name
 	</tr>
       </thead>
       <tbody>
-	[% FOREACH if IN unused_ifaces %]
+	[% FOREACH if IN unused_ifaces.all %]
 	<tr>
 	  <td>[% print_iface(object.id,if.interface) %]</td>
           <td>[% if.description %]</td>

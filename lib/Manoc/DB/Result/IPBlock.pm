@@ -4,7 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::IPBlock;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
+
+use strict;
+use warnings;
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 

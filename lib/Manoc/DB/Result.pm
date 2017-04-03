@@ -1,19 +1,13 @@
-# Copyright 2017- by the Manoc Team
+# Copyright 2017 by the Manoc Team
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-package Manoc::DB::ResultSet::HostedVm;
+package Manoc::DB::Result;
 
 use strict;
 use warnings;
 
-use parent 'Manoc::DB::ResultSet';
-
-__PACKAGE__->load_components(
-    qw/
-        +Manoc::DB::Helper::ResultSet::TupleArchive
-        /
-);
+use parent 'DBIx::Class::Core';
 
 1;
 

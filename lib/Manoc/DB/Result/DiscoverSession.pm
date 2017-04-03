@@ -4,7 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DiscoverSession;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
+
+use strict;
+use warnings;
 
 use constant {
     STATUS_NEW     => 'N',

@@ -7,11 +7,16 @@ package Manoc::DB::Result::IPNetwork;
 use Moose;
 
 #  'extends' since we are using Moose
-extends 'DBIx::Class::Core';
+extends 'Manoc::DB::Result';
 
 use Manoc::IPAddress::IPv4Network;
 
-__PACKAGE__->load_components(qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/);
+__PACKAGE__->load_components(
+    qw/
+          Tree::AdjacencyList
+          +Manoc::DB::InflateColumn::IPv4
+      /
+);
 
 __PACKAGE__->table('ip_network');
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPNetwork');
@@ -349,7 +354,7 @@ sub arp_entries {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub ip_entries {
@@ -363,7 +368,7 @@ sub ip_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub ipblock_entries {
@@ -377,13 +382,13 @@ sub ipblock_entries {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return  $rs;
 }
 
 sub supernets {
     my $self = shift;
     my $rs   = $self->search_related('supernets');
-    return wantarray() ? $rs->all : $rs;
+    return $rs;
 }
 
 sub supernets_ordered {
@@ -395,13 +400,13 @@ sub supernets_ordered {
         }
     );
 
-    return wantarray ? $rs->all : $rs;
+    return $rs;
 }
 
 sub subnets {
     my $self = shift;
     my $rs   = $self->search_related('subnets');
-    return wantarray() ? $rs->all : $rs;
+    return $rs;
 }
 
 sub first_supernet {
@@ -413,7 +418,7 @@ sub children_ordered {
     my $self = shift;
     my $rs = $self->children->search( {}, { order_by => { -asc => 'address' } } );
 
-    return wantarray ? $rs->all : $rs;
+    return $rs;
 }
 
 sub sqlt_deploy_hook {
