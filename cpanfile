@@ -9,6 +9,7 @@ requires 'DBI';
 requires 'DBIx::Class';
 requires 'DBIx::Class::EncodedColumn';
 requires 'DBIx::Class::Tree', '0.03003';
+requires 'DBIx::Class::Helpers';
 requires 'Catalyst::Runtime', '5.90077';
 requires 'Catalyst::Authentication::Credential::HTTP';
 requires 'Catalyst::Plugin::ConfigLoader';
