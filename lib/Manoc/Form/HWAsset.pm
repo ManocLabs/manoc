@@ -92,17 +92,16 @@ override validate_model => sub {
 
         # when moving to warehouse check for in_use
         my $location_field = $self->field('location');
-        if ( $location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
-            $item->in_use )
+        if ( $item->in_storage &&
+                 $location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
+                 $item->in_use )
         {
             $location_field->("Asset is in use, cannot be moved to warehouse");
             $found_error++;
         }
     }
 
-    $found_error += super();
-
-    return $found_error;
+    return super() || $found_error;
 };
 
 before 'update_model' => sub {

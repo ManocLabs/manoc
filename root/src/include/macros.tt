@@ -27,16 +27,16 @@ $( document ).ready(function() {
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ip(ip) BLOCK %]
    [% IF ip and ip.isa("Manoc::IpAddress") -%]
-      <a href=[% c.uri_for_action('ip/view', [ip.address]) %]> [% ip.address | html %]</a>
+      <a href="[% c.uri_for_action('ip/view', [ip.address]) %]"> [% ip.address | html %]</a>
    [% ELSE-%]
-      <a href=[% c.uri_for_action('ip/view', [ip]) %]> [% ip | html %]</a>
+      <a href="[% c.uri_for_action('ip/view', [ip]) %]"> [% ip | html %]</a>
    [% END-%]
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                            MAC address                            -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_mac(mac) BLOCK -%]
-<a href=[% c.uri_for('mac', mac) %]> [% mac | html %] </a>
+<a href="[% c.uri_for_action('mac/view', [ mac ]) %]"> [% mac | html %] </a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                           Interface                               -%]
@@ -51,19 +51,19 @@ $( document ).ready(function() {
 [%#                          Building                                 -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_building(building) BLOCK -%]
-<a href=[% c.uri_for_action('building/view', [ building.id ]) %]>[% building.name | html %]</a>
+<a href="[% c.uri_for_action('building/view', [ building.id ]) %]">[% building.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                           Rack                                    -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_rack(rack) BLOCK -%]
-<a href=[% c.uri_for_action('/rack/view', [ rack.id ]) %]>[% rack.name | html %] </a>
+<a href="[% c.uri_for_action('/rack/view', [ rack.id ]) %]">[% rack.name | html %] </a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                           Warehouse                               -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_warehouse(w) BLOCK -%]
-<a href=[% c.uri_for_action('/warehouse/view', [ w.id ]) %]>[% w.name | html %] </a>
+<a href="[% c.uri_for_action('/warehouse/view', [ w.id ]) %]">[% w.name | html %] </a>
 [%- END -%]
 
 [%# ----------------------------------------------------------------- -%]
@@ -78,41 +78,41 @@ $( document ).ready(function() {
 [%#                            VlanRange                              -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vlanrange(range) BLOCK -%]
-<a href=[% c.uri_for_action('vlanrange/view', [ range.id ]) %]>[% range.name | html %]</a>
+<a href="[% c.uri_for_action('vlanrange/view', [ range.id ]) %]">[% range.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                            IP Network                             -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ipnetwork(network) BLOCK -%]
-<a href=[% c.uri_for_action('ipnetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
+<a href="[% c.uri_for_action('ipnetwork/view', [ network.id ]) %]">[% network.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                            IP Block                             -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_ipblock(block) BLOCK -%]
-<a href=[% c.uri_for_action('ipblock/view', [ block.id ]) %]>[% block.name | html %]</a>
+<a href="[% c.uri_for_action('ipblock/view', [ block.id ]) %]">[% block.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Hostname                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_host(id,name) BLOCK -%]
 [% IF id and id.isa("Manoc::IpAddress") -%]
-    [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id.address]) %]>[% id.address | html %]</a>
+    [% name | html %] <a href="[% c.uri_for_action('/ip/view', [id.address]) %]">[% id.address | html %]</a>
  [% ELSE-%]
-    [% name | html %] <a href=[% c.uri_for_action('/ip/view', [id]) %]>[%id%]</a>
+    [% name | html %] <a href="[% c.uri_for_action('/ip/view', [id]) %]">[%id%]</a>
  [% END -%]
 [% END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                             DHCP                                  -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_dhcpsubnet(network) BLOCK -%]
-<a href=[% c.uri_for_action('dhcpsubnet/view', [ network.id ]) %]>[% network.name | html %]</a>
+<a href="[% c.uri_for_action('dhcpsubnet/view', [ network.id ]) %]">[% network.name | html %]</a>
 [%- END -%]
 [% MACRO print_dhcpsharednetwork(network) BLOCK -%]
-<a href=[% c.uri_for_action('dhcpsharednetwork/view', [ network.id ]) %]>[% network.name | html %]</a>
+<a href="[% c.uri_for_action('dhcpsharednetwork/view', [ network.id ]) %]">[% network.name | html %]</a>
 [%- END -%]
 [% MACRO print_dhcpserver(server) BLOCK -%]
-<a href=[% c.uri_for_action('dhcpserver/view', [ server.id ]) %]>[% server.name | html %]</a>
+<a href="[% c.uri_for_action('dhcpserver/view', [ server.id ]) %]">[% server.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Server HardWare                           -%]
@@ -124,23 +124,23 @@ $( document ).ready(function() {
 [%#                         Server logical                            -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_server(server) BLOCK -%]
-<a href=[% c.uri_for_action('server/view', [ server.id ]) %]>[% server.hostname | html %]</a>
+<a href="[% c.uri_for_action('server/view', [ server.id ]) %]">[% server.hostname | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Virtualmachine                            -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vm(vm) BLOCK -%]
-<a href=[% c.uri_for_action('virtualmachine/view', [ vm.id ]) %]>[% vm.name | html %]</a>
+<a href="[% c.uri_for_action('virtualmachine/view', [ vm.id ]) %]">[% vm.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                      Virtual infrastructure                       -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_vinfr(vi) BLOCK -%]
-<a href=[% c.uri_for_action('vinfr/view', [ vi.id ]) %]>[% vi.name | html %]</a>
+<a href="[% c.uri_for_action('vinfr/view', [ vi.id ]) %]">[% vi.name | html %]</a>
 [%- END -%]
 [%# ----------------------------------------------------------------- -%]
 [%#                         Software Pkg                              -%]
 [%# ----------------------------------------------------------------- -%]
 [% MACRO print_softwarepkg(s) BLOCK -%]
-<a href=[% c.uri_for_action('softwarepkg/view', [ s.id ]) %]>[% s.name | html %]</a>
+<a href="[% c.uri_for_action('softwarepkg/view', [ s.id ]) %]">[% s.name | html %]</a>
 [%- END -%]

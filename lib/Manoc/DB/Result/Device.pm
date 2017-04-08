@@ -217,6 +217,9 @@ the config object has been refreshed, undef otherwise.
 sub update_config {
     my ( $self, $config_text, $timestamp ) = @_;
 
+    defined($config_text) or
+        return 1;
+
     $timestamp ||= time;
 
     my $config = $self->config;
