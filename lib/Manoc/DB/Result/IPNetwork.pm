@@ -7,11 +7,16 @@ package Manoc::DB::Result::IPNetwork;
 use Moose;
 
 #  'extends' since we are using Moose
-extends 'DBIx::Class::Core';
+extends 'Manoc::DB::Result';
 
 use Manoc::IPAddress::IPv4Network;
 
-__PACKAGE__->load_components(qw/Tree::AdjacencyList +Manoc::DB::InflateColumn::IPv4/);
+__PACKAGE__->load_components(
+    qw/
+          Tree::AdjacencyList
+          +Manoc::DB::InflateColumn::IPv4
+      /
+);
 
 __PACKAGE__->table('ip_network');
 __PACKAGE__->resultset_class('Manoc::DB::ResultSet::IPNetwork');
@@ -137,6 +142,26 @@ sub label {
     return $self->name . " (" . $self->network . ")";
 }
 
+sub _find_and_update_parent {
+    my $self = shift;
+
+    my $supernets = $self->result_source->resultset->search(
+        {
+            address   => { '<=' => $self->address->padded },
+            broadcast => { '>=' => $self->broadcast->padded },
+        },
+        {
+            order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ]
+        }
+    );
+    my $parent = $supernets->first();
+
+    # this will bypass dbic::tree
+    $parent and $self->_parent($parent);
+
+    return $parent;
+}
+
 # call this method after resizing a network
 sub _rebuild_subtree {
     my $self = shift;
@@ -166,25 +191,23 @@ sub _rebuild_subtree {
     }
 }
 
+sub new {
+    my ( $self, @args ) = @_;
+    my $attrs = shift @args;
+
+    if ( my $network = delete $attrs->{network} ) {
+        $attrs->{address}   = $network->address;
+        $attrs->{prefix}    = $network->prefix;
+        $attrs->{broadcast} = $network->broadcast;
+    }
+
+    return $self->next::method( $attrs, @args );
+}
+
 sub insert {
     my $self = shift;
 
-    my $parent = $self->parent;
-    if ( !$parent ) {
-        my $supernets = $self->result_source->resultset->search(
-            {
-                address   => { '<=' => $self->address->padded },
-                broadcast => { '>=' => $self->broadcast->padded },
-            },
-            {
-                order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ]
-            }
-        );
-        $parent = $supernets->first();
-
-        #bypass dbic::tree
-        $parent and $self->_parent($parent);
-    }
+    my $parent = $self->_find_and_update_parent();
 
     $self->next::method(@_);
 
@@ -210,6 +233,8 @@ sub insert {
     while ( my $child = $new_children->next() ) {
         $child->parent($self);
     }
+
+    return $self;
 }
 
 sub is_outside_parent {
@@ -237,7 +262,9 @@ sub update {
 
     my %dirty = $self->get_dirty_columns;
 
-    if ( $dirty{address} || $dirty{broadcast} ) {
+    my $has_changed_size = $dirty{address} || $dirty{broadcast};
+
+    if ( $has_changed_size ) {
         # check if larger than parent
         $self->is_outside_parent and
             die "network cannot be larger than its parent";
@@ -248,6 +275,13 @@ sub update {
         $self->_rebuild_subtree();
     }
     $self->next::method(@_);
+
+    if (!$self->parent && $has_changed_size) {
+        my $new_parent = $self->_find_and_update_parent();
+        $new_parent and $self->result_source->resultset->rebuild_tree;
+    }
+
+    return $self;
 }
 
 __PACKAGE__->set_primary_key('id');
@@ -320,7 +354,7 @@ sub arp_entries {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub ip_entries {
@@ -334,7 +368,7 @@ sub ip_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub ipblock_entries {
@@ -348,13 +382,13 @@ sub ipblock_entries {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return  $rs;
 }
 
 sub supernets {
     my $self = shift;
     my $rs   = $self->search_related('supernets');
-    return wantarray() ? $rs->all : $rs;
+    return $rs;
 }
 
 sub supernets_ordered {
@@ -366,13 +400,13 @@ sub supernets_ordered {
         }
     );
 
-    return wantarray ? $rs->all : $rs;
+    return $rs;
 }
 
 sub subnets {
     my $self = shift;
     my $rs   = $self->search_related('subnets');
-    return wantarray() ? $rs->all : $rs;
+    return $rs;
 }
 
 sub first_supernet {
@@ -384,7 +418,7 @@ sub children_ordered {
     my $self = shift;
     my $rs = $self->children->search( {}, { order_by => { -asc => 'address' } } );
 
-    return wantarray ? $rs->all : $rs;
+    return $rs;
 }
 
 sub sqlt_deploy_hook {

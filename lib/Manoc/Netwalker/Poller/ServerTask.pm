@@ -255,7 +255,7 @@ sub update_vm {
     return unless defined($uuid);
 
     # nothing to change
-    defined( $vm->identifier ) and
+    defined($vm) && defined( $vm->identifier ) &&
         lc($uuid) eq lc( $vm->identifier ) and
         return;
 

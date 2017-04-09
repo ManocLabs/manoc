@@ -4,9 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::WinLogon;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
 

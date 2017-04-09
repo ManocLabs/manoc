@@ -6,6 +6,8 @@ package Manoc::DB::Helper::NetwalkerCredentials;
 use strict;
 use warnings;
 
+use parent 'DBIx::Class';
+
 sub make_credentials_columns {
     my $self = shift;
 

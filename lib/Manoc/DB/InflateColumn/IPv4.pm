@@ -6,6 +6,9 @@ package Manoc::DB::InflateColumn::IPv4;
 
 use strict;
 use warnings;
+
+use parent 'DBIx::Class';
+
 use Manoc::IPAddress::IPv4;
 
 sub register_column {
@@ -40,7 +43,7 @@ DBIx::Class::InflateColumn::Serializer - Inflator for IP v4 addresses
 =head1 SYNOPSIS
 
   package Manoc::DB::Result::Table;
-  use parent 'DBIx::Class::';
+  use parent 'DBIx::Class';
 
   __PACKAGE__->load_components('+Manoc::DB::InflateColumn::IPv4);
 

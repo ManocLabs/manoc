@@ -100,7 +100,7 @@ sub options_hypervisor {
     return unless $self->schema;
 
     my @options;
-    my @rs = $self->schema->resultset('Server')->hypervisors();
+    my @rs = $self->schema->resultset('Server')->hypervisors()->all;
 
     foreach my $b (@rs) {
         my $option = {

@@ -4,7 +4,8 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::DiscoverSession;
 
-use base 'DBIx::Class::ResultSet';
+use parent 'Manoc::DB::ResultSet';
+
 use strict;
 use warnings;
 

@@ -4,9 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::VirtualMachine;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
 
 sub unused {
     my ($self) = @_;
@@ -30,7 +31,7 @@ sub unused {
         },
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 1;

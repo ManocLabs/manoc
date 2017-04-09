@@ -4,9 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::Mat;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
 
 __PACKAGE__->load_components(
     qw/

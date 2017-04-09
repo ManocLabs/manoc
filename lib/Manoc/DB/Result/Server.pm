@@ -4,10 +4,11 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Server;
 
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
@@ -157,7 +158,7 @@ sub virtual_servers {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('Server');
-    $rs = $rs->search(
+    return $rs->search(
         {
             'vm.hypervisor_id' => $self->id,
         },
@@ -165,7 +166,6 @@ sub virtual_servers {
             join => 'vm',
         }
     );
-    return wantarray() ? $rs->all() : $rs;
 }
 
 sub num_cpus {

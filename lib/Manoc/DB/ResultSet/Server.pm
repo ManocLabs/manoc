@@ -4,29 +4,30 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::Server;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
 
 sub hypervisors {
     my $self = shift;
 
     my $rs = $self->search( { is_hypervisor => 1, decommissioned => 0 } );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub standalone_hypervisors {
     my $self = shift;
 
     my $rs = $self->hypervisors->search( { virtual_infr => undef } );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub logical_servers {
     my $self = shift;
 
     my $rs = $self->search( { vm_id => undef, serverhw_id => undef }, );
-    return wantarray() ? $rs->all() : $rs;
+    return  $rs;
 }
 
 1;

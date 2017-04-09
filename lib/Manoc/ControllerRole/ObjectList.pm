@@ -83,7 +83,7 @@ sub get_object_list {
     my $rs      = $c->stash->{resultset};
     my $filter  = $self->get_object_list_filter($c);
     my $options = $c->stash->{object_list_options} || $self->object_list_options;
-    return [ $rs->search( $filter, $options ) ];
+    return [ $rs->search( $filter, $options )->all ];
 }
 
 =head2 get_object_list_filter

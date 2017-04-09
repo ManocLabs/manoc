@@ -68,7 +68,7 @@
   </tbody>
   [% IF range.vlans %]
   <tbody id="children[%range.id%]" class="collapse" aria-labelledby="row[%range.id%]">
-    [% FOREACH vlan  IN range.vlans %]
+    [% FOREACH vlan  IN range.vlans.all %]
     <tr class="childrow">
       <td><a href="[% c.uri_for_action('vlan/view', [vlan.id]) %]">[% vlan.name | html %]</a></td>
       <td colspan="2">[% vlan.id | html %]</td>

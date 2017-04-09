@@ -69,7 +69,7 @@ sub get_object_list {
                 join     => 'building',
                 order_by => 'me.name',
             }
-        )
+        )->all
     ];
 }
 

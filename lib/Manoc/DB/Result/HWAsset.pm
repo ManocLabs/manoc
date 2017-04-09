@@ -3,10 +3,11 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::HWAsset;
+
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
-
-use base 'DBIx::Class::Core';
 
 use Carp;
 
@@ -34,8 +35,6 @@ our %TYPE = (
     (TYPE_PRINTER)     => { label => 'Printer' },
     (TYPE_IPPHONE)     => { label => 'VoIP Phone' },
 );
-
-__PACKAGE__->load_components(qw/PK::Auto InflateColumn/);
 
 __PACKAGE__->table('hwassets');
 __PACKAGE__->add_columns(

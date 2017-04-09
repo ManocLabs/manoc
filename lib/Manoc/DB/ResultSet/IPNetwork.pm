@@ -4,16 +4,18 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::IPNetwork;
 
-use base 'DBIx::Class::ResultSet';
-use Scalar::Util qw(blessed);
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
+
+use Scalar::Util qw(blessed);
 
 sub get_root_networks {
     my ($self) = @_;
 
     my $rs = $self->search( { 'me.parent_id' => undef } );
-    return wantarray() ? $rs->all : $rs;
+    return $rs;
 }
 
 sub rebuild_tree {
@@ -57,4 +59,3 @@ sub including_address_ordered {
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

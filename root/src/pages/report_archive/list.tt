@@ -15,7 +15,7 @@
          </tr>
        </thead>
   <tbody>
-[% FOREACH r IN reports %]
+[% FOREACH r IN reports.all %]
          <tr>
  	 <td><a href=[% c.uri_for_action('/reportarchive/view_type', r.type) %]> [% r.type  %] </a></td>
 	 <td>[% r.name | html %] </td>

@@ -4,7 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::IPBlock;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
+
+use strict;
+use warnings;
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
@@ -59,7 +62,7 @@ sub arp_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 
 }
 
@@ -74,7 +77,7 @@ sub ip_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub contained_networks {
@@ -88,7 +91,7 @@ sub contained_networks {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub container_network {

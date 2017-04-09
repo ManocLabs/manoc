@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use Carp 'croak';
-use parent 'DBIx::Class::Row';
+use parent 'DBIx::Class';
 
 __PACKAGE__->mk_group_accessors( inherited => '_tuple_archive_columns' );
 
@@ -27,15 +27,14 @@ Define tuple columns for L<Manoc::DB::Helper::ResultSet::TupleArchive>
  use strict;
  use warnings;
 
- use parent 'DBIx::Class::ResultSet';
+ use parent 'DBIx::Class::Result';
 
-  __PACKAGE__->load_components('+Manoc::DB::Helper::Row::TupleArchive');
+ __PACKAGE__->load_components('+Manoc::DB::Helper::Row::TupleArchive');
 
-  # define resultset for using ResultSet::TupleArchive
-  __PACKAGE__->resultset_class('MySchema::ResultSet::Bar');
+ # define resultset for using ResultSet::TupleArchive
+ __PACKAGE__->resultset_class('MySchema::ResultSet::Bar');
 
-  __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
-
+ __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
 
 =head METHODS
 

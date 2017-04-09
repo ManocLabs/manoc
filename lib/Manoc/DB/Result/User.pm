@@ -4,14 +4,15 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::User;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
 
 use strict;
 use warnings;
+
 use Digest::MD5 qw(md5_base64);    # for old password
 use Try::Tiny;
 
-__PACKAGE__->load_components(qw(PK::Auto EncodedColumn Core));
+__PACKAGE__->load_components(qw(EncodedColumn));
 
 __PACKAGE__->table('users');
 __PACKAGE__->add_columns(

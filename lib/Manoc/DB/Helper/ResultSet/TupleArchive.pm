@@ -8,7 +8,7 @@ use warnings;
 
 use Carp 'croak';
 
-use parent 'DBIx::Class::ResultSet';
+use parent 'DBIx::Class';
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ sub register_tuple {
         {
             %tuple, archived => 0,
         }
-    );
+    )->all();
 
     if ( scalar(@entries) > 1 ) {
         warn "More than one non archived entry";
@@ -124,4 +124,3 @@ it under the same terms as Perl itself.
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

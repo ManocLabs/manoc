@@ -4,7 +4,8 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DiscoveredHost;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
 
@@ -70,7 +71,7 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint( [qw/session_id address/] );
 
 __PACKAGE__->belongs_to(
-    session_id => 'Manoc::DB::Result::DiscoverSession',
+    session => 'Manoc::DB::Result::DiscoverSession',
     'session_id'
 );
 

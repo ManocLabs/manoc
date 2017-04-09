@@ -16,7 +16,7 @@
      </tr>
   </thead>
   <tbody>
-    [% FOREACH host IN object.discovered_hosts %]
+    [% FOREACH host IN object.discovered_hosts.all %]
     <tr>
       <td><input id="[host.id]" type="checkbox" /></td>
       <td data-sort="[% host.address.padded %]">[% host.address | html %]</td>

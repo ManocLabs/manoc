@@ -4,9 +4,11 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::IfStatus;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
+
 
 sub search_unused {
     my ( $self, $device ) = @_;

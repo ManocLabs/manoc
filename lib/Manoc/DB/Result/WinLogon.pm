@@ -4,14 +4,15 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::WinLogon;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
 
 __PACKAGE__->load_components(
     qw(
-        +Manoc::DB::InflateColumn::IPv4
         +Manoc::DB::Helper::Row::TupleArchive
+        +Manoc::DB::InflateColumn::IPv4
         )
 );
 

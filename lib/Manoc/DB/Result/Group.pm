@@ -4,12 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Group;
 
-use parent 'DBIx::Class::Core';
+use parent 'Manoc::DB::Result';
 
 use strict;
 use warnings;
-
-__PACKAGE__->load_components(qw(PK::Auto Core));
 
 __PACKAGE__->table('groups');
 __PACKAGE__->add_columns(

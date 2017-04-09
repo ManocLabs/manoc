@@ -24,20 +24,20 @@ use_table=1
   	<dd>[% ipaddress.address %]</dd>
 
 	<dt>Servers</dt>
-	<dd>[% FOREACH s IN servers %][% print_server(s) -%] [% END -%]</dd>
+	<dd>[% FOREACH s IN servers.all %][% print_server(s) -%] [% END -%]</dd>
 
 	<dt>Devices</dt>
-	<dd>[% FOREACH d IN devices %][% print_device(d) -%] [% END -%]
+	<dd>[% FOREACH d IN devices.all %][% print_device(d) -%] [% END -%]
 
 	<dt>Metworks</dt>
-	<dd>[% FOREACH net IN networks %]
+	<dd>[% FOREACH net IN networks.all %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
 	</dd>
 
 	<dt>IP Blocks</td>
-	<dd>[% FOREACH block IN ipblocks %]
+	<dd>[% FOREACH block IN ipblocks.all %]
 	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
@@ -93,7 +93,7 @@ use_table=1
          </tr>
       </thead>
       <tbody>
-	[% FOREACH r IN arp_entries %]
+	[% FOREACH r IN arp_entries.all %]
         <tr>
  	  <td> <a href="[% c.uri_for_action('mac/view',r.macaddr) %]">[% r.macaddr %]</a></td>
  	  <td> <a href="[% c.uri_for_action('vlan/view',[r.vlan]) %]">[% r.vlan %]</a></td>
@@ -117,7 +117,7 @@ use_table=1
            </tr>
            </thead>
          <tbody>
-          [% FOREACH h IN hostnames %]
+          [% FOREACH h IN hostnames.all %]
             <tr>
  	      <td>[% h.name %]</td>
   	      <td>[% date.format(h.firstseen) %]</td>
@@ -140,7 +140,7 @@ use_table=1
         </tr>
       </thead>
       <tbody>
-        [% FOREACH h IN logons %]
+        [% FOREACH h IN logons.all %]
         <tr>
  	  <td>[% h.user %]</td>
 	  <td>[% date.format(h.firstseen) %]</td>
@@ -166,7 +166,7 @@ use_table=1
         </tr>
       </thead>
       <tbody>
-	[% FOREACH r IN leases %]
+	[% FOREACH r IN leases.all %]
          <tr>
  	   <td>[% r.server -%]</td>
  	   <td>[% print_mac(r.macaddr) %]</td>
@@ -193,7 +193,7 @@ use_table=1
         </tr>
       </thead>
       <tbody>
-	[% FOREACH r IN reservations %]
+	[% FOREACH r IN reservations.all %]
         <tr>
  	  <td>[% r.server %]</td>
  	  <td>[% print_mac(r.macaddr) %]</td>

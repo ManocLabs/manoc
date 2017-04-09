@@ -4,9 +4,11 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::VlanRange;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
+
 
 sub get_overlap_ranges {
     my ( $self, $start, $end ) = @_;
@@ -32,4 +34,3 @@ sub get_overlap_ranges {
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

@@ -3,10 +3,11 @@
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::Device;
+
+use parent 'Manoc::DB::Result';
+
 use strict;
 use warnings;
-
-use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
@@ -218,18 +219,19 @@ sub update_config {
     my ( $self, $config_text, $timestamp ) = @_;
 
     defined($config_text) or
-        return 1;
+        return;
 
     $timestamp ||= time;
 
     my $config = $self->config;
     if ( !$config ) {
-        $self->create_related(
+        $config = $self->create_related(
             'config' => {
                 config      => $config_text,
                 config_date => $timestamp,
             }
         );
+        $self->config($config);
 
         return 1;
     }

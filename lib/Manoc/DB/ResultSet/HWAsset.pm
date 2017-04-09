@@ -4,9 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::ResultSet::HWAsset;
 
-use base 'DBIx::Class::ResultSet';
 use strict;
 use warnings;
+
+use parent 'Manoc::DB::ResultSet';
 
 use Manoc::DB::Result::HWAsset;
 use Carp;

@@ -4,10 +4,10 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::DHCPSubnet;
 
-use Moose;
+use parent  'Manoc::DB::Result';
 
-#  'extends' since we are using Moose
-extends 'DBIx::Class::Core';
+use strict;
+use warnings;
 
 use Manoc::IPAddress::IPv4Network;
 

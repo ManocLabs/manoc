@@ -65,7 +65,7 @@ sub options_range {
     my $self = shift;
     return unless $self->schema;
 
-    my $rs = $self->schema->resultset('VlanRange')->search();
+    my $rs = $self->schema->resultset('VlanRange')->search()->all;
     return map +{ value => $_->id, label => $_->name }, $rs->all();
 }
 
@@ -77,4 +77,3 @@ __PACKAGE__->meta->make_immutable;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

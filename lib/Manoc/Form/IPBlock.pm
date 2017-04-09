@@ -6,8 +6,9 @@ package Manoc::Form::IPBlock;
 
 use HTML::FormHandler::Moose;
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::TraitFor::Horizontal';
-with 'Manoc::Form::TraitFor::SaveButton';
+with 'Manoc::Form::TraitFor::Horizontal',
+    'Manoc::Form::TraitFor::SaveButton',
+    'Manoc::Form::TraitFor::IPAddr';
 
 use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
@@ -32,6 +33,7 @@ has_field 'from_addr' => (
     size     => 15,
     required => 1,
     label    => 'From',
+    inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
@@ -48,6 +50,7 @@ has_field 'to_addr' => (
     size     => 15,
     required => 1,
     label    => 'To',
+    inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,
     # we set wrapper=>0 so we don't have the inner div too!
