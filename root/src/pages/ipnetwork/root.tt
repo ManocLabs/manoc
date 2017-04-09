@@ -27,12 +27,12 @@
    <tbody>
      <tr[% UNLESS object.children %] class="leafrow"[% END %]>
        <td>
-	 <a [% IF object.children.size -%]
-            role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%object.id %]" aria-expanded="false" aria-controls="children[object.id %]"
-	   [% ELSE -%]
-	   href="[% c.uri_for_action('ipnetwork/view', [object.id]) %]"
-	   [% END %]>
-	   [% object.name | html %]</a></td>
+         [% IF object.children.size -%]
+  	     <a role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%object.id %]" aria-expanded="false" aria-controls="children[% object.id %]">&nbsp;</a>
+   	     [% END %]
+         <a href="[% c.uri_for_action('ipnetwork/view', [object.id]) %]">[% object.name %]</a>
+       </td>
+
        <td data-sort="[% object.network.address.padded  %]">[% object.network | html %]</td>
        <td>[% print_vlan(object.vlan) %]</td>
      </tr>
