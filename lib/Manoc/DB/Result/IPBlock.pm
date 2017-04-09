@@ -62,7 +62,7 @@ sub arp_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 
 }
 
@@ -77,7 +77,7 @@ sub ip_entries {
             }
         }
     );
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub contained_networks {
@@ -91,7 +91,7 @@ sub contained_networks {
         }
     );
 
-    return wantarray() ? $rs->all() : $rs;
+    return $rs;
 }
 
 sub container_network {

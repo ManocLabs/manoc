@@ -158,7 +158,7 @@ sub virtual_servers {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('Server');
-    $rs = $rs->search(
+    return $rs->search(
         {
             'vm.hypervisor_id' => $self->id,
         },
@@ -166,7 +166,6 @@ sub virtual_servers {
             join => 'vm',
         }
     );
-    return wantarray() ? $rs->all() : $rs;
 }
 
 sub num_cpus {
