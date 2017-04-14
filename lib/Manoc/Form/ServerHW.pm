@@ -6,15 +6,18 @@ package Manoc::Form::ServerHW;
 use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
-with 'Manoc::Form::TraitFor::Horizontal';
-with 'Manoc::Form::TraitFor::SaveButton';
-with 'Manoc::Form::TraitFor::RackOptions';
+with 'Manoc::Form::TraitFor::Horizontal',
+    'Manoc::Form::HWAsset::Location',
+    'Manoc::Form::TraitFor::SaveButton',
+    'Manoc::Form::TraitFor::IPAddr';
 
-with 'Manoc::Form::HWAsset::Location';
+use namespace::autoclean;
+
+use Manoc::Form::Types ('MacAddress');
+use HTML::FormHandler::Types ('IPAddress');
 
 use Manoc::DB::Result::HWAsset;
 
-use namespace::autoclean;
 
 has '+item_class'  => ( default => 'ServerHW' );
 has '+name'        => ( default => 'form-serverhw' );
@@ -38,6 +41,31 @@ has_block 'processor_block2' => (
     class       => ['form-group'],
 );
 
+has_field 'nics' => (
+    type    => 'Repeatable',
+    widget  => '+Manoc::Form::Widget::Repeatable',
+);
+
+has_field 'nics.id' => (
+    type => 'PrimaryKey',
+    do_wrapper => 0,
+);
+
+has_field 'nics.macaddr' => (
+    type         => 'Text',
+    apply        => [MacAddress],
+    element_attr => {
+        placeholder => 'mac addr',
+    },
+
+    do_wrapper => 0,
+    tags => {
+        before_element => '<div class="col-sm-6">',
+        after_element => '</div>'
+    }
+);
+
+
 sub build_render_list {
     my $self = shift;
 
@@ -52,6 +80,8 @@ sub build_render_list {
         'processor_block1', 'processor_block2',
         'ram_memory',
         'storage1_size', 'storage2_size',
+
+        'nics',
 
         'save',
         'csrf_token',

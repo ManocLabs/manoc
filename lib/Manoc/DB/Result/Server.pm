@@ -123,13 +123,6 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->has_many(
-    nics => 'Manoc::DB::Result::ServerNIC',
-    { 'foreign.server_id' => 'self.id' },
-    { cascade_delete => 1 }
-);
-
-
-__PACKAGE__->has_many(
     addresses => 'Manoc::DB::Result::ServerAddr',
     { 'foreign.server_id' => 'self.id' },
     { cascade_delete => 1 }

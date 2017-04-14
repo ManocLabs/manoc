@@ -55,7 +55,6 @@
           <dt>Hostname</dt><dd>[% object.hostname %] </dd>
           <dt>Primary Address</dt><dd>[% print_ip(object.address) %] </dd>
           <dt>Aliases</dt><dd>[% FOREACH a IN object.addresses.all %][% print_ip(a.ipaddr) -%] [% END -%]</dd>
-          <dt>NICs</dt><dd>[% FOREACH n IN object.nics.all %][% print_mac(n.macaddr) -%] [% END -%]</dd>
 	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
           [% IF object.decommissioned -%]
           <dt>Decommissioned</dt>

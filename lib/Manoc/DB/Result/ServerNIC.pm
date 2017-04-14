@@ -17,7 +17,7 @@ __PACKAGE__->add_columns(
         is_auto_increment => 1,
     },
 
-    server_id => {
+    serverhw_id => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -33,11 +33,11 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->add_unique_constraint( ['server_id', 'macaddr'] );
+__PACKAGE__->add_unique_constraint( ['serverhw_id', 'macaddr'] );
 
 __PACKAGE__->belongs_to(
-    server => 'Manoc::DB::Result::Server',
-    { 'foreign.id' => 'self.server_id' }
+    serverhw => 'Manoc::DB::Result::ServerHW',
+    { 'foreign.id' => 'self.serverhw_id' }
 );
 
 =head1 NAME

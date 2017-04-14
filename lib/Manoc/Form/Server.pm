@@ -30,11 +30,11 @@ has_field 'hostname' => (
 has_field 'address' => (
     type         => 'Text',
     required     => 1,
-    label        => 'IP Address',
+    label        => 'Primary Address',
     apply        => [IPAddress],
     inflate_method => \&inflate_ipv4,
     element_attr => {
-#        placeholder => 'leave empty to use DNS',
+        placeholder => '0.0.0.0',
         size        => '100%',
     },
 
@@ -115,35 +115,23 @@ has_field 'virtinfr' => (
     empty_select => '--- Choose ---',
 );
 
-has_field 'nics' => (
-    type => 'Repeatable',
-    do_wrapper => 0,
-    num_extra => 1,
-);
-
-has_field 'nics.id' => ( type => 'PrimaryKey' );
-has_field 'nics.macaddr' => (
-    type         => 'Text',
-    apply        => [MacAddress],
-    element_attr => {
-        placeholder => 'mac addr',
-    },
-);
-
 has_field 'addresses' => (
-    type => 'Repeatable',
+    type       => 'Repeatable',
     do_wrapper => 0,
-    num_extra => 1,
+    add_extra  => 1,
 );
 
-has_field 'addresses.id' => ( type => 'PrimaryKey' );
+has_field 'addresses.id' => (
+    type => 'PrimaryKey'
+);
+
 has_field 'addresses.ipaddr' => (
     type         => 'Text',
     label        => 'IP Address',
     apply        => [IPAddress],
     inflate_method => \&inflate_ipv4,
     element_attr => {
-        placeholder => 'ip addr',
+        placeholder => '0.0.0.0',
     },
 );
 

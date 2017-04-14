@@ -94,6 +94,13 @@ __PACKAGE__->might_have(
     }
 );
 
+
+__PACKAGE__->has_many(
+    nics => 'Manoc::DB::Result::ServerNIC',
+    { 'foreign.serverhw_id' => 'self.id' },
+    { cascade_delete => 1 }
+);
+
 sub new {
     my ( $self, @args ) = @_;
     my $attrs = shift @args;
