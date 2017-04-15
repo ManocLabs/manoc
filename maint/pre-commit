@@ -18,6 +18,7 @@ git diff --name-only --cached | {
         match_pattern=''
         echo "$orig" | grep -Eqi "\.p[ml]" || continue 
 
+	echo "Tidying $orig"
 	perltidy -nse -nst "$orig" -o "$orig.tidy" || labort=1
 	mv "$orig.tidy" "$orig"
         git add "$orig"
