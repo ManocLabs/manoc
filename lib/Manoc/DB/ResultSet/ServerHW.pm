@@ -23,7 +23,7 @@ sub unused {
     )->get_column('serverhw_id');
 
     my $me = $self->current_source_alias;
-    my $assets = $self->search(
+    my $rs = $self->search(
         {
             'hwasset.location' =>
                 { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
@@ -35,8 +35,8 @@ sub unused {
             join => 'hwasset',
         }
     );
+    return wantarray ? $rs->all : $rs;
 
-    return $assets;
 }
 
 1;

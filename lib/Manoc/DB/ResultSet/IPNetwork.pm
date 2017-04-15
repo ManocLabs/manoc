@@ -14,8 +14,9 @@ use Scalar::Util qw(blessed);
 sub get_root_networks {
     my ($self) = @_;
 
-    my $rs = $self->search( { 'me.parent_id' => undef } );
-    return $rs;
+    my $me = $self->current_source_alias;
+    my $rs = $self->search( { "$me.parent_id" => undef } );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub rebuild_tree {
@@ -40,16 +41,18 @@ sub including_address {
         $ipaddress = $ipaddress->padded;
     }
 
-    return $self->search(
+    my $rs = $self->search(
         {
             'address'   => { '<=' => $ipaddress },
             'broadcast' => { '>=' => $ipaddress },
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub including_address_ordered {
-    shift->including_address(@_)->search( {}, { order_by => { -desc => 'address' } } );
+    my $rs = shift->including_address(@_)->search( {}, { order_by => { -desc => 'address' } } );
+    return wantarray ? $rs->all : $rs;
 }
 
 1;

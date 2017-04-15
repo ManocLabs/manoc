@@ -6,7 +6,6 @@ package Manoc::DB::Result::Vlan;
 use strict;
 use warnings;
 
-
 use parent 'Manoc::DB::Result';
 
 __PACKAGE__->table('vlan');
@@ -45,8 +44,9 @@ sub devices {
         }
     )->get_column('device_id')->as_query;
 
-    my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Device');
-    return $rs->search( { id => { -in => $ids } } );
+    my $rs = $self->result_source->schema->resultset('Manoc::DB::Result::Device')
+        ->search( { id => { -in => $ids } } );
+    return wantarray ? $rs->all : $rs;
 }
 
 __PACKAGE__->set_primary_key('id');

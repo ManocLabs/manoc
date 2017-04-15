@@ -25,13 +25,13 @@
   <dd><a href="[%c.uri_for_action('vlanrange/list') %]"> [% object.vlan_range.name %]</a></dd>
   <dt>Associated subnets</dt>
   <dd>
-    [% FOREACH range IN object.ranges.all -%]
+    [% FOREACH range IN object.ranges -%]
     <a href="[%c.uri_for_action('iprange/view',[r.id])%]">[% r.name | html %]</a>
     [% END -%]
   </dd>
   <dt>Used in</dt>
   <dd>
-    [% FOREACH device IN object.devices.all %]
+    [% FOREACH device IN object.devices %]
     <a href="[%c.uri_for_action('device/view',[device.id])%]"> [% device.name.html %] </a>
     [% END -%]
   </dd>

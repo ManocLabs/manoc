@@ -9,7 +9,6 @@ use warnings;
 
 use parent 'Manoc::DB::ResultSet';
 
-
 sub get_overlap_ranges {
     my ( $self, $start, $end ) = @_;
 
@@ -24,7 +23,9 @@ sub get_overlap_ranges {
         },
     ];
 
-    return $self->search($conditions);
+    return
+        wantarray ? $self->search($conditions)->all :
+        $self->search_rs($conditions);
 }
 
 1;

@@ -4,7 +4,6 @@
 # it under the same terms as Perl itself.
 package Manoc::DB::Result::VlanRange;
 
-
 use parent 'Manoc::DB::Result';
 
 use strict;
@@ -52,9 +51,10 @@ __PACKAGE__->resultset_class('Manoc::DB::ResultSet::VlanRange');
 sub get_mergeable_ranges {
     my ( $self, $options ) = @_;
 
-    my $rs = $self->result_source->resultset;
-    return $rs->search( [ { start => $self->end + 1 }, { end => $self->start - 1 }, ],
-        $options );
+    my $rs =
+        $self->result_source->resultset->search(
+        [ { start => $self->end + 1 }, { end => $self->start - 1 }, ], $options );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub split_new_range {

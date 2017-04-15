@@ -44,13 +44,13 @@
     <dt>Default GW</dt>
 	<dd>[% object.default_gw | html %]</dd>
 	<dt>Supernets</dt>
-	<dd>[% FOREACH net IN object.supernets_ordered.all %]
+	<dd>[% FOREACH net IN object.supernets_ordered %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
 	  [% print_ipnetwork(net) -%]
 	  [% END -%]
 	</dd>
 	<dt>Blocks</td>
-	<dd>[% FOREACH block IN object.ipblock_entries.all %]
+	<dd>[% FOREACH block IN object.ipblock_entries %]
 	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
@@ -87,7 +87,7 @@
 	</tr>
       </thead>
     <tbody>
-      [% FOREACH network IN object.children_ordered.all -%]
+      [% FOREACH network IN object.children_ordered -%]
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>

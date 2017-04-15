@@ -9,21 +9,22 @@ use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-__PACKAGE__->load_components('Helper::ResultSet');
+# do not load ingnorewantarray helper since it breaks
+# HTML::FormHandler
 
-sub search {
-    # this is a terribile hack because HFH requires wantarray support
-    # for HTML::FormHandler::InitResult
-    my $caller1 = ( caller(1) )[0];
-    my $caller2 = ( caller(2) )[0];
-
-    if ( defined($caller1) && $caller1 =~ /^HTML::FormHandler/ ||
-        defined($caller2) && $caller2 =~ /^HTML::FormHandler/ )
-    {
-        return wantarray ? shift->search(@_)->all : shift->search_rs(@_);
-    }
-    return shift->next::method(@_);
-}
+__PACKAGE__->load_components(
+    qw{
+        Helper::ResultSet::AutoRemoveColumns
+        Helper::ResultSet::CorrelateRelationship
+        Helper::ResultSet::Me
+        Helper::ResultSet::NoColumns
+        Helper::ResultSet::RemoveColumns
+        Helper::ResultSet::ResultClassDWIM
+        Helper::ResultSet::SearchOr
+        Helper::ResultSet::SetOperations
+        Helper::ResultSet::Shortcut
+        }
+);
 
 1;
 # Local Variables:

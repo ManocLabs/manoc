@@ -25,22 +25,25 @@ sub search_by_ipaddress {
         $ipaddress = $ipaddress->padded;
     }
 
-    return $self->search( { ipaddr => $ipaddress } );
+    my $rs = $self->search( { ipaddr => $ipaddress } );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub search_by_ipaddress_ordered {
-    shift->search_by_ipaddress(@_)->search(
+    my $rs = shift->search_by_ipaddress(@_)->search(
         {},
         {
             order_by => { -desc => [ 'lastseen', 'firstseen' ] }
         }
     );
+    return wantarray ? $rs->all : $rs;
+
 }
 
 sub search_conflicts {
     my $self = shift;
 
-    $self->search(
+    my $rs = $self->search(
         { archived => '0' },
         {
             select   => [ 'ipaddr', { count => { distinct => 'macaddr' } } ],
@@ -49,12 +52,13 @@ sub search_conflicts {
             having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub search_multihomed {
     my $self = shift;
 
-    $self->search(
+    my $rs = $self->search(
         { archived => '0' },
         {
             select   => [ 'macaddr', { count => { distinct => 'ipaddr' } } ],
@@ -63,12 +67,13 @@ sub search_multihomed {
             having => { 'COUNT(DISTINCT(ipaddr))' => { '>', 1 } },
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub first_last_seen {
     my $self = shift;
 
-    $self->search(
+    my $rs = $self->search(
         {},
         {
             select => [ 'ipaddr', { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
@@ -76,6 +81,7 @@ sub first_last_seen {
             group_by => ['ipaddr'],
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub register_tuple {
