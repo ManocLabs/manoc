@@ -14,10 +14,14 @@ __PACKAGE__->load_components('Helper::ResultSet');
 sub search {
     # this is a terribile hack because HFH requires wantarray support
     # for HTML::FormHandler::InitResult
-    (caller(1))[0] =~ /^HTML::FormHandler/ ||
-        (caller(2))[0] =~ /^HTML::FormHandler/ and
-        return wantarray ? shift->search(@_)->all : shift->search_rs(@_);
+    my $caller1 = ( caller(1) )[0];
+    my $caller2 = ( caller(2) )[0];
 
+    if ( defined($caller1) && $caller1 =~ /^HTML::FormHandler/ ||
+        defined($caller2) && $caller2 =~ /^HTML::FormHandler/ )
+    {
+        return wantarray ? shift->search(@_)->all : shift->search_rs(@_);
+    }
     return shift->next::method(@_);
 }
 
