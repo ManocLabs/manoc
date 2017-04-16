@@ -1,0 +1,82 @@
+[% META
+   use_table=1
+-%]
+[%
+   page.title='Workstation ' _ object.hostname
+-%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+[% page.toolbar = BLOCK -%]
+[% IF ! object.decommissioned %]
+  <div class="btn-group">
+     <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('workstation/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+       <li class="[% 'disabled' UNLESS c.check_permission(object, 'edit') %]">
+  	     <a href="[% c.uri_for_action('workstation/decommission', [object.id]) %]">
+	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href="[%c.uri_for_action('workstation/delete',[object.id]) %]">[% bootstrap_icon('trash') %] Delete</a></li>
+    </ul>
+  </div><!-- end btn group -->
+[% ELSE -%]
+[%# decommissioned object -%]
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('workstation/restore', [object.id]) %]">
+   Restore</a>
+  <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('workstation/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
+[% END -%]
+[% END -%]
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    [% bootstrap_nav_tab("general", "General", 1) -%]
+    [% bootstrap_nav_tab("vm", "Virtual machines", 0) IF object.virtual_machines -%]
+    [% bootstrap_nav_tab("software", "Software", 0) -%]
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="general">
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <dl class="dl-horizontal">
+          <dt>Hostname</dt><dd>[% object.hostname %] </dd>
+	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
+          [% IF object.decommissioned -%]
+          <dt>Decommissioned</dt>
+          <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+          [% END -%]
+          <dt>Ethernet Address</dt><dd>[% print_ip(object.ethernet_ipaddr) %] </dd>
+          <dt>Wireless Address</dt><dd>[% print_ip(object.wireless_ipaddr) %] </dd>
+          <dt>Workstation Hardware</dt><dd>[% print_workstationhw(object.workstationhw) %]</dd>
+      </dl>
+    </div><!-- panel body -->
+  </div><!-- panel -->
+</div>
+
+  <div role="tabpanel" class="tab-pane" id="software">
+      <table class="table" id="software_list">
+          <thead>
+	          <tr>
+	              <th>Name</th>
+	              <th>Version</th>
+	          </tr>
+          </thead>
+          <tbody>
+	          [% FOREACH p IN object.installed_sw_pkgs  %]
+	          <tr>
+                  <td>[% print_softwarepkg(p.software_pkg) %]</td>
+                  <td>[% p.version %]</td>
+	          </tr>
+	          [% END %]
+          </tbody>
+      </table>
+  </div> <!-- tab panel software -->
+
+
+</div><!-- tab content -->

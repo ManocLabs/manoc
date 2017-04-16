@@ -1,0 +1,53 @@
+[%
+    page.title = 'Import workstation hardware from CSV'
+-%]
+
+<div class="col-sm-11">
+[% form.render %]
+</div>
+
+<div class="col-sm-1">
+<a class="btn" role="button" data-toggle="collapse" href="#helpSection" aria-expanded="false" aria-controls="helpSection">[% bootstrap_icon('question-sign') %] Help</a>
+</div>
+
+<div class="col-sm-12">&nbsp;</div>
+
+<div class="col-sm-12 collapse" id="helpSection">
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">File format</h3></div>
+
+  <table class="table table-condensed">
+  <thead>
+    <th>Column</th><th>Required</th><th></Notes></th>
+  </thead>
+  <tbody>
+    <tr><td>Vendor</td><td>Yes</td><td></td></tr>
+    <tr><td>Model</td><td>Yes</td><td></td></tr>
+    <tr><td>Inventory</td><td>No</td><td>Inventory number, if missing will be generated</td></tr>
+    <tr><td>Serial</td><td>No</td><td>Serial number given by the vendor</td></tr>
+    <tr><td>RAM</td><td>Yes</td><td>Megabytes</td></tr>
+    <tr><td>CPU</td><td>Yes</td><td>CPU model type</td></tr>
+    <tr><td>Frequency</td><td>No</td><td>CPU frequency in MHz</td></tr>
+    <tr><td>Storage 1</td><td>No</td><td>Primary storage size (GB)</td></tr>
+    <tr><td>Storage 2</td><td>No</td><td>Secondary storage size (GB)</td></tr>
+    <tr><td>Display</td><td>No</td><td>Display type and model</td></tr>
+    <tr><td>Ethernet</td><td>No</td><td>Ethernet mac address</td></tr>
+    <tr><td>Wireless</td><td>No</td><td>Wireless mac address</td></tr>
+    <tr><td>Notes</td><td>No</td><td></td></tr>
+  </tbody>
+  </table>
+</div><!-- panel -->
+</div><!-- col -->
+
+
+
+
+<div class="col-sm-12">
+<table class="table table-condensed">
+[% FOREACH r IN form.row_messages %]
+<tr>
+  <td>[%r.row_number %]</td><td>[% r.status %]</td><td>[% r.message %]</td>
+</tr>
+[% END %]
+</table>
+</div><!-- col -->

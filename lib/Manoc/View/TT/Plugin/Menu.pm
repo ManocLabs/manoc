@@ -93,13 +93,27 @@ my @DEFAULT_MENU_ITEMS = (
             {
                 name => 'Hypervisors',
                 path => '#',
-                #                action => '/server/hypervisors',
+                # action => '/server/hypervisors',
             },
             {
                 name   => 'Software',
                 action => '/softwarepkg/list'
             }
 
+        ]
+    },
+    {
+        name    => 'Hosts',
+        fa_icon => 'desktop',
+        submenu => [
+            {
+                name   => 'Workstation',
+                action => '/workstation/list',
+            },
+            {
+                name   => 'Software',
+                action => '/softwarepkg/list'
+            }
         ]
     },
     {
@@ -117,6 +131,10 @@ my @DEFAULT_MENU_ITEMS = (
             {
                 name   => 'Device Hardware',
                 action => '/hwasset/list_devices',
+            },
+            {
+                name   => 'Workstation Hardware',
+                action => '/workstationhw/list',
             },
             {
                 name   => 'Buildings',

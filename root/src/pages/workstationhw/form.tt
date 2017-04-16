@@ -1,0 +1,4 @@
+[% form.render %]
+[% PROCESS location.tt %]
+[% PROCESS modelvendor.tt %]
+[% ajax_form(form.name) %]
