@@ -22,7 +22,7 @@ has '+name'        => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
 sub build_render_list {
-    [ 'name', 'mng_block', 'hwasset_block', 'rack_block', 'notes', 'save', 'csrf_token' ];
+    [ 'name', 'mng_block', 'hwasset', 'rack_block', 'notes', 'save', 'csrf_token' ];
 }
 
 has_field 'name' => (
@@ -37,35 +37,22 @@ has_field 'name' => (
     ]
 );
 
-has_block 'hwasset_block' => (
-    render_list => [ 'hwasset', 'asset_button' ],
-    tag         => 'div',
-    class       => ['form-group'],
-);
-
 has_field 'hwasset' => (
     type         => 'Select',
     label        => 'Hardware asset',
     empty_select => '--- Select asset ---',
     required     => 0,
 
-    do_wrapper => 0,
-    tags       => {
-        before_element => '<div class="col-sm-8">',
-        after_element  => '</div>'
+    tags => {
+        input_append_button              => 'Add',
+        input_append_button_element_attr => {
+            class => 'btn-primary',
+            href  => '#',
+            id    => 'form-device.asset_button',
+        },
     },
-    label_class => ['col-sm-2'],
-);
-
-has_field 'asset_button' => (
-    type         => 'Button',
-    widget       => 'ButtonTag',
-    element_attr => {
-        class => [ 'btn', 'btn-primary' ],
-        href  => '#',
-    },
-    widget_wrapper => 'None',
-    value          => "Add",
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
 );
 
 has_block 'mng_block' => (
@@ -75,10 +62,10 @@ has_block 'mng_block' => (
 );
 
 has_field 'mng_address' => (
-    apply        => [IPAddress],
-    label        => 'Management Address',
-    required     => 1,
-    element_attr => { placeholder => 'IP Address' },
+    apply          => [IPAddress],
+    label          => 'Management Address',
+    required       => 1,
+    element_attr   => { placeholder => 'IP Address' },
     inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,
@@ -99,7 +86,8 @@ has_field 'mng_url_format' => (
         before_element => '<div class="col-sm-3">',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-2'],
+    element_class => ['selectpicker'],
+    label_class   => ['col-sm-2'],
 );
 
 has_block 'rack_block' => (
@@ -116,12 +104,15 @@ has_field 'rack' => (
     required     => 0,
 
     do_wrapper => 0,
-    # we set wrapper=>0 so we don't have the inner div too!
+    # set wrapper=>0 so we don't get the inner div
+
     tags => {
-        before_element => '<div class="col-sm-6">',
+        before_element => '<div class="col-sm-6" >',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-2'],
+    element_class => ['selectpicker'],
+    element_attr  => { "data-live-search" => "true" },
+    label_class   => ['col-sm-2'],
 );
 
 has_field 'rack_level' => (

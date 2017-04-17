@@ -42,15 +42,19 @@ has_field 'name' => (
 has_field 'dhcp_server' => ( type => 'Hidden', );
 
 has_field 'dhcp_shared_network' => (
-    type         => 'Select',
-    label        => 'Shared Network',
-    empty_select => '--- No shared subnet ---',
+    type          => 'Select',
+    label         => 'Shared Network',
+    empty_select  => '--- No shared subnet ---',
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
 );
 
 has_field 'network' => (
-    type         => 'Select',
-    label        => 'Subnet',
-    empty_select => '--- Select a subnet ---',
+    type          => 'Select',
+    label         => 'Subnet',
+    empty_select  => '--- Select a subnet ---',
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
 );
 
 has_block 'range_block' => (
@@ -68,7 +72,10 @@ has_field 'range' => (
         before_element => '<div class="col-sm-8">',
         after_element  => '</div>'
     },
-    label_class => ['col-sm-2'],
+    label_class   => ['col-sm-2'],
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
+
 );
 
 has_field 'ipblock_button' => (

@@ -78,7 +78,9 @@ has_field 'virtinfr' => (
     nullable => 1,
 
     empty_select => '--- Choose ---',
-    bs_block_field_helper( { label => 2, input => 4 } )
+    bs_block_field_helper( { label => 2, input => 4 } ),
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
 );
 
 has_field 'hypervisor' => (
@@ -86,7 +88,9 @@ has_field 'hypervisor' => (
     label        => 'Hypervisor',
     nullable     => 1,
     empty_select => '--- Choose ---',
-    bs_block_field_helper( { label => 2, input => 4 } )
+    bs_block_field_helper( { label => 2, input => 4 } ),
+    element_class => 'selectpicker',
+    element_attr  => { 'data-live-search' => 'true' }
 );
 
 has_field 'notes' => (

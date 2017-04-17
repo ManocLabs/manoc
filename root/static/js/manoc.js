@@ -27,6 +27,7 @@ function showDialogForm(url, title, on_close) {
             $('#modalBoxMessage').html(data.html);
             form = $('#modalBoxMessage form');
             form.submit(function(e) { e.preventDefault(e); submit_func(form); });
+            $(".selectpicker").selectpicker('refresh');
         }
     });
     return true;

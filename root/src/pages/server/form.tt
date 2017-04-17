@@ -133,10 +133,6 @@
 
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
-    $("#[% form.name %]\\.vm").selectpicker();
-    $("#[% form.name %]\\.serverhw").selectpicker();
-    $("#[% form.name %]\\.virtinfr").selectpicker();
-
 	$('#[% form.name %]\\.serverhw_btn').click(function() {
       showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
       return false;
