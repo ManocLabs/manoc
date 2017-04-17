@@ -9,20 +9,20 @@ use warnings;
 
 use parent 'Manoc::DB::ResultSet';
 
-
 sub search_unused {
     my ( $self, $device ) = @_;
 
     my $conditions = { 'mat_entry.macaddr' => undef };
     $device and $conditions->{'me.device_id'} = $device;
 
-    $self->search(
+    my $rs = $self->search(
         $conditions,
         {
             alias => 'me',
             join  => 'mat_entry',
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub search_mat_last_activity {
@@ -31,7 +31,7 @@ sub search_mat_last_activity {
     my $conditions = {};
     $device and $conditions->{'me.device_id'} = $device;
 
-    $self->search(
+    my $rs = $self->search(
         $conditions,
         {
             alias    => 'me',
@@ -41,5 +41,6 @@ sub search_mat_last_activity {
             join     => 'mat_entry',
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 1;

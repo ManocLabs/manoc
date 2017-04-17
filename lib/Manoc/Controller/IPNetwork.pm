@@ -55,7 +55,7 @@ sub get_object_list {
                 prefetch => 'vlan',
                 order_by => { -asc => 'address' }
             }
-        )
+        )->all()
     ];
 }
 
@@ -122,18 +122,19 @@ sub root : Chained('base') {
         $rs = $rs->get_root_networks;
     }
 
+    my $me       = $rs->current_source_alias;
     my @networks = $rs->search(
         {},
         {
             prefetch => [ 'vlan', 'children' ],
             order_by => [
-                { -asc  => 'me.address' },
-                { -desc => 'me.broadcast' },
-                { -asc  => 'children.address' },
-                { -desc => 'children.broadcast' },
+                { -asc  => "$me.address" },
+                { -desc => "$me.broadcast" },
+                { -asc  => "children.address" },
+                { -desc => "children.broadcast" },
             ]
         }
-    );
+    )->all();
     $c->stash( networks => \@networks );
 }
 

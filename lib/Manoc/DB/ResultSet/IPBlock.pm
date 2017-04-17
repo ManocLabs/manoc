@@ -19,21 +19,23 @@ sub including_address {
     {
         $ipaddress = $ipaddress->padded;
     }
-    return $self->search(
+    my $rs = $self->search(
         {
             'from_addr' => { '<=' => $ipaddress },
             'to_addr'   => { '>=' => $ipaddress },
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub including_address_ordered {
-    shift->including_address(@_)->search(
+    my $rs = shift->including_address(@_)->search(
         {},
         {
             order_by => [ { -desc => 'from_addr' }, { -asc => 'to_addr' } ]
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 1;

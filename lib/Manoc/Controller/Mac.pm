@@ -36,7 +36,7 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                 {
                     prefetch => { 'device' => ['mng_url_format'] }
                 }
-            )
+            )->all
         ],
 
         arp_results => [
@@ -47,7 +47,7 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                 {
                     order_by => { -desc => [ 'lastseen', 'firstseen' ] }
                 }
-            )
+            )->all
         ],
 
         dot11_results => [
@@ -58,15 +58,14 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
                 {
                     order_by => { -desc => [ 'lastseen', 'firstseen' ] }
                 }
-            )
+            )->all,
         ],
 
-        servers => [
-            $c->model('ManocDB::Server')->search(
+        serverhw =>
+            $c->model('ManocDB::ServerHW')->search(
                 { 'nics.macaddr' => $macaddr },
                 { join => 'nics' }
-            )
-        ],
+            ),
 
         reservations =>
             [ $c->model('ManocDB::DHCPReservation')->search( { macaddr => $macaddr } ) ],

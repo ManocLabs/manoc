@@ -62,7 +62,7 @@ page.title='DHCP server ' _ object.name
                             <th>Pool</th>
                         </tr>
                     </thead>
-                    [% FOREACH s IN object.dhcp_shared_networks.all -%]
+                    [% FOREACH s IN object.dhcp_shared_networks -%]
                     [% IF s.dhcp_subnets.size %]
                     <tbody>
                         <tr>

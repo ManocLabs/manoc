@@ -71,3 +71,56 @@ function showDialogForm(url, title, on_close) {
         }
     })
 }( jQuery ));
+
+
+$(function() {
+
+    $('.form-btn-add:not(:last)')
+        .removeClass('form-btn-add').addClass('form-btn-remove')
+        .removeClass('btn-success').addClass('btn-danger')
+        .html('<span class="glyphicon glyphicon-minus"></span>');
+
+    $(document).on('click', '.form-btn-add', function(e)
+    {
+        e.preventDefault();
+
+        var containerId = $(this).attr('data-rep-id');
+        var container = $('#' + $.escapeSelector(containerId));
+
+        var lastEntry = container.find('.hfh-repinst:last');
+
+        var entryClone = lastEntry.clone().wrap('<div>').parent();
+        var newEntryHtml = entryClone.html();
+
+        var lastIndex = container.attr('data-rep-count');
+        if ( lastIndex == undefined ) {
+            lastIndex = container.find('.hfh-repinst').length - 1;
+        } else {
+            lastIndex = parseInt(lastIndex);
+        }
+        var newIndex  = lastIndex + 1;
+        container.attr('data-rep-count', newIndex);
+
+        newEntryHtml = newEntryHtml.replace(
+            new RegExp( containerId + '.' + lastIndex,  'g'),
+            containerId + '.' + newIndex);
+
+        container.append(newEntryHtml);
+
+        $('#' + $.escapeSelector(containerId + '.' + newIndex)).find('input').val('');
+
+        container.find('.form-btn-add:not(:last)')
+            .removeClass('form-btn-add').addClass('form-btn-remove')
+            .removeClass('btn-success').addClass('btn-danger')
+            .html('<span class="glyphicon glyphicon-minus"></span>');
+        return false;
+    });
+
+    $(document).on('click', '.form-btn-remove', function(e)
+    {
+		$(this).parents('.hfh-repinst:first').remove();
+
+		e.preventDefault();
+		return false;
+	});
+});

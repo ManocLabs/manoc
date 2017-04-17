@@ -9,7 +9,7 @@
   <dt>Device vendor</dt><dd>[% vendor  | html %]</dd>
   <dt>Known NICS</dt>
   <dd>
-    [% FOREACH s IN servers.all %][% print_server(s) -%] [% END -%]
+    [% FOREACH s IN serverhw %][% print_serverhw(s) -%] [% END -%]
   </dd>
 </dl>
 

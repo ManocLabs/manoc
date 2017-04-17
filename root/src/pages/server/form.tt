@@ -106,24 +106,6 @@
                 [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
-        <div id="form-server.nics">
-            [% FOR element IN form.field('nics').fields -%]
-            [% SET i = element.name %]
-            <div class="form-group hfh-repinst" id="form-server.nics.[% i %]">
-                [% element.field('id').render %]
-                <label class="col-sm-2 control-label" for="[% element.field('macaddr').id %]">NIC</label>
-
-                <div class="col-sm-8">
-                    [% element.field('macaddr').render %]
-                        <button data-rep-id="form-server.nics" data-rep-count="[% i %]"
-                                class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
-                            <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
-                        </button>
-                    [% FOR err IN element.field('macaddr').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
-                </div>
-             </div>
-            [% END %]
-        </div>
          <div id="form-server.addresses">
             [% FOR element IN form.field('addresses').fields -%]
             [% SET i = element.name %]
@@ -133,7 +115,7 @@
 
                 <div class="col-sm-8">
                     [% element.field('ipaddr').render %]
-                        <button data-rep-id="form-server.addresses" data-rep-count="[% i %]"
+                        <button data-rep-id="form-server.addresses"
                                 class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
                             <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
                         </button>
@@ -166,44 +148,6 @@ $( document ).ready(function() {
     });
 
     form_refresh();
-
-    $(document).on('click', '.form-btn-add', function(e)
-    {
-        e.preventDefault();
-
-        var containerId = $(this).attr('data-rep-id');
-        var container = $('#' + $.escapeSelector(containerId));
-
-        var lastEntry = container.find('.hfh-repinst:last');
-
-        var entryClone = lastEntry.clone().wrap('<div>').parent();
-        var newEntryHtml = entryClone.html();
-
-        var lastIndex = $(this).attr('data-rep-count');
-        var newIndex  = parseInt(lastIndex) + 1;
-
-        newEntryHtml = newEntryHtml.replace(
-            new RegExp( containerId + '.' + lastIndex,  'g'),
-            containerId + '.' + newIndex);
-
-        container.append(newEntryHtml);
-
-        $('#' + $.escapeSelector(containerId + '.' + newIndex)).find('input').val('');
-
-        container.find('.form-btn-add:not(:last)')
-            .removeClass('form-btn-add').addClass('form-btn-remove')
-            .removeClass('btn-success').addClass('btn-danger')
-            .html('<span class="glyphicon glyphicon-minus"></span>');
-        return false;
-    });
-
-    $(document).on('click', '.form-btn-remove', function(e)
-    {
-		$(this).parents('.hfh-repinst:first').remove();
-
-		e.preventDefault();
-		return false;
-	});
 
     $('#[% form.name %] input').on('change', function() {
       form_refresh();

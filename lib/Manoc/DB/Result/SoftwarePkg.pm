@@ -34,7 +34,7 @@ __PACKAGE__->has_many(
 sub count_servers_by_version {
     my $self = shift;
 
-    $self->server_swpkg->search(
+    my $rs = $self->server_swpkg->search(
         {},
         {
             select => [
@@ -47,6 +47,7 @@ sub count_servers_by_version {
             group_by => ['version'],
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 __PACKAGE__->many_to_many( servers => 'server_swpkg', 'server' );

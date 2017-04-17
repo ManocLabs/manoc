@@ -72,6 +72,8 @@
   <dd>[% object.storage1_size | html %]</dd>
   <dt>Secondary storage</dt>
   <dd>[% object.storage2_size | html %]</dd>
+  <dt>NICs</dt>
+  <dd>[% FOREACH n IN object.nics %][% print_mac(n.macaddr) -%] [% END -%]</dd>
   <dt>Notes</dt>
   <dd>[% object.notes | html %]</dd>
 </dl>

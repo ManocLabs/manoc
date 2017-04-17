@@ -13,9 +13,9 @@ use Manoc::IPAddress::IPv4Network;
 
 __PACKAGE__->load_components(
     qw/
-          Tree::AdjacencyList
-          +Manoc::DB::InflateColumn::IPv4
-      /
+        Tree::AdjacencyList
+        +Manoc::DB::InflateColumn::IPv4
+        /
 );
 
 __PACKAGE__->table('ip_network');
@@ -264,7 +264,7 @@ sub update {
 
     my $has_changed_size = $dirty{address} || $dirty{broadcast};
 
-    if ( $has_changed_size ) {
+    if ($has_changed_size) {
         # check if larger than parent
         $self->is_outside_parent and
             die "network cannot be larger than its parent";
@@ -276,7 +276,7 @@ sub update {
     }
     $self->next::method(@_);
 
-    if (!$self->parent && $has_changed_size) {
+    if ( !$self->parent && $has_changed_size ) {
         my $new_parent = $self->_find_and_update_parent();
         $new_parent and $self->result_source->resultset->rebuild_tree;
     }
@@ -368,7 +368,7 @@ sub ip_entries {
             }
         }
     );
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub ipblock_entries {
@@ -382,13 +382,13 @@ sub ipblock_entries {
         }
     );
 
-    return  $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub supernets {
     my $self = shift;
     my $rs   = $self->search_related('supernets');
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub supernets_ordered {
@@ -399,14 +399,13 @@ sub supernets_ordered {
             order_by => [ { -asc => 'me.address' }, { -desc => 'me.broadcast' } ]
         }
     );
-
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub subnets {
     my $self = shift;
     my $rs   = $self->search_related('subnets');
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub first_supernet {
@@ -418,7 +417,7 @@ sub children_ordered {
     my $self = shift;
     my $rs = $self->children->search( {}, { order_by => { -asc => 'address' } } );
 
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 sub sqlt_deploy_hook {

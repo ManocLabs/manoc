@@ -9,7 +9,7 @@
 
 <div id="versionfilter_wrapper" class="btn-group" role="group">
 <select name="versionfilter" class="selectpicker" id="statusfilter" data-style="btn-default btn-sm">
-[% FOREACH s IN object.count_servers_by_version.all -%]
+[% FOREACH s IN object.count_servers_by_version -%]
   <option value="[% s.get_column('version') | html %]">
   [% s.get_column('version') | html%] ([% s.get_column('n_servers') | html%])
   </option>
@@ -27,7 +27,7 @@
      </tr>
    </thead>
    <tbody>
-[% FOREACH s IN object.server_swpkg.all %]
+[% FOREACH s IN object.server_swpkg %]
    <tr>
       <td>[% s.version %]</td>
       <td>[% print_server(s.server) %]</td>

@@ -56,7 +56,7 @@ page.no_content_row = 1
       </tr>
     </thead>
     <tbody>
-      [% FOREACH d IN object.devices.all -%]
+      [% FOREACH d IN object.devices -%]
       <tr>
 	<td>[% d.level %]</td>
 	<td>[% print_device(d) %]</td>
@@ -86,7 +86,7 @@ page.no_content_row = 1
       </tr>
     </thead>
     <tbody>
-      [% FOREACH d IN object.servers.all -%]
+      [% FOREACH d IN object.servers -%]
       <tr>
 	<td>[% d.level %]</td>
 	<td>[% print_serverhw(d) %]</td>

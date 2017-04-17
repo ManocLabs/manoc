@@ -26,7 +26,7 @@ sub unused_devices {
     )->get_column('hwasset_id');
 
     my $me = $self->current_source_alias;
-    my $assets = $self->search(
+    my $rs = $self->search(
         {
             "$me.type"     => Manoc::DB::Result::HWAsset::TYPE_DEVICE,
             "$me.location" => { '!=' => Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
@@ -35,8 +35,7 @@ sub unused_devices {
             }
         },
     );
-
-    return $assets;
+    return wantarray ? $rs->all : $rs;
 }
 
 1;

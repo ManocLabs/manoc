@@ -9,7 +9,22 @@ use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-__PACKAGE__->load_components('Helper::ResultSet');
+# do not load ingnorewantarray helper since it breaks
+# HTML::FormHandler
+
+__PACKAGE__->load_components(
+    qw{
+        Helper::ResultSet::AutoRemoveColumns
+        Helper::ResultSet::CorrelateRelationship
+        Helper::ResultSet::Me
+        Helper::ResultSet::NoColumns
+        Helper::ResultSet::RemoveColumns
+        Helper::ResultSet::ResultClassDWIM
+        Helper::ResultSet::SearchOr
+        Helper::ResultSet::SetOperations
+        Helper::ResultSet::Shortcut
+        }
+);
 
 1;
 # Local Variables:

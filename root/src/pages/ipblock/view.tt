@@ -33,7 +33,7 @@
 	<dt>In network</dt>
 	<dd>[% print_ipnetwork(object.container_network) %]</dd>
 	<dt>Contained networks</dt>
-	<dd>[% FOREACH net IN object.contained_networks.all %]
+	<dd>[% FOREACH net IN object.contained_networks %]
 	  [% print_ipnetwork(net) -%][% "," UNLESS loop.last -%]
 	  [% END -%]
 	</dd>
@@ -72,7 +72,7 @@
 	</tr>
       </thead>
     <tbody>
-      [% FOREACH network IN object.children_ordered.all -%]
+      [% FOREACH network IN object.children_ordered -%]
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>

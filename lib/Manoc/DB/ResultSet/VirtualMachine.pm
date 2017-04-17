@@ -31,7 +31,7 @@ sub unused {
         },
     );
 
-    return $rs;
+    return wantarray ? $rs->all : $rs;
 }
 
 1;

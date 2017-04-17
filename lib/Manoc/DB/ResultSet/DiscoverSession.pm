@@ -19,12 +19,13 @@ sub including_address {
     {
         $ipaddress = $ipaddress->padded;
     }
-    return $self->search(
+    my $rs = $self->search(
         {
             'from_addr' => { '<=' => $ipaddress },
             'to_addr'   => { '>=' => $ipaddress },
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 1;

@@ -81,7 +81,7 @@
           </tr>
 	</thead>
 	<tbody>
-	  [% FOREACH m IN mat_history.all %]
+	  [% FOREACH m IN mat_history %]
 	  <tr>
 	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
 	    <td> [% print_vlan(m.vlan,m.vlan) %]     </td>

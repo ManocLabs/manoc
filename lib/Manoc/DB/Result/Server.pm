@@ -9,7 +9,6 @@ use parent 'Manoc::DB::Result';
 use strict;
 use warnings;
 
-
 __PACKAGE__->load_components(qw/+Manoc::DB::InflateColumn::IPv4/);
 
 __PACKAGE__->table('servers');
@@ -123,16 +122,9 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->has_many(
-    nics => 'Manoc::DB::Result::ServerNIC',
-    { 'foreign.server_id' => 'self.id' },
-    { cascade_delete => 1 }
-);
-
-
-__PACKAGE__->has_many(
     addresses => 'Manoc::DB::Result::ServerAddr',
     { 'foreign.server_id' => 'self.id' },
-    { cascade_delete => 1 }
+    { cascade_delete      => 1 }
 );
 
 __PACKAGE__->might_have(
@@ -158,7 +150,7 @@ sub virtual_servers {
     my $self = shift;
 
     my $rs = $self->result_source->schema->resultset('Server');
-    return $rs->search(
+    $rs = $rs->search(
         {
             'vm.hypervisor_id' => $self->id,
         },
@@ -166,6 +158,7 @@ sub virtual_servers {
             join => 'vm',
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 sub num_cpus {
@@ -211,14 +204,14 @@ sub decommission {
     $self->vm_id(undef);
 
     if ( $args{recursive} ) {
-        foreach my $vm ( $self->virtual_machines ) {
+        foreach my $vm ( $self->virtual_machines->all ) {
             $vm->server and $vm->server->decommission($timestamp);
             $vm->decommission();
             $vm->update;
         }
     }
     else {
-        foreach my $vm ( $self->virtual_machines ) {
+        foreach my $vm ( $self->virtual_machines->all ) {
             $vm->hypervisor(undef);
             $vm->update;
         }

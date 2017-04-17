@@ -1,0 +1,27 @@
+#!/bin/bash
+
+[ -f ".perltidyrc" ] || exit 1
+
+echo "Precommit Perl tidy"
+
+root="$(git rev-parse --show-toplevel)"
+git diff --name-only --cached | {
+  labort=0
+
+  while IFS= read -r orig ; do
+    orig="${root}/${orig}"
+
+    # file is getting deleted, ignore
+    [ -f "$orig" ] || continue
+
+        # file matches one of the patterns
+        match_pattern=''
+        echo "$orig" | grep -Eqi "\.p[ml]" || continue 
+
+	echo "Tidying $orig"
+	perltidy -nse -nst "$orig" -o "$orig.tidy" || labort=1
+	mv "$orig.tidy" "$orig"
+        git add "$orig"
+      done
+}
+exit $labort

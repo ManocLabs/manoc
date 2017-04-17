@@ -51,7 +51,7 @@ page.no_content_row = 1
       </tr>
     </thead>
     <tbody>
-[% FOREACH r IN object.racks.all -%]
+[% FOREACH r IN object.racks -%]
       <tr>
  	<td>[% r.floor | html %]</td>
  	<td>[% print_rack(r) %]</td>
@@ -80,7 +80,7 @@ page.no_content_row = 1
       </tr>
     </thead>
     <tbody>
-[% FOREACH w IN object.warehouses.all -%]
+[% FOREACH w IN object.warehouses -%]
       <tr>
  	<td>[% w.floor | html %]</td>
  	<td>[% print_warehouse(w) %]</td>

@@ -18,7 +18,7 @@ __PACKAGE__->load_components(
 sub search_multihost {
     my $self = shift;
 
-    $self->search(
+    my $rs = $self->search(
         { 'archived' => 0 },
         {
             select => [
@@ -43,6 +43,7 @@ sub search_multihost {
             ]
         }
     );
+    return wantarray ? $rs->all : $rs;
 }
 
 1;
