@@ -37,7 +37,7 @@ __PACKAGE__->config(
     form_class              => 'Manoc::Form::Workstation::Edit',
     enable_permission_check => 1,
     view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
+    json_columns            => [ 'id', 'hostname', 'os', 'os_ver' ],
 
     create_page_title => 'Create workstation',
     edit_page_title   => 'Edit workstation',
