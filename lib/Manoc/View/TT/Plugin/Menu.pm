@@ -75,11 +75,11 @@ my @DEFAULT_MENU_ITEMS = (
         ],
     },
     {
-        name    => 'Server',
+        name    => 'Servers',
         fa_icon => 'server',
         submenu => [
             {
-                name   => 'Servers',
+                name   => 'Server List',
                 action => '/server/list',
             },
             {
@@ -94,12 +94,7 @@ my @DEFAULT_MENU_ITEMS = (
                 name => 'Hypervisors',
                 path => '#',
                 # action => '/server/hypervisors',
-            },
-            {
-                name   => 'Software',
-                action => '/softwarepkg/list'
             }
-
         ]
     },
     {
@@ -110,32 +105,38 @@ my @DEFAULT_MENU_ITEMS = (
                 name   => 'Workstation',
                 action => '/workstation/list',
             },
-            {
-                name   => 'Software',
-                action => '/softwarepkg/list'
-            }
         ]
     },
     {
-        name    => 'Assets',
-        fa_icon => 'building',
+        name    => 'Inventory',
+        fa_icon => 'list',
         submenu => [
             {
-                name   => 'Hardware Inventory',
+                name   => 'All Hardware',
                 action => '/hwasset/list',
-            },
-            {
-                name   => 'Server Hardware',
-                action => '/serverhw/list',
             },
             {
                 name   => 'Device Hardware',
                 action => '/hwasset/list_devices',
             },
             {
+                name   => 'Server Hardware',
+                action => '/serverhw/list',
+            },
+            {
                 name   => 'Workstation Hardware',
                 action => '/workstationhw/list',
             },
+            {
+                name   => 'Installed Software',
+                action => '/softwarepkg/list'
+            },
+        ],
+    },
+    {
+        name    => 'Premises',
+        fa_icon => 'building',
+        submenu => [
             {
                 name   => 'Buildings',
                 action => '/building/list',
@@ -148,7 +149,6 @@ my @DEFAULT_MENU_ITEMS = (
                 name   => 'Warehouses',
                 action => '/warehouse/list',
             },
-
         ]
     },
     {
