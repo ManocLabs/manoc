@@ -1,0 +1,44 @@
+[%
+    page.title = 'Import workstations from CSV'
+-%]
+
+<div class="col-sm-11">
+[% form.render %]
+</div>
+
+<div class="col-sm-1">
+<a class="btn" role="button" data-toggle="collapse" href="#helpSection" aria-expanded="false" aria-controls="helpSection">[% bootstrap_icon('question-sign') %] Help</a>
+</div>
+
+<div class="col-sm-12">&nbsp;</div>
+
+<div class="col-sm-12 collapse" id="helpSection">
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">File format</h3></div>
+
+  <table class="table table-condensed">
+  <thead>
+    <th>Column</th><th>Required</th><th></Notes></th>
+  </thead>
+  <tbody>
+    <tr><td>Hostname</td><td>Yes</td><td></td></tr>
+    <tr><td>OS</td><td>Yes</td><td></td></tr>
+    <tr><td>OS Ver</td><td>Yes</td><td></td></tr>
+    <tr><td>Ethernet IP</td><td>No</td><td>Ethernet static IP address</td></tr>
+    <tr><td>Wireless IP</td><td>No</td><td>Wireless static IP address</td></tr>
+    <tr><td>Notes</td><td>No</td><td></td></tr>
+  </tbody>
+  </table>
+</div><!-- panel -->
+</div><!-- col -->
+
+
+<div class="col-sm-12">
+<table class="table table-condensed">
+[% FOREACH r IN form.row_messages %]
+<tr>
+  <td>[%r.row_number %]</td><td>[% r.status %]</td><td>[% r.message %]</td>
+</tr>
+[% END %]
+</table>
+</div><!-- col -->

@@ -146,7 +146,14 @@ __PACKAGE__->might_have(
     serverhw => 'Manoc::DB::Result::ServerHW',
     'hwasset_id',
     {
-        cascade_update => 1,
+        cascade_delete => 1,
+    }
+);
+
+__PACKAGE__->might_have(
+    workstationhw => 'Manoc::DB::Result::WorkstationHW',
+    'hwasset_id',
+    {
         cascade_delete => 1,
     }
 );
@@ -154,6 +161,12 @@ __PACKAGE__->might_have(
 sub server {
     my $self = shift;
     $self->serverhw and return $self->serverhw->server;
+    return undef;
+}
+
+sub workstation {
+    my $self = shift;
+    $self->workstationhw and return $self->workstationhw->workstation;
     return undef;
 }
 
@@ -166,7 +179,9 @@ Return 1 when there is an associated logical item, 0 otherwise.
 sub in_use {
     my $self = shift;
     return ( $self->type eq TYPE_DEVICE && defined( $self->device ) ) ||
-        ( $self->type eq TYPE_SERVER && defined( $self->server ) );
+        ( $self->type eq TYPE_SERVER && defined( $self->server ) ) ||
+        ( $self->type eq TYPE_WORKSTATION && defined( $self->workstation ) );
+
 }
 
 sub is_decommissioned {

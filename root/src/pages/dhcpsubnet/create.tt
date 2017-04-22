@@ -27,8 +27,6 @@ function refresh_ipblocks() {
 }
 
 $( document ).ready(function() {
-   $('#form-dhcpsubnet\\.range').selectpicker();
-
     $('#form-dhcpsubnet\\.ipblock_button').click(function() {
 	showDialogForm("[% c.uri_for_action('/ipblock/create_ipblock') %]", "Create IP Block", on_close_create_form);
       	return false;

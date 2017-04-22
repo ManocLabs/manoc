@@ -3,10 +3,9 @@ use HTML::FormHandler::Moose;
 
 extends 'Manoc::Form::Base';
 
-with 'Manoc::Form::TraitFor::SaveButton',
-    'Manoc::Form::TraitFor::IPAddr';
+with 'Manoc::Form::TraitFor::SaveButton', 'Manoc::Form::TraitFor::IPAddr';
 
-use Manoc::Form::Types ('MacAddress');
+use Manoc::Form::Types       ('MacAddress');
 use HTML::FormHandler::Types ('IPAddress');
 
 use namespace::autoclean;
@@ -24,16 +23,16 @@ has_field 'hostname' => (
     label        => 'Hostname',
     element_attr => {
         placeholder => 'hostname.local.domain',
-        size         => '100%',
+        size        => '100%',
     },
 );
 has_field 'address' => (
-    type         => 'Text',
-    required     => 1,
-    label        => 'Primary Address',
-    apply        => [IPAddress],
+    type           => 'Text',
+    required       => 1,
+    label          => 'Primary Address',
+    apply          => [IPAddress],
     inflate_method => \&inflate_ipv4,
-    element_attr => {
+    element_attr   => {
         placeholder => '0.0.0.0',
         size        => '100%',
     },
@@ -81,12 +80,18 @@ has_field 'serverhw' => (
     type         => 'Select',
     label        => 'Hardware',
     empty_select => '--- Choose ---',
+
+    element_class => ['selectpicker'],
+    element_attr  => { "data-live-search" => "true" },
 );
 
 has_field 'vm' => (
     type         => 'Select',
     label        => 'Virtual Machine',
     empty_select => '--- Choose ---',
+
+    element_class => ['selectpicker'],
+    element_attr  => { "data-live-search" => "true" },
 );
 
 has_field 'vm_btn' => (
@@ -113,6 +118,9 @@ has_field 'virtinfr' => (
     type         => 'Select',
     label        => 'Virtual Infrastructure',
     empty_select => '--- Choose ---',
+
+    element_class => ['selectpicker'],
+    element_attr  => { "data-live-search" => "true" },
 );
 
 has_field 'addresses' => (
@@ -121,16 +129,14 @@ has_field 'addresses' => (
     add_extra  => 1,
 );
 
-has_field 'addresses.id' => (
-    type => 'PrimaryKey'
-);
+has_field 'addresses.id' => ( type => 'PrimaryKey' );
 
 has_field 'addresses.ipaddr' => (
-    type         => 'Text',
-    label        => 'IP Address',
-    apply        => [IPAddress],
+    type           => 'Text',
+    label          => 'IP Address',
+    apply          => [IPAddress],
     inflate_method => \&inflate_ipv4,
-    element_attr => {
+    element_attr   => {
         placeholder => '0.0.0.0',
     },
 );
@@ -203,8 +209,6 @@ sub options_vm {
     return @selections;
 
 }
-
-
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

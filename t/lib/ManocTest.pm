@@ -51,6 +51,9 @@ sub get_mech {
     ok( $Mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'Manoc' ),
         "Created mech object" );
 
+    use Moose::Util qw( apply_all_roles );
+    apply_all_roles( $Mech, 'ManocTest::MechanizeJson' );
+
     return $Mech;
 }
 

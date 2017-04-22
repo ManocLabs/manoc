@@ -1,4 +1,4 @@
-package Manoc::Form::CSVImport::ServerHW;
+package Manoc::Form::CSVImport::WorkstationHW;
 
 use HTML::FormHandler::Moose;
 use namespace::autoclean;
@@ -15,8 +15,9 @@ has '+optional_columns' => (
     default => sub {
         [
             qw/
-                n_procs n_cores_proc proc_freq  inventory serial
+                proc_freq  inventory serial
                 storage1_size storage2_size notes
+                ethernet_addr wireless_addr
                 /
         ];
     }
@@ -25,14 +26,14 @@ has '+optional_columns' => (
 
 has '+column_names' => (
     default => sub {
-        {
-            'cpu'        => 'cpu_model',
-            'ram'        => 'ram_memory',
-            'processors' => 'n_procs',
-            'cores'      => 'n_cores_proc',
-            'frequency'  => 'proc_freq',
-            'storage 1'  => 'storage1_size',
-            'storage 2'  => 'storage2_size',
+        return {
+            'cpu'       => 'cpu_model',
+            'frequency' => 'proc_freq',
+            'ram'       => 'ram_memory',
+            'storage 1' => 'storage1_size',
+            'storage 2' => 'storage2_size',
+            'wireless'  => 'wireless_addr',
+            'ethernet'  => 'ethernet_addr',
         };
     }
 );

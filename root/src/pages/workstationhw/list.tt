@@ -1,0 +1,99 @@
+[% META
+   use_table=1
+-%]
+[%
+page.title = 'Workstation Hardware'
+%]
+
+
+<div id="tabletoolbar">
+
+[%- IF c.check_permission('workstationhw.create') -%]
+  <a href="[% c.uri_for_action('workstationhw/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
+
+  <div class="btn-group" role="group">
+  <div class="dropdown">
+      <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">CSV<span class="caret"></span></button>
+      <ul class="dropdown-menu">
+      <li>
+         [%- IF c.check_permission('workstationhw.create') -%]
+          <a href="[% c.uri_for_action('workstationhw/import_csv') %]">[% bootstrap_icon("upload") %]
+          Import CSV</a>
+         [% END -%]
+      </li>
+      <li>
+         <a href="[% c.uri_for_action('workstationhw/list_csv') %]">[% bootstrap_icon("download") %]
+        Esport CSV</a>
+     </li>
+     </ul>
+  </div><!--  dropdown -->
+  </div><!-- group -->
+
+  <div class="btn-group" role="group">
+
+  <div id="statusfilter_wrapper">
+        <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+            <option value="a">Show all</option>
+            <option value="u">In use</option>
+            <option value="d">Decommissioned</option>
+        </select>
+  </div><!-- statusfilter_wrapper -->
+</div>
+
+</div><!-- tabletoolbar -->
+
+<table class="table" id="workstationhw_list">
+    <thead>
+	    <tr>
+            <th>Inventory</th>
+	        <th>Vendor</th>
+   	        <th>Model</th>
+            <th>Location</th>
+            <th>Used by</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+[% fragment = BLOCK -%]
+
+table_source =  {
+      "url":  "[% c.uri_for_action('workstationhw/datatable_source') %]",
+      "data": function ( d ) {
+         d.search_status = $('#statusfilter').val();
+      }
+};
+table_columns = [{
+        'data': 'inventory',
+        'fnCreatedCell': function(nTd, sData, oData, iRow, iCol) {
+            $(nTd).html("<a href='" + oData.href + "'>" + oData.inventory + "</a>");
+        }
+    },
+    {
+        'data': 'vendor'
+    },
+    {
+        'data': 'model'
+    },
+    {
+        'data': 'location'
+    },
+    {
+        'data': 'workstation',
+        'fnCreatedCell': function(nTd, sData, oData, iRow, iCol) {
+            if (oData.workstation) {
+                $(nTd).html("<a href='" + oData.workstation.href + "'>" + oData.workstation.hostname + "</a>");
+            }
+        }
+    }
+];
+$(document).ready(function() {
+  [% init_table_js('workstationhw_list', { toolbar='tabletoolbar', server_source='table_source', columns='table_columns' }) %]
+  $("#statusfilter").on('changed.bs.select', function (e) {
+       $( '#workstationhw_list' ).dataTable().api().ajax.reload();
+  });
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

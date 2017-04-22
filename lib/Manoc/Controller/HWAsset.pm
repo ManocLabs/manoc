@@ -2,23 +2,20 @@
 #
 # This library is free software. You can redistribute it and/or modify
 # it under the same terms as Perl itself.
-use strict;
-
 package Manoc::Controller::HWAsset;
 use Moose;
 use namespace::autoclean;
+
 BEGIN { extends 'Catalyst::Controller'; }
 
 # Not using CommonCRUD
-with 'Manoc::ControllerRole::ResultSet';
-with 'Manoc::ControllerRole::ObjectForm';
-with 'Manoc::ControllerRole::ObjectList';
-
-with 'Manoc::ControllerRole::JSONView';
-with 'Manoc::ControllerRole::JQDatatable';
+with 'Manoc::ControllerRole::ResultSet',
+    'Manoc::ControllerRole::ObjectForm',
+    'Manoc::ControllerRole::ObjectList',
+    'Manoc::ControllerRole::JSONView',
+    'Manoc::ControllerRole::JQDatatable';
 
 use Manoc::DB::Result::HWAsset;
-
 use Manoc::Form::HWAsset;
 
 =head1 NAME
@@ -71,7 +68,7 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
 
     $c->stash(
         object          => $object,
-	 title           => 'Create device hardware',
+        title           => 'Create device hardware',
         form_class      => 'Manoc::Form::HWAsset',
         form_parameters => { type => Manoc::DB::Result::HWAsset->TYPE_DEVICE },
     );
@@ -148,6 +145,13 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     # redirect serverhw to specific controller
     if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_SERVER ) {
         $c->res->redirect( $c->uri_for_action( 'serverhw/edit', [ $object->serverhw->id ] ) );
+        $c->detach();
+    }
+
+    # redirect workstation to specific controller
+    if ( $object->type eq Manoc::DB::Result::HWAsset->TYPE_WORKSTATION ) {
+        $c->res->redirect(
+            $c->uri_for_action( 'workstationhw/edit', [ $object->workstationhw->id ] ) );
         $c->detach();
     }
 

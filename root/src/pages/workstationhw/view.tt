@@ -1,0 +1,77 @@
+[%
+   page.title='Workstation Hardware ' _ object.inventory
+%]
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+[% page.toolbar = BLOCK -%]
+[%- IF !object.is_decommissioned -%]
+ <div class="btn-group">
+    <a class="btn btn-primary [% 'disabled' UNLESS  c.check_permission(object, 'delete') %]" href=[%c.uri_for_action('workstationhw/edit', [object.id]) %]>[% bootstrap_icon('pencil') %] Edit</a>
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li class="[% 'disabled' UNLESS c.check_permission('workstationhw.create') %]">
+         <a href=[% c.uri_for_action('workstationhw/create', { copy => object.id }) %]>[% bootstrap_icon('duplicate') %] Duplicate</a>
+      </li>
+      <li class="[% 'disabled' UNLESS ( c.check_permission(object, 'edit') && !object.in_use ) %]">
+         <a href=[% c.uri_for_action('workstationhw/decommission', [object.id]) %]>
+   	     [% bootstrap_icon('remove') %]Decommission</a>
+      </li>
+      <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+         <a href=[% c.uri_for_action('workstationhw/delete', [object.id]) %]>[% bootstrap_icon('trash') %] Delete</a>
+      </li>
+      <li role="separator" class="divider"></li>
+      <li class="[% 'disabled' IF NOT c.check_permission('workstation.create') OR object.workstation %]">
+         <a href=[% c.uri_for_action('workstation/create', { workstationhw => object.id}) %]>Create workstation</a>
+      </li>
+ </div><!-- end toolbar -->
+[% ELSE -%]
+[%# decommissioned object -%]
+   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
+      href="[% c.uri_for_action('workstationhw/restore', [object.id]) %]">
+   Restore</a>
+  <a class="btn btn-danger [% 'disabled' UNLESS c.check_permission(object, 'delete') %]"
+      href="[% c.uri_for_action('workstationhw/delete', [object.id]) %]">
+  [% bootstrap_icon('trash') %] Delete</a>
+[% END -%]
+[% END -%]
+
+ <dl class="dl-horizontal">
+  <dt>Inventory</dt>
+  <dd>[% object.inventory | html %]</dd>
+  <dt>Vendor</dt>
+  <dd>[% object.vendor | html %]</dd>
+  <dt>Model</dt>
+  <dd>[% object.model | html %]</dd>
+  <dt>Serial</dt>
+  <dd>[% object.serial | html %]</dd>
+[% IF object.is_in_warehouse %]
+  <dt>Warehouse</dt>
+  <dd>Yes</dd>
+[% ELSE -%]
+  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Floor</dt><dd>[% object.floor | html %]</dd>
+  <dt>Room</dt> <dd>[% object.room | html %]</dd>
+[% END %]
+  [% IF object.decommissioned -%]
+  <dt>Decommissioned</dt>
+  <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
+  [% END -%]
+  <dt>Used by</dt><dd>[% IF object.workstation %][% print_workstation(object.workstation) %][% END %]</dd>
+  <dt>RAM</dt>
+  <dd>[% object.ram_memory | html %]</dd>
+  <dt>CPU</dt>
+  <dd>[% object.cpu_model | html %] at [% object.proc_freq | html %]Mhz
+  <dt>Primary storage</dt>
+  <dd>[% object.storage1_size | html %]</dd>
+  <dt>Secondary storage</dt>
+  <dd>[% object.storage2_size | html %]</dd>
+  <dt>Display</dt>
+  <dd>[% object.display %]</dd>
+  <dt>Ethernet Mac Address</dt>
+  <dd>[% object.ethernet_macaddr %]</dd>
+  <dt>Wireless Mac Address</dt>
+  <dd>[% object.wireless_macaddr %]</dd>
+  <dt>Notes</dt>
+  <dd>[% object.notes | html %]</dd>
+</dl>

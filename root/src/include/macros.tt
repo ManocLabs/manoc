@@ -144,3 +144,15 @@ $( document ).ready(function() {
 [% MACRO print_softwarepkg(s) BLOCK -%]
 <a href="[% c.uri_for_action('softwarepkg/view', [ s.id ]) %]">[% s.name | html %]</a>
 [%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                      Workstation HardWare                         -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_workstationhw(workstationhw) BLOCK -%]
+<a href=[% c.uri_for_action('workstationhw/view', [ workstationhw.id ]) %]>[% workstationhw.inventory | html %]</a>
+[%- END -%]
+[%# ----------------------------------------------------------------- -%]
+[%#                     Workstation logical                           -%]
+[%# ----------------------------------------------------------------- -%]
+[% MACRO print_workstation(server) BLOCK -%]
+<a href="[% c.uri_for_action('workstation/view', [ workstation.id ]) %]">[% workstation.hostname | html %]</a>
+[%- END -%]

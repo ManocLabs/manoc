@@ -1,0 +1,21 @@
+[% form.render %]
+[% SET createhw_url = c.uri_for_action('/workstationhw/create', { hide_location => 1 } )
+-%]
+
+[% fragment = BLOCK -%]
+function on_close_create_form(data) {
+  if (data.object_id) {
+    $("#[% form.name %]\\.workstationhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+    $("#[% form.name %]\\.workstationhw").selectpicker('val', data.object_id);
+    $("#[% form.name %]\\.workstationhw").selectpicker('refresh');
+  }
+}
+
+$( document ).ready(function() {
+	$('#[% form.name %]\\.asset_button').click(function() {
+      showDialogForm("[% createhw_url  %]", "Create asset", on_close_create_form);
+      return false;
+    });
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]

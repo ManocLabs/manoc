@@ -13,19 +13,23 @@
 [% MACRO init_table(id, options) BLOCK -%]
 [% capture = BLOCK -%]
 $(function() {
-    $("#[% id  %]").DataTable( {
-      "responsive" : true,
+[% init_table_js(id, options) %]
+});
+[% END -%]
+[% js_scripts.push(capture) -%]
+[% END -%]
+[% MACRO init_table_js(id, options) BLOCK -%]
+$("#[% id  %]").DataTable( {
+[% IF options.responsive -%]
+   "responsive" :  true,
+[% END -%]
 [% IF options.server_source -%]
    "serverSide":   true,
    "processing":   true,
-   "ajax":         "[% options.server_source %]",
+   "ajax":         [% options.server_source %],
 [% END -%]
 [% IF options.columns -%]
-   "columns": [
-  [% FOREACH c in options.columns -%]
-        { "data": [% c %] },
-  [% END -%]
-]
+   "columns":      [% options.columns %],
 [% END -%]
    "dom": "<'row'<'col-sm-8'<'toolbar'>><'col-sm-4'f>>" +
           "<'row'<'col-sm-12'tr>>" +
@@ -34,7 +38,4 @@ $(function() {
 [% IF options.toolbar -%]
    $("#[% options.toolbar %]").appendTo($("#[% id %]_wrapper div.toolbar").first());
 [% END -%]
-});
-[% END -%]
-[% js_scripts.push(capture) -%]
 [% END -%]

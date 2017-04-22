@@ -68,7 +68,7 @@ $("#statusfilter").on('changed.bs.select',
         } else if (value == 'u') {
             s = '^In use$';
         }
-        $('#virtualmachine_list').DataTable().columns(0).search(s, true, false).draw();
+        $('#server_list').DataTable().columns(0).search(s, true, false).draw();
   }
 );
 

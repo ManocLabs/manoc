@@ -36,10 +36,7 @@ function refresh_assets(options) {
 
 $( document ).ready(function() {
     rack_select = $('#[% form.name %]\\.rack');
-    rack_select.selectpicker();
-
     asset_select = $('#[% form.name %]\\.hwasset');
-    asset_select.selectpicker();
 
 	$('#form-device\\.asset_button').click(function() {
       showDialogForm("[% createhw_url  %]", "Create asset", on_close_create_form);

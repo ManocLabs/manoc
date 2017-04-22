@@ -1,4 +1,4 @@
-package Manoc::Form::CVSImport::Server;
+package Manoc::Form::CSVImport::Server;
 
 use HTML::FormHandler::Moose;
 use namespace::autoclean;

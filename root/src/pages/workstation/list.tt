@@ -1,0 +1,101 @@
+[% META
+   use_table=1
+-%]
+[%
+page.title='Workstations'
+-%]
+
+<div id="tabletoolbar">
+[%- IF c.check_permission('workstation.create') -%]
+ <a href="[% c.uri_for_action('/workstation/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] Add</a>
+[% END -%]
+
+  <div class="btn-group" role="group">
+  <div class="dropdown">
+      <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">CSV<span class="caret"></span></button>
+      <ul class="dropdown-menu">
+      <li>
+         [%- IF c.check_permission('workstation.create') -%]
+          <a href="[% c.uri_for_action('workstation/import_csv') %]">[% bootstrap_icon("upload") %]
+          Import CSV</a>
+         [% END -%]
+      </li>
+      <li>
+         <a href="[% c.uri_for_action('workstation/list_csv') %]">[% bootstrap_icon("download") %]
+        Esport CSV</a>
+     </li>
+     </ul>
+  </div><!--  dropdown -->
+  </div><!-- group -->
+
+  <div class="btn-group" role="group">
+  <div id="statusfilter_wrapper" class="filtermenu">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+    <option value="a">Show all</option>
+    <option value="u">In use</option>
+    <option value="d">Decommissioned</option>
+  </select>
+  </div>
+  </div>
+
+</div>
+
+ <table class="table" id="workstation_list">
+   <thead>
+     <tr>
+        <th>Name</th>
+        <th>OS</th>
+        <th>Hardware</th>
+        <th>Location</th>
+     </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+
+[% fragment = BLOCK -%]
+var table_source =  {
+      "url":  "[% c.uri_for_action('workstation/datatable_source') %]",
+      "data": function ( d ) {
+         d.search_status = $('#statusfilter').val();
+      }
+};
+var table_columns = [
+    {
+        'data': 'hostname',
+        'fnCreatedCell': function(nTd, sData, oData, iRow, iCol) {
+            $(nTd).html("<a href='" + oData.href + "'>" + oData.hostname + "</a>");
+        }
+    },
+    {
+        'data': 'os'
+    },
+    {
+        'data': 'hardware',
+        'fnCreatedCell': function(nTd, sData, oData, iRow, iCol) {
+            if (oData.hardware) {
+                $(nTd).html("<a href='" + oData.hardware.href + "'>" + oData.hardware.label + "</a>");
+            } else {
+                $(nTd).html("-");
+            }
+        }
+    },
+    {
+        'data': 'hardware',
+        'fnCreatedCell': function(nTd, sData, oData, iRow, iCol) {
+            if (oData.hardware && oData.hardware.location) {
+                $(nTd).html(oData.hardware.location);
+            } else {
+                $(nTd).html("-");
+            }
+        }
+    }
+];
+$(document).ready(function() {
+  [% init_table_js('workstation_list', { toolbar='tabletoolbar', server_source='table_source', columns='table_columns' }) %]
+  $("#statusfilter").on('changed.bs.select', function (e) {
+       $( '#workstation_list' ).dataTable().api().ajax.reload();
+  });
+});
+[% END %]
+[% js_scripts.push(fragment) -%]
