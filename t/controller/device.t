@@ -12,6 +12,7 @@ init_manoctest;
 
 my $mech   = get_mech();
 my $schema = ManocTest::Schema->get_schema();
+$schema->init_vlan;
 
 mech_login;
 

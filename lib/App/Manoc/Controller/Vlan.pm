@@ -30,13 +30,62 @@ __PACKAGE__->config(
     }
 );
 
-=action index
+=action  vid
+
+View Vlan by vid
 
 =cut
 
-sub index : Path : Args(0) {
+sub vid : Chained('base') : PathPart('') : CaptureArgs(1) {
+    my ( $self, $c, $vid ) = @_;
+
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
+    }
+
+    $c->stash(
+        vid => $vid,
+        object_list => $c->stash->{resultset}->search( { vid => $vid } )
+    );
+
+}
+
+=action list
+
+Display a list of items.
+
+=cut
+
+sub list : Chained('base') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
-    $c->res->redirect( $c->uri_for_action('vlanrange/list') );
+
+    if ( $self->enable_permission_check && $self->view_object_perm ) {
+        $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
+    }
+
+    my $segment_list = [
+        $c->model('ManocDB::LanSegment')->search(
+            {},
+            {
+                order_by => ['me.name'],
+            }
+        )->all()
+    ];
+
+    my $qp            = $c->req->query_parameters;
+    my $segment_param = $qp->{lansegment};
+    $c->debug and $c->log->debug("looking for segment=$segment_param");
+
+    my $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_param } );
+    $c->debug and $c->log->debug( $segment ? "segment found" : "segment not foud" );
+
+    $segment ||= $c->model('ManocDB::LanSegment')->search()->first;
+
+    $c->stash(
+        segment_list => $segment_list,
+        cur_segment  => $segment,
+    );
+
 }
 
 =action create
@@ -47,7 +96,15 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $range_id = $c->req->query_parameters->{'range'};
-    $c->stash( form_defaults => { vlan_range => $range_id } );
+
+    my $range = $c->model('ManocDB::VlanRange')->find( { id => $range_id } );
+
+    if ( !$range ) {
+        $c->response->redirect( $c->uri_for_action('vlan/list') );
+        $c->detach();
+    }
+
+    $c->stash( form_parameters => { vlan_range => $range_id } );
 };
 
 =method object_delete
@@ -73,7 +130,7 @@ sub object_delete {
 sub get_form_success_url {
     my ( $self, $c ) = @_;
 
-    return $c->uri_for_action("vlanrange/list");
+    return $c->uri_for_action("vlan/list");
 }
 
 __PACKAGE__->meta->make_immutable;

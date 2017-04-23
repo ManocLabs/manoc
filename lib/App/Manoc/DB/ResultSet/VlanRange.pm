@@ -8,25 +8,30 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
-=method get_overlap_ranges( $start, $end )
+=method get_overlap_ranges( $lan_segment, $start, $end )
 
 Return all the VlanRange which are overlap the given internal.
 
 =cut
 
 sub get_overlap_ranges {
-    my ( $self, $start, $end ) = @_;
+    my ( $self, $lan_segment, $start, $end ) = @_;
 
-    my $conditions = [
-        {
-            start => { '<=' => $start },
-            end   => { '>=' => $start },
-        },
-        {
-            start => { '<=' => $end },
-            end   => { '>=' => $end },
-        },
-    ];
+    my $lan_segment_id = ref($lan_segment) ? $lan_segment->id : $lan_segment;
+
+    my $conditions = {
+        -or => [
+            {
+                start => { '<=' => $start },
+                end   => { '>=' => $start },
+            },
+            {
+                start => { '<=' => $end },
+                end   => { '>=' => $end },
+            },
+        ],
+        lan_segment_id => $lan_segment_id,
+    };
 
     return
         wantarray ? $self->search($conditions)->all :

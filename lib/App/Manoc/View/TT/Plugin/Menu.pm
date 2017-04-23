@@ -55,19 +55,19 @@ my @DEFAULT_MENU_ITEMS = (
                 ]
             },
             {
-                name    => 'VLAN',
+                name    => 'LAN',
                 submenu => [
                     {
-                        name   => "VLAN by range",
-                        action => 'vlanrange/list',
+                        name   => 'Segments',
+                        action => 'lansegment/list',
                     },
                     {
-                        name   => "VTP list",
+                        name   => "VLANs",
+                        action => 'vlan/list',
+                    },
+                    {
+                        name   => "VTP",
                         action => 'vtp/list',
-                    },
-                    {
-                        name   => "Compare with VTP",
-                        action => 'vtp/compare',
                     },
                 ]
             },

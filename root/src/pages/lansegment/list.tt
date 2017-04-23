@@ -1,0 +1,39 @@
+[% page.title = 'LAN segments' %]
+
+[%- IF c.check_permission('lansegment', 'create') -%]
+[%- page.toolbar = BLOCK %]
+<div id="vlanrange_create">
+  <a href="[% c.uri_for_action('/lansegment/create') %]" class="btn btn-sm btn-primary">[% bootstrap_icon("plus") %] New segment </a>
+</div>
+[%- END -%]
+[%- END -%]
+
+  <table class="table">
+  <thead>
+    <tr>
+        <th class="col-sm-3">Name</th>
+        <th class="col-sm-1">VLANs</th>
+        <th class="col-sm-1">Devices</th>
+        <th class="col-sm-6">Notes</th>
+   	    <th class="col-sm-2"></th>
+    </tr>
+  </thead>
+  <tbody>
+[%- FOREACH segment IN object_list %]
+    <tr>
+      <td>[% segment.name | html %]</td>
+      <td>[% segment.get_column('vlan_count') %]</td>
+      <td>[% segment.get_column('device_count') %]</td>
+      <td>[% segment.notes | html %]</td>
+      <td style="text-align: right">
+        [%- IF c.check_permission(segment, 'edit') -%]
+        <a href="[% c.uri_for_action('lansegment/edit',[segment.id])%]">[% fa_icon('pencil') %]<span class="sr-only">Edit</span></a>
+        [%- END -%]
+        [%- IF c.check_permission(segment, 'delete') -%]
+        <a href="[% c.uri_for_action('lansegment/delete',[segment.id])%]">[% fa_icon('trash') %]<span class="sr-only">Delete</span></a>
+        [%- END -%]
+      </td>
+    </tr>
+    [% END -%]
+  </tbody>
+  </table>

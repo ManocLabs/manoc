@@ -168,19 +168,15 @@ __view_tt__
 -%]
 [% page.toolbar = BLOCK -%]
 [%- IF c.check_permission(object, 'edit') || c.check_permission(object, 'delete') -%]
-  <div class="btn-group">
+    <div class="btn-group">
+    <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]" href="[% c.uri_for_action('<+ model.lower +>/edit',[object.id]) %]">[% bootstrap_icon('pencil') %] Edit</a>
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Edit <span class="caret"></span>
+      <span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-    [% IF c.check_permission(object, 'edit') -%]
-      <li><a href="[% c.uri_for_action('<+ model.lower +>/edit',[object.id]) %]">
-    [% bootstrap_icon('pencil') %] Edit info</a></li>
-    [% END -%]
-    [% IF c.check_permission(object, 'delete') -%]
-      <li><a href="[%c.uri_for_action('<+ model.lower +>/delete',[object.id]) %]">
-    [% bootstrap_icon('trash') %] Delete</a></li>
-    [% END -%]
+    <li class="[% 'disabled' UNLESS c.check_permission(object, 'delete') %]">
+       <a href="[%c.uri_for_action('<+ model.lower +>/delete',[object.id]) %]">
+       [% bootstrap_icon('trash') %] Delete</a></li>
     </ul>
   </div><!-- end btn group -->
 [% END -%]

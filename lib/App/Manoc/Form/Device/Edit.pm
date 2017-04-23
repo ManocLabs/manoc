@@ -17,7 +17,10 @@ has '+name'        => ( default => 'form-device' );
 has '+html_prefix' => ( default => 1 );
 
 sub build_render_list {
-    [ 'name', 'mng_block', 'hwasset', 'rack_block', 'notes', 'save', 'csrf_token' ];
+    return [
+        'name',        'mng_block', 'hwasset', 'rack_block',
+        'lan_segment', 'notes',     'save',    'csrf_token'
+    ];
 }
 
 has_field 'name' => (
@@ -122,6 +125,15 @@ has_field 'rack_level' => (
     label_class => ['col-sm-2'],
 );
 
+has_field 'lan_segment' => (
+    type         => 'Select',
+    label        => 'Lan Segment',
+    empty_select => '--- Select ---',
+    required     => 0,
+
+    element_class => 'selectpicker',
+);
+
 has_field 'notes' => ( type => 'TextArea' );
 
 sub options_mng_url_format {
@@ -162,6 +174,16 @@ sub options_rack {
 
     return $self->get_rack_options;
 }
+
+before update_fields => sub {
+    my $self = shift;
+
+    my $lan_segment_rs = $self->schema->resultset('LanSegment');
+    if ( $lan_segment_rs->count == 1 ) {
+        $self->field('lan_segment')->default( $lan_segment_rs->first->id );
+    }
+
+};
 
 override validate_model => sub {
     my ($self) = @_;

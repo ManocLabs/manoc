@@ -2,10 +2,17 @@
    use_table=1
 -%]
 [%
-   page.title = 'VTP DB'
+   page.title = 'VTP database'
 -%]
+[% page.toolbar = BLOCK %]
+<div id="tabletoolbar">
+ <a href="[% c.uri_for_action('vtp/compare') %]" class="btn btn-sm btn-defaulty">VLAN/VTP comparison</a>
+[% END -%]
+</div>
+[% END %]
 
-[% init_table('vlan_list', {}) %]
+
+[% init_table('vlan_list') %]
 <table class="table" id="vlan_list">
   <thead>
     <tr>

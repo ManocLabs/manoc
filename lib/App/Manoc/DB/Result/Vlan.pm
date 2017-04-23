@@ -12,6 +12,11 @@ __PACKAGE__->table('vlan');
 
 __PACKAGE__->add_columns(
     id => {
+        data_type         => 'int',
+        is_auto_increment => 1,
+        is_nullable       => 0
+    },
+    vid => {
         data_type   => 'int',
         is_nullable => 0
     },
@@ -24,6 +29,11 @@ __PACKAGE__->add_columns(
         data_type   => 'varchar',
         size        => 255,
         is_nullable => 1
+    },
+    lan_segment_id => {
+        data_type      => 'int',
+        is_nullable    => 0,
+        is_foreign_key => 1
     },
     vlan_range_id => {
         data_type      => 'int',
@@ -49,14 +59,42 @@ sub devices {
         }
     )->get_column('device_id')->as_query;
 
-    my $rs = $self->result_source->schema->resultset('App::Manoc::DB::Result::Device')
-        ->search( { id => { -in => $ids } } );
+    my $rs = $self->result_source->schema->resultset('App::Manoc::DB::Result::Device');
+    $rs = $rs->search( { vid => { -in => $ids } } );
+
     return wantarray ? $rs->all : $rs;
 }
 
+sub update {
+    my ( $self, @args ) = @_;
+
+    $self->lan_segment( $self->vlan_range->lan_segment );
+    $self->next::method(@args);
+
+    return $self;
+}
+
+sub insert {
+    my ( $self, @args ) = @_;
+
+    $self->lan_segment( $self->vlan_range->lan_segment );
+
+    $self->next::method(@args);
+
+    return $self;
+
+}
+
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->add_unique_constraints( [ 'lan_segment_id', 'vid' ], ['name'] );
+
+__PACKAGE__->belongs_to(
+    lan_segment => 'App::Manoc::DB::Result::LanSegment',
+    'lan_segment_id'
+);
 
 __PACKAGE__->belongs_to( vlan_range => 'App::Manoc::DB::Result::VlanRange', 'vlan_range_id' );
+
 __PACKAGE__->has_many(
     ip_networks => 'App::Manoc::DB::Result::IPNetwork',
     { 'foreign.vlan_id' => 'self.id' },

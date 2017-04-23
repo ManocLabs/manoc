@@ -19,6 +19,11 @@ __PACKAGE__->add_columns(
         is_auto_increment => 1,
         is_nullable       => 0
     },
+    lan_segment_id => {
+        data_type      => 'int',
+        is_nullable    => 0,
+        is_foreign_key => 1
+    },
     name => {
         data_type   => 'varchar',
         size        => 255,
@@ -47,6 +52,9 @@ __PACKAGE__->has_many( vlans => 'App::Manoc::DB::Result::Vlan', 'vlan_range_id' 
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::VlanRange');
 
+__PACKAGE__->belongs_to( lan_segment => 'App::Manoc::DB::Result::LanSegment', 'lan_segment_id' );
+
+
 =method get_mergeable_ranges
 
 Return a resultset containing all ranges which can be merged with this one
@@ -56,10 +64,15 @@ Return a resultset containing all ranges which can be merged with this one
 sub get_mergeable_ranges {
     my ( $self, $options ) = @_;
 
-    my $rs =
-        $self->result_source->resultset->search(
-        [ { start => $self->end + 1 }, { end => $self->start - 1 }, ], $options );
+    my $rs = $self->result_source->resultset;
+    return $rs->search(
+        {
+            [ { start => $self->end + 1 }, { end => $self->start - 1 }, ],
+            { lan_segment_id => $self->lan_segment_id }
+        },
+        $options );
     return wantarray ? $rs->all : $rs;
+
 }
 
 =method split_new_range($name, $split_point, $direction)
@@ -90,9 +103,10 @@ sub split_new_range {
                 # create new range
                 my $new_range = $rs->create(
                     {
-                        name  => $name,
-                        start => $split_point,
-                        end   => $self->end,
+                        name           => $name,
+                        lan_segment_id => $self->lan_segment_id,
+                        start          => $split_point,
+                        end            => $self->end,
                     }
                 );
 
@@ -113,9 +127,10 @@ sub split_new_range {
                       # create new range
                 my $new_range = $rs->create(
                     {
-                        name  => $name,
-                        start => $self->start,
-                        end   => $split_point - 1,
+                        name           => $name,
+                        lan_segment_id => $self->lan_segment_id,
+                        start          => $self->start,
+                        end            => $split_point - 1,
                     }
                 );
 

@@ -27,6 +27,11 @@ has_field 'name' => (
     ],
 );
 
+has 'lan_segment' => (
+    is       => 'ro',
+    required => 1,
+);
+
 has_field 'start' => (
     label    => 'From VLAN',
     type     => 'Integer',
@@ -63,7 +68,7 @@ override validate_model => sub {
 
     # check for overlapping ranges (excluding self!)
     my $rs = $self->source->resultset;
-    my $overlap = $rs->get_overlap_ranges( $start, $end );
+    my $overlap = $rs->get_overlap_ranges( $self->lan_segment, $start, $end );
     $overlap = $overlap->search( id => { '<>' => $self->item->id } )
         if $item->in_storage;
     $overlap->count() > 0 and
@@ -80,6 +85,14 @@ override validate_model => sub {
             ->add_error(
             'There are associated vlans which will be above the upper end of the range');
     }
+};
+
+before 'update_model' => sub {
+    my $self   = shift;
+    my $values = $self->value;
+    my $item   = $self->item;
+
+    $item->lan_segment( $self->lan_segment );
 };
 
 =head1 LICENSE
