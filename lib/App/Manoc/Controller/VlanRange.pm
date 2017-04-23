@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with
-    "App::Manoc::ControllerRole::CommonCRUD",
+    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'list', 'view' ] },
     "App::Manoc::ControllerRole::JSONView";
 
 use App::Manoc::Form::VlanRange;
@@ -28,7 +28,7 @@ __PACKAGE__->config(
     form_class              => 'App::Manoc::Form::VlanRange',
     enable_permission_check => 1,
     view_object_perm        => undef,
-    json_columns            => [qw(id name description)],
+    json_columns            => [qw(id lansegment name description)],
     object_list             => {
         order_by => [ 'start', 'vlans.id' ],
         prefetch => 'vlans',
@@ -56,7 +56,7 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
         params => $c->req->parameters,
     );
 
-    $c->response->redirect( $c->uri_for_action('vlanrange/list') );
+    $c->response->redirect( $c->uri_for_action('vlan/list') );
     $c->detach();
 }
 
@@ -80,9 +80,32 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
         params => $c->req->parameters,
     );
 
-    $c->response->redirect( $c->uri_for_action('vlanrange/list') );
+    $c->response->redirect( $c->uri_for_action('vlan/list') );
     $c->detach();
 }
+
+=head1 METHODS
+
+
+=head2 create
+
+=cut
+
+before 'create' => sub {
+    my ( $self, $c ) = @_;
+
+    my $segment_id = $c->req->query_parameters->{'lansegment'};
+    my $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_id } );
+
+    if ( !$segment ) {
+        $c->response->redirect( $c->uri_for_action('vlan/list') );
+        $c->detach();
+    }
+
+    $c->stash( form_parameters => { lan_segment => $segment } );
+};
+
+=cut
 
 =method delete_object
 
@@ -110,7 +133,17 @@ sub delete_object {
 sub get_form_success_url {
     my ( $self, $c ) = @_;
 
-    return $c->uri_for_action( $c->namespace . "/list" );
+    return $c->uri_for_action("vlan/list");
+}
+
+=method get_delete_success_url
+
+=cut
+
+sub get_delete_success_url {
+    my ( $self, $c ) = @_;
+
+    return $c->uri_for_action("vlan/list");
 }
 
 =method get_delete_failure_url
@@ -120,7 +153,7 @@ sub get_form_success_url {
 sub get_delete_failure_url {
     my ( $self, $c ) = @_;
 
-    return $c->uri_for_action( $c->namespace . "/list" );
+    return $c->uri_for_action("vlan/list");
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -7,14 +7,32 @@
 </div>
 [%- END -%]
 [%- END -%]
+
+<!-- Nav tabs -->
+[% foreach
+<ul class="nav nav-tabs" role="tablist">
+      <td>[% range.lan_segment.name | html %]</td>
+  [% bootstrap_nav_tab("general", "General", 1) -%]
+  [% bootstrap_nav_tab_remote("ifstatus", "Interface Status",
+                      c.uri_for_action('/device/ifstatus', [object.id])  0) -%]
+  [% bootstrap_nav_tab("ifunused", "Unused Intefaces", 0)-%]
+  [% bootstrap_nav_tab_remote("neighs", "Neighbours",
+    c.uri_for_action('/device/neighs', [object.id]), 0) -%]
+  [% bootstrap_nav_tab_remote("ssid", "SSID List",
+    c.uri_for_action('/device/ssids', [object.id]), 0) -%]
+  [% bootstrap_nav_tab_remote("clients", "Wireless clients",
+    c.uri_for_action('/device/dot11clients', [object.id]), 0) -%]
+</ul>
+
+
 <table class="table">
   <thead>
     <tr>
         <th class="col-sm-4">Range</th>
         <th class="col-sm-1">Start</th>
         <th class="col-sm-1">End</th>
-        <th class="col-sm-4">Description</th>
-	<th class="col-sm-2"></th>
+        <th class="col-sm-5">Description</th>
+   	    <th class="col-sm-1"></th>
     </tr>
   </thead>
   [%- FOREACH range IN object_list %]

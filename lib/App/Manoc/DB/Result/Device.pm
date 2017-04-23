@@ -42,11 +42,18 @@ __PACKAGE__->add_columns(
         is_nullable   => 1,
     },
 
+    lan_segment_id => {
+        data_type      => 'int',
+        is_nullable    => 1,
+        is_foreign_key => 1
+    },
+
     rack_id => {
         data_type      => 'int',
         is_nullable    => 1,
         is_foreign_key => 1,
     },
+
     rack_level => {
         data_type   => 'int',
         is_nullable => 1,
@@ -105,6 +112,11 @@ sub rack {
     $self->next::method(@args);
 }
 
+__PACKAGE__->belongs_to(
+    lan_segment => 'App::Manoc::DB::Result::LanSegment',
+    'lan_segment_id'
+);
+
 __PACKAGE__->has_many(
     ifstatus => 'App::Manoc::DB::Result::IfStatus',
     'device_id'
@@ -126,10 +138,12 @@ __PACKAGE__->has_many(
     dot11clients => 'App::Manoc::DB::Result::Dot11Client',
     'device_id'
 );
+
 __PACKAGE__->has_many(
     dot11assocs => 'App::Manoc::DB::Result::Dot11Assoc',
     'device_id'
 );
+
 __PACKAGE__->has_many(
     mat_assocs => 'App::Manoc::DB::Result::Mat',
     'device_id'

@@ -137,7 +137,7 @@ with 'App::Manoc::Netwalker::Poller::BaseTask', 'App::Manoc::Logger::Role';
 sub _build_arp_vlan {
     my $self = shift;
 
-    my $vlan = $self->nwinfo->arp_vlan->id ||
+    my $vlan = $self->nwinfo->arp_vlan->vid ||
         $self->config->default_vlan;
     return defined($vlan) ? $vlan : 1;
 }

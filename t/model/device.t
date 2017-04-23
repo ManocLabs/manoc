@@ -9,17 +9,25 @@ use ManocTest::Schema;
 my $schema = ManocTest::Schema->connect();
 ok( $schema, "Create schema" );
 
-my $device;
-eval { $device = $schema->resultset("Device")->create( { name => 'test' } ); };
-ok( $@, "mng_address is required" );
+$schema->init_vlan;
+my $lan_segment = $schema->resultset("LanSegment")->search({})->first();
 
-$device = $schema->resultset("Device")->create(
-    {
-        name        => 'D01',
-        mng_address => '10.0.0.1',
-    }
-);
-ok( $device, "Create device" );
+my $device;
+eval {
+    $device = $schema->resultset("Device")->create(
+        {
+            name => 'test',
+            lan_segment => $lan_segment,
+        });
+};
+ok($@, "mng_address is required");
+
+$device = $schema->resultset("Device")->create({
+       name        => 'D01',
+       mng_address => '10.0.0.1',
+       lan_segment => $lan_segment,
+       });
+ok($device, "Create device");
 
 # get defaults from DB
 $device->discard_changes;

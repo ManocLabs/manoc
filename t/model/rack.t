@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -45,13 +46,16 @@ $hwasset->move_to_rack($rack);
 $hwasset->update;
 ok( $rack->hwassets->count, "Asset in rack" );
 
+$schema->init_vlan;
+my $lan_segment = $schema->resultset("LanSegment")->search({})->first();
 my $device = $schema->resultset("Device")->create(
     {
         name        => "D01",
         mng_address => "1.1.1.1",
         rack        => $rack,
-    }
-);
-ok( $rack->devices->count, "Device in rack" );
+        lan_segment => $lan_segment
+    });
+ok($rack->devices->count, "Device in rack");
+
 
 done_testing;

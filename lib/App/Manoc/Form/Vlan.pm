@@ -14,14 +14,14 @@ use App::Manoc::Form::Types::VlanID;
 has '+name'        => ( default => 'form-vlan' );
 has '+html_prefix' => ( default => 1 );
 
-has_field 'vlan_range' => (
-    type         => 'Select',
-    label        => 'VLAN range',
-    empty_select => '--- Choose ---',
-    required     => 1,
+has '+item_class' => ( default => 'Vlan' );
+
+has 'vlan_range' => (
+    is       => 'ro',
+    required => 1,
 );
 
-has_field 'id' => (
+has_field 'vid' => (
     label    => 'VLAN ID',
     type     => 'Integer',
     apply    => ['VlanID'],
@@ -49,26 +49,30 @@ has_field 'description' => (
 override validate_model => sub {
     my $self = shift;
 
-    my $vlan_id   = $self->field('id')->value;
-    my $range_id  = $self->field('vlan_range')->value;
-    my $range     = $self->schema->resultset('VlanRange')->find($range_id);
+    my $vlan_id   = $self->field('vid')->value;
+    my $range     = $self->vlan_range;
     my $vlan_from = $range->start;
     my $vlan_to   = $range->end;
 
+    my $error = 0;
+
     if ( $vlan_id < $vlan_from || $vlan_id > $vlan_to ) {
-        $self->field('id')->add_error("VLAN id must be within range $vlan_from-$vlan_to");
+        $self->field('vid')->add_error("VLAN ID must be within range $vlan_from-$vlan_to");
+        $error++;
     }
 
-    super();
+    super() or $error++;
+
+    return $error ? undef : 1;
 };
 
-sub options_range {
-    my $self = shift;
-    return unless $self->schema;
+before 'update_model' => sub {
+    my $self   = shift;
+    my $values = $self->value;
+    my $item   = $self->item;
 
-    my $rs = $self->schema->resultset('VlanRange')->search()->all;
-    return map +{ value => $_->id, label => $_->name }, $rs->all();
-}
+    $item->vlan_range( $self->vlan_range );
+};
 
 __PACKAGE__->meta->make_immutable;
 1;

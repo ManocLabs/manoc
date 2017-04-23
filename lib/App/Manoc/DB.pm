@@ -8,6 +8,7 @@ use warnings;
 
 use App::Manoc::DB::Search;
 use App::Manoc::DB::Search::Query;
+use Catalyst::Utils;    # merge_hashes
 
 =head1 DESCRIPTION
 
@@ -144,6 +145,8 @@ sub init_admin {
             agent      => 0,
         }
     );
+
+    return 1;
 }
 
 =method init_vlan
@@ -160,7 +163,15 @@ sub init_vlan {
     if ( $rs->count() > 0 ) {
         return;
     }
-    my $vlan_range = $rs->update_or_create(
+
+    $rs = $self->resultset('LanSegment');
+    my $segment = $rs->update_or_create(
+        {
+            name => 'default',
+        }
+    );
+
+    my $vlan_range = $segment->add_to_vlan_ranges(
         {
             name        => 'sample',
             description => 'sample range',
@@ -168,7 +179,10 @@ sub init_vlan {
             end         => 10,
         }
     );
-    $vlan_range->add_to_vlans( { name => 'native', id => 1 } );
+
+    $vlan_range->add_to_vlans( { name => 'native', vid => 1 } );
+
+    return 1;
 }
 
 =method init_ipnetwork
@@ -226,6 +240,8 @@ sub init_ipnetwork {
             name    => 'Workstations'
         }
     );
+
+    return 1;
 }
 
 =method init_roles
@@ -246,6 +262,7 @@ sub init_roles {
         $rs->update_or_create( { role => $role } );
     }
 
+    return 1;
 }
 
 =method init_management_url
@@ -281,6 +298,8 @@ sub init_management_url {
             format => 'https://:%h',
         }
     );
+
+    return 1;
 }
 
 1;

@@ -99,6 +99,10 @@ is( $hw->display_location, "Decommissioned", "Display location decommissioned" )
 
 $hw->delete;
 
+
+$schema->init_vlan;
+my $lan_segment = $schema->resultset("LanSegment")->search({})->first();
+
 # test unused devices
 $rs->populate(
     [
@@ -110,6 +114,7 @@ $rs->populate(
             device => {
                 name        => 'D0001',
                 mng_address => '1.1.1.1',
+                lan_segment => $lan_segment,
             },
         },
         {

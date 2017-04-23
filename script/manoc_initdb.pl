@@ -47,8 +47,8 @@ sub run {
     $self->schema->init_ipnetwork;
     $self->log->info('Creating management urls.');
     $self->schema->init_management_url;
-
 }
+
 no Moose;
 
 package main;
