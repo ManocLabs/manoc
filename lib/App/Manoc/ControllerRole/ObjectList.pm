@@ -29,7 +29,13 @@ a resultset.
           }
       },
       class      => 'ManocDB::Artist',
-      );
+
+      # artists can be filtered by name using query parameters
+      object_list_filter_columns => [ 'name' ],
+
+      # prefetch cds
+      object_list_options => { prefetch => 'cds' },
+  );
 
   # manages /artist/
   sub list : Chained('object_list') : PathPart('') : Args(0) {
