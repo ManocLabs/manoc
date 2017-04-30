@@ -41,7 +41,7 @@ my $building = $schema->resultset("Building")->create(
 
     my $hwasset = $schema->resultset("HWAsset")->create(
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
             vendor     => 'IQ',
             model      => 'MegaPort 48',
             serial     => 'TestHW01',

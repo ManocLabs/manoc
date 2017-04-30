@@ -16,7 +16,7 @@ ok($schema, "Create schema");
     $arp_rs->delete;
 
     my %tuple1 = (
-	ipaddr	=> Manoc::IPAddress::IPv4->new('1.1.1.1')->padded,
+	ipaddr	=> App::Manoc::IPAddress::IPv4->new('1.1.1.1')->padded,
 	macaddr	=> '00:11:22:33:44:55',
 	vlan	=> 1,
     );

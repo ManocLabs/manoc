@@ -98,7 +98,7 @@ my $r = $rs->populate([
 
 $schema->resultset("HWAsset")->create(
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
             vendor     => 'DeviceVendor',
             model      => 'MegaPort 48',
             serial     => 'Test04',
@@ -112,7 +112,7 @@ $r = $rs->populate([
         vendor     => $vendor,
         model      => $model,
         serial     => "Test02",
-        location   => Manoc::DB::Result::HWAsset->LOCATION_DECOMMISSIONED,
+        location   => App::Manoc::DB::Result::HWAsset->LOCATION_DECOMMISSIONED,
     },
     {
         ram_memory => $ram_memory,

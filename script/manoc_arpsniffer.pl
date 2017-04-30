@@ -5,11 +5,11 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
-use Manoc::ArpSniffer;
+use App::Manoc::ArpSniffer;
 
-my $app = Manoc::ArpSniffer->new_with_options();
+my $app = App::Manoc::ArpSniffer->new_with_options();
 $app->run;
 
 # Local Variables:

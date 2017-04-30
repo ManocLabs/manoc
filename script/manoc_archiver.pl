@@ -5,16 +5,16 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
-package Manoc::Archiver;
+package App::Manoc::Archiver;
 use Moose;
-use Manoc::Logger;
-use Manoc::Utils::Datetime qw(str2seconds print_timestamp);
+use App::Manoc::Logger;
+use App::Manoc::Utils::Datetime qw(str2seconds print_timestamp);
 
 use Data::Dumper;
 
-extends 'Manoc::Script';
+extends 'App::Manoc::Script';
 
 sub archive {
     my ( $self, $time ) = @_;
@@ -84,7 +84,7 @@ no Moose;
 
 package main;
 
-my $app = Manoc::Archiver->new_with_options();
+my $app = App::Manoc::Archiver->new_with_options();
 $app->run();
 
 # Local Variables:

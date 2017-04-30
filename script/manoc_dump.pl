@@ -4,12 +4,12 @@ use strict;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
 package main;
-use Manoc::DataDumper::Script;
+use App::Manoc::DataDumper::Script;
 
-my $app = Manoc::DataDumper::Script->new_with_options();
+my $app = App::Manoc::DataDumper::Script->new_with_options();
 $app->run();
 
 # Local Variables:

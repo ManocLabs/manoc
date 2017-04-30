@@ -5,15 +5,15 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
-package Manoc::DDLCreator;
+package App::Manoc::DDLCreator;
 use Moose;
 
 use SQL::Translator;
 use SQL::Translator::Diff;
 
-extends 'Manoc::Script';
+extends 'App::Manoc::Script';
 
 has 'comments' => (
     is       => 'rw',
@@ -131,7 +131,7 @@ sub create_ddl {
         show_warnings  => $self->show_warnings,
         add_drop_table => $self->add_drop_table,
         validate       => $self->validate,
-        parser_args    => { dbic_schema => 'Manoc::DB', },
+        parser_args    => { dbic_schema => 'App::Manoc::DB', },
     );
 
     $translator->parser('SQL::Translator::Parser::DBIx::Class');
@@ -149,5 +149,5 @@ no Moose;
 
 package main;
 
-my $app = Manoc::DDLCreator->new_with_options();
+my $app = App::Manoc::DDLCreator->new_with_options();
 $app->run;

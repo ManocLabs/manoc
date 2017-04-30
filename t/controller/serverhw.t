@@ -39,7 +39,7 @@ $mech->title_is('Manoc - Server Hardware S000001', "Server page");
 
 # add another asset just to complicate the scenario
 $schema->resultset('HWAsset')->create({
-    type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+    type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
     vendor     => 'IQ',
     model      => 'MegaPort 24',
     serial     => 'Test04',

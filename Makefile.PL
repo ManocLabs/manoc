@@ -1,7 +1,7 @@
 use inc::Module::Install;
-name     'Manoc';
+name     'App-Manoc';
 license  'Perl_5';
-all_from 'lib/Manoc.pm';
+all_from 'lib/App/Manoc.pm';
 author 'Gabriele Mambrini <g.mambrini@gmail.com>';
 
 install_share 'root';

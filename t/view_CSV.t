@@ -3,6 +3,6 @@ use warnings;
 use Test::More;
 
 
-BEGIN { use_ok 'Manoc::View::CSV' }
+BEGIN { use_ok 'App::Manoc::View::CSV' }
 
 done_testing();

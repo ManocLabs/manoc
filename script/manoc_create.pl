@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run( 'Manoc', 'Create' );
+Catalyst::ScriptRunner->run( 'App::Manoc', 'Create' );
 
 1;
 

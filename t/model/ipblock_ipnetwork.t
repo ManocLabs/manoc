@@ -16,8 +16,8 @@ ok($schema, "Create schema");
 
 # prepare some ipblocks to be used later
 my $block01 = $schema->resultset("IPBlock")->create({
-    from_addr => Manoc::IPAddress::IPv4->new('192.168.1.0'),
-    to_addr   => Manoc::IPAddress::IPv4->new('192.168.1.100'),
+    from_addr => App::Manoc::IPAddress::IPv4->new('192.168.1.0'),
+    to_addr   => App::Manoc::IPAddress::IPv4->new('192.168.1.100'),
     name      => 'Block01'
 });
 ok($block01, "Created block 192.168.1.10-100");
@@ -29,15 +29,15 @@ cmp_ok($block01->to_addr->padded, 'eq', '192.168.001.100',
 
 # prepare some ipblocks to be used later
 my $block02 = $schema->resultset("IPBlock")->create({
-    from_addr => Manoc::IPAddress::IPv4->new('192.168.1.50'),
-    to_addr   => Manoc::IPAddress::IPv4->new('192.168.1.100'),
+    from_addr => App::Manoc::IPAddress::IPv4->new('192.168.1.50'),
+    to_addr   => App::Manoc::IPAddress::IPv4->new('192.168.1.100'),
     name      => 'Block02'
 });
 ok($block02, "Created block 192.168.2.0-100");
 
 
 my $net01 = $schema->resultset("IPNetwork")->create({
-    address => Manoc::IPAddress::IPv4->new('192.168.1.0'),
+    address => App::Manoc::IPAddress::IPv4->new('192.168.1.0'),
     prefix  => '24',
     name    => 'Net01'
 });
@@ -47,7 +47,7 @@ cmp_ok($net01->broadcast->padded, 'eq', '192.168.001.255',
    "Check broadcast address in new network");
 
 my $net02 = $schema->resultset("IPNetwork")->create({
-    network => Manoc::IPAddress::IPv4Network->new('192.168.1.0', 25),
+    network => App::Manoc::IPAddress::IPv4Network->new('192.168.1.0', 25),
     name    => 'Net02',
 });
 ok ($net02, "Created 192.168.1.0/25 using network object");
@@ -55,7 +55,7 @@ ok ($net02, "Created 192.168.1.0/25 using network object");
 cmp_ok($net02->parent->id, '==', $net01->id, "192.168.1.0/25 parent is 192.168.1.0/24");
 
 my $net03 = $schema->resultset("IPNetwork")->create({
-    network => Manoc::IPAddress::IPv4Network->new('192.168.1.0', 26),
+    network => App::Manoc::IPAddress::IPv4Network->new('192.168.1.0', 26),
     name    => 'Net03',
 });
 ok ($net02, "Created 192.168.1.0/26 using network object");
@@ -67,7 +67,7 @@ cmp_ok(
 );
 
 my $net02b = $schema->resultset("IPNetwork")->create({
-    network => Manoc::IPAddress::IPv4Network->new('192.168.1.128', 25),
+    network => App::Manoc::IPAddress::IPv4Network->new('192.168.1.128', 25),
     name    => 'Net02b',
 });
 

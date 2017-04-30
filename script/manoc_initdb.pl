@@ -3,20 +3,20 @@
 use strict;
 use warnings;
 
-package Manoc::Script::InitDB;
+package App::Manoc::Script::InitDB;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
 use Moose;
-use Manoc::Logger;
-use Manoc::IPAddress::IPv4;
+use App::Manoc::Logger;
+use App::Manoc::IPAddress::IPv4;
 
-use Manoc::CatalystRole::Permission;
+use App::Manoc::CatalystRole::Permission;
 use Catalyst::Utils;
 
-extends 'Manoc::Script';
+extends 'App::Manoc::Script';
 with 'MooseX::Getopt::Dashes';
 
 has 'reset_admin' => (
@@ -39,7 +39,7 @@ sub run {
     $self->log->info('Creating admin user.');
     $self->schema->init_admin;
     $self->log->info('Creating roles.');
-    my $conf_roles = $self->config->{'Manoc::Permission'}->{roles};
+    my $conf_roles = $self->config->{'App::Manoc::Permission'}->{roles};
     $self->schema->init_roles($conf_roles);
     $self->log->info('Creating vlan.');
     $self->schema->init_vlan;
@@ -53,7 +53,7 @@ no Moose;
 
 package main;
 
-my $app = Manoc::Script::InitDB->new_with_options();
+my $app = App::Manoc::Script::InitDB->new_with_options();
 $app->run();
 
 # Local Variables:

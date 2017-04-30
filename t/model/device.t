@@ -27,8 +27,8 @@ ok($device, "Create device");
 # get defaults from DB
 $device->discard_changes;
 
-cmp_ok(ref($device->mng_address), 'eq', 'Manoc::IPAddress::IPv4',
-       "Check mng_address is a Manoc::IPAddress::IPv4" );
+cmp_ok(ref($device->mng_address), 'eq', 'App::Manoc::IPAddress::IPv4',
+       "Check mng_address is a App::Manoc::IPAddress::IPv4" );
 
 ok(!$device->decommissioned, "New devices are marked as not decommisioned");
 
