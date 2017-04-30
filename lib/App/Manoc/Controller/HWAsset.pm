@@ -1,9 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::HWAsset;
+#ABSTRACT: HWAsset controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -17,16 +17,6 @@ with 'App::Manoc::ControllerRole::ResultSet',
 
 use App::Manoc::DB::Result::HWAsset;
 use App::Manoc::Form::HWAsset;
-
-=head1 NAME
-
-App::Manoc::Controller::HWAsset - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -165,7 +155,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-=haed2 delete
+=head2 delete
 
 =cut
 
@@ -338,7 +328,8 @@ sub datatable_search_cb {
     my $status = $c->request->param('search_status');
     if ( defined($status) ) {
         $status eq 'd' and
-            $extra_filter->{location} = App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
+            $extra_filter->{location} =
+            App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
         $status eq 'w' and
             $extra_filter->{location} = App::Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE;
         $status eq 'u' and
@@ -394,17 +385,6 @@ sub unused_devices_js : Chained('base') : PathPart('js/device/unused') {
     $c->stash( object_list => [ $rs->unused_devices->all() ] );
     $c->detach('/hwasset/list_js');
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

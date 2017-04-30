@@ -1,14 +1,13 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::Login;
-use utf8;
+
 use HTML::FormHandler::Moose;
 
+##VERSION
+
+use namespace::autoclean;
+
 extends 'HTML::FormHandler';
-with 'App::Manoc::Form::TraitFor::Theme';
-with 'App::Manoc::Form::TraitFor::CSRF';
+with 'App::Manoc::Form::TraitFor::Theme', 'App::Manoc::Form::TraitFor::CSRF';
 
 has '+name' => ( default => 'login_form' );
 

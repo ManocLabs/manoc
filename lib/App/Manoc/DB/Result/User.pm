@@ -1,13 +1,12 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::User;
-
-use parent 'App::Manoc::DB::Result';
+#ABSTRACT: A model object representing a person with access to the system.
 
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 use Digest::MD5 qw(md5_base64);    # for old password
 use Try::Tiny;
@@ -97,11 +96,6 @@ sub roleset {
 sub roles {
     return join( ",", keys( %{ shift->roleset } ) );
 }
-
-=head1 NAME
-
-Manoc:DB::User - A model object representing a person with access to
-the system.
 
 =head1 DESCRIPTION
 

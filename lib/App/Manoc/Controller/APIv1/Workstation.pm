@@ -1,24 +1,18 @@
-# Copyright 2017 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::APIv1::Workstation;
+#ABSTRACT: Controller for DHCP APIs
+
 use Moose;
+##VERSION
+
 use namespace::autoclean;
-
-=head1 NAME
-
-App::Manoc::Controller::APIv1::DHCP - Catalyst Controller for DHCP APIs
-
-=head1 DESCRIPTION
-
-Catalyst Controller for implementing DHCP related web APIs.
-
-=cut
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
 =head1 METHODS
+
+=cut
+
+=head2 workstation_base
 
 =cut
 
@@ -66,17 +60,6 @@ sub workstation_post : Chained('workstation_base') PathPart('') POST {
 
     $c->stash( api_response_data => $data );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

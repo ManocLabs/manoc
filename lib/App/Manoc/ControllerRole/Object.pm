@@ -1,12 +1,12 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ControllerRole::Object;
+#ABSTRACT: Role for controllers accessing a result row
 
 use Moose::Role;
-use MooseX::MethodAttributes::Role;
+
+##VERSION
 use namespace::autoclean;
+
+use MooseX::MethodAttributes::Role;
 
 requires 'base';
 
@@ -16,15 +16,10 @@ has find_object_options => (
     default => sub { {} }
 );
 
-=head1 NAME
-
-App::Manoc::ControllerRole::Object - Role for controllers accessing a resultrow
-
 =head1 DESCRIPTION
 
 This is a base role for all Manoc controllers which manage a row from
 a resultset.
-
 
 =head1 SYNPOSYS
 

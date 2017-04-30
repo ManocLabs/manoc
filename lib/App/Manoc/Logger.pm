@@ -1,13 +1,10 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Logger;
-# just a tiny wrapper around Log4perl
+##ABSTRACT:  just a tiny wrapper around Log4perl
 
 use strict;
 use warnings;
+
+##VERSION
 
 use Carp;
 

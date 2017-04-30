@@ -1,16 +1,12 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ControllerRole::JQDatatable;
+#ABSTRACT: Support for DataTables Table jQuery
 
 use Moose::Role;
+
+##VERSION
+
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
-
-=head1 NAME
-
-App::Manoc::ControllerRole::JQDatatable - Support for DataTables Table jQuery
 
 =head1 DESCRIPTION
 

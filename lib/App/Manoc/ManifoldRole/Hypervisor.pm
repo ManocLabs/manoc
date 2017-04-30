@@ -1,9 +1,7 @@
-# Copyright 2017- by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ManifoldRole::Hypervisor;
 use Moose::Role;
+
+##VERSION
 
 # expected map:
 #  - uuid

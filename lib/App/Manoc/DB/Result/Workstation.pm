@@ -1,11 +1,9 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::Workstation;
 
 use strict;
 use warnings;
+
+##VERSION
 
 use parent 'App::Manoc::DB::Result';
 
@@ -168,17 +166,6 @@ sub restore {
 =cut
 
 sub label { shift->hostname }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
 # Local Variables:

@@ -2,6 +2,8 @@ package App::Manoc::Form::DHCPSharedNetwork;
 
 use HTML::FormHandler::Moose;
 
+##VERSION
+
 use namespace::autoclean;
 
 extends 'App::Manoc::Form::Base';

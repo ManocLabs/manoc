@@ -1,11 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::InflateColumn::IPv4;
+#ABSTRACT: Inflator for IP v4 addresses
 
 use strict;
 use warnings;
+
+##VERSION
 
 use parent 'DBIx::Class';
 
@@ -36,10 +35,6 @@ sub deflate_ipv4_column {
     return $value->padded if defined($value);
 }
 
-=head1 NAME
-
-DBIx::Class::InflateColumn::Serializer - Inflator for IP v4 addresses
-
 =head1 SYNOPSIS
 
   package App::Manoc::DB::Result::Table;
@@ -58,3 +53,9 @@ DBIx::Class::InflateColumn::Serializer - Inflator for IP v4 addresses
 =cut
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

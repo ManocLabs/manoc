@@ -1,13 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::TraitFor::Horizontal;
+#ABSTRACT: Role for Manoc horizontal forms
+
 use HTML::FormHandler::Moose::Role;
 
-=head1 NAME
-
-App::Manoc::Form::TraitFor::Horizontal - Role for Manoc horizontal forms
+##VERSION
 
 =head1 DESCRIPTION
 

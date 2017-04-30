@@ -1,11 +1,8 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Netwalker::Poller::ServerTask;
 
 use Moose;
+##VERSION
+
 use Try::Tiny;
 
 with
@@ -14,7 +11,6 @@ with
 
 use App::Manoc::Netwalker::Poller::TaskReport;
 use App::Manoc::Manifold;
-
 use App::Manoc::IPAddress::IPv4;
 
 has 'server_id' => (
@@ -88,7 +84,7 @@ sub _create_manifold {
     catch {
         my $error = "Internal error while creating manifold $manifold_name: $_";
         $self->log->debug($error);
-        return undef;
+        return;
     };
 
     $manifold or $self->log->debug("Manifold constructor returned undef");
@@ -118,7 +114,7 @@ sub _build_source {
         my $error = "Cannot create source with manifold $manifold_name";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
 
     # auto connect
@@ -126,7 +122,7 @@ sub _build_source {
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
     return $source;
 }
@@ -134,7 +130,7 @@ sub _build_source {
 sub _build_task_report {
     my $self = shift;
 
-    $self->server_entry or return undef;
+    $self->server_entry or return;
     my $server_address = $self->server_entry->address->address;
     return App::Manoc::Netwalker::Poller::TaskReport->new( host => $server_address );
 }
@@ -152,14 +148,14 @@ sub update {
     my $entry = $self->server_entry;
     unless ($entry) {
         $self->log->error( "Cannot find server id ", $self->server_id );
-        return undef;
+        return;
     }
 
     # load netwalker info from DB
     my $nwinfo = $self->nwinfo;
     unless ($nwinfo) {
         $self->log->error( "No netwalker info for server", $entry->hostname );
-        return undef;
+        return;
     }
 
     # try to connect and update nwinfo accordingly
@@ -168,7 +164,7 @@ sub update {
         $self->reschedule_on_failure;
         $nwinfo->offline(1);
         $nwinfo->update();
-        return undef;
+        return;
     }
 
     $self->update_server_info;
@@ -255,8 +251,7 @@ sub update_vm {
     return unless defined($uuid);
 
     # nothing to change
-    defined($vm) && defined( $vm->identifier ) &&
-        lc($uuid) eq lc( $vm->identifier ) and
+    defined($vm) && defined( $vm->identifier ) && lc($uuid) eq lc( $vm->identifier ) and
         return;
 
     if ( defined($vm) && !defined( $vm->identifier ) ) {
@@ -350,16 +345,16 @@ sub fetch_virtual_machines {
         }
 
         # search for uuid among detached vms
-        if (!$vm) {
+        if ( !$vm ) {
             $self->log->debug("Searching detached vm with $uuid.");
             my @detached_vms = $self->schema->resultset('VirtualMachine')->search(
                 {
-                    identifier => $uuid,
+                    identifier    => $uuid,
                     hypervisor_id => undef,
-                    virtinfr_id=>undef
+                    virtinfr_id   => undef
                 }
             );
-            if ( @detached_vms == 1) {
+            if ( @detached_vms == 1 ) {
                 $vm = $detached_vms[0];
                 $self->log->info("Reclaimed detached vm $uuid.");
                 $vm->hypervisor($server);
@@ -367,7 +362,7 @@ sub fetch_virtual_machines {
         }
 
         # create a new vm
-        if (!$vm) {
+        if ( !$vm ) {
             $self->log->info("Creating new vm $uuid.");
 
             $vm = $self->schema->resultset('VirtualMachine')->new_result( {} );

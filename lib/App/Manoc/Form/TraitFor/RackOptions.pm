@@ -1,13 +1,9 @@
-# Copyright 2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::TraitFor::RackOptions;
+#ABSTRACT: Role for populating rack selections
+
 use HTML::FormHandler::Moose::Role;
 
-=head1 NAME
-
-App::Manoc::Form::TraitFor::RackOptions - Role for populating rack selections
+##VERSION
 
 =head1 METHDOS
 
@@ -35,17 +31,6 @@ sub get_rack_options {
         },
         $racks->all();
 }
-
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 no HTML::FormHandler::Moose::Role;
 

@@ -1,27 +1,16 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::DiscoverSession;
+#ABSTRACT: DiscoverSession - Catalyst Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Form::DiscoverSession;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "App::Manoc::ControllerRole::CommonCRUD" => { -exclude => qw/update/ };
-
-=head1 NAME
-
-App::Manoc::Controller::DiscoverSession - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=head1 METHODS
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -119,17 +108,6 @@ sub command : Chained('base') : PathPart('command') : POST {
     $c->stash( json_data => $result );
     $c->forward('View::JSON');
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

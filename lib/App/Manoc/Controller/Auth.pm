@@ -1,22 +1,14 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Auth;
+#ABSTRACT: Auth Catalyst Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 use App::Manoc::Form::Login;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-App::Manoc::Controller::Auth - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
 
 =head1 METHODS
 
@@ -72,17 +64,6 @@ sub logout : Local : CaptureArgs(0) {
     $c->delete_session();
     $c->response->redirect( $c->uri_for('/auth/login') );
 }
-
-=head1 AUTHOR
-
-Rigo
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

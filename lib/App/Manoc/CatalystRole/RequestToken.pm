@@ -1,10 +1,8 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::CatalystRole::RequestToken;
-
 use Moose::Role;
+
+##VERSION
+
 use namespace::autoclean;
 
 use Digest::SHA1;

@@ -1,16 +1,14 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::Rack;
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
 
+##VERSION
+
 extends 'App::Manoc::Form::Base';
-with 'App::Manoc::Form::TraitFor::Horizontal';
-with 'App::Manoc::Form::TraitFor::SaveButton';
+
+with
+    'App::Manoc::Form::TraitFor::Horizontal',
+    'App::Manoc::Form::TraitFor::SaveButton';
 
 has '+name'        => ( default => 'form-rack' );
 has '+html_prefix' => ( default => 1 );
@@ -69,17 +67,6 @@ sub options_building {
     }
     return @selections;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

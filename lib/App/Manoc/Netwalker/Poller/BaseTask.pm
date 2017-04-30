@@ -1,11 +1,7 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Netwalker::Poller::BaseTask;
 
 use Moose::Role;
+##VERSION
 
 has 'schema' => (
     is       => 'ro',
@@ -18,7 +14,6 @@ has 'config' => (
     isa      => 'App::Manoc::Netwalker::Config',
     required => 1
 );
-
 
 has 'credentials' => (
     is      => 'ro',
@@ -48,7 +43,6 @@ sub _build_refresh_interval {
     shift->config->refresh_interval;
 }
 
-
 has 'timestamp' => (
     is      => 'ro',
     isa     => 'Int',
@@ -56,24 +50,25 @@ has 'timestamp' => (
 );
 
 sub reschedule_on_failure {
-    my $self = shift;
+    my $self   = shift;
     my $nwinfo = $self->nwinfo;
 
     my $backoff;
 
-    if ($nwinfo->attempt_backoff) {
+    if ( $nwinfo->attempt_backoff ) {
         $backoff = $nwinfo->attempt_backoff * 2;
-    } else {
+    }
+    else {
         $backoff = $self->config->min_backoff_time;
     }
     $nwinfo->attempt_backoff($backoff);
 
     my $next_attempt = $self->timestamp + $backoff;
-    $nwinfo->scheduled_attempt( $next_attempt );
+    $nwinfo->scheduled_attempt($next_attempt);
 }
 
 sub reschedule_on_success {
-    my $self = shift;
+    my $self   = shift;
     my $nwinfo = $self->nwinfo;
 
     $nwinfo->attempt_backoff(0);

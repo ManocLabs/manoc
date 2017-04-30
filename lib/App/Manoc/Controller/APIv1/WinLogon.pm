@@ -1,20 +1,11 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::APIv1::WinLogon;
+#ABSTRACT: Controller for WinLogon APIs
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
-
-=head1 NAME
-
-App::Manoc::Controller::APIv1::WinLogon - Catalyst Controller for WinLogon APIs
-
-=head1 DESCRIPTION
-
-Catalyst Controller for implementing WinLogon related web APIs.
-
-=cut
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
@@ -79,17 +70,6 @@ sub winlogon_post : Chained('winlogon_base') PathPart('') Args(0) POST {
     my $data = { message => "entry registered", };
     $c->stash( api_response_data => $data );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

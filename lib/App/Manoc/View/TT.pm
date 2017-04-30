@@ -1,11 +1,9 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::View::TT;
 
 use strict;
 use warnings;
+
+##VERSION
 
 use base 'Catalyst::View::TT';
 
@@ -15,8 +13,8 @@ __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     INCLUDE_PATH       => [
         App::Manoc->path_to( 'root', 'src' ),
-        App::Manoc->path_to( 'root', 'src',   'include' ),
-        App::Manoc->path_to( 'root', 'src',   'pages' ),
+        App::Manoc->path_to( 'root', 'src', 'include' ),
+        App::Manoc->path_to( 'root', 'src', 'pages' ),
     ],
     PRE_PROCESS => 'init.tt',
     WRAPPER     => 'wrapper.tt',
@@ -34,16 +32,7 @@ TT View for Manoc.
 
 =head1 SEE ALSO
 
-L<Manoc>
-
-=head1 AUTHOR
-
-gabriele
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<App::Manoc>
 
 =cut
 

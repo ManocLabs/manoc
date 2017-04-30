@@ -1,15 +1,12 @@
 package App::Manoc::Script;
-
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 use Moose;
+
+##VERSION
+
 with 'MooseX::Getopt::Dashes';
 with 'App::Manoc::Logger::Role';
 
-use Config::JFDI;
+use Config::ZOMG;
 use Cwd;
 use FindBin;
 use File::Spec::Functions;
@@ -54,7 +51,7 @@ sub _build_config {
     my $config;
 
     if ( $ENV{MANOC_CONF} ) {
-        $config = Config::JFDI->open( file => $ENV{MANOC_CONF}, );
+        $config = Config::ZOMG->open( file => $ENV{MANOC_CONF}, );
         my $path = catdir( $ENV{MANOC_CONF}, updir() );
         $self->manoc_config_dir($path);
     }
@@ -62,7 +59,7 @@ sub _build_config {
         my @config_paths = ( catdir( $FindBin::Bin, updir() ), '/etc/manoc', );
 
         foreach my $path (@config_paths) {
-            $config = Config::JFDI->open(
+            $config = Config::ZOMG->open(
                 path => $path,
                 name => 'manoc',
             );

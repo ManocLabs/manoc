@@ -1,20 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::APIv1::DHCPReservation;
+#ABSTRACT: Catalyst Controller for DHCP APIs
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
-
-=head1 NAME
-
-App::Manoc::Controller::APIv1::DHCP - Catalyst Controller for DHCP APIs
-
-=head1 DESCRIPTION
-
-Catalyst Controller for implementing DHCP related web APIs.
-
-=cut
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
@@ -70,7 +60,7 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
             $server->reservations->update( on_server => 0 );
 
             foreach my $r (@$records) {
-                my $macaddr = $r->{macaddr}                               or next;
+                my $macaddr = $r->{macaddr}                                    or next;
                 my $ipaddr  = App::Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
                 my $status  = $r->{server};
                 my $hostname = $r->{hostname};
@@ -94,17 +84,6 @@ sub reservation_post : Chained('reservation_base') PathPart('') POST {
 
     $c->stash( api_response_data => $data );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,14 +1,17 @@
 package App::Manoc::Form::HWAsset;
+
 use HTML::FormHandler::Moose;
 
-extends 'App::Manoc::Form::Base';
-with 'App::Manoc::Form::TraitFor::Horizontal';
-with 'App::Manoc::Form::TraitFor::SaveButton';
-with 'App::Manoc::Form::HWAsset::Location';
-
-use aliased 'App::Manoc::DB::Result::HWAsset' => 'DB::HWAsset';
+##VERSION
 
 use namespace::autoclean;
+
+extends 'App::Manoc::Form::Base';
+with 'App::Manoc::Form::TraitFor::Horizontal',
+    'App::Manoc::Form::TraitFor::SaveButton',
+    'App::Manoc::Form::HWAsset::Location';
+
+use aliased 'App::Manoc::DB::Result::HWAsset' => 'DB::HWAsset';
 
 has '+item_class'  => ( default => 'HWAsset' );
 has '+name'        => ( default => 'form-hwasset' );
@@ -93,8 +96,8 @@ override validate_model => sub {
         # when moving to warehouse check for in_use
         my $location_field = $self->field('location');
         if ( $item->in_storage &&
-                 $location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
-                 $item->in_use )
+            $location_field->value eq DB::HWAsset->LOCATION_WAREHOUSE &&
+            $item->in_use )
         {
             $location_field->("Asset is in use, cannot be moved to warehouse");
             $found_error++;

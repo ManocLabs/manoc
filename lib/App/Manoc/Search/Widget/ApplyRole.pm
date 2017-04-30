@@ -1,6 +1,9 @@
 package App::Manoc::Search::Widget::ApplyRole;
 
 use Moose::Role;
+
+##VERSION
+
 use Class::Load qw/ load_optional_class /;
 use namespace::autoclean;
 

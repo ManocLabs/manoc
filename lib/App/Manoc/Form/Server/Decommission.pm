@@ -1,12 +1,8 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::Server::Decommission;
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
+
+##VERSION
 
 extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::Theme';
@@ -24,30 +20,30 @@ has_field 'submit' => (
 );
 
 has_field 'serverhw_action' => (
-    label    => 'Action for associated hardware',
-    type     => 'Select',
-    widget   => 'RadioGroup',
-    options  => [
+    label   => 'Action for associated hardware',
+    type    => 'Select',
+    widget  => 'RadioGroup',
+    options => [
         { value => 'DECOMMISSION', label => 'Decommission' },
         { value => 'WAREHOUSE',    label => 'Return to warehouse' },
     ],
 );
 
 has_field 'vm_action' => (
-    label    => 'Action for associated virtual machine',
-    type     => 'Select',
-    widget   => 'RadioGroup',
-    options  => [
+    label   => 'Action for associated virtual machine',
+    type    => 'Select',
+    widget  => 'RadioGroup',
+    options => [
         { value => 'DECOMMISSION', label => 'Decommission' },
         { value => 'KEEP',         label => 'Deassociate' },
     ],
 );
 
 has_field 'hostedvm_action' => (
-    label    => 'Action for hosted virtual machine',
-    type     => 'Select',
-    widget   => 'RadioGroup',
-    options  => [
+    label   => 'Action for hosted virtual machine',
+    type    => 'Select',
+    widget  => 'RadioGroup',
+    options => [
         { value => 'KEEP',      label => 'Deassociate' },
         { value => 'RECURSIVE', label => 'Decommission VMs and servers' },
     ],
@@ -85,7 +81,7 @@ before update_fields => sub {
         $self->field('vm_action')->required(1);
 
     $server->virtual_machines->count and
-         $self->field('hostedvm_action')->required(1);
+        $self->field('hostedvm_action')->required(1);
 };
 
 sub update_model {
@@ -126,17 +122,6 @@ sub update_model {
         }
     );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

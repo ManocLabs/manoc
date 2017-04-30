@@ -1,9 +1,9 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Ip;
+#ABSTRACT: Ip controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 use App::Manoc::IPAddress::IPv4;
 use App::Manoc::Utils::IPAddress qw(check_addr);
@@ -12,14 +12,6 @@ use App::Manoc::Form::Ip;
 BEGIN { extends 'Catalyst::Controller'; }
 
 use strict;
-
-=head1 NAME
-
-App::Manoc::Controller::Ip - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -49,10 +41,9 @@ sub view : Chained('base') : PathPart('') : Args(0) {
 
     my $ipaddress = $c->stash->{ipaddress};
 
-    $c->stash(
-        devices =>
-            $c->model('ManocDB::Device')->search( { mng_address => $ipaddress->padded } )->first
-        );
+    $c->stash( devices =>
+            $c->model('ManocDB::Device')->search( { mng_address => $ipaddress->padded } )
+            ->first );
 
     $c->stash(
         ipblocks => [ $c->model('ManocDB::IPBlock')->including_address_ordered($ipaddress) ] );
@@ -67,17 +58,16 @@ sub view : Chained('base') : PathPart('') : Args(0) {
     $c->stash(
         servers => [
             $c->model('ManocDB::Server')->search(
-                { -or =>
-                      [
-                          { address => $ipaddress->padded },
-                          { 'addresses.ipaddr' => $ipaddress->padded },
-                      ]
-                  },
+                {
+                    -or => [
+                        { address            => $ipaddress->padded },
+                        { 'addresses.ipaddr' => $ipaddress->padded },
+                    ]
+                },
                 { join => 'addresses' }
             )
         ],
     );
-
 
     $c->stash(
         hostnames => [
@@ -162,17 +152,6 @@ sub delete : Chained('base') : PathPart('delete') : Args(0) {
         $c->stash( template => 'generic_delete.tt' );
     }
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,15 +1,13 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Manifold::SSH::Fortigate;
 
 use Moose;
-with 'App::Manoc::ManifoldRole::Base';
-with 'App::Manoc::ManifoldRole::NetDevice';
-with 'App::Manoc::ManifoldRole::FetchConfig';
-with 'App::Manoc::ManifoldRole::SSH';
+
+##VERSION
+
+with 'App::Manoc::ManifoldRole::Base',
+    'App::Manoc::ManifoldRole::NetDevice',
+    'App::Manoc::ManifoldRole::FetchConfig',
+    'App::Manoc::ManifoldRole::SSH';
 
 use Try::Tiny;
 use File::Temp qw/ tempfile  /;
@@ -79,7 +77,7 @@ sub _build_arp_table {
     }
     catch {
         $self->log->error( 'Error fetching arp table: ', $self->get_error );
-        return undef;
+        return;
     };
 
     # parse arp table

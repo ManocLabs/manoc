@@ -1,27 +1,18 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::VirtualMachine;
+#ABSTRACT: VirtualMachine controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
+
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD';
-with 'App::Manoc::ControllerRole::JSONView';
+with
+    'App::Manoc::ControllerRole::CommonCRUD',
+    'App::Manoc::ControllerRole::JSONView';
 
 use App::Manoc::Form::VirtualMachine;
-
-=head1 NAME
-
-App::Manoc::Controller::VirtualMachine - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -138,17 +129,6 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         template        => 'generic_confirm.tt',
     );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

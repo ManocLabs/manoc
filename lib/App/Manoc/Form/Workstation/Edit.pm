@@ -1,20 +1,17 @@
-# Copyright 2011-2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::Workstation::Edit;
 use HTML::FormHandler::Moose;
 
-extends 'App::Manoc::Form::Base';
+##VERSION
 
+use namespace::autoclean;
+
+extends 'App::Manoc::Form::Base';
 with
     'App::Manoc::Form::TraitFor::Horizontal',
     'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::IPAddr';
 
 use HTML::FormHandler::Types ('IPAddress');
-
-use namespace::autoclean;
 
 has '+item_class' => ( default => 'Workstation' );
 

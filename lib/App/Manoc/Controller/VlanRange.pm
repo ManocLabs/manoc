@@ -1,14 +1,15 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::VlanRange;
+#ABSTRACT: VlanRange controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD";
-with "App::Manoc::ControllerRole::JSONView";
+with
+    "App::Manoc::ControllerRole::CommonCRUD",
+    "App::Manoc::ControllerRole::JSONView";
 
 use App::Manoc::Form::VlanRange;
 use App::Manoc::Form::VlanRange::Merge;
@@ -29,14 +30,6 @@ __PACKAGE__->config(
     view_object_perm        => undef,
     json_columns            => [qw(id name description)],
 );
-
-=head1 NAME
-
-App::Manoc::Controller::VlanRange - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -103,7 +96,7 @@ sub delete_object {
 
     if ( $range->vlans->count() ) {
         $c->flash( error_msg => "There are vlans in vlan range '$name'. Cannot delete it." );
-        return undef;
+        return;
     }
 
     return $range->delete;
@@ -146,17 +139,6 @@ sub get_delete_failure_url {
 
     return $c->uri_for_action( $c->namespace . "/list" );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

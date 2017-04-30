@@ -1,14 +1,12 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Search::Result;
+
 use Moose;
+
+##VERSION
 
 use App::Manoc::Search::Item::IpAddr;
 use App::Manoc::Search::Item::MacAddr;
 use App::Manoc::Search::Item::WinLogon;
-
 use App::Manoc::Search::Widget::ApplyRole;
 
 has query => ( is => 'ro' );

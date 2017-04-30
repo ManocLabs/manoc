@@ -1,15 +1,15 @@
-# Copyright 2011-2014 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Device;
+#ABSTRACT: Device Controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD";
-with "App::Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
-with "App::Manoc::ControllerRole::CSVView";
+with "App::Manoc::ControllerRole::CommonCRUD",
+    "App::Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', },
+    "App::Manoc::ControllerRole::CSVView";
 
 use Text::Diff;
 
@@ -26,16 +26,6 @@ use App::Manoc::Netwalker::ControlClient;
 use Module::Load;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-App::Manoc::Controller::Device - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -460,7 +450,7 @@ sub delete_object {
     if ($has_related_info) {
         $c->flash(
             error_msg => "Device '$device' has some associated info and cannot be deleted." );
-        return undef;
+        return;
     }
 
     return $device->delete;
@@ -476,17 +466,6 @@ sub get_json_object {
     my $r = $self->prepare_json_object( $c, $device );
     $r->{rack} = $device->rack->id, return $r;
 }
-
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

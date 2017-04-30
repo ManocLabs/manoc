@@ -7,6 +7,9 @@ package App::Manoc::Manifold;
 
 use strict;
 use warnings;
+
+##VERSION
+
 use namespace::clean;
 use base qw(Class::Accessor::Grouped);
 use Carp qw(croak);

@@ -1,6 +1,8 @@
 package App::Manoc::Netwalker::Poller::Scoreboard;
 
 use Moose;
+##VERSION
+
 use Moose::Util::TypeConstraints;
 
 enum 'TaskStatus', [qw(DONE QUEUED RUNNING ERROR)];
@@ -10,7 +12,6 @@ has _status => (
     isa     => 'HashRef[HashRef[TaskStatus]]',
     default => sub { {} },
 );
-
 
 has _job => (
     is      => 'ro',
@@ -59,7 +60,7 @@ sub server_status_list { shift->_status->{server} }
 =cut
 
 sub get_job_info {
-    my ( $self, $job_id) = @_;
+    my ( $self, $job_id ) = @_;
 
     return $self->_job->{$job_id};
 }
@@ -69,17 +70,16 @@ sub get_job_info {
 =cut
 
 sub delete_job_info {
-    my ( $self, $job_id) = @_;
+    my ( $self, $job_id ) = @_;
 
     my $info = $self->_job->{$job_id};
 
     if ($info) {
-        my ($class, $id) = @$info;
+        my ( $class, $id ) = @$info;
         delete $self->_status->{$class}->{$id};
         delete $self->_job->{$job_id};
     }
 }
-
 
 # private methods
 

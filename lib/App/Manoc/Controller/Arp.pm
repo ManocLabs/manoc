@@ -1,9 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Arp;
+#ABSTRACT: Arp Catalyst Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -11,10 +12,6 @@ with 'App::Manoc::ControllerRole::ResultSet';
 with 'App::Manoc::ControllerRole::JQDatatable';
 
 use App::Manoc::Utils::Datetime qw/print_timestamp/;
-
-=head1 NAME
-
-App::Manoc::Controller::Arp - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -59,19 +56,6 @@ sub list_js : Private {
 
     $c->detach('datatable_response');
 }
-
-=encoding utf8
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

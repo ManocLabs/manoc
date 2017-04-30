@@ -1,13 +1,11 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::Device;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 __PACKAGE__->load_components(qw/+App::Manoc::DB::InflateColumn::IPv4/);
 
@@ -203,7 +201,7 @@ sub get_config_date {
     my $self = shift;
 
     my $config = $self->config;
-    $config or return undef;
+    $config or return;
     return $config->config_date;
 }
 
@@ -289,17 +287,6 @@ sub restore {
     $self->decommissioned(0);
     $self->decommission_ts(undef);
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
 # Local Variables:

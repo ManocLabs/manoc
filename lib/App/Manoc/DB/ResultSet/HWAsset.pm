@@ -1,11 +1,9 @@
-# Copyright 2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::ResultSet::HWAsset;
 
 use strict;
 use warnings;
+
+##VERSION
 
 use parent 'App::Manoc::DB::ResultSet';
 
@@ -28,9 +26,10 @@ sub unused_devices {
     my $me = $self->current_source_alias;
     my $rs = $self->search(
         {
-            "$me.type"     => App::Manoc::DB::Result::HWAsset::TYPE_DEVICE,
-            "$me.location" => { '!=' => App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
-            "$me.id"       => {
+            "$me.type" => App::Manoc::DB::Result::HWAsset::TYPE_DEVICE,
+            "$me.location" =>
+                { '!=' => App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
+            "$me.id" => {
                 -not_in => $used_asset_ids->as_query,
             }
         },

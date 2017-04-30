@@ -1,11 +1,9 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Netwalker::Discover::Task;
 
 use Moose;
+
+##VERSION
+
 with 'App::Manoc::Logger::Role';
 
 use Try::Tiny;
@@ -95,7 +93,7 @@ sub create_manifold {
     catch {
         my $error = "Internal error while creating manifold $manifold_name: $_";
         $self->log->debug($error);
-        return undef;
+        return;
     };
 
     $manifold or $self->log->debug("Manifold constructor returned undef");

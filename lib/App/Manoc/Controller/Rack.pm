@@ -1,15 +1,14 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::Rack;
+#ABSTRACT: Rack controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD';
-with "App::Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
+with
+    'App::Manoc::ControllerRole::CommonCRUD',
+    'App::Manoc::ControllerRole::JSONView' => { -excludes => 'get_json_object', };
 
 use App::Manoc::Form::Rack;
 
@@ -26,14 +25,6 @@ __PACKAGE__->config(
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
 );
-
-=head1 NAME
-
-App::Manoc::Controller::Rack - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -81,11 +72,11 @@ sub delete_object {
 
     if ( $rack->hwassets->count ) {
         $c->flash( error_msg => "Rack contains hardware assets. Cannot be deleted." );
-        return undef;
+        return;
     }
     if ( $rack->devices->count ) {
         $c->flash( error_msg => "Rack has associated devices. Cannot be deleted." );
-        return undef;
+        return;
     }
 
     return $rack->delete;
@@ -106,17 +97,6 @@ sub get_json_object {
     $r->{devices} = [ map +{ id => $_->id, name => $_->name }, $rack->devices ];
     return $r;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,15 +1,14 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Netwalker::ControlClient;
+
 use Moose;
+##VERSION
+
 use namespace::autoclean;
+
+with 'App::Manoc::Logger::Role';
 
 use IO::Socket;
 use Moose::Util::TypeConstraints;
-
-with 'App::Manoc::Logger::Role';
 
 has config => (
     is       => 'ro',
@@ -39,7 +38,7 @@ sub check_response {
 
     # something went wrong
     $self->status('connection_error');
-    return undef;
+    return;
 }
 
 sub _build_socket {
@@ -74,14 +73,14 @@ sub _build_socket {
     my $line = <$handle>;
     if ( !defined($line) ) {
         $self->log->error("Protocol error after connecting netwalker");
-        return undef;
+        return;
     }
 
     chomp($line);
     $self->log->debug("Hello from netwalker: $line");
     if ( !$self->check_response($line) ) {
         $self->log->error("Protocol error after connecting netwalker");
-        return undef;
+        return;
     }
 
     $self->status("connected");
@@ -92,7 +91,7 @@ sub enqueue_device {
     my ( $self, $id ) = @_;
 
     my $handle = $self->socket;
-    $handle or return undef;
+    $handle or return;
 
     $self->log->debug("Enqueue device $id");
     print $handle "ENQUEUE DEVICE $id\n";
@@ -106,7 +105,7 @@ sub enqueue_server {
     my ( $self, $id ) = @_;
 
     my $handle = $self->socket;
-    $handle or return undef;
+    $handle or return;
 
     $self->log->debug("Enqueue server $id");
     print $handle "ENQUEUE SERVER $id\n";

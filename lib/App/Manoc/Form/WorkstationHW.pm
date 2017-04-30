@@ -5,6 +5,10 @@
 package App::Manoc::Form::WorkstationHW;
 use HTML::FormHandler::Moose;
 
+##VERSION
+
+use namespace::autoclean;
+
 extends 'App::Manoc::Form::Base';
 with
     'App::Manoc::Form::TraitFor::Horizontal',
@@ -12,11 +16,8 @@ with
     'App::Manoc::Form::TraitFor::RackOptions',
     'App::Manoc::Form::HWAsset::Location';
 
-use namespace::autoclean;
-
-use App::Manoc::Form::Helper qw/bs_block_field_helper/;
-
 use App::Manoc::DB::Result::HWAsset;
+use App::Manoc::Form::Helper qw/bs_block_field_helper/;
 use App::Manoc::Form::Types ('MacAddress');
 
 has '+item_class'  => ( default => 'WorkstationHW' );

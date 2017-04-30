@@ -1,12 +1,12 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ControllerRole::ObjectForm;
 
 use Moose::Role;
-use MooseX::MethodAttributes::Role;
+
+##VERSION
+
 use namespace::autoclean;
+
+use MooseX::MethodAttributes::Role;
 
 with 'App::Manoc::ControllerRole::Object';
 

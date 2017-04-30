@@ -1,22 +1,15 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Interface;
+#ABSTRACT: Interface Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Form::IfNotes;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-App::Manoc::Controller::Interface - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -126,17 +119,6 @@ sub delete_notes : Chained('object') : PathPart('delete_notes') : Args(0) {
         $c->stash( template => 'generic_delete.tt' );
     }
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

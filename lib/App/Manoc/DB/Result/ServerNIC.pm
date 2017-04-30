@@ -1,17 +1,15 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::ServerNIC;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
 
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
+
 __PACKAGE__->table('server_nic');
 __PACKAGE__->add_columns(
-   id => {
+    id => {
         data_type         => 'int',
         is_nullable       => 0,
         is_auto_increment => 1,
@@ -33,7 +31,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->add_unique_constraint( ['serverhw_id', 'macaddr'] );
+__PACKAGE__->add_unique_constraint( [ 'serverhw_id', 'macaddr' ] );
 
 __PACKAGE__->belongs_to(
     serverhw => 'App::Manoc::DB::Result::ServerHW',

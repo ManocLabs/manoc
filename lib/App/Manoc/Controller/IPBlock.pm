@@ -1,31 +1,19 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::IPBlock;
+#ABSTRACT: IPBlock controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 
-with 'App::Manoc::ControllerRole::CommonCRUD';
-with 'App::Manoc::ControllerRole::ObjectForm';
-with 'App::Manoc::ControllerRole::JSONView';
+with
+    'App::Manoc::ControllerRole::CommonCRUD',
+    'App::Manoc::ControllerRole::ObjectForm',
+    'App::Manoc::ControllerRole::JSONView';
 
 use App::Manoc::Form::IPBlock;
-
 use App::Manoc::Utils::Datetime qw(str2seconds);
-
-=head1 NAME
-
-App::Manoc::Controller::IPBlock - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -116,17 +104,6 @@ sub ipblocks_js : Chained('base') : PathPart('js/ipblock/list') {
     $c->stash( object_list => [ $rs->search( {} )->all() ] );
     $c->detach('/ipblock/list_js');
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,15 +1,15 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::Warehouse;
+#ABSTRACT:T Warehouse controller
+
 use Moose;
+##VERSION
+
 use namespace::autoclean;
+
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD';
-with "App::Manoc::ControllerRole::JSONView";
+with
+    'App::Manoc::ControllerRole::CommonCRUD',
+    'App::Manoc::ControllerRole::JSONView';
 
 use App::Manoc::Form::Warehouse;
 
@@ -84,22 +84,11 @@ sub delete_object {
 
     if ( $warehouse->hwassets->count ) {
         $c->flash( error_msg => "Warehouse is not empty. Cannot be deleted." );
-        return undef;
+        return;
     }
 
     return $warehouse->delete;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

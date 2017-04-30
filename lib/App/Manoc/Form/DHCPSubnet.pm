@@ -2,11 +2,12 @@ package App::Manoc::Form::DHCPSubnet;
 
 use HTML::FormHandler::Moose;
 
+##VERSION
+
 use namespace::autoclean;
 
 extends 'App::Manoc::Form::Base';
-with 'App::Manoc::Form::TraitFor::SaveButton';
-with 'App::Manoc::Form::TraitFor::Horizontal';
+with 'App::Manoc::Form::TraitFor::SaveButton', 'App::Manoc::Form::TraitFor::Horizontal';
 
 use HTML::FormHandler::Types ('IPAddress');
 

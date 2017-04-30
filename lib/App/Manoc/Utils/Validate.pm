@@ -1,10 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Utils::Validate;
 use strict;
 use warnings;
+
+##VERSION
+
 use Carp 'croak';
 
 BEGIN {
@@ -211,17 +210,6 @@ sub _validate_hash {
 
     return { valid => scalar(@$errors) == 0 ? 1 : 0, errors => $errors };
 }
-
-=head1 AUTHOR
-
-Gabriele
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
 # Local Variables:

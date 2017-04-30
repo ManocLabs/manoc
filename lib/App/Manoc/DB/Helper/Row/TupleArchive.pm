@@ -1,20 +1,15 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Helper::Row::TupleArchive;
+#ABSTRACT:  Tuple archive support
 
 use strict;
 use warnings;
+
+##VERSION
 
 use Carp 'croak';
 use parent 'DBIx::Class';
 
 __PACKAGE__->mk_group_accessors( inherited => '_tuple_archive_columns' );
-
-=head1 NAME
-
-App::Manoc::DB::Helper::Row::TupleArchive -  Tuple archive support
 
 =head1 DESCRIPTION
 
@@ -36,7 +31,7 @@ Define tuple columns for L<App::Manoc::DB::Helper::ResultSet::TupleArchive>
 
  __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
 
-=head METHODS
+=head1 METHODS
 
 =head2  set_tuple_archive_columns(@column_names)
 
@@ -102,18 +97,6 @@ sub tuple_archive_columns {
 }
 
 1;
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
 # Local Variables:
 # mode: cperl
 # indent-tabs-mode: nil

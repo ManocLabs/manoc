@@ -1,9 +1,10 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::User;
+#ABSTRACT: User controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -13,16 +14,6 @@ use App::Manoc::Form::User::Create;
 use App::Manoc::Form::User::Edit;
 use App::Manoc::Form::User::ChangePassword;
 use App::Manoc::Form::User::SetPassword;
-
-=head1 NAME
-
-App::Manoc::Controller::User - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -92,17 +83,6 @@ sub change_password : Chained('base') : PathPart('password') : Args(0) {
         params => $c->req->parameters,
     );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

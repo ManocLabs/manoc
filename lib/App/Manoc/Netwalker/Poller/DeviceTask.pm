@@ -1,19 +1,12 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Netwalker::Poller::DeviceTask;
 
 use Moose;
+##VERSION
+with 'App::Manoc::Netwalker::Poller::BaseTask', 'App::Manoc::Logger::Role';
+
 use Try::Tiny;
-
-with 'App::Manoc::Netwalker::Poller::BaseTask',
-    'App::Manoc::Logger::Role';
-
 use App::Manoc::Netwalker::Poller::TaskReport;
 use App::Manoc::Manifold;
-
 use App::Manoc::IPAddress::IPv4;
 
 has 'device_id' => (
@@ -138,7 +131,7 @@ sub _create_manifold {
     catch {
         my $error = "Internal error while creating manifold $manifold_name: $_";
         $self->log->debug($error);
-        return undef;
+        return;
     };
 
     $manifold or $self->log->debug("Manifold constructor returned undef");
@@ -169,7 +162,7 @@ sub _build_config_source {
         my $error = "Cannot create config source with manifold $manifold_name";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
 
     # auto connect
@@ -177,7 +170,7 @@ sub _build_config_source {
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
     return $source;
 }
@@ -207,7 +200,7 @@ sub _build_source {
         my $error = "Cannot create source with manifold $manifold_name";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
 
     # auto connect
@@ -215,7 +208,7 @@ sub _build_source {
         my $error = "Cannot connect to $host";
         $self->log->error($error);
         $self->task_report->add_error($error);
-        return undef;
+        return;
     }
     return $source;
 }
@@ -223,7 +216,7 @@ sub _build_source {
 sub _build_task_report {
     my $self = shift;
 
-    $self->device_entry or return undef;
+    $self->device_entry or return;
     my $device_address = $self->device_entry->mng_address->address;
     return App::Manoc::Netwalker::Poller::TaskReport->new( host => $device_address );
 }
@@ -274,14 +267,14 @@ sub update {
     my $entry = $self->device_entry;
     unless ($entry) {
         $self->log->error( "Cannot find device id ", $self->device_id );
-        return undef;
+        return;
     }
 
     # load netwalker info from DB
     my $nwinfo = $self->nwinfo;
     unless ($nwinfo) {
         $self->log->error( "No netwalker info for device", $entry->name );
-        return undef;
+        return;
     }
 
     # try to connect and update nwinfo accordingly
@@ -292,7 +285,7 @@ sub update {
         $self->reschedule_on_failure();
         $nwinfo->offline(1);
         $nwinfo->update();
-        return undef;
+        return;
     }
 
     $self->update_device_info;

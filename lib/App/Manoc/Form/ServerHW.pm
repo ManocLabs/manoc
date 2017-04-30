@@ -1,9 +1,10 @@
-# Copyright 2011-2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::ServerHW;
+
 use HTML::FormHandler::Moose;
+
+##VERSION
+
+use namespace::autoclean;
 
 extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::Horizontal',
@@ -11,13 +12,9 @@ with 'App::Manoc::Form::TraitFor::Horizontal',
     'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::IPAddr';
 
-use namespace::autoclean;
-
-use App::Manoc::Form::Types ('MacAddress');
 use HTML::FormHandler::Types ('IPAddress');
-
+use App::Manoc::Form::Types  ('MacAddress');
 use App::Manoc::DB::Result::HWAsset;
-
 
 has '+item_class'  => ( default => 'ServerHW' );
 has '+name'        => ( default => 'form-serverhw' );
@@ -42,12 +39,12 @@ has_block 'processor_block2' => (
 );
 
 has_field 'nics' => (
-    type    => 'Repeatable',
-    widget  => '+App::Manoc::Form::Widget::Repeatable',
+    type   => 'Repeatable',
+    widget => '+App::Manoc::Form::Widget::Repeatable',
 );
 
 has_field 'nics.id' => (
-    type => 'PrimaryKey',
+    type       => 'PrimaryKey',
     do_wrapper => 0,
 );
 
@@ -59,12 +56,11 @@ has_field 'nics.macaddr' => (
     },
 
     do_wrapper => 0,
-    tags => {
+    tags       => {
         before_element => '<div class="col-sm-6">',
-        after_element => '</div>'
+        after_element  => '</div>'
     }
 );
-
 
 sub build_render_list {
     my $self = shift;

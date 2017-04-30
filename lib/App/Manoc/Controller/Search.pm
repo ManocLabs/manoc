@@ -1,12 +1,10 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Search;
-use strict;
-use warnings;
+#ABSTRACT: Search controller
 
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Search::QueryType;
@@ -15,14 +13,6 @@ use App::Manoc::Search::Query;
 use App::Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-App::Manoc::Controller::Search - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -97,17 +87,12 @@ sub index : Path : Args(0) {
     $c->stash( search_types => \@search_types );
 }
 
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

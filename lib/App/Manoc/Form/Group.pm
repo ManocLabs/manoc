@@ -1,13 +1,12 @@
-# Copyright 2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Form::Group;
+
 use HTML::FormHandler::Moose;
-extends 'App::Manoc::Form::Base';
+
+##VERSION
+
 use namespace::autoclean;
 
+extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::SaveButton';
 
 has '+name'        => ( default => 'form-user' );

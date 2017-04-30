@@ -1,14 +1,11 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::DataDumper::Converter::v3;
-
 use Moose;
-use App::Manoc::Utils::IPAddress qw(padded_ipaddr netmask2prefix);
+
+##VERSION
 
 extends 'App::Manoc::DataDumper::Converter::Base';
+
+use App::Manoc::Utils::IPAddress qw(padded_ipaddr netmask2prefix);
 
 has 'device_id_map' => (
     isa     => 'HashRef',

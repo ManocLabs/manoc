@@ -1,25 +1,17 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::VTP;
+#ABSTRACT: VTP controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-with 'App::Manoc::ControllerRole::ResultSet';
-with 'App::Manoc::ControllerRole::ObjectList';
-
-=head1 NAME
-
-App::Manoc::Controller::VTP - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller for showing VTP entries.
-
-=cut
+with
+    'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectList';
 
 __PACKAGE__->config(
     # define PathPart
@@ -112,17 +104,12 @@ sub get_object_list {
     return \@objects;
 }
 
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
 __PACKAGE__->meta->make_immutable;
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:
