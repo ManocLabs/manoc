@@ -2,11 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok 'Manoc::Utils::IPAddress' };
+BEGIN { use_ok 'App::Manoc::Utils::IPAddress' };
 
-BEGIN { use_ok 'Manoc::IPAddress::IPv4' };
+BEGIN { use_ok 'App::Manoc::IPAddress::IPv4' };
 {
-    my $addr = Manoc::IPAddress::IPv4->new('10.1.100.1');
+    my $addr = App::Manoc::IPAddress::IPv4->new('10.1.100.1');
     ok( $addr, 'create IPv4 Object from unpadded address');
 
     # stringify
@@ -17,21 +17,21 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4' };
 
     # cmp overload
     cmp_ok( $addr eq '10.1.100.1', '==', 1, "operator eq string");
-    cmp_ok( $addr eq  Manoc::IPAddress::IPv4->new('10.1.100.1'),  '==', 1, "operator eq object");
+    cmp_ok( $addr eq  App::Manoc::IPAddress::IPv4->new('10.1.100.1'),  '==', 1, "operator eq object");
     cmp_ok( $addr gt '2.1.1.1', '==', 1, "operator lt string");
-    cmp_ok( $addr gt Manoc::IPAddress::IPv4->new('2.1.1.1'), '==', 1, "operator lt object");
+    cmp_ok( $addr gt App::Manoc::IPAddress::IPv4->new('2.1.1.1'), '==', 1, "operator lt object");
     cmp_ok( $addr lt '192.10.0.0', '==', 1, "operator lt string");
-    cmp_ok( $addr lt Manoc::IPAddress::IPv4->new('192.10.0.0'), '==', 1, "operator lt object");
+    cmp_ok( $addr lt App::Manoc::IPAddress::IPv4->new('192.10.0.0'), '==', 1, "operator lt object");
 
     # <=> overload
-    ok( $addr < Manoc::IPAddress::IPv4->new('192.10.0.0'), "operator < object");
-    ok( $addr > Manoc::IPAddress::IPv4->new('10.0.0.0'),  "operator > object");
+    ok( $addr < App::Manoc::IPAddress::IPv4->new('192.10.0.0'), "operator < object");
+    ok( $addr > App::Manoc::IPAddress::IPv4->new('10.0.0.0'),  "operator > object");
 
 }
 
-BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
+BEGIN { use_ok 'App::Manoc::IPAddress::IPv4Network' };
 {
-    my $net = Manoc::IPAddress::IPv4Network->new('192.168.1.0', '24');
+    my $net = App::Manoc::IPAddress::IPv4Network->new('192.168.1.0', '24');
     ok( $net, 'create IPv4 Network from address/prefix');
 
     cmp_ok( "$net", 'eq', '192.168.1.0/24', 'stringify');
@@ -45,14 +45,14 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
     cmp_ok( $net->last_host,  'eq', '192.168.1.254', 'last host');
     cmp_ok( $net->wildcard,   'eq', '0.0.0.255',     'wildcard');
 
-    ok( $net->contains_address( Manoc::IPAddress::IPv4->new('192.168.1.5'),
+    ok( $net->contains_address( App::Manoc::IPAddress::IPv4->new('192.168.1.5'),
                                 '192.168.1.0/24 contains 192.168.1.5') );
-    ok( ! $net->contains_address( Manoc::IPAddress::IPv4->new('192.168.0.5'),
+    ok( ! $net->contains_address( App::Manoc::IPAddress::IPv4->new('192.168.0.5'),
                                 '192.168.1.0/24 does not contain 192.168.0.5') );
 }
 
 {
-    my $net = Manoc::IPAddress::IPv4Network->new('10.10.0.0', '255.255.0.0');
+    my $net = App::Manoc::IPAddress::IPv4Network->new('10.10.0.0', '255.255.0.0');
     ok( $net, 'Create IPv4 Network from address/netmask');
 
     cmp_ok( "$net", 'eq', '10.10.0.0/16', 'stringify');
@@ -61,14 +61,14 @@ BEGIN { use_ok 'Manoc::IPAddress::IPv4Network' };
 
 
 {
-    my $net = Manoc::IPAddress::IPv4Network->new('10.10.0.0', '0');
+    my $net = App::Manoc::IPAddress::IPv4Network->new('10.10.0.0', '0');
     ok( $net, 'Create IPv4 Network with /0 prefix');
 
     cmp_ok( "$net", 'eq', '0.0.0.0/0', 'stringify');
 }
 
 {
-    my $net = Manoc::IPAddress::IPv4Network->new('1.2.3.4', '32');
+    my $net = App::Manoc::IPAddress::IPv4Network->new('1.2.3.4', '32');
     ok( $net, 'Create IPv4 Network with /32 prefix');
 
     cmp_ok( "$net", 'eq', '1.2.3.4/32', 'stringify');

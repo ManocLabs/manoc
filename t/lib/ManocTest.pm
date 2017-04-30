@@ -18,9 +18,9 @@ use File::Spec;
 
 use Test::More;
 
-use Manoc::DB;
+use App::Manoc::DB;
 our $ADMIN_USER = 'admin';
-our $ADMIN_PASS = $Manoc::DB::DEFAULT_ADMIN_PASSWORD;
+our $ADMIN_PASS = $App::Manoc::DB::DEFAULT_ADMIN_PASSWORD;
 
 sub init_manoctest {
 
@@ -48,7 +48,7 @@ sub get_mech {
         exit 0;
     }
 
-    ok( $Mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'Manoc' ),
+    ok( $Mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'App::Manoc' ),
         "Created mech object" );
 
     use Moose::Util qw( apply_all_roles );

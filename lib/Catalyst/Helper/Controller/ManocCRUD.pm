@@ -46,12 +46,12 @@ The Manoc Team
 =head1 SEE ALSO
 
 L<Catalyst::Controller>
-L<Manoc::Form::Base>
+L<App::Manoc::Form::Base>
 L<MAnoc::ControllerRole::CommonCRUD>
 
 =head1 CAVEATS
 
-Form class must be customized in order to use Manoc::Form::Base.
+Form class must be customized in order to use App::Manoc::Form::Base.
 
 =head1 LICENSE
 
@@ -65,8 +65,8 @@ sub mk_compclass {
     my $helper = shift;
     my @args   = @_;
 
-    my $schema_class = "Manoc::DB";
-    my $model_class  = "Manoc::Model::ManocDB";
+    my $schema_class = "App::Manoc::DB";
+    my $model_class  = "App::Manoc::Model::ManocDB";
 
     my $model_name       = $helper->{name};
     my $controller_class = "$helper->{app}::Controller::$model_name";
@@ -103,7 +103,7 @@ sub mk_compclass {
     my $form_generator = Catalyst::Helper::Controller::ManocCRUD::Form->new(
         schema       => $schema,
         rs_name      => $model_name,
-        class_prefix => 'Manoc::Form',
+        class_prefix => 'App::Manoc::Form',
         schema_name  => $schema_class,
         label        => 1,
     );
@@ -207,17 +207,17 @@ __controller__
 # it under the same terms as Perl itself.
 use strict;
 
-package Manoc::Controller::[% model %];
+package App::Manoc::Controller::[% model %];
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'Manoc::ControllerRole::CommonCRUD';
+with 'App::Manoc::ControllerRole::CommonCRUD';
 
-use Manoc::Form::[% model %];
+use App::Manoc::Form::[% model %];
 
 =head1 NAME
 
-Manoc::Controller::[% model %] - Catalyst Controller
+App::Manoc::Controller::[% model %] - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -233,7 +233,7 @@ __PACKAGE__->config(
         }
     },
     class      => 'ManocDB::[% model %]',
-    form_class => 'Manoc::Form::[% model %]',
+    form_class => 'App::Manoc::Form::[% model %]',
 );
 
 =head1 AUTHOR

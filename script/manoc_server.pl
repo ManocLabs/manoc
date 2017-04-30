@@ -5,7 +5,7 @@ BEGIN {
 }
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run( 'Manoc', 'Server' );
+Catalyst::ScriptRunner->run( 'App::Manoc', 'Server' );
 
 1;
 
@@ -57,4 +57,3 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

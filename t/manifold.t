@@ -3,16 +3,16 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    use Manoc::Logger;
-    Manoc::Logger->init();
+    use App::Manoc::Logger;
+    App::Manoc::Logger->init();
 
-    use_ok('Manoc::Manifold', 'load manifold registry');
+    use_ok('App::Manoc::Manifold', 'load manifold registry');
 };
 
-ok(Manoc::Manifold->load_namespace, 'load manifold names');
+ok(App::Manoc::Manifold->load_namespace, 'load manifold names');
 
 {
-    my %manifolds = map { $_ => 1 } Manoc::Manifold->manifolds;
+    my %manifolds = map { $_ => 1 } App::Manoc::Manifold->manifolds;
 
     ok($manifolds{'SNMP::Simple'}, 'SNMP Simple manifold found');
     ok($manifolds{'SNMP::Info'},   'SNMP Info manifold found');
@@ -21,8 +21,8 @@ ok(Manoc::Manifold->load_namespace, 'load manifold names');
     ok($manifolds{'SSH::Linux'},   'Fortinet SSH manifold found');
 }
 
-cmp_ok( Manoc::Manifold->name_mappings->{'SNMP::Info'}, 'eq',
-	    'Manoc::Manifold::SNMP::Info',
+cmp_ok( App::Manoc::Manifold->name_mappings->{'SNMP::Info'}, 'eq',
+	    'App::Manoc::Manifold::SNMP::Info',
 	    'Mapping name for SNMP manifold');
 
 
@@ -30,7 +30,7 @@ SKIP: {
     skip 'Net::Telnet::Cisco based tests', 1 unless
         eval { require 'Net::Telnet::Cisco' };
 
-    my $m = Manoc::Manifold->new_manifold('Telnet::IOS',
+    my $m = App::Manoc::Manifold->new_manifold('Telnet::IOS',
                                           credentials => {
                                               username => 'admin',
                                               password => 'test',
@@ -43,7 +43,7 @@ SKIP: {
     skip 'SNMP::Info based tests', 1 unless
         eval { require SNMP::Info };
 
-    my $m = Manoc::Manifold->new_manifold('SNMP::Info',
+    my $m = App::Manoc::Manifold->new_manifold('SNMP::Info',
                                           credentials => { snmp_community => 'public' },
                                           host => '127.0.0.1');
     ok($m, 'Create SNMP manifold');
@@ -59,7 +59,7 @@ SKIP: {
     my $host      = $ENV{MANOC_TEST_SNMP_HOST};
     my $community = $ENV{MANOC_TEST_SNMP_COMMUNITY} || 'public';
 
-    my $m = Manoc::Manifold->new_manifold('SNMP::Simple',
+    my $m = App::Manoc::Manifold->new_manifold('SNMP::Simple',
                                           credentials => { snmp_community => $community },
                                           host => $host );
     ok($m, 'Create SNMP manifold');

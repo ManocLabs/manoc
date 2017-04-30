@@ -3,36 +3,36 @@ use warnings;
 use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Utils::Datetime qw(str2seconds);
+use App::Manoc::Utils::Datetime qw(str2seconds);
 
-BEGIN { use_ok 'Manoc::Search::Query' }
+BEGIN { use_ok 'App::Manoc::Search::Query' }
 
 my ( $q, $s );
 
-ok( $q = Manoc::Search::Query->new( { search_string => 'test' } ), 'Object creation' );
+ok( $q = App::Manoc::Search::Query->new( { search_string => 'test' } ), 'Object creation' );
 
-$q = Manoc::Search::Query->new( { search_string => 'word' } );
+$q = App::Manoc::Search::Query->new( { search_string => 'word' } );
 $q->parse;
 ok( @{ $q->words() } == 1, 'Tokenizer one word' );
 
 $s = 'more than two words';
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse;
 ok( @{ $q->words() } == 4, 'Tokenizer four words' );
 
 $s = 'here "the words" "have been quoted" by "me"';
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse;
 ok( @{ $q->words() } == 5, 'Tokenizer quotes' );
 
 $s = 'rack 23';
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse;
 ok( @{ $q->words() } == 1 && $q->words()->[0] eq '23' && $q->query_type eq 'rack',
     'Rack shortcut' );
 
 $s = 'building "central palace"';
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse;
 ok(
     @{ $q->words() } == 1 &&
@@ -42,22 +42,22 @@ ok(
 );
 
 $s = "limit:5d and complex query";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok( @{ $q->words() } == 3 && $q->limit == str2seconds('5d'), 'Tokenizer limit keyword 1' );
 
 $s = "keyword limit:5d inside query";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok( @{ $q->words() } == 3 && $q->limit == str2seconds('5d'), 'Tokenizer limit keyword 2' );
 
 $s = "keyword limit 5d inside query";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok( @{ $q->words() } == 3 && $q->limit == str2seconds('5d'), 'Tokenizer limit keyword 3' );
 
 $s = "a 1.2.30.255/3 subnet";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -70,7 +70,7 @@ ok(
 );
 
 $s = "1.2.30.255/32 limit 5d";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -84,7 +84,7 @@ ok(
 );
 
 $s = "10.1.2.234";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -97,7 +97,7 @@ ok(
 );
 
 $s = "10.1.2.";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -110,7 +110,7 @@ ok(
 );
 
 $s = "00:50:56:C0:00:08";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -123,7 +123,7 @@ ok(
 );
 
 $s = "00-50-56-C0-00-08";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -136,7 +136,7 @@ ok(
 );
 
 $s = "0050.56C0.0008";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -149,7 +149,7 @@ ok(
 );
 
 $s = "0a:b8:";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -162,7 +162,7 @@ ok(
 );
 
 $s = ":00:08";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -175,7 +175,7 @@ ok(
 );
 
 $s = "subnet 172.16.100.0";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -188,7 +188,7 @@ ok(
 );
 
 $s = "23 type:rack";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
@@ -201,7 +201,7 @@ ok(
 );
 
 $s = "device \"172.18.19.4\"";
-$q = Manoc::Search::Query->new( { search_string => $s } );
+$q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (

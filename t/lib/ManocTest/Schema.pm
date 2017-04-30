@@ -2,7 +2,7 @@ package ManocTest::Schema;
 use strict;
 use warnings;
 
-use base qw( Manoc::DB );
+use base qw( App::Manoc::DB );
 
 =head1 NAME
 

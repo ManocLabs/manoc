@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run( 'Manoc', 'CGI' );
+Catalyst::ScriptRunner->run( 'App::Manoc', 'CGI' );
 
 1;
 
@@ -27,4 +27,3 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

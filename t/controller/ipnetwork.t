@@ -18,8 +18,8 @@ mech_login;
 # prepare some ipblocks to be used later
 
 $schema->resultset("IPBlock")->create({
-    from_addr => Manoc::IPAddress::IPv4->new('192.168.1.10'),
-    to_addr   => Manoc::IPAddress::IPv4->new('192.168.1.100'),
+    from_addr => App::Manoc::IPAddress::IPv4->new('192.168.1.10'),
+    to_addr   => App::Manoc::IPAddress::IPv4->new('192.168.1.100'),
     name      => 'Block01'
 });
 
@@ -124,7 +124,7 @@ $mech->text_contains('Net01', "Super network is listed");
 
 
 $schema->resultset("IPNetwork")->create({
-    address => Manoc::IPAddress::IPv4->new('192.168.1.0'),
+    address => App::Manoc::IPAddress::IPv4->new('192.168.1.0'),
     prefix  => '26',
     name    => 'Subnet02'
 });
@@ -142,7 +142,7 @@ $mech->text_contains('Subnet02', "Subsub network  listed in list");
 
 
 $schema->resultset("IPNetwork")->create({
-    address => Manoc::IPAddress::IPv4->new('192.168.2.0'),
+    address => App::Manoc::IPAddress::IPv4->new('192.168.2.0'),
     prefix  => '24',
     name    => 'Net02'
 });

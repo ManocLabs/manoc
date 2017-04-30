@@ -5,11 +5,11 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Manoc::Support;
+use App::Manoc::Support;
 
-use Manoc::Netwalker::Script;
+use App::Manoc::Netwalker::Script;
 
-my $app = Manoc::Netwalker::Script->new_with_options();
+my $app = App::Manoc::Netwalker::Script->new_with_options();
 $app->run();
 
 # Local Variables:

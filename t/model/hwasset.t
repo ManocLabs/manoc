@@ -14,7 +14,7 @@ my $rs = $schema->resultset("HWAsset");
 ok($rs, 'Resultset');
 
 my %fields = (
-    type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+    type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
     vendor     => 'Moon',
     model      => 'ShinyBlade',
 );
@@ -102,7 +102,7 @@ $hw->delete;
 $rs->populate(
     [
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
             vendor     => 'IQ',
             model      => 'MegaPort 48',
             serial     => 'Test01',
@@ -112,20 +112,20 @@ $rs->populate(
             },
         },
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
             vendor     => 'IQ',
             model      => 'MegaPort 48',
             serial     => 'Test02',
-            location   => Manoc::DB::Result::HWAsset->LOCATION_DECOMMISSIONED,
+            location   => App::Manoc::DB::Result::HWAsset->LOCATION_DECOMMISSIONED,
         },
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_SERVER,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_SERVER,
             vendor     => 'HAL',
             model      => 'MyServer',
             serial     => 'Test03',
         },
         {
-            type       => Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+            type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
             vendor     => 'IQ',
             model      => 'MegaPort 24',
             serial     => 'Test04',

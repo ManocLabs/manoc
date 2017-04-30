@@ -22,11 +22,11 @@ ok($wks, "Create workstation");
 # get defaults from DB
 $wks->discard_changes;
 
-cmp_ok(ref($wks->ethernet_static_ipaddr), 'eq', 'Manoc::IPAddress::IPv4',
-       "Check ethernet address is a Manoc::IPAddress::IPv4" );
+cmp_ok(ref($wks->ethernet_static_ipaddr), 'eq', 'App::Manoc::IPAddress::IPv4',
+       "Check ethernet address is a App::Manoc::IPAddress::IPv4" );
 
-cmp_ok(ref($wks->wireless_static_ipaddr), 'eq', 'Manoc::IPAddress::IPv4',
-       "Check wireless address is a Manoc::IPAddress::IPv4" );
+cmp_ok(ref($wks->wireless_static_ipaddr), 'eq', 'App::Manoc::IPAddress::IPv4',
+       "Check wireless address is a App::Manoc::IPAddress::IPv4" );
 
 ok(!$wks->decommissioned, "New devices are marked as not decommisioned");
 
