@@ -1,11 +1,9 @@
-# Copyright 2011-2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::ResultSet::WorkstationHW;
 
 use strict;
 use warnings;
+
+##VERSION
 
 use parent 'App::Manoc::DB::ResultSet';
 

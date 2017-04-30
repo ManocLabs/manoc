@@ -1,19 +1,17 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::IPNetwork;
 
 use HTML::FormHandler::Moose;
+
+##VERSION
+
+use namespace::autoclean;
+
 extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::Horizontal',
     'App::Manoc::Form::TraitFor::IPAddr';
 
-
-use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
-
 use App::Manoc::IPAddress::IPv4Network;
 use App::Manoc::IPAddress::IPv4;
 
@@ -36,11 +34,11 @@ has_block 'network_block' => (
 );
 
 has_field 'address' => (
-    apply      => [IPAddress],
-    size       => 15,
-    required   => 1,
-    label      => 'Address',
-    do_wrapper => 0,
+    apply          => [IPAddress],
+    size           => 15,
+    required       => 1,
+    label          => 'Address',
+    do_wrapper     => 0,
     inflate_method => \&inflate_ipv4,
 
     # we set wrapper=>0 so we don't have the inner div too!
@@ -131,7 +129,8 @@ override validate_model => sub {
     }
 
     if ( $values->{default_gw} && $values->{address} && $values->{prefix} ) {
-        my $net = App::Manoc::IPAddress::IPv4Network->new( $values->{address}, $values->{prefix} );
+        my $net =
+            App::Manoc::IPAddress::IPv4Network->new( $values->{address}, $values->{prefix} );
         my $gw = App::Manoc::IPAddress::IPv4->new( $values->{default_gw} );
         $net->contains_address($gw) or
             $self->field('default_gw')->add_error('Gateway outside network');

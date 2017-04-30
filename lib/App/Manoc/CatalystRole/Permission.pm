@@ -1,11 +1,10 @@
-# Copyright 2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::CatalystRole::Permission;
 
-use namespace::autoclean;
 use Moose::Role;
+
+##VERSION
+
+use namespace::autoclean;
 
 use Catalyst::Exception ();
 use Catalyst::Utils;

@@ -1,13 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::HWAsset;
-
-use parent 'App::Manoc::DB::Result';
-
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 use Carp;
 
@@ -161,13 +158,13 @@ __PACKAGE__->might_have(
 sub server {
     my $self = shift;
     $self->serverhw and return $self->serverhw->server;
-    return undef;
+    return;
 }
 
 sub workstation {
     my $self = shift;
     $self->workstationhw and return $self->workstationhw->workstation;
-    return undef;
+    return;
 }
 
 =head2 in_use

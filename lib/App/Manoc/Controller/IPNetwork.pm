@@ -1,11 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::IPNetwork;
+#ABSTRACT: IPNetwork controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN {
@@ -137,17 +136,6 @@ sub root : Chained('base') {
     )->all();
     $c->stash( networks => \@networks );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

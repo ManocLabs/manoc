@@ -1,10 +1,8 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Manifold::SSH::Linux;
 use Moose;
+
+##VERSION
+
 with 'App::Manoc::ManifoldRole::SSH',
     'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::Host',
@@ -237,7 +235,7 @@ sub _build_arp_table {
     }
     catch {
         $self->log->error( 'Error fetching arp table: ', $self->get_error );
-        return undef;
+        return;
     };
 
     # parse arp table
@@ -344,7 +342,7 @@ sub dmidecode {
     my ( $self, $keyword ) = @_;
     my @out = $self->root_cmd( "dmidecode", "-s", $keyword );
 
-    defined( $out[0] ) or return undef;
+    defined( $out[0] ) or return;
 
     my $ret = undef;
     foreach my $line (@out) {
@@ -352,7 +350,7 @@ sub dmidecode {
         chomp($line);
         return $line;
     }
-    return undef;
+    return;
 }
 
 sub root_cmd {
@@ -377,7 +375,7 @@ sub root_cmd {
             $self->log->debug( "using sudo: " . join( ' ', @cmd ) );
         }
         else {
-            return undef;
+            return;
         }
     }
 

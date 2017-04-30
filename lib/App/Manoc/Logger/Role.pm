@@ -1,13 +1,10 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Logger::Role;
 
-use 5.008;
 use Moose::Role;
-use Log::Log4perl;
 
+##VERSION
+
+use Log::Log4perl;
 use App::Manoc::Logger;
 
 has 'log' => (

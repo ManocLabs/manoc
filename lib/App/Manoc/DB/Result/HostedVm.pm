@@ -1,18 +1,16 @@
-# Copyright 2017- by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::HostedVm;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
 
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
+
 __PACKAGE__->load_components(
     qw/
         +App::Manoc::DB::Helper::Row::TupleArchive
-      /
+        /
 );
 
 __PACKAGE__->table('hosted_vm');

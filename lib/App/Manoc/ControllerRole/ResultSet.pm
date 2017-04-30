@@ -1,16 +1,16 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ControllerRole::ResultSet;
+#ABSTRACT:  Role for controllers accessing resultset
 
 use Moose::Role;
+
+##VERSION
+
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
 =head1 NAME
 
-App::Manoc::ControllerRole::ResultSet - Role for controllers accessing resultset
+App::Manoc::ControllerRole::ResultSet -
 
 =head1 DESCRIPTION
 

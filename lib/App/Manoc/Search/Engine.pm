@@ -1,10 +1,9 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Search::Engine;
 
 use Moose;
+
+##VERSION
+
 use Module::Pluggable::Object;
 
 use App::Manoc::Search;
@@ -39,7 +38,8 @@ sub BUILD {
 sub _find_drivers {
     my ($self) = @_;
 
-    my $locator = Module::Pluggable::Object->new( search_path => ['App::Manoc::Search::Driver'], );
+    my $locator =
+        Module::Pluggable::Object->new( search_path => ['App::Manoc::Search::Driver'], );
     foreach my $class ( $locator->plugins ) {
         $self->_load_driver($class);
     }

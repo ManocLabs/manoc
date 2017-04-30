@@ -1,23 +1,15 @@
-# Copyright 2011-2014 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Query;
+#ABSTRACT: Query controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 use App::Manoc::Utils qw(clean_string);
 use App::Manoc::Utils::Datetime qw(str2seconds);
 use App::Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-App::Manoc::Controller::Query - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller for showing predefined queries on Manoc DB.
 
 =head1 METHODS
 
@@ -406,17 +398,6 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
         template => 'query/new_devices.tt'
     );
 }
-
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

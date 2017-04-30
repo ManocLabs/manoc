@@ -1,13 +1,11 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::VirtualMachine;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 __PACKAGE__->table('virtual_machines');
 
@@ -97,28 +95,26 @@ __PACKAGE__->might_have(
 sub hypervisor {
     my ( $self, @args ) = @_;
 
-    if (my $hypervisor = $args[0]) {
+    if ( my $hypervisor = $args[0] ) {
         # use virtinfr_id instead of virtinfr to avoid loops
-        $self->virtinfr_id($hypervisor->virtinfr);
+        $self->virtinfr_id( $hypervisor->virtinfr );
     }
 
-    return $self->next::method( @args );
+    return $self->next::method(@args);
 }
 
 sub virtinfr {
     my ( $self, @args ) = @_;
 
-    if (my $virtinfr = $args[0]) {
-        if ($self->hypervisor && $self->hypervisor->virtinfr_id != $self->virtinfr_id ) {
+    if ( my $virtinfr = $args[0] ) {
+        if ( $self->hypervisor && $self->hypervisor->virtinfr_id != $self->virtinfr_id ) {
             # use hypervisor_id instead of hypervisor to avoid loops
             $self->hypervisor_id(undef);
         }
     }
 
-    return $self->next::method( @args );
+    return $self->next::method(@args);
 }
-
-
 
 =head2 label
 

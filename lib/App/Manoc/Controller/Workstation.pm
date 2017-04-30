@@ -1,9 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Workstation;
+#ABSTRACT: Workstation controller
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -15,16 +15,6 @@ with 'App::Manoc::ControllerRole::CommonCRUD',
 
 use App::Manoc::Form::Workstation::Edit;
 use App::Manoc::Form::Workstation::Decommission;
-
-=head1 NAME
-
-App::Manoc::Controller::Workstation - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -215,17 +205,6 @@ sub datatable_row {
 
     return $json_data;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

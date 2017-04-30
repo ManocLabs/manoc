@@ -1,15 +1,10 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DataDumper::Script;
-use warnings;
-use strict;
-
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 
 use Moose;
+
+##VERSION
+
+extends 'App::Manoc::Script';
 
 use App::Manoc::Support;
 use App::Manoc::DataDumper;
@@ -23,8 +18,6 @@ use Archive::Tar;
 use Try::Tiny;
 
 use YAML::Syck;
-
-extends 'App::Manoc::Script';
 
 has 'enable_fk' => (
     is       => 'rw',

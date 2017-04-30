@@ -1,9 +1,10 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::SoftwarePkg;
+#ABSTRACT: SoftwarePkg controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Form::Building;
@@ -14,14 +15,6 @@ with
     'App::Manoc::ControllerRole::ResultSet',
     'App::Manoc::ControllerRole::Object',
     'App::Manoc::ControllerRole::JQDatatable';
-
-=head1 NAME
-
-App::Manoc::Controller::Building - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -92,17 +85,6 @@ sub list : Chained('base') : PathPart('') : Args(0) {
 
     $c->require_permission( $c->stash->{resultset}, 'list' );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

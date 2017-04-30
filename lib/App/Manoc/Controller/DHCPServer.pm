@@ -1,27 +1,16 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-use strict;
-
 package App::Manoc::Controller::DHCPServer;
+#ABSTRACT: DHCPServer Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with 'App::Manoc::ControllerRole::CommonCRUD';
 
 use App::Manoc::Form::DHCPServer;
 use App::Manoc::Form::DHCPSharedNetwork;
-
-=head1 NAME
-
-App::Manoc::Controller::DHCPServer - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -33,17 +22,6 @@ __PACKAGE__->config(
     class      => 'ManocDB::DHCPServer',
     form_class => 'App::Manoc::Form::DHCPServer',
 );
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

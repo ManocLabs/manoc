@@ -1,22 +1,9 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::IfNotes;
+#ABSTRACT: Manoc Form for entering interface notes.
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
 
-=head1 NAME
-
-App::Manoc::Form::IfNotes
-
-=head1 DESCRIPTION
-
-Manoc Form for entering interface notes.
-
-=cut
+##VERSION
 
 extends 'App::Manoc::Form::Base';
 
@@ -64,17 +51,6 @@ override 'update_model' => sub {
     super();
 };
 
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -84,4 +60,3 @@ __PACKAGE__->meta->make_immutable;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-

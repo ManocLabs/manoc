@@ -1,14 +1,11 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 
 package App::Manoc::DataDumper::Data;
-
-use FindBin;
-use lib "$FindBin::Bin/../lib";
+#ABSTRACT: Represents a datadumper file
 
 use Moose;
+
+##VERSION
+
 use Archive::Tar;
 use App::Manoc::Utils;
 use YAML::Syck;
@@ -82,11 +79,11 @@ sub load {
 
     my $tar;
 
-    -f $filename or return undef;
+    -f $filename or return;
     try {
         $tar = Archive::Tar->new($filename);
     };
-    $tar or return undef;
+    $tar or return;
 
     my $obj = $self->new(
         {
@@ -157,30 +154,6 @@ no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-App::Manoc::DataDumper::Data - Represents a data file
-
-=head1 AUTHORS
-
-The Manoc Team
-
-=head1 COPYRIGHT
-
-This software is copyright (c) 2011-2015 by the Manoc Team
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=end
-
 # Local Variables:
 # mode: cperl
 # indent-tabs-mode: nil

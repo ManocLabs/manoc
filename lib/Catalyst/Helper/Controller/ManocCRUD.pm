@@ -1,17 +1,12 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package Catalyst::Helper::Controller::ManocCRUD;
-
-use Class::Load;
-use namespace::autoclean;
 
 use strict;
 use warnings;
 
-use FindBin;
-use lib "$FindBin::Bin:../lib";
+##VERSION
+
+use Class::Load;
+use namespace::autoclean;
 
 use File::Spec::Functions qw(catdir catfile canonpath);
 use Catalyst::Helper::Controller::ManocCRUD::Form;
@@ -208,6 +203,7 @@ __controller__
 use strict;
 
 package App::Manoc::Controller::[% model %];
+##VERSION
 use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
@@ -235,17 +231,6 @@ __PACKAGE__->config(
     class      => 'ManocDB::[% model %]',
     form_class => 'App::Manoc::Form::[% model %]',
 );
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,23 +1,15 @@
-
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::About;
+#ABSTRACT: Auth Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
 use English '-no_match_vars';
-
-=head1 NAME
-
-App::Manoc::Controller::User - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -47,7 +39,7 @@ sub stats : Private {
 
     my $stats = {
         manoc_ver    => $App::Manoc::VERSION,
-        db_version   => $App::Manoc::DB::VERSION,
+        db_version   => $App::Manoc::DB::SCHEMA_VERSION,
         dbi_ver      => $DBI::VERSION,
         dbic_ver     => $DBIx::Class::VERSION,
         catalyst_ver => $Catalyst::VERSION,
@@ -64,17 +56,6 @@ sub stats : Private {
 
     $c->stash( stats => $stats );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

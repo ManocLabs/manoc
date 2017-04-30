@@ -1,9 +1,10 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::WorkstationHW;
+#ABSTRACT: WorkstationHW controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -15,14 +16,6 @@ with
 
 use App::Manoc::Form::WorkstationHW;
 use App::Manoc::Form::CSVImport::WorkstationHW;
-
-=head1 NAME
-
-App::Manoc::Controller::WorkstationHW - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
 
 =head1 METHODS
 
@@ -214,7 +207,8 @@ sub datatable_search_cb {
     my $status = $c->request->param('search_status');
     if ( defined($status) ) {
         $status eq 'd' and
-            $extra_filter->{location} = App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
+            $extra_filter->{location} =
+            App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED;
         $status eq 'w' and
             $extra_filter->{location} = App::Manoc::DB::Result::HWAsset::LOCATION_WAREHOUSE;
         $status eq 'u' and
@@ -257,17 +251,6 @@ sub datatable_row {
 
     return $json_data;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

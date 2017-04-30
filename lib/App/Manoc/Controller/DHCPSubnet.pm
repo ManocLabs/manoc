@@ -1,25 +1,17 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::DHCPSubnet;
+#ABSTRACT: DHCPSubnet Controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::ResultSet';
-with 'App::Manoc::ControllerRole::ObjectForm';
+with
+    'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectForm';
 
 use App::Manoc::Form::DHCPSubnet;
-
-=head1 NAME
-
-App::Manoc::Controller::DHCPSubnet - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -126,17 +118,6 @@ sub get_form_success_url {
     my ( $self, $c ) = @_;
     return $c->uri_for_action( 'dhcpserver/view', [ $c->stash->{object}->dhcp_server->id ] );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

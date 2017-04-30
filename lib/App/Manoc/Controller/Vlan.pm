@@ -1,26 +1,17 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Vlan;
+#ABSTRACT: Vlan controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 use App::Manoc::Form::Vlan;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' };
-# TODO
-with "App::Manoc::ControllerRole::JSONView";
-
-=head1 NAME
-
-App::Manoc::Controller::Vlan - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller for editing VLAN objects.
-
-=cut
+with
+    'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' },
+    'App::Manoc::ControllerRole::JSONView';
 
 __PACKAGE__->config(
     # define PathPart
@@ -85,7 +76,7 @@ sub object_delete {
 
     if ( $vlan->ip_ranges->count ) {
         $c->flash( error_msg => 'There are subnets in this vlan' );
-        return undef;
+        return;
     }
 
     $vlan->delete;
@@ -100,17 +91,6 @@ sub get_form_success_url {
 
     return $c->uri_for_action("vlanrange/list");
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

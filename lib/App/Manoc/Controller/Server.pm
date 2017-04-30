@@ -1,9 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::Server;
+#ABSTRACT: Server controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -13,16 +14,6 @@ with 'App::Manoc::ControllerRole::CommonCRUD';
 use App::Manoc::Form::Server;
 use App::Manoc::Form::Server::Decommission;
 use App::Manoc::Form::ServerNWInfo;
-
-=head1 NAME
-
-App::Manoc::Controller::Server - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -223,17 +214,6 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     $c->stash( json_data => $response );
     $c->forward('View::JSON');
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

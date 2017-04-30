@@ -1,18 +1,13 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Helper::ResultSet::TupleArchive;
+#ABSTRACT Tuple archive support
 use strict;
 use warnings;
+
+##VERSION
 
 use Carp 'croak';
 
 use parent 'DBIx::Class';
-
-=head1 NAME
-
-App::Manoc::DB::Helper::ResultSet::TupleArchive - Tuple archive support
 
 =head1 SYNOPSIS
 
@@ -106,17 +101,6 @@ sub archive {
 }
 
 1;
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 # Local Variables:
 # mode: cperl

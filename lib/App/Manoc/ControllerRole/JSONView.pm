@@ -1,8 +1,11 @@
 package App::Manoc::ControllerRole::JSONView;
 
 use Moose::Role;
-use MooseX::MethodAttributes::Role;
+##VERSION
+
 use namespace::autoclean;
+
+use MooseX::MethodAttributes::Role;
 
 requires 'object', 'object_list';
 

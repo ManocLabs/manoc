@@ -1,11 +1,10 @@
-# Copyright 2011-2017 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::ResultSet;
+#ABSTRACT: base class for Manoc dbic resultset classes
 
 use strict;
 use warnings;
+
+##VERSION
 
 use parent 'DBIx::Class::ResultSet';
 

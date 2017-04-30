@@ -1,13 +1,15 @@
 package App::Manoc::Form::CSVImport;
 
-use utf8;
 use HTML::FormHandler::Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 extends 'HTML::FormHandler';
-
-with 'App::Manoc::Form::TraitFor::Theme';
-with 'App::Manoc::Form::TraitFor::CSRF';
+with
+    'App::Manoc::Form::TraitFor::Theme',
+    'App::Manoc::Form::TraitFor::CSRF';
 
 use Text::CSV;
 use Try::Tiny;
@@ -283,7 +285,7 @@ sub find_entry {
             return $rs->search( \%where )->first;
     }
 
-    return undef;
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;

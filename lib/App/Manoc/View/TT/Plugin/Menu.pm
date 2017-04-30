@@ -1,19 +1,14 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::View::TT::Plugin::Menu;
+#ABSTRACT: Manoc menu plugin
 
 use strict;
 use warnings;
 
+##VERSION
+
 use Template::Plugin;
 use base 'Template::Plugin';
 use namespace::autoclean;
-
-=head1 NAME
-
-App::Manoc::View::TT::Plugin::JSON - Manoc menu plugin
 
 =head1 DESCRIPTION
 
@@ -232,16 +227,7 @@ sub _permission_check {
 
 =head1 SEE ALSO
 
-L<Manoc>
-
-=head1 AUTHOR
-
-gabriele
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<App::Manoc>
 
 =cut
 

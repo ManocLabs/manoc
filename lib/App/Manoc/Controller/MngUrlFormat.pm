@@ -1,25 +1,16 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::MngUrlFormat;
+#ABSTRACT: MngUrlFormat controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Form::MngUrlFormat;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => 'view' };
-
-=head1 NAME
-
-App::Manoc::Controller::MngUrl - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -49,7 +40,7 @@ sub delete_object {
     my $id = $c->stash->{object_pk};
     if ( $c->model('ManocDB::Device')->search( { mng_url_format => $id } )->count ) {
         $c->flash( error_msg => 'Format is in use. Cannot be deleted.' );
-        return undef;
+        return;
     }
 
     return $c->stash->{'object'}->delete;

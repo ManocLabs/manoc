@@ -1,12 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::IPNetwork;
 
 use Moose;
 
-#  'extends' since we are using Moose
+##VERSION
+
 extends 'App::Manoc::DB::Result';
 
 use App::Manoc::IPAddress::IPv4Network;

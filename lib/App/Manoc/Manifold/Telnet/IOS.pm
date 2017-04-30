@@ -1,19 +1,14 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
-# A frontend for CISCO IOS devices still using telnet
-
 package App::Manoc::Manifold::Telnet::IOS;
+#ABSTRACT: A frontend for CISCO IOS devices still using telnet
 
 use Moose;
 
-with 'App::Manoc::ManifoldRole::Base';
-with 'App::Manoc::ManifoldRole::NetDevice';
-with 'App::Manoc::ManifoldRole::FetchConfig';
+##VERSION
 
-with 'App::Manoc::Logger::Role';
+with 'App::Manoc::ManifoldRole::Base',
+    'App::Manoc::ManifoldRole::NetDevice',
+    'App::Manoc::ManifoldRole::FetchConfig',
+    'App::Manoc::Logger::Role';
 
 use Try::Tiny;
 use Net::Telnet::Cisco;
@@ -76,13 +71,13 @@ sub connect {
         );
 
         $session->login( $self->username, $self->password ) or
-            return undef;
+            return;
 
         if ( $self->enable_password ) {
             my $enabled = $session->enable( $self->enable_password );
             if ( !$enabled ) {
                 $self->log->error("Cannot enable session");
-                return undef;
+                return;
             }
         }
         $self->_set_session($session);
@@ -90,7 +85,7 @@ sub connect {
     }
     catch {
         $self->log->error("Error connecting to $host: $@");
-        return undef;
+        return;
     }
 }
 
@@ -117,7 +112,7 @@ sub _build_arp_table {
     };
 
     $self->log->error('Error fetching configuration');
-    return undef;
+    return;
 }
 
 sub _build_configuration {
@@ -132,7 +127,7 @@ sub _build_configuration {
         return join( @data, '\n' );
     };
     $self->log->error('Error fetching configuration: $@');
-    return undef;
+    return;
 }
 
 sub close {

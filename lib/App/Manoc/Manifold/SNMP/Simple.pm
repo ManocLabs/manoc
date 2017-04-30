@@ -1,12 +1,9 @@
-# Copyright 2011-2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
-# A frontend for Net::SNMP
-
 package App::Manoc::Manifold::SNMP::Simple;
+#ABSTRACT: A simple client based on Net::SNMP
+
 use Moose;
+
+##VERSION
 
 with 'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::Host',
@@ -14,7 +11,6 @@ with 'App::Manoc::ManifoldRole::Base',
     'App::Manoc::Logger::Role';
 
 use Net::SNMP 6.0 qw( :snmp DEBUG_ALL ENDOFMIBVIEW );
-
 use Carp qw(croak);
 use Try::Tiny;
 
@@ -101,12 +97,12 @@ sub connect {
     catch {
         my $msg = "Could not connect to " . $self->host . " .$_";
         $self->log->error($msg);
-        return undef;
+        return;
     };
 
     unless ($session) {
         $self->log->error( "Could not connect to ", $self->host );
-        return undef;
+        return;
     }
 
     $self->_set_snmp_session($session);
@@ -143,7 +139,7 @@ sub has_snmp_scalar {
     }
 }
 
-=head 2 has_snmp_table
+=head2 has_snmp_table
 
 Creates a snmp_<columnname> accessor for each defined column.
 
@@ -265,7 +261,7 @@ sub _build_name {
 sub _build_model {
     my $self = shift;
     warn "TODO";
-    return undef;
+    return;
 }
 
 sub _build_os {
@@ -373,7 +369,7 @@ sub _build_os_ver {
 
     if ( $vendor eq 'VMWare' ) {
         my $prodver = $self->snmp_vmwProdVersion;
-	return $prodver if defined($prodver);
+        return $prodver if defined($prodver);
     }
 
     return '';
@@ -387,7 +383,7 @@ sub _build_vendor {
 
 sub _build_serial {
     my $self = shift;
-    return undef;
+    return;
 }
 
 sub _build_cpu_count {
@@ -401,10 +397,10 @@ sub _build_cpu_count {
 sub _build_cpu_model { "Unkown" }
 
 sub _build_ram_memory {
-    my $self = shift;
+    my $self   = shift;
     my $memTot = $self->snmp_memTotalReal;
-    $memTot eq 'noSuchObject' and return undef; 
-    return int( $memTot ) / 1024;
+    $memTot eq 'noSuchObject' and return;
+    return int($memTot) / 1024;
 }
 
 sub _build_kernel { undef }

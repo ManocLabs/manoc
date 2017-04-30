@@ -1,15 +1,18 @@
 package App::Manoc::Form::Server;
+
 use HTML::FormHandler::Moose;
 
-extends 'App::Manoc::Form::Base';
-
-with 'App::Manoc::Form::TraitFor::SaveButton',
-    'App::Manoc::Form::TraitFor::IPAddr';
-
-use App::Manoc::Form::Types       ('MacAddress');
-use HTML::FormHandler::Types ('IPAddress');
+##VERSION
 
 use namespace::autoclean;
+
+extends 'App::Manoc::Form::Base';
+with
+    'App::Manoc::Form::TraitFor::SaveButton',
+    'App::Manoc::Form::TraitFor::IPAddr';
+
+use App::Manoc::Form::Types  ('MacAddress');
+use HTML::FormHandler::Types ('IPAddress');
 
 has '+item_class' => ( default => 'Server' );
 

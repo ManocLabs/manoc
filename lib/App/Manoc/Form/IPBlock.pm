@@ -1,16 +1,16 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::IPBlock;
 
 use HTML::FormHandler::Moose;
+
+##VERSION
+
+use namespace::autoclean;
+
 extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::Horizontal',
     'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::IPAddr';
 
-use namespace::autoclean;
 use HTML::FormHandler::Types ('IPAddress');
 
 has '+name'        => ( default => 'form-ipnetwork' );
@@ -29,10 +29,10 @@ has_block 'range_block' => (
 );
 
 has_field 'from_addr' => (
-    apply    => [IPAddress],
-    size     => 15,
-    required => 1,
-    label    => 'From',
+    apply          => [IPAddress],
+    size           => 15,
+    required       => 1,
+    label          => 'From',
     inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,
@@ -46,10 +46,10 @@ has_field 'from_addr' => (
 );
 
 has_field 'to_addr' => (
-    apply    => [IPAddress],
-    size     => 15,
-    required => 1,
-    label    => 'To',
+    apply          => [IPAddress],
+    size           => 15,
+    required       => 1,
+    label          => 'To',
     inflate_method => \&inflate_ipv4,
 
     do_wrapper => 0,

@@ -1,17 +1,14 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Netwalker::Poller::Workers;
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
-with 'App::Manoc::Netwalker::WorkersRole',
-    'App::Manoc::Logger::Role';
+with 'App::Manoc::Netwalker::WorkersRole', 'App::Manoc::Logger::Role';
 
 use Try::Tiny;
 use POE qw(Filter::Reference Filter::Line);
-
 use App::Manoc::Netwalker::Poller::Scoreboard;
 use App::Manoc::Netwalker::Poller::DeviceTask;
 use App::Manoc::Netwalker::Poller::ServerTask;
@@ -21,7 +18,6 @@ has scoreboard => (
     isa     => 'App::Manoc::Netwalker::Poller::Scoreboard',
     default => sub { App::Manoc::Netwalker::Poller::Scoreboard->new() },
 );
-
 
 =head2 worker_stdout
 
@@ -56,8 +52,8 @@ sub worker_stdout {
 
 =cut
 
-sub worker_error   {
-    my ($self, $job_id) = @_;
+sub worker_error {
+    my ( $self, $job_id ) = @_;
 
     $self->log->warn("Worker error job $job_id");
     $self->scoreboard->delete_job_info($job_id);
@@ -68,19 +64,18 @@ sub worker_error   {
 =cut
 
 sub worker_finished {
-    my ($self, $job_id) = @_;
+    my ( $self, $job_id ) = @_;
 
     $self->log->debug("Job $job_id finished");
 
     my $info = $self->scoreboard->get_job_info($job_id);
     $info or return;
     my $status =
-        $info->[0] eq 'device'
-        ?  $self->scoreboard->get_device_status( $info->[1] )
-        : $self->scoreboard->get_server_status( $info->[1] );
+        $info->[0] eq 'device' ? $self->scoreboard->get_device_status( $info->[1] ) :
+        $self->scoreboard->get_server_status( $info->[1] );
 
-    defined($status) && $status eq 'RUNNING'
-        and $self->log->warn("Job $job_id finished but status was still RUNNING");
+    defined($status) && $status eq 'RUNNING' and
+        $self->log->warn("Job $job_id finished but status was still RUNNING");
 
     $self->scoreboard->delete_job_info($job_id);
 }
@@ -167,7 +162,6 @@ sub visit_device {
             }
         );
         $updater->update;
-
 
         $task_info->{status} = 'DONE';
         $task_info->{report} = $updater->task_report->freeze;

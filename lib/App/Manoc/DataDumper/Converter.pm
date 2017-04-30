@@ -1,11 +1,9 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::DataDumper::Converter;
 
 use Moose;
+
+##VERSION
+
 use Class::Load;
 
 has 'log' => (
@@ -57,7 +55,7 @@ sub _load_converters {
         my $class_name = "v$v";
         $self->log->info("Loading converter $class_name");
         $class_name = "App::Manoc::DataDumper::Converter::$class_name";
-        Class::Load::load_class($class_name) or return undef;
+        Class::Load::load_class($class_name) or return;
 
         my $c = $class_name->new( log => $self->log, schema => $self->schema );
         $self->add_converter($c);

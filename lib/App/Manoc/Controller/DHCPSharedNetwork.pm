@@ -1,25 +1,17 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::DHCPSharedNetwork;
+#ABSTRACT: DHCPSharedNetwork controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::ResultSet';
-with 'App::Manoc::ControllerRole::ObjectForm' => { -excludes => 'get_form_success_url' };
+with
+    'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectForm' => { -excludes => 'get_form_success_url' };
 
 use App::Manoc::Form::DHCPSharedNetwork;
-
-=head1 NAME
-
-App::Manoc::Controller::DHCPSharedNetwork - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
 
 __PACKAGE__->config(
     # define PathPart
@@ -124,17 +116,6 @@ sub get_form_success_url {
 
     return $c->uri_for_action( 'dhcpserver/view', [ $c->stash->{object}->dhcp_server->id ] );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

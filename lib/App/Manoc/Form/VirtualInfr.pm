@@ -1,11 +1,14 @@
-
 package App::Manoc::Form::VirtualInfr;
 use HTML::FormHandler::Moose;
-extends 'App::Manoc::Form::Base';
-with 'App::Manoc::Form::TraitFor::SaveButton';
-with 'App::Manoc::Form::TraitFor::Horizontal';
+
+##VERSION
 
 use namespace::autoclean;
+
+extends 'App::Manoc::Form::Base';
+with
+    'App::Manoc::Form::TraitFor::SaveButton',
+    'App::Manoc::Form::TraitFor::Horizontal';
 
 has '+item_class'  => ( default => 'VirtualInfr' );
 has '+name'        => ( default => 'form-virtualinfr' );

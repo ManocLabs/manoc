@@ -1,11 +1,10 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Model::ManocDB;
 
 use Moose;
 extends 'Catalyst::Model::DBIC::Schema';
+
+##VERSION
+
 use namespace::autoclean;
 
 __PACKAGE__->config( schema_class => 'App::Manoc::DB', );
@@ -45,22 +44,9 @@ sub search {
 
 App::Manoc::Model::ManocDB - Catalyst DBIC Schema Model
 
-=head1 SYNOPSIS
-
-See L<Manoc>
-
 =head1 DESCRIPTION
 
 L<Catalyst::Model::DBIC::Schema> Model using schema L<App::Manoc::DB>
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 

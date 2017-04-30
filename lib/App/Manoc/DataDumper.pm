@@ -1,12 +1,8 @@
 package App::Manoc::DataDumper;
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
-use 5.010;
-
 use Moose;
+
+##VERSION
+
 use App::Manoc::DB;
 use App::Manoc::DataDumper::Converter;
 
@@ -296,7 +292,7 @@ sub load {
 
     if ( !defined($datadump) ) {
         $self->log->fatal( "cannot open ", $self->filename );
-        return undef;
+        return;
     }
 
     #filter metadata file from sources

@@ -1,16 +1,12 @@
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::HWAsset::Location;
+#ABSTRACT: Role for defining a location block
 use HTML::FormHandler::Moose::Role;
 
+##VERSION
+
 with 'App::Manoc::Form::TraitFor::RackOptions';
+
 use App::Manoc::DB::Result::HWAsset;
-
-=head1 NAME
-
-App::Manoc::Form::HWAsset::Location - Role for defining a location block
-
-=cut
 
 has_field 'location' => (
     type     => 'Select',
@@ -220,17 +216,6 @@ sub update_model_location {
 
     $self->_set_value($values);
 }
-
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 no HTML::FormHandler::Moose::Role;
 1;

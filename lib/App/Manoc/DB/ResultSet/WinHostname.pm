@@ -1,14 +1,10 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::ResultSet::WinHostname;
-
 use strict;
 use warnings;
 
-use parent 'App::Manoc::DB::ResultSet';
+##VERSION
 
+use parent 'App::Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
 

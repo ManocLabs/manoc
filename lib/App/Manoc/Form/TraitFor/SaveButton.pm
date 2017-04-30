@@ -1,13 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::TraitFor::SaveButton;
+#ABSTRACT: Role for adding a BS3 'Save' button
+
 use HTML::FormHandler::Moose::Role;
 
-=head1 NAME
-
-App::Manoc::Form::TraitFor::Horizontal - Role for adding a BS3 'Save' button
+##VERSION
 
 =head1 DESCRIPTION
 
@@ -29,17 +25,6 @@ has_field 'save' => (
     value          => "Save",
     order          => 1000,
 );
-
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 no HTML::FormHandler::Moose::Role;
 

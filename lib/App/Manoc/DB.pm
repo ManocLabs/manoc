@@ -1,51 +1,47 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB;
 
 use strict;
 use warnings;
 
-our $VERSION = 4;
+##VERSION
+
+our $SCHEMA_VERSION = 4;
 
 our $DEFAULT_ADMIN_PASSWORD = 'admin';
 
 use parent 'DBIx::Class::Schema';
 
-__PACKAGE__->load_components(qw(
-    Helper::Schema::LintContents
-    Helper::Schema::QuoteNames
-    Helper::Schema::DidYouMean
+__PACKAGE__->load_components(
+    qw(
+        Helper::Schema::LintContents
+        Helper::Schema::QuoteNames
+        Helper::Schema::DidYouMean
 
-    Helper::Schema::Verifier::ColumnInfo
-    Helper::Schema::Verifier::RelationshipColumnName
-    Helper::Schema::Verifier::Parent
-));
-
-__PACKAGE__->load_namespaces(
-    default_resultset_class => '+App::Manoc::DB::ResultSet',
+        Helper::Schema::Verifier::ColumnInfo
+        Helper::Schema::Verifier::RelationshipColumnName
+        Helper::Schema::Verifier::Parent
+        )
 );
 
+__PACKAGE__->load_namespaces( default_resultset_class => '+App::Manoc::DB::ResultSet', );
 
 # add some non-standard allowed keys
- sub allowed_column_keys {
-   my $self = shift;
-   my @keys = $self->next::method;
-   push @keys, qw(encode_class encode_check_method encode_args encode_column
-                  ipv4_address
-                  extras
-                  _inflate_info);
-   return @keys;
- }
+sub allowed_column_keys {
+    my $self = shift;
+    my @keys = $self->next::method;
+    push @keys, qw(encode_class encode_check_method encode_args encode_column
+        ipv4_address
+        extras
+        _inflate_info);
+    return @keys;
+}
 
 sub base_result { 'App::Manoc::DB::Result' }
 
 sub base_resultset { 'App::Manoc::DB::ResultSet' }
 
-
 sub get_version {
-    return $VERSION;
+    return $SCHEMA_VERSION;
 }
 
 our $DEFAULT_CONFIG = {

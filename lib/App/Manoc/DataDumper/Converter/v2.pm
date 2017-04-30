@@ -1,14 +1,13 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::DataDumper::Converter::v2;
 
 use Moose;
+
+##VERSION
+
+extends 'App::Manoc::DataDumper::Converter::Base';
+
 use Data::Dumper;
 use App::Manoc::Utils::IPAddress qw(padded_ipaddr check_addr);
-extends 'App::Manoc::DataDumper::Converter::Base';
 
 # Convert Ip addresses in zero-padded ip addresses
 sub _upgrade_ipcolumn {

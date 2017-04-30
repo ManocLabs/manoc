@@ -1,11 +1,14 @@
 package App::Manoc;
+#ABSTRACT: Network monitoring application
 
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 require 5.10.1;
 use version 0.77;    # even for Perl v.5.10.0
-our $VERSION = qv('2.009_001');
 
 use Catalyst::Runtime 5.90;
 
@@ -154,9 +157,11 @@ after setup_finalize => sub {
 # Start the application
 __PACKAGE__->setup();
 
-=head1 NAME
+no Moose;
 
-Manoc - Network monitoring application
+__PACKAGE__->meta->make_immutable( replace_constructor => 1 );
+
+1;
 
 =head1 SYNOPSIS
 
@@ -164,29 +169,37 @@ Manoc - Network monitoring application
 
 =head1 DESCRIPTION
 
-Manoc configuration class
+Manoc is a web-based network monitoring/reporting platform designed for moderate to large networks.
+
+Manoc can collect:
+
+=over 4
+
+=item Ports status and mac-address associations network devices via SNMP
+
+=item Ethernet/IP address pairings via a sniffer agenta
+
+=item DHCP leases/reservations using a lightweight agent for ISC DHCPD
+based servers
+
+=item users and computer logon in a Windows AD environment, using an
+agent for syslog-ng to trap snare generated syslog messages
+
+=back
+
+Data is stored using a SQL database like Postgres or MySQL using DBIx::Class .
+
+=begin markdown
+
+[![Build Status](https://travis-ci.org/ManocLabs/manoc.svg?branch=master)](https://travis-ci.org/ManocLabs/manoc)
+
+=end markdown
+
 
 =head1 SEE ALSO
 
-L<App::Manoc::Controller::Root>, L<Catalyst>
-
-=head1 AUTHORS
-
-Gabriele Mambrini
-
-Enrico Liguori
-
-=head1 LICENSE
-
-Copyright 2011-2014 by the AUTHORS
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<Catalyst> L<SNMP::Info> L<Moose>
 
 =cut
 
-no Moose;
-
-__PACKAGE__->meta->make_immutable( replace_constructor => 1 );
-
-1;
+=cut

@@ -1,11 +1,9 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ManifoldRole::SSH;
 
 use Moose::Role;
 with 'App::Manoc::Logger::Role';
+
+##VERSION
 
 use Net::OpenSSH;
 
@@ -81,10 +79,10 @@ sub system {
     my $self    = shift;
     my $session = $self->session;
 
-    my $opts = ref($_[0]) eq 'ARRAY' ? shift @_ : {};
+    my $opts = ref( $_[0] ) eq 'ARRAY' ? shift @_ : {};
     $opts->{stdout_discard} = 1;
 
-    return $session->system($opts, @_);
+    return $session->system( $opts, @_ );
 }
 
 sub connect {
@@ -120,7 +118,7 @@ sub connect {
     my $ssh = Net::OpenSSH->new( $host, %opts );
     if ( $ssh->error ) {
         $self->log->error( "Could not connect to $host: " . $ssh->error );
-        return undef;
+        return;
     }
     $self->session($ssh);
     return 1;

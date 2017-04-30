@@ -1,15 +1,12 @@
-# Copyright 2016 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::TraitFor::IPAddr;
+
+#ABSTRACT: Role for populating rack selections
+
 use HTML::FormHandler::Moose::Role;
 
+##VERSION
+
 use App::Manoc::IPAddress::IPv4;
-
-=head1 NAME
-
-App::Manoc::Form::TraitFor::RackOptions - Role for populating rack selections
 
 =head1 METHDOS
 
@@ -23,16 +20,6 @@ sub inflate_ipv4 {
     my ( $self, $value ) = @_;
     return App::Manoc::IPAddress::IPv4->new($value)->padded;
 }
-=head1 AUTHOR
-
-Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 no HTML::FormHandler::Moose::Role;
 

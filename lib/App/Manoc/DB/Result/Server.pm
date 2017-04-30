@@ -1,13 +1,11 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::Server;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 __PACKAGE__->load_components(qw/+App::Manoc::DB::InflateColumn::IPv4/);
 
@@ -169,7 +167,7 @@ sub num_cpus {
     if ( $self->vm ) {
         return $self->vm->vcpus;
     }
-    return undef;
+    return;
 }
 
 sub ram_memory {
@@ -239,17 +237,6 @@ sub restore {
 =cut
 
 sub label { shift->hostname }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
 # Local Variables:

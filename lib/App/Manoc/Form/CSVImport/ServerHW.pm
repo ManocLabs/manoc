@@ -1,6 +1,9 @@
 package App::Manoc::Form::CSVImport::ServerHW;
 
 use HTML::FormHandler::Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 extends 'App::Manoc::Form::CSVImport';

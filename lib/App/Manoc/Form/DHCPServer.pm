@@ -2,6 +2,8 @@ package App::Manoc::Form::DHCPServer;
 
 use HTML::FormHandler::Moose;
 
+##VERSION
+
 use namespace::autoclean;
 
 extends 'App::Manoc::Form::Base';
@@ -41,4 +43,3 @@ has_field 'domain_name' => (
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;
-

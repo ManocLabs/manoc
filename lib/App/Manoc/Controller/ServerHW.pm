@@ -1,26 +1,20 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::ServerHW;
+#ABSTRACT: ServerHW controller
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 use App::Manoc::Form::ServerHW;
 use App::Manoc::Form::CSVImport::ServerHW;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD";
-with "App::Manoc::ControllerRole::JSONView";
-with "App::Manoc::ControllerRole::CSVView";
-
-=head1 NAME
-
-App::Manoc::Controller::ServerHW - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
+with
+    "App::Manoc::ControllerRole::CommonCRUD",
+    "App::Manoc::ControllerRole::JSONView",
+    "App::Manoc::ControllerRole::CSVView";
 
 =head1 METHODS
 
@@ -47,7 +41,11 @@ __PACKAGE__->config(
         prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'server' ]
     },
 
-    csv_columns => [  'model', 'vendor', 'inventory', 'serial', 'ram_memory', 'cpu_model', 'proc_freq', 'n_procs', 'n_cores_proc', 'storage1_size', 'storage2_size', 'notes'],
+    csv_columns => [
+        'model',        'vendor',        'inventory',     'serial',
+        'ram_memory',   'cpu_model',     'proc_freq',     'n_procs',
+        'n_cores_proc', 'storage1_size', 'storage2_size', 'notes'
+    ],
 
 );
 
@@ -202,17 +200,6 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
         template        => 'generic_confirm.tt',
     );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

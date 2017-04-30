@@ -1,16 +1,13 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
-# A frontend for SNMP::Info
-
 package App::Manoc::Manifold::SNMP::Info;
+#ABSTRACT: A frontend for SNMP::Info
+
 use Moose;
 
-with 'App::Manoc::ManifoldRole::Base';
-with 'App::Manoc::ManifoldRole::NetDevice';
-with 'App::Manoc::Logger::Role';
+##VERSION
+
+with 'App::Manoc::ManifoldRole::Base',
+    'App::Manoc::ManifoldRole::NetDevice',
+    'App::Manoc::Logger::Role';
 
 use SNMP::Info;
 use Carp qw(croak);
@@ -94,12 +91,12 @@ sub connect {
     catch {
         my $msg = "Could not connect to " . $self->host . " .$_";
         $self->log->error($msg);
-        return undef;
+        return;
     };
 
     unless ($info) {
         $self->log->error( "Could not connect to ", $self->host );
-        return undef;
+        return;
     }
 
     # guessing special devices...
@@ -120,7 +117,7 @@ sub connect {
 
         unless ($info) {
             $self->log->error("Could not reconnect with new class ($class)");
-            return undef;
+            return;
         }
     }
     $self->_set_snmp_info($info);
@@ -291,7 +288,7 @@ sub _build_vtp_domain {
     if ( defined $vtpdomains and scalar( values(%$vtpdomains) ) ) {
         return ( values(%$vtpdomains) )[-1];
     }
-    return undef;
+    return;
 }
 
 sub _build_vtp_database {
@@ -299,7 +296,7 @@ sub _build_vtp_database {
     my $info = $self->snmp_info;
 
     my $vlan = $info->v_name();
-    defined($vlan) or return undef;
+    defined($vlan) or return;
 
     my %vlan_db;
 

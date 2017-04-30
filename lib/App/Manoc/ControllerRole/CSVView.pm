@@ -1,6 +1,9 @@
 package App::Manoc::ControllerRole::CSVView;
 
 use Moose::Role;
+
+##VERSION
+
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 

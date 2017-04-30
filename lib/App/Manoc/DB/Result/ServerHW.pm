@@ -1,13 +1,11 @@
-# Copyright 2011 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::DB::Result::ServerHW;
-
-use parent 'App::Manoc::DB::Result';
 
 use strict;
 use warnings;
+
+##VERSION
+
+use parent 'App::Manoc::DB::Result';
 
 use App::Manoc::DB::Result::HWAsset;
 
@@ -94,11 +92,10 @@ __PACKAGE__->might_have(
     }
 );
 
-
 __PACKAGE__->has_many(
     nics => 'App::Manoc::DB::Result::ServerNIC',
     { 'foreign.serverhw_id' => 'self.id' },
-    { cascade_delete => 1 }
+    { cascade_delete        => 1 }
 );
 
 sub new {

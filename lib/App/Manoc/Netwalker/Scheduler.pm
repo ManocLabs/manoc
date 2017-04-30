@@ -1,17 +1,15 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Netwalker::Scheduler;
 use Moose;
 use namespace::autoclean;
 
-use Moose::Util::TypeConstraints;
-
+##VERSION
 with 'App::Manoc::Logger::Role';
+
+use Moose::Util::TypeConstraints;
 use POE;
 
-subtype 'ManagerType' => as 'Object' => where sub { $_->does('App::Manoc::Netwalker::WorkersRole') };
+subtype 'ManagerType' => as 'Object' => where
+    sub { $_->does('App::Manoc::Netwalker::WorkersRole') };
 
 has config => (
     is       => 'ro',

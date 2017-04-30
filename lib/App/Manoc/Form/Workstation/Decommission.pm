@@ -1,12 +1,8 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Form::Workstation::Decommission;
 
-use strict;
-use warnings;
 use HTML::FormHandler::Moose;
+
+##VERSION
 
 extends 'App::Manoc::Form::Base';
 with 'App::Manoc::Form::TraitFor::Theme';
@@ -88,17 +84,6 @@ sub update_model {
         }
     );
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

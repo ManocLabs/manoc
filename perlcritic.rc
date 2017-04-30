@@ -1,0 +1,8 @@
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = HTML::FormHandler::Moose  HTML::FormHandler::Moose::Role
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = vars subs refs

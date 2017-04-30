@@ -1,18 +1,15 @@
-# Copyright 2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::Controller::APIv1;
+#ABSTRACT: Base class for API controllers
+
 use Moose;
+
+##VERSION
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
 use App::Manoc::Utils::Validate;
-
-=head1 NAME
-
-App::Manoc::Controller::APIv1 - Base class for API controllers
 
 =head1 DESCRIPTION
 
@@ -111,27 +108,6 @@ sub validate : Private {
     }
     return 1;
 }
-
-=head1 NAME
-
-App::Manoc::Controller::APIv1 - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=encoding utf8
-
-=head1 AUTHOR
-
-Gabriele
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

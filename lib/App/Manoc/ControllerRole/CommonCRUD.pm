@@ -1,20 +1,16 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
 package App::Manoc::ControllerRole::CommonCRUD;
+#ABSTRACT: Controller role for Manoc CRUD
 
 use Moose::Role;
+
+##VERSION
+
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-with 'App::Manoc::ControllerRole::ResultSet';
-with 'App::Manoc::ControllerRole::ObjectForm';
-with 'App::Manoc::ControllerRole::ObjectList';
-
-=head1 NAME
-
-App::Manoc::ControllerRole::CommonCRUD - Controller role for Manoc CRUD
+with 'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectForm',
+    'App::Manoc::ControllerRole::ObjectList';
 
 =head1 DESCRIPTION
 

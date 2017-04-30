@@ -1,7 +1,10 @@
 package Catalyst::Helper::Controller::ManocCRUD::Form;
 
-use namespace::autoclean;
 use Moose;
+
+##VERSION
+
+use namespace::autoclean;
 
 extends 'HTML::FormHandler::Generator::DBIC';
 
@@ -27,4 +30,3 @@ __PACKAGE__->meta->make_immutable;
 # cperl-indent-level: 4
 # cperl-indent-parens-as-block: t
 # End:
-
