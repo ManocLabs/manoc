@@ -7,6 +7,8 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
+use App::Manoc::DB::Result::HWAsset;
+
 sub unused {
     my ($self) = @_;
 
