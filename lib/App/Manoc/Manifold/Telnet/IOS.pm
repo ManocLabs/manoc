@@ -1,5 +1,5 @@
 package App::Manoc::Manifold::Telnet::IOS;
-#ABSTRACT: A frontend for CISCO IOS devices still using telnet
+#ABSTRACT: A minimal frontend for CISCO IOS devices still using telnet
 
 use Moose;
 
@@ -129,6 +129,24 @@ sub _build_configuration {
     $self->log->error('Error fetching configuration: $@');
     return;
 }
+
+sub _build_boottime { }
+
+sub _build_ifstatus_table { }
+
+sub _build_mat { }
+
+sub _build_model { }
+
+sub _build_name { }
+
+sub _build_os { }
+
+sub _build_os_ver { }
+
+sub _build_serial { }
+
+sub _build_vendor { }
 
 sub close {
     shift->session->close();

@@ -51,9 +51,7 @@ sub _build_boottime {
 
 sub _build_name {
     my $self = shift;
-    $self->status =~ m/Hostname:\s+(.+)/;
-    #$self->log->debug("Hostaname: $1");
-    return $1;
+    $self->status =~ m/Hostname:\s+(.+)$/ and return $1;
 }
 
 sub _build_os {
@@ -63,10 +61,21 @@ sub _build_os {
 
 sub _build_os_ver {
     my $self = shift;
-    $self->status =~ m/Version:\s+(\S+)/;
-    #$self->log->debug("OS version: $1");
-    return $1;
+    $self->status =~ m/Version:\s+[\w-]+\s+(.+)$/ and return $1;
 }
+
+sub _build_model {
+    my $self = shift;
+    $self->status =~ m/Version:\s+([\w-]+)/ and return $1;
+}
+
+sub _build_serial {
+    my $self = shift;
+    $self->status =~ m/Serial-Number:\s+(.*)$/ and return $1;
+
+}
+
+sub _build_vendor { return 'Fortinet' }
 
 sub _build_arp_table {
     my $self = shift;
@@ -104,6 +113,10 @@ sub _build_configuration {
     $self->log->error('Error fetching configuration: $@');
     return $config;
 }
+
+sub _build_ifstatus_table { return {} }
+
+sub _build_mat { return {} }
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
