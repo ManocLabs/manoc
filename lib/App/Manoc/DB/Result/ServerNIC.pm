@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::ServerNIC;
+#ABSTRACT: A model object for server additional network interfaces
 
 use strict;
 use warnings;
@@ -37,15 +38,5 @@ __PACKAGE__->belongs_to(
     serverhw => 'App::Manoc::DB::Result::ServerHW',
     { 'foreign.id' => 'self.serverhw_id' }
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::ServerNIC - Server additional network interface
-
-=head1 DESCRIPTION
-
-A model object to mantain netwalker configuration for a server.
-
-=cut
 
 1;

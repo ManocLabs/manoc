@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::WorkstationHW;
+#ABSTRACT: ResultSet class for WorkstationHW
 
 use strict;
 use warnings;
@@ -8,6 +9,13 @@ use warnings;
 use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Result::HWAsset;
+
+=method unused
+
+Resultset containing WorkstationHW which are not decommissioned and
+are not in use by any Workstation
+
+=cut
 
 sub unused {
     my ($self) = @_;
@@ -38,6 +46,12 @@ sub unused {
 
     return $assets;
 }
+
+=head1 SEE ALSO
+
+L<DBIx::Class::ResultSet>
+
+=cut
 
 1;
 # Local Variables:

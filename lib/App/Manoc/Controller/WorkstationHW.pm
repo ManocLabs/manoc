@@ -17,10 +17,6 @@ with
 use App::Manoc::Form::WorkstationHW;
 use App::Manoc::Form::CSVImport::WorkstationHW;
 
-=head1 METHODS
-
-=cut
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -56,10 +52,7 @@ __PACKAGE__->config(
 
 );
 
-=head1 ACTIONS
-
-
-=head2 create
+=action create
 
 =cut
 
@@ -83,7 +76,7 @@ before 'create' => sub {
 
 };
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -100,7 +93,7 @@ before 'edit' => sub {
     }
 };
 
-=head2 import_csv
+=action import_csv
 
 Import a workstation hardware list from a CSV file
 
@@ -129,7 +122,7 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     return unless $process_status;
 }
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -162,7 +155,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
-=head2 restore
+=action restore
 
 =cut
 
@@ -195,7 +188,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-=head1 METHODS
+=method datatable_search_cb
 
 =cut
 
@@ -229,6 +222,10 @@ sub datatable_search_cb {
     return ( $filter, $attr );
 }
 
+=method datatable_row
+
+=cut
+
 sub datatable_row {
     my ( $self, $c, $row ) = @_;
 
@@ -239,13 +236,13 @@ sub datatable_row {
         serial      => $row->serial,
         display     => $row->display,
         location    => $row->display_location,
-        href        => $c->uri_for_action( 'workstationhw/view', [ $row->id ] ),
+        href        => $c->uri_for_action( 'workstationhw/view', [ $row->id ] )->as_string,
         workstation => undef,
     };
     if ( my $wks = $row->workstation ) {
         $json_data->{workstation} = {
             hostname => $wks->name,
-            href     => $c->uri_for_action( 'workstation/view', [ $wks->id ] )
+            href     => $c->uri_for_action( 'workstation/view', [ $wks->id ] )->as_string,
         };
     }
 

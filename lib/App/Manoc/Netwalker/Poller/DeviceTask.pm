@@ -1,19 +1,33 @@
 package App::Manoc::Netwalker::Poller::DeviceTask;
+#ABSTRACT: Device poller task
 
 use Moose;
+
 ##VERSION
-with 'App::Manoc::Netwalker::Poller::BaseTask', 'App::Manoc::Logger::Role';
 
 use Try::Tiny;
+
 use App::Manoc::Netwalker::Poller::TaskReport;
 use App::Manoc::Manifold;
 use App::Manoc::IPAddress::IPv4;
+
+=attr device_id
+
+The id in Manoc DB of the device to update.
+
+=cut
 
 has 'device_id' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1
 );
+
+=attr device_entry
+
+The Device row in Manoc DB identified by C<device_id>.
+
+=cut
 
 has 'device_entry' => (
     is      => 'ro',
@@ -22,27 +36,59 @@ has 'device_entry' => (
     builder => '_build_device_entry',
 );
 
-# a set of all mng_address known to Manoc
-# used to to discover neighbors and uplinks
+=attr nwinfo
+
+NWInfo associated to the current C<device_entry>.
+
+=cut
+
+has 'nwinfo' => (
+    is      => 'ro',
+    isa     => 'Object',
+    lazy    => 1,
+    builder => '_build_nwinfo',
+);
+
+=attr device_set
+
+A set (hash) of all mng_address known to Manoc used to to discover
+ neighbors and uplinks.
+
+=cut
+
 has 'device_set' => (
     is      => 'ro',
     isa     => 'HashRef',
     builder => '_build_device_set',
 );
 
-# the source for information about the device
+=attr source
+
+The source for information about the device: a connected Manifold object.
+
+=cut
+
 has 'source' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_source',
 );
 
-# the source for device configuration backup
+=attr config_source
+
+The Manifold to use as a source for device configuration backup.
+
+=cut
+
 has 'config_source' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_config_source',
 );
+
+=attr task_report
+
+=cut
 
 has 'task_report' => (
     is       => 'ro',
@@ -50,11 +96,19 @@ has 'task_report' => (
     builder  => '_build_task_report',
 );
 
+=attr uplinks
+
+=cut
+
 has 'uplinks' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_uplinks',
 );
+
+=attr native_vlan
+
+=cut
 
 has 'native_vlan' => (
     is      => 'ro',
@@ -62,11 +116,17 @@ has 'native_vlan' => (
     builder => '_build_native_vlan',
 );
 
+=attr arp_vlan
+
+=cut
+
 has 'arp_vlan' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_arp_vlan',
 );
+
+with 'App::Manoc::Netwalker::Poller::BaseTask', 'App::Manoc::Logger::Role';
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -105,13 +165,6 @@ sub _build_native_vlan {
         $self->config->default_vlan;
     return defined($vlan) ? $vlan : 1;
 }
-
-has 'nwinfo' => (
-    is      => 'ro',
-    isa     => 'Object',
-    lazy    => 1,
-    builder => '_build_nwinfo',
-);
 
 sub _build_nwinfo {
     my $self = shift;
@@ -260,6 +313,12 @@ sub _build_uplinks {
 #                                                                      #
 #----------------------------------------------------------------------#
 
+=method update
+
+Update device information
+
+=cut
+
 sub update {
     my $self = shift;
 
@@ -320,7 +379,11 @@ sub update {
     return 1;
 }
 
-#----------------------------------------------------------------------#
+=method update_device_info
+
+Updates device information (model, os, vendor)  in C<nwinfo>.
+
+=cut
 
 sub update_device_info {
     my $self = shift;
@@ -354,7 +417,11 @@ sub update_device_info {
     $nw_entry->update;
 }
 
-#----------------------------------------------------------------------#
+=method update_cdp_neighbors
+
+Update neighbor list in CDPNeigh
+
+=cut
 
 sub update_cdp_neighbors {
     my $self = shift;
@@ -408,7 +475,11 @@ sub update_cdp_neighbors {
     $self->task_report->new_devices($new_dev);
 }
 
-#----------------------------------------------------------------------#
+=method  update_if_table
+
+Update interface information.
+
+=cut
 
 sub update_if_table {
     my $self = shift;
@@ -434,7 +505,11 @@ sub update_if_table {
     }
 }
 
-#----------------------------------------------------------------------#
+=method update_mat
+
+Update mac address table.
+
+=cut
 
 sub update_mat {
     my $self = shift;
@@ -480,7 +555,9 @@ sub update_mat {
     $self->task_report->mat_entries($mat_count);
 }
 
-#----------------------------------------------------------------------#
+=method update_vtp_database
+
+=cut
 
 sub update_vtp_database {
     my $self = shift;
@@ -516,6 +593,10 @@ sub update_vtp_database {
 
 }
 
+=method  update_arp_table
+
+=cut
+
 sub update_arp_table {
     my $self = shift;
 
@@ -546,6 +627,10 @@ sub update_arp_table {
 
     $self->task_report->arp_entries($arp_count);
 }
+
+=method update_config
+
+=cut
 
 sub update_config {
     my $self = shift;

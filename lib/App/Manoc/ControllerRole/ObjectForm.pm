@@ -1,4 +1,5 @@
 package App::Manoc::ControllerRole::ObjectForm;
+#ABSTRACT: Role for editing objects with a form
 
 use Moose::Role;
 
@@ -26,12 +27,11 @@ has 'object_updated_message' => (
     default => 'Updated',
 );
 
-=head1 ACTIONS
+=action form
 
-=head2 form
-
-Handle creation and editing of resources. Form defaults can be
-injected using form_defaults in stash. Form is created by get_form method.
+Private action which handle creation and editing of resources. Form
+defaults can be injected using form_defaults in stash. Form is created
+by get_form method.
 
 =cut
 
@@ -100,9 +100,7 @@ sub form : Private {
     $c->detach();
 }
 
-=head1 METHODS
-
-=head2 get_form
+=method get_form
 
 Create a new form using form_class configuration parameter.
 
@@ -118,9 +116,11 @@ sub get_form {
     return $class->new( ctx => $c, %$parameters );
 }
 
-=head2 get_form_success_url
+=method get_form_success_url
 
-Get the URL to redirect after successful editing.
+Get the URL to redirect after successful editing.  Use
+form_success_url or try to use the view action in the current
+namespace.
 
 =cut
 

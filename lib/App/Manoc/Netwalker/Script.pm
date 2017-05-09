@@ -1,8 +1,24 @@
 package App::Manoc::Netwalker::Script;
+#ABSTRACT: Manoc Netwalker script runner
 
 use Moose;
 
 ##VERSION
+
+=head1 DESCRIPTION
+
+This class is responsible for running the Netwalker daemon. It extends
+L<App::Manoc::Script::Daemon> and sets up the pollers workers, the
+scheduler and the control interface.
+
+=head2 SYNOPSIS
+
+  use App::Manoc::Netwalker::Script;
+
+  my $app = App::Manoc::Netwalker::Script->new_with_options();
+  $app->run();
+
+=cut
 
 extends 'App::Manoc::Script::Daemon';
 
@@ -13,6 +29,12 @@ use App::Manoc::Netwalker::Control;
 use App::Manoc::Netwalker::Scheduler;
 use App::Manoc::Netwalker::Poller::Workers;
 use App::Manoc::Netwalker::Discover::Workers;
+
+=method main
+
+The entry point for the script.
+
+=cut
 
 sub main {
     my $self = shift;
@@ -52,6 +74,12 @@ sub main {
 
     POE::Kernel->run();
 }
+
+=head1 SEE ALSO
+
+L<App::Manoc::Netwalker::Config>, L<App::Manoc::Netwalker::Control>, L<App::Manoc::Netwalker::Scheduler>, L<App::Manoc::Netwalker::Poller::Workers>, L<App::Manoc::Netwalker::Discover::Workers>
+
+=cut
 
 # Clean up the namespace.
 no Moose;

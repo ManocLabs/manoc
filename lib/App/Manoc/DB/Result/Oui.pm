@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Oui;
+#ABSTRACT: A model object for storing OUI to vendor associations
 
 use strict;
 use warnings;

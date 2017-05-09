@@ -1,5 +1,5 @@
 package App::Manoc::Utils;
-
+#ABSTRACT: Miscellaneous support functions
 use strict;
 use warnings;
 
@@ -11,39 +11,10 @@ BEGIN {
         check_mac_addr/;
 }
 
-use FindBin;
-use File::Spec;
-
 use Regexp::Common qw/net/;
 
-use App::Manoc::DB;
 use Carp;
 use Archive::Tar;
-
-########################################################################
-
-# get manoc home and cache it
-my $Manoc_Home;
-
-sub set_manoc_home {
-    my $home = shift || croak "Missing path";
-
-    # manoc home cannot be changed!
-    if ( defined $Manoc_Home ) {
-        carp "Manoc home already set";
-        return;
-    }
-
-    $Manoc_Home = $home;
-}
-
-sub get_manoc_home {
-    return $Manoc_Home if defined $Manoc_Home;
-
-    $Manoc_Home = $ENV{MANOC_HOME};
-    $Manoc_Home ||= File::Spec->catfile( $FindBin::Bin, File::Spec->updir() );
-    return $Manoc_Home;
-}
 
 ########################################################################
 #                                                                      #
@@ -51,10 +22,22 @@ sub get_manoc_home {
 #                                                                      #
 ########################################################################
 
+=function check_mac_addr($addr)
+
+Return 1 if C<$addr> is a valid MAC address.
+
+=cut
+
 sub check_mac_addr {
     my $addr = shift;
     return $addr =~ /^$RE{net}{MAC}$/;
 }
+
+=function clean_string($s)
+
+Return C<$s> trimmed and lowercase.
+
+=cut
 
 sub clean_string {
     my $s = shift;
@@ -69,6 +52,18 @@ sub clean_string {
 #                     S e t    F u n c t i o n s                       #
 #                                                                      #
 ########################################################################
+
+=function decode_bitset($bits, \@names)
+
+Given a string representation of a bitlist and a list of names return
+the names corresponding to 1 bits.
+
+ decode_bitset('0110', ['one', 'two', 'three', 'four' ])
+
+gives C<('two', 'three')>.
+
+
+=cut
 
 sub decode_bitset {
     my $bits  = shift;
@@ -95,6 +90,15 @@ sub decode_bitset {
 #                   T a r   F u n c t i o n s                          #
 #                                                                      #
 ########################################################################
+
+=function tar($filename, $basedir, \@files)
+
+Create a tar file called c<$filename> with files in C<@files> storing
+their paths relatively to C<$basedir>.
+
+Use the C<tar> command if present, otherwise Archive::Tar.
+
+=cut
 
 sub tar {
     my ( $tarname, $basedir, $filelist_ref ) = @_;

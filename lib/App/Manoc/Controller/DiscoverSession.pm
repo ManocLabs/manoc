@@ -23,28 +23,16 @@ __PACKAGE__->config(
     form_class              => 'App::Manoc::Form::DiscoverSession',
     enable_permission_check => 1,
     view_object_perm        => undef,
+    object_list_options     => {
+        join      => 'discovered_hosts',
+        distinct  => 1,
+        '+select' => [ { count => 'discovered_hosts.id' } ],
+        '+as'     => [qw/num_hosts/],
 
+    }
 );
 
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    my $rs = $c->stash->{resultset};
-    return [
-        $rs->search(
-            {},
-            {
-                join      => 'discovered_hosts',
-                distinct  => 1,
-                '+select' => [ { count => 'discovered_hosts.id' } ],
-                '+as'     => [qw/num_hosts/],
-
-            }
-        )
-    ];
-}
-
-=head2 get_object
+=action get_object
 
 =cut
 
@@ -59,6 +47,12 @@ sub get_object {
     );
 }
 
+=action command
+
+To be used via AJAX. Start, stop or delete a session.
+
+=cut
+
 sub command : Chained('base') : PathPart('command') : POST {
     my ( $self, $c ) = @_;
 
@@ -71,7 +65,7 @@ sub command : Chained('base') : PathPart('command') : POST {
     my $cmd = lc( $c->request->body_parameters->{command} );
 
     # check permissions
-    $cmd ~~ qw(restart|start|stop) and
+    $cmd =~ /^(restart|start|stop)$/ and
         $c->require_permission( $session, 'edit' );
     $cmd eq 'delete' and
         $c->require_permission( $session, 'delete' );

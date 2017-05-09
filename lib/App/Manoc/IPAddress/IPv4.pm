@@ -1,8 +1,28 @@
 package App::Manoc::IPAddress::IPv4;
+#ABSTRACT: IPv4 Addresses
 
 use Moose;
 
 ##VERSION
+
+=head1 DESCRIPTION
+
+A class for IPv4 addresses. Supports padding, unpadding,
+stringification and comparison operators.
+
+=head1 SYNOSPIS
+
+  my $addr = App::Manoc::IPAddress::IPv4->new('10.1.100.1');
+
+
+  $addr->padded; # '010.001.100.001'
+  $addr->unpadded; # '10.1.100.1'
+
+  "$addr" eq '10.1.100.1'; # true
+
+  $addr > App::Manoc::IPAddress::IPv4->new('2.1.1.1'); # also true
+
+=cut
 
 use namespace::autoclean;
 
@@ -14,11 +34,21 @@ use overload (
     '<=>' => \&_cmp_op,
 );
 
+=attr numeric
+
+Address integer representation.
+
+=cut
+
 has 'numeric' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
 );
+
+=attr padded
+
+=cut
 
 has 'padded' => (
     is       => 'ro',
@@ -27,6 +57,9 @@ has 'padded' => (
     lazy     => 1,
     builder  => '_build_padded'
 );
+
+=attr unpadded
+=cut
 
 has 'unpadded' => (
     is       => 'ro',
@@ -49,6 +82,12 @@ around BUILDARGS => sub {
         return $class->$orig(@_);
     }
 };
+
+=method address
+
+Return the address in unpadded form. Automatically called by stringification.
+
+=cut
 
 sub address {
     return $_[0]->unpadded;

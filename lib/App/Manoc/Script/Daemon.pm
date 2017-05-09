@@ -7,13 +7,16 @@ use Moose;
 extends 'App::Manoc::Script';
 with 'MooseX::Daemonize';
 
+=method main
+
+Just a place holder: this method MUST be overriden by actual daemon class.
+
+=cut
+
 sub main {
     die "This method must be overridden";
 }
 
-# use -f to start in foreground
-
-# -k or --stop to terminate the daemon
 has cmd_stop => (
     metaclass   => 'Getopt',
     cmd_flag    => 'stop',
@@ -27,7 +30,6 @@ has cmd_stop => (
 
 has '+foreground' => ( writer => '_set_foreground', );
 
-# --status to get info
 has cmd_status => (
     metaclass => 'Getopt',
     cmd_flag  => 'status',
@@ -37,6 +39,21 @@ has cmd_status => (
 
     documentation => 'get daemon status',
 );
+
+=method run
+
+The script entry point.
+
+The following command lines are supported beside the one from
+L<MooseX::Daemonize> and L<App::Manoc::Script>.
+
+=for :list
+* -k or --stop to terminate the daemon
+* --status to get info
+
+Process stay on foreground when started in debug mode.
+
+=cut
 
 sub run {
     my $self = shift;
@@ -69,6 +86,7 @@ after 'start' => sub {
     return unless $self->is_daemon;
     $self->main;
 };
+
 # Clean up the namespace.
 no Moose;
 __PACKAGE__->meta->make_immutable;

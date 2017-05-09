@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::MngUrlFormat;
+#ABSTRACT: A model object for URL string models
 
 use strict;
 use warnings;

@@ -1,6 +1,19 @@
 package App::Manoc::DB::InflateColumn::IPv4;
 #ABSTRACT: Inflator for IP v4 addresses
 
+=head1 SYNOPSIS
+
+  __PACKAGE__->add_column(
+    mng_address => {
+        data_type    => 'varchar',
+        is_nullable  => 0,
+        size         => 15,
+        ipv4_address => 1,
+    }
+   );
+
+=cut
+
 use strict;
 use warnings;
 
@@ -9,6 +22,10 @@ use warnings;
 use parent 'DBIx::Class';
 
 use App::Manoc::IPAddress::IPv4;
+
+=for Pod::Coverage register_column
+
+=cut
 
 sub register_column {
     my $self = shift;
@@ -19,18 +36,18 @@ sub register_column {
 
     $self->inflate_column(
         $column => {
-            inflate => \&inflate_ipv4_column,
-            deflate => \&deflate_ipv4_column,
+            inflate => \&_inflate_ipv4_column,
+            deflate => \&_deflate_ipv4_column,
         }
     );
 }
 
-sub inflate_ipv4_column {
+sub _inflate_ipv4_column {
     my ( $value, $obj ) = @_;
     return App::Manoc::IPAddress::IPv4->new($value) if defined($value);
 }
 
-sub deflate_ipv4_column {
+sub _deflate_ipv4_column {
     my ( $value, $obj ) = @_;
     return $value->padded if defined($value);
 }

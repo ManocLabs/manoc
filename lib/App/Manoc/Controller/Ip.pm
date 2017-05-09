@@ -13,9 +13,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 use strict;
 
-=head1 METHODS
-
-=head2 base
+=action base
 
 =cut
 
@@ -32,7 +30,7 @@ sub base : Chained('/') PathPart('ip') CaptureArgs(1) {
     );
 }
 
-=head2 view
+=action view
 
 =cut
 
@@ -97,7 +95,7 @@ sub view : Chained('base') : PathPart('') : Args(0) {
             [ $c->model('ManocDB::DHCPLease')->search( { ipaddr => $ipaddress->padded } ) ], );
 }
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -127,7 +125,7 @@ sub edit : Chained('base') PathPart('edit') Args(0) {
     $c->detach();
 }
 
-=head2 delete
+=action delete
 
 =cut
 

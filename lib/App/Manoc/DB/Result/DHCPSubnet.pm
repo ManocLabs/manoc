@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DHCPSubnet;
+#ABSTRACT: A model object for DHCP subnets
 
 use strict;
 use warnings;

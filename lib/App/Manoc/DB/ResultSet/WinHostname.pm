@@ -14,6 +14,13 @@ __PACKAGE__->load_components(
         /
 );
 
+=method register_tuple( %params )
+
+Overridden in order to convert $params{ipaddr} to
+L<App::Manoc::IPAddress::IPv4> if needed.
+
+=cut
+
 sub register_tuple {
     my $self   = shift;
     my %params = @_;
@@ -25,6 +32,12 @@ sub register_tuple {
 
     $self->next::method(%params);
 }
+
+=head1 SEE ALSO
+
+L<DBIx::Class::ResultSet>
+
+=cut
 
 1;
 

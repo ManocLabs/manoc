@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Dot11Assoc;
+#ABSTRACT: A model object for host to AP associations via 802.11
 
 use strict;
 use warnings;

@@ -20,7 +20,6 @@ BEGIN {
     use_ok 'App::Manoc::Search::Item::HWAsset';
     use_ok 'App::Manoc::Search::Item::VirtualMachine';
 
-
     use_ok 'App::Manoc::Search::Engine';
     use_ok 'App::Manoc::Search::Query';
 

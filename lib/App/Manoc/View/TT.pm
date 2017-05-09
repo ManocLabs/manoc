@@ -28,7 +28,7 @@ App::Manoc::View::TT - TT View for Manoc
 
 =head1 DESCRIPTION
 
-TT View for Manoc.
+This is the Template Toolkit view for Manoc.
 
 =head1 SEE ALSO
 

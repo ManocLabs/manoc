@@ -11,12 +11,8 @@ use App::Manoc::Form::Building;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with
-    "App::Manoc::ControllerRole::CommonCRUD",
-    "App::Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', };
-
-=head1 METHODS
-
-=cut
+    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => 'delete_object', },
+    "App::Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
 
 __PACKAGE__->config(
     # define PathPart
@@ -30,14 +26,15 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name', 'description', 'label' ],
+    object_list_options => { prefetch => 'racks' },
 );
 
-sub get_object_list {
-    my ( $self, $c ) = @_;
+=method delete_object
 
-    my $rs = $c->stash->{resultset};
-    return [ $rs->search( {}, { prefetch => 'racks' } ) ];
-}
+Override default implementation to warn when building has associated racks or
+warehouses.
+
+=cut
 
 sub delete_object {
     my ( $self, $c ) = @_;
@@ -55,6 +52,12 @@ sub delete_object {
 
     return $building->delete;
 }
+
+=method get_json_object
+
+Override to add rack information
+
+=cut
 
 sub get_json_object {
     my ( $self, $c, $building ) = @_;

@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DiscoveredHost;
+#ABSTRACT: A model object for automatically discovered hosts
 
 use strict;
 use warnings;

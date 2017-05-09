@@ -8,8 +8,9 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::ResultSet';
-with 'App::Manoc::ControllerRole::JQDatatable';
+with
+    'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::JQDatatable';
 
 use App::Manoc::Utils::Datetime qw/print_timestamp/;
 
@@ -17,11 +18,9 @@ use App::Manoc::Utils::Datetime qw/print_timestamp/;
 
 Catalyst Controller.
 
-=head1 METHODS
-
 =cut
 
-=head2 list
+=action list
 
 =cut
 
@@ -32,6 +31,10 @@ sub list : Private {
 
     $c->stash( template => 'arp/list.tt' );
 }
+
+=action list_js
+
+=cut
 
 sub list_js : Private {
     my ( $self, $c ) = @_;

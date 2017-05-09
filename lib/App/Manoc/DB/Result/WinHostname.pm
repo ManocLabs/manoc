@@ -36,6 +36,10 @@ __PACKAGE__->set_primary_key(qw(name ipaddr firstseen));
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::WinHostname');
 
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
+
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 

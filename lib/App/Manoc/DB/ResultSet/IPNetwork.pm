@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::IPNetwork;
+#ABSTRACT: ResultSet class for IPNetwork
 
 use strict;
 use warnings;
@@ -9,6 +10,13 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
 
+=method get_root_networks
+
+Return a resultset containing all networks which are not contained by another
+one.
+
+=cut
+
 sub get_root_networks {
     my ($self) = @_;
 
@@ -16,6 +24,12 @@ sub get_root_networks {
     my $rs = $self->search( { "$me.parent_id" => undef } );
     return wantarray ? $rs->all : $rs;
 }
+
+=method rebuild_tree
+
+Recalculate parent relationship for all rows.
+
+=cut
 
 sub rebuild_tree {
     my $self = shift;
@@ -29,6 +43,12 @@ sub rebuild_tree {
     }
 
 }
+
+=method including_address( $ipaddress )
+
+Return a resultset for all IPNetwork containing C<$ipaddress>.
+
+=cut
 
 sub including_address {
     my ( $self, $ipaddress ) = @_;
@@ -47,6 +67,12 @@ sub including_address {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method including_address_ordered
+
+Same as C<including_address> ordered by ordered by network address.
+
+=cut
 
 sub including_address_ordered {
     my $rs = shift->including_address(@_)->search( {}, { order_by => { -desc => 'address' } } );

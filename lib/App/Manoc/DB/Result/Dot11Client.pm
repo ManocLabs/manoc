@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Dot11Client;
+#ABSTRACT: A model object for 802.11 clients
 
 use strict;
 use warnings;

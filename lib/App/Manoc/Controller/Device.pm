@@ -7,7 +7,18 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD",
+
+=head1 CONSUMED ROLES
+
+=for :list
+* App::Manoc::ControllerRole::CommonCRUD
+* App::Manoc::ControllerRole::JSONView
+* App::Manoc::ControllerRole::CSVView
+
+=cut
+
+with
+    "App::Manoc::ControllerRole::CommonCRUD",
     "App::Manoc::ControllerRole::JSONView" => { -excludes => 'get_json_object', },
     "App::Manoc::ControllerRole::CSVView";
 
@@ -23,7 +34,6 @@ use App::Manoc::Netwalker::ControlClient;
 
 # moved  App::Manoc::Netwalker::DeviceUpdater to conditional block in refresh
 # where we need it
-use Module::Load;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -48,10 +58,7 @@ __PACKAGE__->config(
     create_page_title => 'New device',
 );
 
-=head1 ACTIONS
-
-
-=head2 view
+=action view
 
 =cut
 
@@ -70,7 +77,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     $c->stash( template => 'device/view.tt' );
 }
 
-=head2 ifstatus
+=action ifstatus
 
 Called via xhr by view
 
@@ -125,7 +132,7 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
     $c->stash->{iface_info} = \@iface_info;
 }
 
-=head2 neighs
+=action neighs
 
 Called via xhr by view
 
@@ -153,7 +160,7 @@ sub neighs : Chained('object') : PathPart('neighs') : Args(0) {
     $c->stash->{neighs}     = \@neighs;
 }
 
-=head2 ssids
+=action ssids
 
 Called via xhr by view
 
@@ -178,7 +185,7 @@ sub ssids : Chained('object') : PathPart('ssids') : Args(0) {
     $c->stash->{no_wrapper} = 1;
 }
 
-=head2 dot11clients
+=action dot11clients
 
 Called via xhr by view
 
@@ -202,7 +209,7 @@ sub dot11clients : Chained('object') : PathPart('dot11clients') : Args(0) {
     $c->stash->{no_wrapper} = 1;
 }
 
-=head2 refresh
+=action refresh
 
 =cut
 
@@ -226,7 +233,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     $c->detach();
 }
 
-=head2 uplinks
+=action uplinks
 
 =cut
 
@@ -254,7 +261,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
     $c->detach();
 }
 
-=head2 nwinfo
+=action nwinfo
 
 =cut
 
@@ -284,7 +291,7 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     $c->detach();
 }
 
-=head2 show_run
+=action show_config
 
 Show running configuration
 
@@ -320,7 +327,9 @@ sub show_config : Chained('object') : PathPart('config') : Args(0) {
 
 }
 
-=head2 create
+=action create
+
+Override in order to manage rack parameter.
 
 =cut
 
@@ -335,7 +344,7 @@ before 'create' => sub {
 
 };
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -359,7 +368,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->detach();
 }
 
-=head2 restore
+=action restore
 
 =cut
 
@@ -390,7 +399,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-=head2 update_fromnwinfo
+=action update_from_nwinfo
 
 =cut
 
@@ -418,7 +427,9 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     $c->forward('View::JSON');
 }
 
-=head1 METHODS
+=method get_object
+
+Find by id or mng_address.
 
 =cut
 
@@ -432,7 +443,7 @@ sub get_object {
     return $object;
 }
 
-=head2 delete_object
+=method delete_object
 
 =cut
 
@@ -456,7 +467,7 @@ sub delete_object {
     return $device->delete;
 }
 
-=head2 get_json_object
+=method get_json_object
 
 =cut
 

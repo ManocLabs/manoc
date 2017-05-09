@@ -1,4 +1,5 @@
 package App::Manoc::DataDumper;
+#ABSTRACT: Data dumper for import/export in Manoc
 use Moose;
 
 ##VERSION
@@ -285,6 +286,21 @@ sub _load_table {
     $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );
 }
 
+=method load( $enable_fk, $overwrite, $force )
+
+Load data from C<$self->filename>.
+
+=for: list
+
+* If C<$enable_fk> is true foreign key are checked while data is
+loading, otherwise use deferred foreign key checks.
+
+* If C<$overwrite> is true old data is deleted before loading new.
+
+* If C<$force> is true data loading continues even if an error condition arise.
+
+=cut
+
 sub load {
     my ( $self, $enable_fk, $overwrite, $force ) = @_;
 
@@ -321,6 +337,12 @@ sub load {
 #----------------------------------------------------------------------#
 #                      S A V E   A C T I O N                           #
 #----------------------------------------------------------------------#
+
+=method save
+
+Save Manoc data to C<$self->filename>.
+
+=cut
 
 sub save {
     my ($self) = @_;

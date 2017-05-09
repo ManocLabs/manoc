@@ -9,7 +9,9 @@ use namespace::autoclean;
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
-=head1 METHODS
+=action lease_base
+
+Base action lease actions
 
 =cut
 
@@ -18,7 +20,7 @@ sub lease_base : Chained('deserialize') PathPart('dhcp/lease') CaptureArgs(0) {
     $c->stash( resultset => $c->model('ManocDB::DHCPLease') );
 }
 
-=head2 lease_post
+=action lease_post
 
 POST api/v1/dhcp/lease
 

@@ -1,3 +1,5 @@
+theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
+
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = HTML::FormHandler::Moose  HTML::FormHandler::Moose::Role
 

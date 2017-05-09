@@ -66,7 +66,6 @@ on 'develop' => sub {
   requires "Dist::Zilla" => "0";
   requires "Git::Wrapper" => "0";
   requires "Perl::Tidy" => "0";
-  requires "Pod::Coverage::Moose" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::EOL" => "0";
   requires "Test::More" => "0.88";

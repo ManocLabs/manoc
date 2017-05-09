@@ -1,10 +1,34 @@
-
 package App::Manoc::DataDumper::Data;
-#ABSTRACT: Represents a datadumper file
+#ABSTRACT: Class for managing datadumper file
 
 use Moose;
 
 ##VERSION
+
+=head1 DESCRIPTION
+
+Use this class to create or load data dumper files. A data dumper file
+is just a tar file containing a yaml files. Each yaml file contains a
+set of records for a DB table.
+
+=head1 SYNOPSIS
+
+  $datadump = App::Manoc::DataDumper::Data->init( $filename, $version, $config );
+
+  [...]
+  foreach  $source ( @datasources ) {
+    $table = $source->result_source->name;
+    @data = $source->all;
+    $datadump->add_file( "$table.yaml", \@data );
+  }
+  $datadump->save;
+
+  my $datadump = App::Manoc::DataDumper::Data->load( $self->filename );
+  my $version = $datadump->metadata->{'version'};
+
+  my $records = $datadump->load_file("$table.yml");
+
+=cut
 
 use Archive::Tar;
 use App::Manoc::Utils;
@@ -74,6 +98,12 @@ sub _build_tmpdir {
     return tempdir( "manocdumpXXXXXX", TMPDIR => 1, CLEANUP => 1 );
 }
 
+=method load( $filename )
+
+Load a manoc dump file.
+
+=cut
+
 sub load {
     my ( $self, $filename ) = @_;
 
@@ -95,7 +125,13 @@ sub load {
     return $obj;
 }
 
-#returns a reference to the array of records loaded from the yaml file
+=class_method load_file( $filename )
+
+Open the yaml file C<$filename> from the manoc dump archive and return
+a reference to the array of records found on it.
+
+=cut
+
 sub load_file {
     my ( $self, $filename ) = @_;
 
@@ -108,6 +144,12 @@ sub load_file {
     return \@data;
 }
 
+=class_method init( $filename, $version, $config )
+
+Create a new dumper file.
+
+=cut
+
 sub init {
     my ( $self, $filename, $version, $config ) = @_;
 
@@ -119,6 +161,13 @@ sub init {
         }
     );
 }
+
+=method add_file( $filename, $array_ref )
+
+Add a C<$filename> file to the current dump serialing records form
+C<$array_ref>.
+
+=cut
 
 sub add_file {
     my ( $self, $filename, $array_ref ) = @_;
@@ -137,6 +186,13 @@ sub add_file {
     #free resources
     close $fh;
 }
+
+=method save
+
+Create dump file, i.e. a tar file containing all the serialized record
+plus a metadata file.
+
+=cut
 
 sub save {
     my ($self) = @_;

@@ -116,7 +116,9 @@ sub virtinfr {
     return $self->next::method(@args);
 }
 
-=head2 label
+=method label
+
+Return a string describing the object
 
 =cut
 
@@ -133,7 +135,7 @@ sub label {
     return $label;
 }
 
-=head2 decommission
+=method decommission
 
 Set decommissioned to true, update timestamp and de associate server if
 needed.
@@ -160,7 +162,7 @@ sub decommission {
     $guard->commit;
 }
 
-=head2 restore
+=method restore
 
 =cut
 
@@ -173,7 +175,7 @@ sub restore {
     $self->decommission_ts(undef);
 }
 
-=head2 in_use
+=method in_use
 
 Return true if vm is used by a server
 

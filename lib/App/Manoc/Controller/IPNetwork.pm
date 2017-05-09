@@ -16,16 +16,6 @@ with 'App::Manoc::ControllerRole::CommonCRUD';
 use App::Manoc::Form::IPNetwork;
 use App::Manoc::Utils::Datetime qw/str2seconds/;
 
-=head1 NAME
-
-App::Manoc::Controller::IPNetwork - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=cut
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -37,26 +27,15 @@ __PACKAGE__->config(
     form_class              => 'App::Manoc::Form::IPNetwork',
     enable_permission_check => 1,
     view_object_perm        => undef,
+    object_list_options     => {
+        prefetch => 'vlan',
+        order_by => { -asc => 'address' }
+    }
 );
 
-=head1 METHODS
+=action view
 
 =cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    my $rs = $c->stash->{resultset};
-    return [
-        $rs->search(
-            {},
-            {
-                prefetch => 'vlan',
-                order_by => { -asc => 'address' }
-            }
-        )->all()
-    ];
-}
 
 before 'view' => sub {
     my ( $self, $c ) = @_;
@@ -79,6 +58,12 @@ before 'view' => sub {
     $c->stash( hosts_usage => int( $hosts->count() / $max_hosts * 100 ) );
 };
 
+=action arp
+
+Show ARP activity for the IPNetwork
+
+=cut
+
 sub arp : Chained('object') {
     my ( $self, $c ) = @_;
 
@@ -89,6 +74,12 @@ sub arp : Chained('object') {
 
     $c->detach('/arp/list');
 }
+
+=action arp_js
+
+Datatable AJAX support for ARP activity list
+
+=cut
 
 sub arp_js : Chained('object') {
     my ( $self, $c ) = @_;
@@ -104,6 +95,12 @@ sub arp_js : Chained('object') {
 
     $c->detach('/arp/list_js');
 }
+
+=action root
+
+Show root IP networks.
+
+=cut
 
 sub root : Chained('base') {
     my ( $self, $c ) = @_;

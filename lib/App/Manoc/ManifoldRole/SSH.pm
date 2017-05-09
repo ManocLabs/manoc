@@ -69,11 +69,23 @@ sub _build_password {
     return $self->credentials->{password} || '';
 }
 
+=method cmd(@args)
+
+Execute a command and return its output via capture
+
+=cut
+
 sub cmd {
     my $self    = shift;
     my $session = $self->session;
     return $session->capture(@_);
 }
+
+=method system([$opts], @args)
+
+Execute a command via system discarding output.
+
+=cut
 
 sub system {
     my $self    = shift;
@@ -84,6 +96,13 @@ sub system {
 
     return $session->system( $opts, @_ );
 }
+
+=method connect
+
+Create the Net::OpenSSH session. Debug will be enabled if MANOC_DEBUG_SSH
+environment var is set.
+
+=cut
 
 sub connect {
     my $self = shift;
@@ -124,11 +143,23 @@ sub connect {
     return 1;
 }
 
+=method get_error
+
+Return the session error
+
+=cut
+
 sub get_error {
     my $self = shift;
 
     return $self->session->error;
 }
+
+=method close
+
+Close current session.
+
+=cut
 
 sub close {
     my $self = shift;

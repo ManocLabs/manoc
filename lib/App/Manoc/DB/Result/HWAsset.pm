@@ -1,4 +1,6 @@
 package App::Manoc::DB::Result::HWAsset;
+#ABSTRACT: A model object for the parent class of all Hardware assets
+
 use strict;
 use warnings;
 
@@ -8,6 +10,20 @@ use parent 'App::Manoc::DB::Result';
 
 use Carp;
 
+=head1 CONSTANTS
+
+=head2  Types
+
+To be used in C<type> column.
+
+=for :list
+= TYPE_DEVICE
+= TYPE_PRINTER
+= TYPE_WORKSTATION
+= TYPE_SERVER
+= TYPE_IPPHONE
+=cut
+
 use constant {
     TYPE_DEVICE      => 'D',
     TYPE_PRINTER     => 'P',
@@ -15,6 +31,16 @@ use constant {
     TYPE_SERVER      => 'S',
     TYPE_IPPHONE     => 'p'
 };
+
+=head2 Location
+
+=for :list
+= LOCATION_DECOMMISSIONED
+= LOCATION_WAREHOUSE
+= LOCATION_RACK
+= LOCATION_ROOM
+
+=cut
 
 use constant {
     LOCATION_DECOMMISSIONED => 'd',
@@ -155,11 +181,23 @@ __PACKAGE__->might_have(
     }
 );
 
+=method server
+
+Return true if this asset is a serverhw
+
+=cut
+
 sub server {
     my $self = shift;
     $self->serverhw and return $self->serverhw->server;
     return;
 }
+
+=method workstation
+
+Return true if this asset is a workstationhw
+
+=cut
 
 sub workstation {
     my $self = shift;
@@ -167,7 +205,7 @@ sub workstation {
     return;
 }
 
-=head2 in_use
+=method in_use
 
 Return 1 when there is an associated logical item, 0 otherwise.
 
@@ -181,20 +219,47 @@ sub in_use {
 
 }
 
+=method is_decommissioned
+
+Return true if decommissioned
+
+=cut
+
 sub is_decommissioned {
     my $self = shift;
     return $self->_location eq LOCATION_DECOMMISSIONED;
 }
+
+=method is_in_warehouse
+
+Return true if in warehouse
+
+=cut
 
 sub is_in_warehouse {
     my $self = shift;
     return $self->_location eq LOCATION_WAREHOUSE;
 }
 
+=method is_in_rack
+
+Return true if in rack
+
+=cut
+
 sub is_in_rack {
     my $self = shift;
     return $self->_location eq LOCATION_RACK;
 }
+
+=method location
+
+Set/get current object location.
+If needed rack/floor/room/building fields are cleared.
+
+You cannot use this method to decommission an object, use <decommission>.
+
+=cut
 
 sub location {
     my $self = shift;
@@ -241,6 +306,12 @@ sub location {
     return $self->_location;
 }
 
+=method decommission
+
+Mark object as decommissioned.
+
+=cut
+
 sub decommission {
     my $self = shift;
     my $timestamp = shift || time();
@@ -249,6 +320,12 @@ sub decommission {
     $self->locationchange_ts ||
         $self->locationchange_ts($timestamp);
 }
+
+=method restore
+
+Undo decommissionining. Set location to warehouse.
+
+=cut
 
 sub restore {
     my $self = shift;
@@ -259,6 +336,12 @@ sub restore {
     $self->locationchange_ts(undef);
 }
 
+=method move_to_rack( $rack )
+
+Set location to rack $rack. Parameter $rack can be an id or row object.
+
+=cut
+
 sub move_to_rack {
     my ( $self, $rack ) = @_;
 
@@ -267,6 +350,12 @@ sub move_to_rack {
     $self->rack_id($rack_id);
     $self->location(LOCATION_RACK);
 }
+
+=method move_to_room($building, $floor, $room)
+
+Set location to building $building, floor $floor and room $room.
+
+=cut
 
 sub move_to_room {
     my ( $self, $building, $floor, $room ) = @_;
@@ -280,6 +369,13 @@ sub move_to_room {
     $self->location(LOCATION_ROOM);
 }
 
+=method move_to_warehouse( $warehouse )
+
+Set location to warehouse $warehouse.
+Parameter $warehouse can be an id or row object.
+
+=cut
+
 sub move_to_warehouse {
     my ( $self, $warehouse ) = @_;
 
@@ -289,17 +385,35 @@ sub move_to_warehouse {
     $self->location(LOCATION_WAREHOUSE);
 }
 
+=method label
+
+Return a string describing the object
+
+=cut
+
 sub label {
     my $self = shift;
 
     return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
 
+=method display_type
+
+Return a string describing the object type
+
+=cut
+
 sub display_type {
     my $self = shift;
 
     return $TYPE{ $self->type }->{label};
 }
+
+=method display_location
+
+Return a string describing the object location
+
+=cut
 
 sub display_location {
     my $self = shift;
@@ -328,12 +442,22 @@ sub display_location {
     }
 }
 
+=method generate_inventory
+
+Generate a unique inventory identifier and set the inventory field
+
+=cut
+
 sub generate_inventory {
     my $self = shift;
 
     my $inventory = sprintf( "%s%06d", $self->type, $self->id );
     $self->inventory($inventory);
 }
+
+=for POD::Coverate insert
+
+=cut
 
 sub insert {
     my ( $self, @args ) = @_;
@@ -348,6 +472,10 @@ sub insert {
     }
     return $self;
 }
+
+=for POD::Coverate insert
+
+=cut
 
 sub update {
     my ( $self, @args ) = @_;

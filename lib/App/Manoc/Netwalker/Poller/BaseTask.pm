@@ -1,7 +1,16 @@
 package App::Manoc::Netwalker::Poller::BaseTask;
+#ABSTRACT: Base role for poller tasks
 
 use Moose::Role;
 ##VERSION
+
+requires "nwinfo";
+
+=attr schema
+
+The Manoc DB schema.
+
+=cut
 
 has 'schema' => (
     is       => 'ro',
@@ -9,11 +18,23 @@ has 'schema' => (
     required => 1
 );
 
+=attr config
+
+Netwalker config object
+
+=cut
+
 has 'config' => (
     is       => 'ro',
     isa      => 'App::Manoc::Netwalker::Config',
     required => 1
 );
+
+=attr credentials
+
+Authentication credentials hash.
+
+=cut
 
 has 'credentials' => (
     is      => 'ro',
@@ -32,7 +53,13 @@ sub _build_credentials {
     return $credentials;
 }
 
-has refresh_interval => (
+=attr refresh_interval
+
+The refresh interval used to compute future scheduling.
+
+=cut
+
+has 'refresh_interval' => (
     is      => 'ro',
     isa     => 'Int',
     lazy    => 1,
@@ -43,11 +70,24 @@ sub _build_refresh_interval {
     shift->config->refresh_interval;
 }
 
+=attr timestamp
+
+UNIX timestamp saying the at which the task was started
+
+=cut
+
 has 'timestamp' => (
     is      => 'ro',
     isa     => 'Int',
     default => sub { time },
 );
+
+=method reschedule_on_failure
+
+Update C<nwinfo->scheduled_attempt> field after a failed poller attempt.
+Implements backoff, doubling interval extent up to C<config->max_backoff>.
+
+=cut
 
 sub reschedule_on_failure {
     my $self   = shift;
@@ -66,6 +106,12 @@ sub reschedule_on_failure {
     my $next_attempt = $self->timestamp + $backoff;
     $nwinfo->scheduled_attempt($next_attempt);
 }
+
+=method reschedule_on_success
+
+Update C<nwinfo->scheduled_attempt> field after a successful poller attempt.
+
+=cut
 
 sub reschedule_on_success {
     my $self   = shift;

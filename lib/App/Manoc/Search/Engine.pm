@@ -74,6 +74,12 @@ sub _register_driver {
     push @{ $self->driver_registry->{$type} }, $driver;
 }
 
+=method search($query)
+
+Run a search using the query object C<$query>.
+
+=cut
+
 sub search {
     my ( $self, $query ) = @_;
 

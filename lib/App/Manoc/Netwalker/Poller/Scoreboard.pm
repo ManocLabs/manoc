@@ -1,6 +1,17 @@
 package App::Manoc::Netwalker::Poller::Scoreboard;
+#ABSTRACT: Mantains netwalker workers task status
+
+=head1 DESCRIPTION
+
+This class mantains netwalker workers task status.
+
+Status is an an enumeration of C<qw(DONE QUEUED RUNNING ERROR)> and is
+mantained for server and device tasks, indexed by their own id.
+
+=cut
 
 use Moose;
+
 ##VERSION
 
 use Moose::Util::TypeConstraints;
@@ -19,43 +30,43 @@ has _job => (
     default => sub { {} },
 );
 
-=head2 get_device_status( $id )
+=method get_device_status( $id )
 
 =cut
 
 sub get_device_status { shift->_get( 'device', @_ ) }
 
-=head2 set_device_info( $id, $status, $jobid )
+=method set_device_info( $id, $status, $jobid )
 
 =cut
 
 sub set_device_info { shift->_set( 'device', @_ ) }
 
-=head2 device_status_list
+=method device_status_list
 
 =cut
 
 sub device_status_list { shift->_status->{device} }
 
-=head2 get_server_status
+=method get_server_status
 
 =cut
 
 sub get_server_status { shift->_get( 'server', @_ ) }
 
-=head2 set_server_info
+=method set_server_info
 
 =cut
 
 sub set_server_info { shift->_set( 'server', @_ ) }
 
-=head2 server_status_list
+=method server_status_list
 
 =cut
 
 sub server_status_list { shift->_status->{server} }
 
-=head2 get_job_info
+=method get_job_info
 
 =cut
 

@@ -15,11 +15,18 @@ App::Manoc::View::JSON - Catalyst JSON View
 
 =head1 SYNOPSIS
 
-See L<Manoc>
+  sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash( json_data => \@my_list );
+    $c->forward('View::JSON');
+  }
 
 =cut
 
 __PACKAGE__->config( 'expose_stash' => 'json_data', );
+
+=for Pod::Coverage encode_json
 
 sub encode_json {
     my ( $self, $c, $data ) = @_;
@@ -36,9 +43,9 @@ sub encode_json {
     return $encoder->encode($data);
 }
 
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
-Catalyst JSON View.
+L<Catalyst::View::JSON>
 
 =cut
 

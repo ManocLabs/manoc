@@ -1,7 +1,6 @@
 package App::Manoc::Form::CSVImport;
 
 use HTML::FormHandler::Moose;
-
 ##VERSION
 
 use namespace::autoclean;
@@ -144,8 +143,8 @@ sub _build_csv_to_db_map {
     # populate column names mapping
     my %csv2db_name;
     foreach my $csv_col ( @{ $self->csv_column_names } ) {
-        print STDERR "checking $csv_col\n";
-        if ( $csv_col ~~ @all_columns || lc($csv_col) ~~ @all_columns ) {
+        #print STDERR "checking $csv_col\n";
+        if ( grep { lc($csv_col) eq lc($_) } @all_columns ) {
             $csv2db_name{$csv_col} = $csv_col;
             next;
         }
@@ -194,7 +193,7 @@ sub update_model {
     # check required columns
     my $mapped_columns = $self->csv_mapped_columns;
     foreach my $col ( @{ $self->required_columns } ) {
-        $col ~~ %$mapped_columns and next;
+        $mapped_columns->{$col} and next;
         $self->add_form_error("row '$col' not found");
     }
     $self->has_errors and return;

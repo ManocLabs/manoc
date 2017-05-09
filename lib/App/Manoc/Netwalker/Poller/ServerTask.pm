@@ -1,23 +1,33 @@
 package App::Manoc::Netwalker::Poller::ServerTask;
+#ABSTRACT: Server poller task
 
 use Moose;
+
 ##VERSION
 
 use Try::Tiny;
 
-with
-    'App::Manoc::Netwalker::Poller::BaseTask',
-    'App::Manoc::Logger::Role';
-
 use App::Manoc::Netwalker::Poller::TaskReport;
 use App::Manoc::Manifold;
 use App::Manoc::IPAddress::IPv4;
+
+=attr server_id
+
+The id in Manoc DB of the server to poll
+
+=cut
 
 has 'server_id' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1
 );
+
+=attr server_entry
+
+The Server row in Manoc DB identified by C<server_id>
+
+=cut
 
 has 'server_entry' => (
     is      => 'ro',
@@ -26,6 +36,12 @@ has 'server_entry' => (
     builder => '_build_server_entry',
 );
 
+=attr nwinfo
+
+The curresponding ServerNWInfo row for C<server_entry>
+
+=cut
+
 has 'nwinfo' => (
     is      => 'ro',
     isa     => 'Object',
@@ -33,25 +49,52 @@ has 'nwinfo' => (
     builder => '_build_nwinfo',
 );
 
-# the source for information
+=attr source
+
+The source for information, i.e. a connected Manifold object.
+
+=cut
+
 has 'source' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_source',
 );
 
-# the source for server configuration backup
+=attr config_source
+
+The source for server configuration backup
+
+=cut
+
 has 'config_source' => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_config_source',
 );
 
+=attr task_report
+
+=cut
+
 has 'task_report' => (
     is       => 'ro',
     required => 0,
     builder  => '_build_task_report',
 );
+
+=head1 CONSUMED ROLES
+
+=for :list
+
+* App::Manoc::Netwalker::Poller::BaseTask
+* App::Manoc::Logger::Role
+
+=cut
+
+with
+    'App::Manoc::Netwalker::Poller::BaseTask',
+    'App::Manoc::Logger::Role';
 
 #----------------------------------------------------------------------#
 #                                                                      #
@@ -141,6 +184,13 @@ sub _build_task_report {
 #                                                                      #
 #----------------------------------------------------------------------#
 
+=method update
+
+Update server information using data from C<source>.  Reschedule next
+poll.
+
+=cut
+
 sub update {
     my $self = shift;
 
@@ -185,7 +235,9 @@ sub update {
     return 1;
 }
 
-=head2 update_server_info
+=method update_server_info
+
+Called by C<update>, updates info in C<nwinfo>.
 
 =cut
 
@@ -233,9 +285,10 @@ sub update_server_info {
     $nw_entry->update;
 }
 
-#----------------------------------------------------------------------#
+=method update_vm
 
-=head2 update_vm
+If server is hosted on a virtual machine and the vm uuid is available,
+update the associated virtual machine in Manoc DB.
 
 =cut
 
@@ -304,6 +357,12 @@ sub update_vm {
 }
 
 =head2 fetch_virtual_machines
+
+If the server is an hypervisor update the list of its currently hosted
+virtual machines.
+
+Requires a Manifold consuming the
+L<App::Manoc::ManifoldRole::Hypervisor> role.
 
 =cut
 
@@ -386,7 +445,11 @@ sub fetch_virtual_machines {
 
 }
 
-=head2 update_packages
+=method update_packages
+
+Updates the list of software packages installed on the server
+
+Requires a Manifold consuming the L<App::Manoc::ManifoldRole::Host> role.
 
 =cut
 

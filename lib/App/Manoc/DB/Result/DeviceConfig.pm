@@ -1,4 +1,12 @@
 package App::Manoc::DB::Result::DeviceConfig;
+#ABSTRACT: A model object to store device configuration.
+
+=head1 DESCRIPTION
+
+DeviceConfig stores device configuration as text for backup and mantains previous
+configurations in order to implement configuration diff.
+
+=cut
 
 use strict;
 use warnings;
@@ -40,16 +48,5 @@ __PACKAGE__->belongs_to(
     device => 'App::Manoc::DB::Result::Device',
     'device_id',
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::DeviceConfig - A model object to mantain the devices configuration backup.
-
-=head1 DESCRIPTION
-
-This is an object that represents a CDP entry. It uses DBIx::Class
-(aka, DBIC) to do ORM.
-
-=cut
 
 1;

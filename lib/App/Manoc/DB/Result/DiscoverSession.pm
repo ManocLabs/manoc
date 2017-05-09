@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DiscoverSession;
+#ABSTRACT: A model object for discovery sessions
 
 use strict;
 use warnings;
@@ -74,15 +75,41 @@ __PACKAGE__->has_many(
     'session_id', { cascade_delete => 1 }
 );
 
+=method is_new
+
+=cut
+
 sub is_new { return shift->status eq STATUS_NEW }
+
+=method is_done
+
+=cut
 
 sub is_done { return shift->status eq STATUS_DONE }
 
+=method is_running
+
+=cut
+
 sub is_running { return shift->status eq STATUS_RUNNING }
+
+=method is_stopped
+
+=cut
 
 sub is_stopped { return shift->status eq STATUS_STOPPED }
 
+=method is_waiting
+
+=cut
+
 sub is_waiting { return shift->status eq STATUS_WAITING }
+
+=method restart
+
+Set status to new and reset next_address
+
+=cut
 
 sub restart {
     my $self = shift;
@@ -90,6 +117,12 @@ sub restart {
     $self->status(STATUS_NEW);
     $self->next_addr( $self->from_addr );
 }
+
+=method display_status
+
+Show current status in human readable form
+
+=cut
 
 sub display_status {
     my $self   = shift;
@@ -101,6 +134,12 @@ sub display_status {
     $status eq STATUS_WAITING and return 'waiting';
     $status eq STATUS_DONE    and return 'done';
 }
+
+=method progression
+
+Return the percentage of scanned addresses as a integer
+
+=cut
 
 sub progression {
     my $self = shift;
@@ -116,6 +155,10 @@ sub progression {
 
     return int( $done / $total * 100 );
 }
+
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_table ) = @_;

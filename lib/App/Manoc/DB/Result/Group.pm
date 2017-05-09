@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Group;
+#ABSTRACT: A model object for user groups
 
 use strict;
 use warnings;

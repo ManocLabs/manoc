@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Device;
+#ABSTRACT: A model object for logical devices
 
 use strict;
 use warnings;
@@ -85,6 +86,12 @@ __PACKAGE__->belongs_to(
     { join_type => 'left' }
 );
 
+=method rack
+
+Get/set associated rack. Updates associated hardware asset if defined.
+
+=cut
+
 sub rack {
     my ( $self, @args ) = @_;
 
@@ -162,6 +169,13 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
+=method mng_address
+
+Getter/setter for mng_address column. Both string values and
+ L<App::Manoc::IPAddress::IPv4> are supported
+
+=cut
+
 sub mng_address {
     my ( $self, $value ) = @_;
 
@@ -172,9 +186,9 @@ sub mng_address {
     return $self->_mng_address();
 }
 
-=head2 get_mng_url
+=method get_mng_url
 
-Return mng_address formatted using mng_url_format,
+Return mng_address formatted using mng_url_format
 
 =cut
 
@@ -191,7 +205,7 @@ sub get_mng_url {
     return $str;
 }
 
-=head2 get_config_date
+=method get_config_date
 
 Return the date of the last saved config, undef if there isn't any
 
@@ -205,7 +219,7 @@ sub get_config_date {
     return $config->config_date;
 }
 
-=head2 update_config( $config_text, [ $timestamp ] )
+=method update_config( $config_text, [ $timestamp ] )
 
 Create or update the related DeviceConfig object. Check if
 configuration has changed before rotating the stored one.  Return 1 if
@@ -247,7 +261,7 @@ sub update_config {
     return;
 }
 
-=head2 decommission([$timestamp])
+=method decommission([$timestamp])
 
 Set decommissioned to true, update timestamp and deassociate nwinfo if
 needed.
@@ -273,7 +287,7 @@ sub decommission {
     $guard->commit;
 }
 
-=head2 reactivate
+=method restore
 
 Set decommissioned to false and reset timestamp.
 

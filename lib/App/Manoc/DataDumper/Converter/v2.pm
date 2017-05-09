@@ -1,4 +1,5 @@
-package App::Manoc::DataDumper::Converter::v2;
+package    # hide from CPAN
+    App::Manoc::DataDumper::Converter::v2;
 
 use Moose;
 

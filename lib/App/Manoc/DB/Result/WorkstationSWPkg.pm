@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::WorkstationSWPkg;
+#ABSTRACT:  A model object representing the JOIN between SoftwarePkg and Workstation.
 
 use strict;
 use warnings;
@@ -38,18 +39,5 @@ __PACKAGE__->belongs_to(
     software_pkg => 'App::Manoc::DB::Result::SoftwarePkg',
     'software_pkg_id'
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::WorkstationSWPkg - A model object representing the JOIN
-between Software and Workstation.
-
-=head1 DESCRIPTION
-
-This is an object that represents a mapping between workstations and
-softwarepkg in the application database.  It uses DBIx::Class (aka,
-DBIC) to do ORM.
-
-=cut
 
 1;

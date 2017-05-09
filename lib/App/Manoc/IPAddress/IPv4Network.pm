@@ -1,4 +1,28 @@
 package App::Manoc::IPAddress::IPv4Network;
+#ABSTRACT: IPv4 Networks
+
+=head1 DESCRIPTION
+
+A class for IPv4 networks.
+
+=head1 SYNOPSIS
+
+  my $net = App::Manoc::IPAddress::IPv4Network->new('192.168.1.0', '24');
+  # same as  App::Manoc::IPAddress::IPv4Network->new('10.10.0.0', '255.255.0.0');
+
+  print "$net"; # prints 192.168.1.0/24
+
+  $net->address;     # returns '192.168.1.0'
+  $net->prefix;      # returns '24'
+  $net->netmask;     # returns '255.255.255.0'
+  $net->broadcast;   # returns 192.168.1.255'
+  $net->first_host;  # returns '192.168.1.1',
+  $net->last_host;   # returns '192.168.1.254'
+  $net->wildcard;    # returns '0.0.0.255'
+
+  $net->contains_address( App::Manoc::IPAddress::IPv4->new('192.168.1.5') );
+
+=cut
 
 use Moose;
 
@@ -12,6 +36,10 @@ use App::Manoc::IPAddress::IPv4;
 
 use overload ( '""' => sub { shift->_stringify() }, );
 
+=attr address
+
+=cut
+
 has 'address' => (
     is       => 'ro',
     isa      => 'App::Manoc::IPAddress::IPv4',
@@ -22,6 +50,10 @@ has 'address' => (
 sub _address_i {
     $_[0]->address->numeric();
 }
+
+=attr prefix
+
+=cut
 
 has 'prefix' => (
     is       => 'ro',
@@ -40,6 +72,10 @@ has '_netmask_i' => (
 sub _build_netmask_i {
     prefix2netmask_i( $_[0]->prefix );
 }
+
+=attr netmask
+
+=cut
 
 has 'netmask' => (
     is       => 'ro',
@@ -65,6 +101,10 @@ sub _build_broadcast_i {
     $_[0]->_address_i | ~$_[0]->_netmask_i;
 }
 
+=attr broadcast
+
+=cut
+
 has 'broadcast' => (
     is       => 'ro',
     isa      => 'App::Manoc::IPAddress::IPv4',
@@ -88,6 +128,10 @@ has _first_host_i => (
 sub _build_first_host_i {
     $_[0]->_address_i + 1;
 }
+
+=attr first_host
+
+=cut
 
 has first_host => (
     is       => 'ro',
@@ -113,6 +157,10 @@ sub _build_last_host_i {
     $_[0]->_broadcast_i - 1;
 }
 
+=attr last_host
+
+=cut
+
 has last_host => (
     is       => 'ro',
     isa      => 'App::Manoc::IPAddress::IPv4',
@@ -124,6 +172,10 @@ has last_host => (
 sub _build_last_host {
     App::Manoc::IPAddress::IPv4->new( numeric => $_[0]->_last_host_i );
 }
+
+=attr wildcard
+
+=cut
 
 has wildcard => (
     is       => 'ro',
@@ -140,6 +192,10 @@ sub _build_wildcard {
     return App::Manoc::IPAddress::IPv4->new( numeric => $addr );
 }
 
+=attr num_hosts
+
+=cut
+
 has num_hosts => (
     is       => 'ro',
     isa      => 'Int',
@@ -151,6 +207,12 @@ has num_hosts => (
 sub _build_num_hosts {
     return $_[0]->_last_host_i - $_[0]->_first_host_i + 1;
 }
+
+=method contains_address($address)
+
+Return 1 if the address is part of this network.
+
+=cut
 
 sub contains_address {
     my ( $self, $address ) = @_;

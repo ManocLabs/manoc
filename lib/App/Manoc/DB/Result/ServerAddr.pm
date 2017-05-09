@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::ServerAddr;
+#ABSTRACT: A model object representing IP addresses assigned to a server
 
 use strict;
 use warnings;
@@ -39,15 +40,5 @@ __PACKAGE__->belongs_to(
     server => 'App::Manoc::DB::Result::Server',
     { 'foreign.id' => 'self.server_id' }
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::ServerAddr - Server additional network addresses
-
-=head1 DESCRIPTION
-
-A model object to mantain netwalker configuration for a server.
-
-=cut
 
 1;

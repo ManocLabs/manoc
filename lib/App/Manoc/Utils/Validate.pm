@@ -1,4 +1,7 @@
 package App::Manoc::Utils::Validate;
+
+# ABSTRACT: Helpers for data validation.
+
 use strict;
 use warnings;
 
@@ -13,21 +16,13 @@ BEGIN {
         /;
 }
 
-=head1 NAME
-
-App::Manoc::Utils::Validate - Helpers for data validation.
-
-=encoding utf8
-
 =head1 DESCRIPTION
 
 These package contains helpers for data validation.
 
-=head1 METHODS
-
 =cut
 
-=head2 validate($value, \%rule, %options)
+=function validate($value, \%rule, %options)
 
 Validate $value using %rule. Rule can have the following clauses:
 

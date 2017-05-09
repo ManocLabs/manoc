@@ -126,10 +126,9 @@ __PACKAGE__->many_to_many(
     'software_pkg'
 );
 
-=head2 decommission([timestamp=>$timestamp])
+=method decommission([timestamp=>$timestamp])
 
 Set decommissioned to true, update timestamp.
-
 
 =cut
 
@@ -146,7 +145,7 @@ sub decommission {
     $self->update();
 }
 
-=head2 restore
+=method restore
 
 =cut
 
@@ -161,7 +160,9 @@ sub restore {
     $self->update;
 }
 
-=head2 label
+=method label
+
+Return a string describing the object
 
 =cut
 

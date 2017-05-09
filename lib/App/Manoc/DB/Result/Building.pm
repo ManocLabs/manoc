@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Building;
+#ABSTRACT: A model object for buildings
 
 use strict;
 use warnings;
@@ -40,6 +41,12 @@ __PACKAGE__->has_many(
     warehouses => 'App::Manoc::DB::Result::Warehouse',
     'building_id', { cascade_delete => 0 }
 );
+
+=method label
+
+Return a string describing the object
+
+=cut
 
 sub label {
     my $self  = shift;

@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::Mat;
+#ABSTRACT: ResultSet class for Mat
 
 use strict;
 use warnings;
@@ -12,6 +13,14 @@ __PACKAGE__->load_components(
         +App::Manoc::DB::Helper::ResultSet::TupleArchive
         /
 );
+
+=method search_multihost
+
+Return a resultset containing interfaces on which has been activity for more
+than one mac address. Returned columns are device (containing device id),
+interface, count and description.
+
+=cut
 
 sub search_multihost {
     my $self = shift;

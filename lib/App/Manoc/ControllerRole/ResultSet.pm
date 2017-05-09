@@ -20,15 +20,13 @@ This is a base role for all Manoc controllers which manage a resultset.
 
 has 'class' => ( is => 'ro', isa => 'Str', writer => '_set_class' );
 
-=head1 ACTIONS
-
-=head2 setup
+=action setup
 
 =cut
 
 sub setup : Chained('/') : CaptureArgs(0) : PathPart('specify.in.subclass.config') { }
 
-=head2 base
+=action base
 
 Add a resultset to the stash. Chained to setup.
 
@@ -40,10 +38,7 @@ sub base : Chained('setup') : PathPart('') : CaptureArgs(0) {
     $c->stash( resultset => $self->get_resultset($c) );
 }
 
-=head1 METHODS
-
-
-=head2 get_resultset
+=method get_resultset
 
 It returns a resultset of the controller's class.  Used by base.
 

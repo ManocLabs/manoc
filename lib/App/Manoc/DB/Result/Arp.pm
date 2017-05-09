@@ -1,4 +1,19 @@
 package App::Manoc::DB::Result::Arp;
+#ABSTRACT: A model object for information gathered via Arp
+
+=head1 DESCRIPTION
+
+This is an object which represents (ipaddr, macaddr, vlan) tuples fetched by ARP
+tables or sniffed by ArpSniffer. It uses L<DBIx::Class> (aka, DBIC) to do ORM.
+Tuples are associated to a time interval using
+L<App::Manoc::DB::Helper::Row::TupleArchive>.
+
+=head1 SEE ALSO
+
+L<App::Manoc::DB::Helper::Row::TupleArchive>,
+ L<App::Manoc::DB::InflateColumn::IPv4>
+
+=cut
 
 use strict;
 use warnings;
@@ -40,6 +55,9 @@ __PACKAGE__->set_tuple_archive_columns(qw(macaddr ipaddr vlan));
 
 __PACKAGE__->set_primary_key( 'ipaddr', 'macaddr', 'firstseen', 'vlan' );
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::Arp');
+
+=for Pod::Coverage sqlt_deploy_hook
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

@@ -71,6 +71,12 @@ __PACKAGE__->many_to_many( user_roles => 'map_user_role', 'role' );
 __PACKAGE__->has_many( map_user_group => 'App::Manoc::DB::Result::UserGroup', 'user_id' );
 __PACKAGE__->many_to_many( groups => 'map_user_group', 'user_group' );
 
+=method group_roleset
+
+Return an hash listing all the roles associated to the user via user groups.
+
+=cut
+
 # Just add this accessor, the map function does the expansion:
 sub group_roleset {
     my $self  = shift;
@@ -83,6 +89,13 @@ sub group_roleset {
     return $roles;
 }
 
+=method roleset
+
+Return an hash listing all the roles associated to the user,
+ both group based and personal.
+
+=cut
+
 sub roleset {
     my $self = shift;
 
@@ -93,14 +106,20 @@ sub roleset {
     return $roles;
 }
 
+=method roles
+
+Return a string listing all the roles associated to the user separated by space.
+To be used in UI.
+
+=cut
+
 sub roles {
     return join( ",", keys( %{ shift->roleset } ) );
 }
 
-=head1 DESCRIPTION
+=method check_password
 
-This is an object that represents a row in the 'users' table of your
-application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
+Used for Catalyst authentication.
 
 =cut
 

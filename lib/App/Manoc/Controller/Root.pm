@@ -22,9 +22,7 @@ App::Manoc::Controller::Root - Root Controller for Manoc
 
 The Root controller is used to implement global actions.
 
-=head1 METHODS
-
-=head2 index
+=action index
 
 The root page (/), redirect to search page.
 
@@ -37,7 +35,7 @@ sub index : Path : Args(0) {
     $c->detach();
 }
 
-=head2 auto
+=action auto
 
 Perform CSRF checks for POST requests, sets is_xhr for async request,
 check authentication.
@@ -101,6 +99,12 @@ sub auto : Private {
     return 1;
 }
 
+=method check_auth
+
+Check if user is authenticated and restricts a2a users to API controllers
+
+=cut
+
 sub check_auth {
     my ( $self, $c ) = @_;
 
@@ -120,7 +124,7 @@ sub check_auth {
     return 1;
 }
 
-=head2 default
+=action default
 
 Shows 404 error page for Manoc using Error controller
 
@@ -131,7 +135,7 @@ sub default : Path {
     $c->detach('error/http_404');
 }
 
-=head2 message
+=action message
 
 Basic minimal page for showing messages
 
@@ -143,7 +147,7 @@ sub message : Path('message') Args(0) {
     $c->stash( template => 'message.tt' );
 }
 
-=head2 end
+=action end
 
 Attempt to render a view, if needed.
 
@@ -152,11 +156,10 @@ Attempt to render a view, if needed.
 sub end : ActionClass('RenderView') {
 }
 
-=head2 access_denied
+=action access_denied
 
 Action called by ACL rules for failed checks.
 Shows 403 error page for Manoc using Error controller
-
 
 =cut
 

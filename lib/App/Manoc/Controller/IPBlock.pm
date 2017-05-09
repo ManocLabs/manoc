@@ -29,6 +29,12 @@ __PACKAGE__->config(
     json_columns            => [qw( id name from_addr to_addr )],
 );
 
+=action view
+
+Override in order to add ARP statistics.
+
+=cut
+
 before 'view' => sub {
     my ( $self, $c ) = @_;
 
@@ -50,6 +56,12 @@ before 'view' => sub {
     $c->stash( hosts_usage => int( $hosts->count() / $max_hosts * 100 ) );
 };
 
+=action arp
+
+Show ARP activity for the IPBlock
+
+=cut
+
 sub arp : Chained('object') {
     my ( $self, $c ) = @_;
 
@@ -60,6 +72,12 @@ sub arp : Chained('object') {
 
     $c->detach('/arp/list');
 }
+
+=action arp_js
+
+Datatable AJAX support for ARP activity list
+
+=cut
 
 sub arp_js : Chained('object') {
     my ( $self, $c ) = @_;
@@ -74,35 +92,6 @@ sub arp_js : Chained('object') {
     $c->stash( datatable_resultset => $rs );
 
     $c->detach('/arp/list_js');
-}
-
-=head2 create_ipblock
-
-Create a new device using a form. Chained to base.
-
-=cut
-
-sub create_ipblock : Chained('base') : PathPart('create_ipblock') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $object = $c->stash->{resultset}->new_result( {} );
-
-    ## TODO better permission
-    $c->require_permission( $object, 'create' );
-
-    $c->stash(
-        object     => $object,
-        form_class => 'App::Manoc::Form::IPBlock',
-    );
-    $c->detach('form');
-}
-
-sub ipblocks_js : Chained('base') : PathPart('js/ipblock/list') {
-    my ( $self, $c ) = @_;
-
-    my $rs = $c->stash->{resultset};
-    $c->stash( object_list => [ $rs->search( {} )->all() ] );
-    $c->detach('/ipblock/list_js');
 }
 
 __PACKAGE__->meta->make_immutable;

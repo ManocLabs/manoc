@@ -1,5 +1,5 @@
 package App::Manoc::ControllerRole::JQDatatable;
-#ABSTRACT: Support for DataTables Table jQuery
+#ABSTRACT: Support for jQuery DataTable
 
 use Moose::Role;
 
@@ -44,11 +44,24 @@ sub _build_datatable_search_columns {
     return [ @{ $self->datatable_columns } ];
 }
 
+=method get_datatable_resultset
+
+Return the resultset to use for datatables.
+Defaults to stash->{resultset}
+
+=cut
+
 sub get_datatable_resultset {
     my ( $self, $c ) = @_;
 
     return $c->stash->{'resultset'};
 }
+
+=action datatable_source
+
+View for datatable AJAX data source
+
+=cut
 
 sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) {
     my ( $self, $c ) = @_;

@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::DiscoverSession;
+#ABSTRACT: ResultSet class for DiscoverSession
 
 use strict;
 use warnings;
@@ -8,6 +9,13 @@ use warnings;
 use parent 'App::Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
+
+=method including_address($ipaddress)
+
+Return a resultset of all DiscoverSession which include C<$ipaddress> in their
+range.
+
+=cut
 
 sub including_address {
     my ( $self, $ipaddress ) = @_;

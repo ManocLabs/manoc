@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::ServerHW;
+##BSTRACT: A model object representing a server hardware asset
 
 use strict;
 use warnings;
@@ -98,6 +99,10 @@ __PACKAGE__->has_many(
     { cascade_delete        => 1 }
 );
 
+=for Pod::Coverage new
+
+=cut
+
 sub new {
     my ( $self, @args ) = @_;
     my $attrs = shift @args;
@@ -127,6 +132,10 @@ sub new {
     return $self->next::method( $new_attrs, @args );
 }
 
+=for Pod::Coverage insert
+
+=cut
+
 sub insert {
     my ( $self, @args ) = @_;
 
@@ -145,16 +154,34 @@ sub insert {
     return $self;
 }
 
+=method cores
+
+Return the total number of cores for this machine
+
+=cut
+
 sub cores {
     my ($self) = @_;
     return $self->n_procs * $self->n_cores_procs;
 }
+
+=method label
+
+Return a string describing the object
+
+=cut
 
 sub label {
     my $self = shift;
 
     return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
+
+=method in_use
+
+Return true if there is an associated server
+
+=cut
 
 sub in_use { defined( shift->server ); }
 

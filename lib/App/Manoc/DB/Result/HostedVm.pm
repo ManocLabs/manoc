@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::HostedVm;
+#ABSTRACT: A model object to represent VirtualMachine associations  to Hypervisor
 
 use strict;
 use warnings;
@@ -43,6 +44,10 @@ __PACKAGE__->belongs_to(
     hypervisor => 'App::Manoc::DB::Result::Server',
     'hypervisor_id',
 );
+
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

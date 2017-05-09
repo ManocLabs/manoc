@@ -1,4 +1,5 @@
 package App::Manoc::ControllerRole::JSONView;
+#ABSTRACT: Role for adding JSON support for view and view list
 
 use Moose::Role;
 ##VERSION
@@ -21,7 +22,7 @@ has json_add_object_href => (
     default => 1,
 );
 
-=head2 prepare_json_object
+=method prepare_json_object
 
 Get an hashref from a row.
 
@@ -42,7 +43,7 @@ sub prepare_json_object {
     return $ret;
 }
 
-=head2 get_json_object
+=method get_json_object
 
 Call prepare_json_object. Redefine this method for custom serialization.
 
@@ -53,7 +54,7 @@ sub get_json_object {
     return $self->prepare_json_object( $c, $row );
 }
 
-=head2 view_js
+=action view_js
 
 =cut
 
@@ -65,7 +66,7 @@ sub view_js : Chained('object') : PathPart('js') : Args(0) {
     $c->forward('View::JSON');
 }
 
-=head2 list_js
+=action list_js
 
 =cut
 

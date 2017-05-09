@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::HWAsset;
+#ABSTRACT: ResultSet class for HWAsset
 
 use strict;
 use warnings;
@@ -9,6 +10,13 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Result::HWAsset;
 use Carp;
+
+=method unused_devices
+
+Return a resultset of all device hardware assets which are not in use by a
+non-decommissioned device.
+
+=cut
 
 sub unused_devices {
     my ($self) = @_;

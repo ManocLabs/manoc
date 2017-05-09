@@ -23,11 +23,12 @@ __PACKAGE__->config(
     class                   => 'ManocDB::VlanVtp',
     enable_permission_check => 1,
     view_object_perm        => undef,
+    object_list_options     => {
+        prefetch => 'vlan'
+    }
 );
 
-=head1 METHODS
-
-=head2 list
+=action list
 
 =cut
 
@@ -35,7 +36,7 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
     # just use defaults
 }
 
-=head2 no_vlan
+=action compare
 
 =cut
 
@@ -85,23 +86,6 @@ sub compare : Chained('base') : PathPart('compare') : Args(0) {
     @diff = sort { $a->{id} <=> $a->{id} } @diff;
 
     $c->stash( diff => \@diff );
-}
-
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    my $rs      = $c->stash->{resultset};
-    my @objects = $rs->search(
-        {},
-        {
-            prefetch => 'vlan'
-        }
-    );
-    return \@objects;
 }
 
 __PACKAGE__->meta->make_immutable;

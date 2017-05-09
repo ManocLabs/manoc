@@ -7,8 +7,8 @@ use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 with
-    'App::Manoc::ControllerRole::CommonCRUD',
-    'App::Manoc::ControllerRole::JSONView' => { -excludes => 'get_json_object', };
+    'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'delete_object' },
+    'App::Manoc::ControllerRole::JSONView'   => { -excludes => 'get_json_object', };
 
 use App::Manoc::Form::Rack;
 
@@ -24,32 +24,14 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+    object_list_options     => {
+        prefetch => 'building',
+        join     => 'building',
+        order_by => 'me.name',
+    }
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    return [
-        $c->stash->{resultset}->search(
-            {},
-            {
-                prefetch => 'building',
-                join     => 'building',
-                order_by => 'me.name',
-            }
-        )->all
-    ];
-}
-
-=head2 create
+=action create
 
 =cut
 
@@ -61,7 +43,7 @@ before 'create' => sub {
     $c->stash( form_defaults => { building => $building_id } );
 };
 
-=head2 delete_object
+=method delete_object
 
 =cut
 
@@ -82,7 +64,7 @@ sub delete_object {
     return $rack->delete;
 }
 
-=head2 get_json_object
+=method get_json_object
 
 =cut
 

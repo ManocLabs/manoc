@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::IPBlock;
+#ABSTRACT: A model object for IP address blocks
 
 use strict;
 use warnings;
@@ -49,6 +50,12 @@ __PACKAGE__->might_have(
     { 'foreign.range_id' => 'self.id' },
 );
 
+=method arp_entries
+
+Return a resultset for all entries in Arp with IP addresses in this block
+
+=cut
+
 sub arp_entries {
     my $self = shift;
 
@@ -62,6 +69,12 @@ sub arp_entries {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method ip_entries
+
+Return a resultset for all entries IP contained in this block
+
+=cut
 
 sub ip_entries {
     my $self = shift;
@@ -77,6 +90,12 @@ sub ip_entries {
     return wantarray ? $rs->all : $rs;
 }
 
+=method contained_networks
+
+Return all network contained in this block
+
+=cut
+
 sub contained_networks {
     my $self = shift;
 
@@ -90,6 +109,12 @@ sub contained_networks {
 
     return wantarray ? $rs->all : $rs;
 }
+
+=method container_network
+
+Return the smallest network containing this block
+
+=cut
 
 sub container_network {
     my $self = shift;
@@ -106,6 +131,10 @@ sub container_network {
     );
     return $rs->first;
 }
+
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_table ) = @_;

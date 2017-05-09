@@ -1,4 +1,11 @@
 package App::Manoc::Logger::Role;
+#ABSTRACT: Role for Manoc logger
+
+=head1 Description
+
+This role adds a log attribute pointing to a L<App::Manoc::Logger> instance.
+
+=cut
 
 use Moose::Role;
 

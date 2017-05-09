@@ -1,4 +1,12 @@
 package App::Manoc::Netwalker::Discover::Task;
+#ABSTRACT: Netwalker discover task
+
+=head1 DESCRIPTION
+
+A class which implements a scan on a single IP address and eventuallu
+store its findings in Manoc DB.
+
+=cut
 
 use Moose;
 
@@ -15,11 +23,17 @@ use App::Manoc::IPAddress::IPv4;
 use Net::Ping;
 use Socket;
 
+=attr schema
+=cut
+
 has 'schema' => (
     is       => 'ro',
     isa      => 'Object',
     required => 1
 );
+
+=attr config
+=cut
 
 has 'config' => (
     is       => 'ro',
@@ -27,17 +41,23 @@ has 'config' => (
     required => 1
 );
 
+=attr session_id
+
+Identifier for the current discovery session. Required.
+
+=cut
+
 has 'session_id' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1
 );
 
-has 'address' => (
-    is       => 'ro',
-    isa      => 'App::Manoc::IPAddress::IPv4',
-    required => 1
-);
+=attr session
+
+Current discovery session, identified by session id.
+
+=cut
 
 has 'session' => (
     is      => 'ro',
@@ -46,6 +66,24 @@ has 'session' => (
     builder => '_build_session',
 );
 
+=attr address
+
+L<App::Manoc::IPAddress::IPv4> object pointing the target of the scan. Required.
+
+=cut
+
+has 'address' => (
+    is       => 'ro',
+    isa      => 'App::Manoc::IPAddress::IPv4',
+    required => 1
+);
+
+=attr credentials
+
+Netwalker credentials hash. Defaults to use Netwalker configuration.
+
+=cut
+
 has 'credentials' => (
     is      => 'ro',
     isa     => 'HashRef',
@@ -53,7 +91,7 @@ has 'credentials' => (
     builder => '_build_credentials',
 );
 
-has 'ping_handler' => (
+has '_ping_handler' => (
     is      => 'ro',
     isa     => 'Maybe[Object]',
     lazy    => 1,
@@ -81,7 +119,7 @@ sub _build_ping_handler {
     return Net::Ping->new();
 }
 
-sub create_manifold {
+sub _create_manifold {
     my $self          = shift;
     my $manifold_name = shift;
     my %params        = @_;
@@ -100,13 +138,19 @@ sub create_manifold {
     return $manifold;
 }
 
+=method scan
+
+Ping C<$self->address> by using ping and if it's alive try to get information using DNS and SNMP::Simple.
+
+=cut
+
 sub scan {
     my ($self) = @_;
 
     my $address = $self->address->unpadded;
     $self->log->debug("ping $address");
 
-    if ( !$self->ping_handler->ping($address) ) {
+    if ( !$self->_ping_handler->ping($address) ) {
         $self->log->debug("$address is not alive, skipping");
         return;
     }
@@ -123,7 +167,7 @@ sub scan {
     if ( $self->session->use_snmp ) {
         $self->log->debug("snmp scan $address");
         try {
-            my $m = $self->create_manifold(
+            my $m = $self->_create_manifold(
                 'SNMP::Simple',
                 credentials => $self->credentials,
                 host        => $address

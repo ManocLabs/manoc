@@ -14,6 +14,18 @@ use namespace::autoclean;
 
 Manoc TT plugin to generate application navigation menu
 
+=head1 SYNOPSYS
+
+    [%- USE Menu -%]
+
+
+    [% FOREACH s IN Menu.menu %]
+         <li>
+         <a href="[%IF s.path %][% s.path %][% ELSE %]#[% END %]">
+         # etc...
+
+    [% END %]
+
 =cut
 
 my @DEFAULT_MENU_ITEMS = (
@@ -169,11 +181,23 @@ my @DEFAULT_MENU_ITEMS = (
     }
 );
 
+=method new
+
+Contructor.
+
+=cut
+
 sub new {
     my ( $class, $context, $params ) = @_;
 
     bless { _CONTEXT => $context, }, $class;
 }
+
+=method menu
+
+Return the menu structure filtered based on current user permission.
+
+=cut
 
 sub menu {
     my $self = shift;
@@ -182,10 +206,10 @@ sub menu {
     # get Catalyst app
     my $c = $ctx->stash->get('c');
 
-    return process_menu( $c, @DEFAULT_MENU_ITEMS );
+    return _process_menu( $c, @DEFAULT_MENU_ITEMS );
 }
 
-sub process_menu {
+sub _process_menu {
     my $c    = shift;
     my @menu = @_;
 
@@ -208,7 +232,7 @@ sub process_menu {
         }
 
         if ( $item->{submenu} ) {
-            my @submenu = process_menu( $c, @{ $item->{submenu} } );
+            my @submenu = _process_menu( $c, @{ $item->{submenu} } );
             next unless @submenu;
             $new_item->{submenu} = \@submenu;
         }

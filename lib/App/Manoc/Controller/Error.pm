@@ -9,19 +9,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 NAME
-
-App::Manoc::Controller::Error
-
-=head1 DESCRIPTION
-
-Catalyst Controller for showing error pages
-
-=head1 METHODS
-
-=cut
-
-=head2 http_403
+=action http_403
 
 Error page for HTTP 403.
 
@@ -33,7 +21,7 @@ sub http_403 : Private {
     $c->response->status(403);
 }
 
-=head2 http_404
+=action http_404
 
 Error page for HTTP 404.
 
