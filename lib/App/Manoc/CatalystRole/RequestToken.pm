@@ -1,4 +1,6 @@
 package App::Manoc::CatalystRole::RequestToken;
+#ABSTRACT: Catalyst plugin for Manoc CSRF support
+
 use Moose::Role;
 
 ##VERSION

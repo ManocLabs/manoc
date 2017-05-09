@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Server;
+#ABSTRACT: A model object representing a server
 
 use strict;
 use warnings;
@@ -144,6 +145,12 @@ __PACKAGE__->many_to_many(
     'software_pkg'
 );
 
+=method virtual_servers
+
+If this server is an hypervisor return associacte virtual servers
+
+=cut
+
 sub virtual_servers {
     my $self = shift;
 
@@ -159,16 +166,28 @@ sub virtual_servers {
     return wantarray ? $rs->all : $rs;
 }
 
+=method num_cpus
+
+Return the number of cpus for the associated physical or virtual machine
+
+=cut
+
 sub num_cpus {
     my ($self) = @_;
     if ( $self->serverhw ) {
-        return $self->serverhw->n_procs * $self->serverhw->n_cores_procs;
+        return $self->serverhw->cores;
     }
     if ( $self->vm ) {
         return $self->vm->vcpus;
     }
     return;
 }
+
+=method ram_memory
+
+Return the ram memory for associated virtual of physical machine
+
+=cut
 
 sub ram_memory {
     my ($self) = @_;
@@ -180,7 +199,7 @@ sub ram_memory {
     }
 }
 
-=head2 decommission([timestamp=>$timestamp, recursive=>[0|1]])
+=method decommission([timestamp=>$timestamp, recursive=>[0|1]])
 
 Set decommissioned to true, update timestamp.
 When recursive option is set decommission hosted VMs and servers.
@@ -219,7 +238,9 @@ sub decommission {
     $guard->commit;
 }
 
-=head2 restore
+=method restore
+
+Restore decommissioned object
 
 =cut
 
@@ -232,7 +253,9 @@ sub restore {
     $self->decommission_ts(undef);
 }
 
-=head2 label
+=method label
+
+Return a string describing the object
 
 =cut
 

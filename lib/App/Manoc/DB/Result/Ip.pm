@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Ip;
+#ABSTRACT: A model object for information on IP addresses
 
 use strict;
 use warnings;

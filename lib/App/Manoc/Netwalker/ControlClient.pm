@@ -1,4 +1,11 @@
 package App::Manoc::Netwalker::ControlClient;
+#ABSTRACT: Netwalker control protocol client
+
+=head1 DESCRIPTION
+
+This class implements a client connecting to Netwalker control server.
+
+=cut
 
 use Moose;
 ##VERSION
@@ -10,18 +17,23 @@ with 'App::Manoc::Logger::Role';
 use IO::Socket;
 use Moose::Util::TypeConstraints;
 
+=attr config
+
+Netwalker configuration. Required.
+
+=cut
+
 has config => (
     is       => 'ro',
     isa      => 'App::Manoc::Netwalker::Config',
     required => 1
 );
 
-has socket => (
-    isa     => 'Maybe[Object]',
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_socket',
-);
+=attr status
+
+Current client status.
+
+=cut
 
 has status => (
     is      => 'rw',
@@ -30,16 +42,12 @@ has status => (
     default => 'new'
 );
 
-sub check_response {
-    my ( $self, $response ) = @_;
-
-    $response =~ /^OK\s/o  and return 1;
-    $response =~ /^ERR\s/o and return 0;
-
-    # something went wrong
-    $self->status('connection_error');
-    return;
-}
+has _socket => (
+    isa     => 'Maybe[Object]',
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_socket',
+);
 
 sub _build_socket {
     my $self = shift;
@@ -87,10 +95,16 @@ sub _build_socket {
     return $handle;
 }
 
+=method enqueue_device($id)
+
+Send a ENQUEUE DEVICE command to Netwalker
+
+=cut
+
 sub enqueue_device {
     my ( $self, $id ) = @_;
 
-    my $handle = $self->socket;
+    my $handle = $self->_socket;
     $handle or return;
 
     $self->log->debug("Enqueue device $id");
@@ -98,13 +112,19 @@ sub enqueue_device {
     my $response = <$handle>;
     $self->log->debug("Got response from netwalker: $response");
 
-    return $self->check_response($response);
+    return $self->_check_response($response);
 }
+
+=method enqueue_server($server_id)
+
+Send a ENQUEUE SERVER command to Netwalker
+
+=cut
 
 sub enqueue_server {
     my ( $self, $id ) = @_;
 
-    my $handle = $self->socket;
+    my $handle = $self->_socket;
     $handle or return;
 
     $self->log->debug("Enqueue server $id");
@@ -112,7 +132,18 @@ sub enqueue_server {
     my $response = <$handle>;
     $self->log->debug("Got response from netwalker: $response");
 
-    return $self->check_response($response);
+    return $self->_check_response($response);
+}
+
+sub _check_response {
+    my ( $self, $response ) = @_;
+
+    $response =~ /^OK\s/o  and return 1;
+    $response =~ /^ERR\s/o and return 0;
+
+    # something went wrong
+    $self->status('connection_error');
+    return;
 }
 
 no Moose;

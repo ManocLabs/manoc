@@ -42,10 +42,6 @@ use Catalyst qw/
 extends 'Catalyst';
 
 with 'App::Manoc::Logger::CatalystRole';
-with 'Catalyst::ClassData';
-
-__PACKAGE__->mk_classdata("plugin_registry");
-__PACKAGE__->plugin_registry( {} );
 
 # Configure the application.
 #
@@ -111,49 +107,6 @@ __PACKAGE__->config(
     }
 );
 
-sub load_plugins {
-    my $self    = shift;
-    my $plugins = __PACKAGE__->config->{LoadPlugin};
-    my ( $class, $file );
-
-    foreach my $it ( keys %{$plugins} ) {
-        my $plugin = ucfirst($it);
-        # hack stolen from catalyst:
-        # don't overwrite $@ if the load did not generate an error
-        my $error;
-        {
-            local $@;
-            $class = "App::Manoc::Plugin::" . $plugin . "::Init";
-            $file  = $class . '.pm';
-            $file =~ s{::}{/}g;
-            eval { CORE::require($file) };
-            $error = $@;
-        }
-        die $error if $error;
-
-        $class->load( __PACKAGE__->config->{LoadPlugin}->{$it} );
-    }
-}
-
-sub _add_plugin {
-    my ( $name, $opt ) = @_;
-    $name or die "missing plugin name";
-    $opt ||= 1;
-    my $plugin = __PACKAGE__->plugin_registry;
-    $plugin->{$name} = $opt;
-    __PACKAGE__->plugin_registry($plugin);
-}
-
-########################################################################
-
-########################################################################
-
-after setup_finalize => sub {
-    #Load Search Plugins
-    __PACKAGE__->load_plugins;
-
-};
-
 # Start the application
 __PACKAGE__->setup();
 
@@ -171,18 +124,26 @@ __PACKAGE__->meta->make_immutable( replace_constructor => 1 );
 
 Manoc is a web-based network monitoring/reporting platform designed for moderate to large networks.
 
-Manoc can collect:
+Manoc collects and displays:
 
 =over 4
 
-=item Ports status and mac-address associations network devices via SNMP
+=item
 
-=item Ethernet/IP address pairings via a sniffer agenta
+Ports status and mac-address associations network devices via SNMP
 
-=item DHCP leases/reservations using a lightweight agent for ISC DHCPD
+=item
+
+Ethernet/IP address pairings via a sniffer agenta
+
+=item
+
+DHCP leases/reservations using a lightweight agent for ISC DHCPD
 based servers
 
-=item users and computer logon in a Windows AD environment, using an
+=item
+
+users and computer logon in a Windows AD environment, using an
 agent for syslog-ng to trap snare generated syslog messages
 
 =back

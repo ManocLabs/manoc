@@ -16,10 +16,6 @@ with
     'App::Manoc::ControllerRole::Object',
     'App::Manoc::ControllerRole::JQDatatable';
 
-=head1 METHODS
-
-=cut
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -47,6 +43,12 @@ __PACKAGE__->config(
     # datatable_search_callback => 'datatable_search_cb',
 );
 
+=method datatable_row
+
+Callback to create datatable row. Generates link and extracts n_servers.
+
+=cut
+
 sub datatable_row {
     my ( $self, $c, $row ) = @_;
 
@@ -59,7 +61,7 @@ sub datatable_row {
     };
 }
 
-=head2 view
+=action view
 
 Display a single items.
 
@@ -74,7 +76,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
 }
 
-=head2 list
+=action list
 
 Display a list of items. Chained to base since the table is AJAX based
 

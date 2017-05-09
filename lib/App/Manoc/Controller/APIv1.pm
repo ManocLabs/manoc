@@ -14,12 +14,44 @@ use App::Manoc::Utils::Validate;
 =head1 DESCRIPTION
 
 This class should be used for implementing API controllers which manage entry point in api/v1.
-It disables csrf and requires HTTP authentication.
+It disables CRSF and requires HTTP authentication.
 
-Responses are generated using api_response_data stash element.
+Data can be validated using L<App::Manoc::Utils::Validate> via
+C<validate> method.
 
-Error messages can be stored in api_message or api_field_errors for
-input validatiation error.
+Responses are generated using C<api_response_data> stash element.
+
+Error messages are be stored in C<api_message> or C<api_field_errors>.
+
+=head1 SYNOPSIS
+
+  package App::Manoc::APIv1::FooApi;
+
+  BEGIN { extends 'App::Manoc::Controller::APIv1' }
+
+  sub foo_base : Chained('deserialize') PathPart('foo') CaptureArgs(0) {
+    my ( $self, $c ) = @_;
+    $c->stash( resultset => $c->model('ManocDB::Foo') );
+  }
+
+  sub foo_post : Chained('foo_base') PathPart('') POST {
+    my ( $self, $c ) = @_;
+
+    $c->stash(
+        api_validate => {
+            type  => 'hash',
+            items => {
+                foo_name => {
+                    type     => 'scalar',
+                    required => 1,
+                },
+                bar_list => {
+                    type     => 'array',
+                    required => 1,
+                },
+            },
+        }
+    );
 
 =cut
 
@@ -29,10 +61,22 @@ has use_json_boolean => (
     default => 0,
 );
 
+=method begin
+
+Set is_api in stash
+
+=cut
+
 sub begin : Private {
     my ( $self, $c ) = @_;
     $c->stash( is_api => 1 );
 }
+
+=action base
+
+Path api/v1. Require HTTP Authentication
+
+=cut
 
 sub base : Chained('/') PathPart('api/v1') CaptureArgs(0) {
     my ( $self, $c ) = @_;
@@ -41,6 +85,12 @@ sub base : Chained('/') PathPart('api/v1') CaptureArgs(0) {
     $c->user_exists or
         $c->authenticate( {}, 'agent' );
 }
+
+=method deserialize
+
+Chained to base, stores request body data in C<api_request_data> in stash.
+
+=cut
 
 sub deserialize : Chained('base') CaptureArgs(0) PathPart('') {
     my ( $self, $c ) = @_;
@@ -53,6 +103,13 @@ sub deserialize : Chained('base') CaptureArgs(0) PathPart('') {
         $c->log->debug('No body data for API input');
     }
 }
+
+=method end
+
+Genereates http status code preparare data (API results or validation
+errors) for JSON serializer.
+
+=cut
 
 sub end : Private {
     my ( $self, $c ) = @_;
@@ -94,6 +151,14 @@ sub end : Private {
 
     $c->forward('View::JSON');
 }
+
+=method validate
+
+Read data from C<api_request_data> stash value and validates with
+L<App::Manoc::Utils::Validate> using rules in C<api_validate> stash
+value.
+
+=cut
 
 sub validate : Private {
     my ( $self, $c ) = @_;

@@ -1,4 +1,6 @@
 package App::Manoc::DB::Result::Vlan;
+#ABSTRACT: A model object representing the table vlan
+
 use strict;
 use warnings;
 
@@ -30,7 +32,12 @@ __PACKAGE__->add_columns(
     }
 );
 
-# return devices which are using the vlan, using ifstatus info
+=method devices
+
+Return devices which are using the vlan, using ifstatus info
+
+=cut
+
 sub devices {
     my $self = shift;
 
@@ -82,16 +89,5 @@ __PACKAGE__->belongs_to(
         is_foreign_key_constraint => 0,
     }
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::Vlan - A model object representing the table vlan
-
-=head1 DESCRIPTION
-
-This is an object that represents a row in the 'vlan' table of your
-application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
-
-=cut
 
 1;

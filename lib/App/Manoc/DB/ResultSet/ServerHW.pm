@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::ServerHW;
+#ABSTRACT: ResultSet class for ServerHW
 
 use strict;
 use warnings;
@@ -8,6 +9,13 @@ use warnings;
 use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Result::HWAsset;
+
+=method unused
+
+Resultset containing ServerHW which are not decommissioned and
+are used by any Server.
+
+=cut
 
 sub unused {
     my ($self) = @_;
@@ -38,6 +46,12 @@ sub unused {
     return wantarray ? $rs->all : $rs;
 
 }
+
+=head1 SEE ALSO
+
+L<DBIx::Class::ResultSet>
+
+=cut
 
 1;
 # Local Variables:

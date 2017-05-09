@@ -10,11 +10,7 @@ use App::Manoc::Form::Login;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 METHODS
-
-=cut
-
-=head2 index
+=action index
 
 =cut
 
@@ -24,7 +20,7 @@ sub index : Path : Args(0) {
     $c->detach();
 }
 
-=head2 login
+=action login
 
 =cut
 
@@ -54,7 +50,7 @@ sub login : Local : CaptureArgs(0) {
     );
 }
 
-=head2 logout
+=action logout
 
 =cut
 

@@ -1,5 +1,5 @@
 package App::Manoc::DB::Result::VlanRange;
-
+#ABSTRACT:  A model object representing the table vlan_range
 use strict;
 use warnings;
 
@@ -47,6 +47,12 @@ __PACKAGE__->has_many( vlans => 'App::Manoc::DB::Result::Vlan', 'vlan_range_id' 
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::VlanRange');
 
+=method get_mergeable_ranges
+
+Return a resultset containing all ranges which can be merged with this one
+
+=cut
+
 sub get_mergeable_ranges {
     my ( $self, $options ) = @_;
 
@@ -55,6 +61,13 @@ sub get_mergeable_ranges {
         [ { start => $self->end + 1 }, { end => $self->start - 1 }, ], $options );
     return wantarray ? $rs->all : $rs;
 }
+
+=method split_new_range($name, $split_point, $direction)
+
+Creating a new range called $name splitting the current one at id $split_point
+in the given $direction. Direction can be "UP" or "DOWN".
+
+=cut
 
 sub split_new_range {
     my ( $self, $name, $split_point, $direction ) = @_;
@@ -123,6 +136,12 @@ sub split_new_range {
     );    # end of transaction
 }
 
+=method merge_with_range( $other )
+
+Merge the range with an adjancent $other.
+
+=cut
+
 sub merge_with_range {
     my ( $self, $other ) = @_;
 
@@ -156,16 +175,5 @@ sub merge_with_range {
         }
     );
 }
-
-=head1 NAME
-
-App::Manoc::DB::Result::Vlan - A model object representing the table vlan_range
-
-=head1 DESCRIPTION
-
-This is an object that represents a row in the 'vlan_range' table of your
-application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
-
-=cut
 
 1;

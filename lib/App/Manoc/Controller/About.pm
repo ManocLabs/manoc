@@ -1,5 +1,5 @@
 package App::Manoc::Controller::About;
-#ABSTRACT: Auth Controller
+#ABSTRACT: Controller for about page
 
 use Moose;
 
@@ -11,11 +11,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 use English '-no_match_vars';
 
-=head1 METHODS
-
-=cut
-
-=head2 index
+=action index
 
 =cut
 
@@ -25,7 +21,7 @@ sub index : Path : Args(0) {
     $c->forward('/about/stats');
 }
 
-=head2 statistics
+=action stats
 
 =cut
 

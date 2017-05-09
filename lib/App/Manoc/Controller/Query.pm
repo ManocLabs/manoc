@@ -1,5 +1,6 @@
 package App::Manoc::Controller::Query;
-#ABSTRACT: Query controller
+#ABSTRACT: Controller for query and reports
+
 use Moose;
 
 ##VERSION
@@ -11,11 +12,7 @@ use App::Manoc::Utils::IPAddress qw(unpadded_ipaddr);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 METHODS
-
-=cut
-
-=head2 index
+=action index
 
 =cut
 
@@ -23,7 +20,7 @@ sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 }
 
-=head2 base
+=action base
 
 =cut
 
@@ -31,7 +28,7 @@ sub base : Chained('/') : PathPart('query') : CaptureArgs(0) {
     my ( $self, $c ) = @_;
 }
 
-=head2 stats
+=action statistics
 
 =cut
 
@@ -86,6 +83,10 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
     );
 }
 
+=action ipconflict
+
+=cut
+
 sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
     my ( $self, $c ) = @_;
     my $schema = $c->model('ManocDB');
@@ -107,6 +108,10 @@ sub ipconflict : Chained('base') : PathPart('ipconflict') : Args(0) {
         template   => 'query/ipconflict.tt',
     );
 }
+
+=action multihost
+
+=cut
 
 sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
     my ( $self, $c ) = @_;
@@ -163,6 +168,10 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
     $c->stash( template         => 'query/multihost.tt' );
 }
 
+=action unused_ifaces
+
+=cut
+
 sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -207,6 +216,10 @@ sub unused_ifaces : Chained('base') : PathPart('unused_ifaces') : Args(0) {
     );
 }
 
+=action unknown_devices
+
+=cut
+
 sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -246,59 +259,9 @@ sub unknown_devices : Chained('base') : PathPart('unknown_devices') : Args(0) {
     );
 }
 
-####################################################################
+=action portsecurity
 
-sub device_list : Chained('base') : PathPart('device_list') : Args(0) {
-    my ( $self, $c ) = @_;
-    my $schema = $c->model('ManocDB');
-
-    my @rs = $schema->resultset('Device')->search(
-        undef,
-        {
-            join     => { rack   => 'building' },
-            prefetch => { 'rack' => 'building' },
-            order_by => [ 'building.description', 'rack.id' ]
-        }
-    );
-    my @table = map {
-        ipaddr       => $_->id->address,
-            name     => $_->name,
-            vendor   => $_->vendor || 'n/a',
-            model    => $_->model || 'n/a',
-            os       => ( ( $_->os || 'n/a' ) . ' ' . ( $_->os_ver || '' ) ),
-            rack     => $_->rack->id,
-            floor    => $_->rack->floor,
-            building => $_->rack->building->description,
-            serial => $_->serial || 'n/a',
-    }, @rs;
-
-    $c->stash( table => \@table, template => 'query/device_list.tt' );
-}
-
-sub rack_list : Chained('base') : PathPart('rack_list') : Args(0) {
-    my ( $self, $c ) = @_;
-    my $schema = $c->model('ManocDB');
-
-    my @rs = $schema->resultset('Rack')->search(
-        undef,
-        {
-            join     => 'building',
-            prefetch => 'building',
-            order_by => ['me.name'],
-        }
-    );
-    my @table = map {
-        id             => $_->name,
-            build_id   => $_->building->name,
-            build_name => $_->building->description,
-            floor      => $_->floor,
-            notes      => $_->notes,
-    }, @rs;
-
-    $c->stash( table => \@table, template => 'query/rack_list.tt' );
-}
-
-####################################################################
+=cut
 
 sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
     my ( $self, $c ) = @_;
@@ -324,7 +287,9 @@ sub portsecurity : Chained('base') : PathPart('portsecurity') : Args(0) {
 
 }
 
-####################################################################
+=action multi_mac
+
+=cut
 
 sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
     my ( $self, $c ) = @_;
@@ -358,7 +323,9 @@ sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
     $c->stash( multimacs => \@multimacs, template => 'query/multi_mac.tt' );
 }
 
-####################################################################
+=action new_devices
+
+=cut
 
 sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     my ( $self, $c ) = @_;
@@ -399,6 +366,7 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
     );
 }
 
+no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

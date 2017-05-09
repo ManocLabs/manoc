@@ -28,11 +28,7 @@ __PACKAGE__->config(
     enable_permission_check => 1,
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 admin_password
+=action admin_password
 
 Used by admin to set password on other users
 
@@ -63,7 +59,7 @@ sub admin_password : Chained('object') : PathPart('password') : Args(0) {
 
 =cut
 
-=head2 change_password
+=action change_password
 
 =cut
 

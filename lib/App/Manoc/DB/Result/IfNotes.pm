@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::IfNotes;
+#ABSTRACT: A model object for user notes on device interfaces
 
 use strict;
 use warnings;
@@ -29,15 +30,3 @@ __PACKAGE__->add_columns(
 __PACKAGE__->belongs_to( device => 'App::Manoc::DB::Result::Device', 'device_id' );
 __PACKAGE__->set_primary_key( 'device_id', 'interface' );
 1;
-
-# __PACKAGE__->set_sql('unused',
-# 		     q{
-# 			 SELECT device AS d, interface AS i
-# 			 FROM __TABLE__
-# 			 WHERE device=?
-# 			   AND (SELECT COUNT(interface)
-# 			        FROM mat
-# 			        WHERE device=d
-# 			         AND interface=i
-# 				 AND lastseen > ?) = 0
-# 		     });

@@ -1,4 +1,5 @@
 package App::Manoc::DataDumper::Converter;
+#ABSTRACT: Helper for reading datadumps from previous Manoc version
 
 use Moose;
 
@@ -6,21 +7,45 @@ use Moose;
 
 use Class::Load;
 
+=attr log
+
+A Manoc logger instance. Required.
+
+=cut
+
 has 'log' => (
     is       => 'ro',
     required => 1,
 );
+
+=attr schema
+
+Manoc::DB schema. Required.
+
+=cut
 
 has 'schema' => (
     is       => 'ro',
     required => 1,
 );
 
+=attr from_version
+
+Original version of dump
+
+=cut
+
 has 'from_version' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
 );
+
+=attr to_version
+
+Destination version
+
+=cut
 
 has 'to_version' => (
     is       => 'ro',
@@ -29,7 +54,7 @@ has 'to_version' => (
 );
 
 # sorted by ascending version
-has 'converters' => (
+has '_converters' => (
     is      => 'rw',
     isa     => 'ArrayRef',
     default => sub { [] },
@@ -62,18 +87,30 @@ sub _load_converters {
     }
 }
 
+=method get_table_name( $source_name )
+
+Return the table to load corresponding to DB source C<$source_name>.
+
+=cut
+
 sub get_table_name {
     my ( $self, $source_name ) = @_;
 
     my $method_name = "get_table_name_${source_name}";
 
     # get name from lowest converter
-    foreach my $c ( @{ $self->converters } ) {
+    foreach my $c ( @{ $self->_converters } ) {
         next unless $c->can($method_name);
         my $name = $c->$method_name();
         $name and return $name;
     }
 }
+
+=method upgrade_table( \@data, $name )
+
+Apply any needed transformation to records in @data for table C<$name>.
+
+=cut
 
 sub upgrade_table {
     my ( $self, $data, $name ) = @_;
@@ -82,11 +119,17 @@ sub upgrade_table {
 
     # use all converters
     $self->log->info("Running converters for $name");
-    foreach my $c ( @{ $self->converters } ) {
+    foreach my $c ( @{ $self->_converters } ) {
         next unless $c->can($method_name);
         $c->$method_name($data);
     }
 }
+
+=method after_import_source( $source )
+
+To be called after having imported all data for data source C<$source>.
+
+=cut
 
 sub after_import_source {
     my ( $self, $source ) = @_;
@@ -95,7 +138,7 @@ sub after_import_source {
     my $method_name = "after_import_${source_name}";
 
     $self->log->info("Running after import callbacks");
-    foreach my $c ( @{ $self->converters } ) {
+    foreach my $c ( @{ $self->_converters } ) {
         next unless $c->can($method_name);
         $c->$method_name($source);
     }

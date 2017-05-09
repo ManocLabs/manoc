@@ -1,10 +1,16 @@
 package App::Manoc::View::CSV;
-#ABSTRACT: CSV view for Manoc
+#ABSTRACT: CSV Catalyst view for Manoc
 
 use strict;
 use warnings;
 
 ##VERSION
+
+=head1 DESCRIPTION
+
+C<Catalyst::View::CSV>
+
+=cut
 
 use base qw ( Catalyst::View::CSV );
 

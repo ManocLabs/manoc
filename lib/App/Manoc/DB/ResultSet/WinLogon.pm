@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::WinLogon;
+#ABSTRACT: ResultSet class for WinLogon
 
 use strict;
 use warnings;
@@ -14,6 +15,13 @@ __PACKAGE__->load_components(
         +App::Manoc::DB::Helper::ResultSet::TupleArchive
         /
 );
+
+=method register_tuple( %params )
+
+Overridden in order to convert $params{ipaddr} to
+L<App::Manoc::IPAddress::IPv4> if needed.
+
+=cut
 
 sub register_tuple {
     my $self   = shift;

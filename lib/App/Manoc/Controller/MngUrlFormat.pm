@@ -26,11 +26,7 @@ __PACKAGE__->config(
 
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 delete
+=method delete_object
 
 =cut
 
@@ -46,7 +42,7 @@ sub delete_object {
     return $c->stash->{'object'}->delete;
 }
 
-=head2 get_delete_failure_url
+=method get_delete_failure_url
 
 =cut
 

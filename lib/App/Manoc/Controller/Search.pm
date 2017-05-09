@@ -14,11 +14,7 @@ use App::Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 METHODS
-
-=cut
-
-=head2 index
+=action index
 
 =cut
 

@@ -1,10 +1,16 @@
 package App::Manoc::Logger::CatalystRole;
+#ABSTRACT: Catalyst role to enable Log4perl logger
+
 use Moose::Role;
 
 ##VERSION
 
 use App::Manoc::Logger;
 use Log::Log4perl::Catalyst;
+
+=for Pod::Coverage setup_log
+
+=cut
 
 sub setup_log {
     my ( $class, $levels ) = @_;

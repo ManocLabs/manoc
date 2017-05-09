@@ -4,11 +4,27 @@ use Moose;
 
 ##VERSION
 
+=head1 DESCRIPTION
+
+Workstation CRUD controller using for the C</workstation> path.
+
+=cut
+
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-with 'App::Manoc::ControllerRole::CommonCRUD',
+=head1 CONSUMED ROLES
+
+=for :list
+* App::Manoc::ControllerRole::CommonCRUD
+* App::Manoc::ControllerRole::JQDatatable
+* App::Manoc::ControllerRole::JSONView
+* App::Manoc::ControllerRole::CSVView
+
+=cut
+
+with "App::Manoc::ControllerRole::CommonCRUD",
     "App::Manoc::ControllerRole::JQDatatable",
     "App::Manoc::ControllerRole::JSONView",
     "App::Manoc::ControllerRole::CSVView";
@@ -41,8 +57,9 @@ __PACKAGE__->config(
 
 );
 
-=head2 create
+=action create
 
+Override C<create> action to support hardware_id form default.
 =cut
 
 before 'create' => sub {
@@ -60,7 +77,7 @@ before 'create' => sub {
         $c->stash( form_defaults => \%form_defaults );
 };
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -77,7 +94,7 @@ before 'edit' => sub {
     }
 };
 
-=head2 import_csv
+=action import_csv
 
 Import a workstation hardware list from a CSV file
 
@@ -106,7 +123,7 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     return unless $process_status;
 }
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -131,7 +148,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->detach();
 }
 
-=head2 restore
+=action restore
 
 =cut
 
@@ -163,7 +180,9 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-=head1 METHODS
+=method datatable_search_cb
+
+Update datatable filter using search_status
 
 =cut
 
@@ -186,19 +205,25 @@ sub datatable_search_cb {
     return ( $filter, $attr );
 }
 
+=method datatable_row
+
+Create a row object for datatable adding hardware info resolving href.
+
+=cut
+
 sub datatable_row {
     my ( $self, $c, $row ) = @_;
 
     my $json_data = {
         hostname => $row->hostname,
         os       => $row->os,
-        href     => $c->uri_for_action( 'workstation/view', [ $row->id ] ),
+        href     => $c->uri_for_action( 'workstation/view', [ $row->id ] )->as_string,
         hardware => undef
     };
     if ( my $hw = $row->workstationhw ) {
         $json_data->{hardware} = {
             label    => $hw->label,
-            href     => $c->uri_for_action( 'workstationhw/view', [ $hw->id ] ),
+            href     => $c->uri_for_action( 'workstationhw/view', [ $hw->id ] )->as_string,
             location => $hw->display_location
         };
     }

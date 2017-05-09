@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Mat;
+#ABSTRACT: A model object for port-macaddress associations
 
 use strict;
 use warnings;
@@ -48,6 +49,10 @@ __PACKAGE__->set_primary_key( 'macaddr', 'device_id', 'firstseen', 'vlan' );
 __PACKAGE__->belongs_to( 'device' => 'App::Manoc::DB::Result::Device', 'device_id' );
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::Mat');
+
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;

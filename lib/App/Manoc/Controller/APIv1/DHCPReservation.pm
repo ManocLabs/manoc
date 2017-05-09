@@ -1,5 +1,6 @@
 package App::Manoc::Controller::APIv1::DHCPReservation;
 #ABSTRACT: Catalyst Controller for DHCP APIs
+
 use Moose;
 
 ##VERSION
@@ -8,7 +9,9 @@ use namespace::autoclean;
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
-=head1 METHODS
+=action reservation_base
+
+Base action for reservation.
 
 =cut
 
@@ -17,7 +20,7 @@ sub reservation_base : Chained('deserialize') PathPart('dhcp/reservation') Captu
     $c->stash( resultset => $c->model('ManocDB::DHCPReservation') );
 }
 
-=head2 reservation_post
+=action reservation_post
 
 POST api/v1/dhcp/reservation
 

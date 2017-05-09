@@ -1,4 +1,11 @@
 package App::Manoc::DB::Result::DeviceNWInfo;
+#ABSTRACT: Model object for netwalker configuration for devices
+
+=head1 DESCRIPTION
+
+A model object to mantain netwalker configuration  and connection information for a device.
+
+=cut
 
 use strict;
 use warnings;
@@ -166,16 +173,5 @@ __PACKAGE__->belongs_to(
     arp_vlan => 'App::Manoc::DB::Result::Vlan',
     'arp_vlan_id'
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::NetwalkerInfo - Device Netwalker configuration and
-connection information
-
-=head1 DESCRIPTION
-
-A model object to mantain netwalker configuration for a device.
-
-=cut
 
 1;

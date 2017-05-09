@@ -5,14 +5,38 @@ use Moose;
 
 ##VERSION
 
-with 'App::Manoc::ManifoldRole::Base',
+=head1 DESCRIPTION
+
+A simple SNMP client Manifold, entirely based on Net::SNMP avoiding
+the need of any MIB file.
+
+=cut
+
+with
+    'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::Host',
     'App::Manoc::ManifoldRole::Hypervisor',
     'App::Manoc::Logger::Role';
 
+=head1 CONSUMED ROLES
+
+=for :list
+* App::Manoc::ManifoldRole::Base
+* App::Manoc::ManifoldRole::Host
+* App::Manoc::ManifoldRole::Hypervisor
+* App::Manoc::Logger::Role
+
+=cut
+
 use Net::SNMP 6.0 qw( :snmp DEBUG_ALL ENDOFMIBVIEW );
 use Carp qw(croak);
 use Try::Tiny;
+
+=attr community
+
+SNMP community string
+
+=cut
 
 has 'community' => (
     is      => 'ro',
@@ -21,12 +45,24 @@ has 'community' => (
     builder => '_build_community',
 );
 
+=attr version
+
+SNMP version: 1, 2c or 3.
+
+=cut
+
 has 'version' => (
     is      => 'ro',
     isa     => 'Str',
     lazy    => '1',
     builder => '_build_version',
 );
+
+=attr snmp_session
+
+The Net::SNMP session used by the manifold.
+
+=cut
 
 has 'snmp_session' => (
     is     => 'ro',
@@ -52,6 +88,12 @@ sub _build_version {
     );
     return $version_map{$version};
 }
+
+=method connect
+
+Connect the manifold using Net::SNMP and set snmp_session.
+
+=cut
 
 sub connect {
     my ($self) = @_;
@@ -115,6 +157,14 @@ sub connect {
 #
 #----------------------------------------------------------------------#
 
+=method has_snmp_scalar($name, %attrs)
+
+Creates a snmp_<$name> attribute with _build_$name builder.  The
+%attrs arra must define the "oid" paramater and can set a "munger"
+subroutine.
+
+=cut
+
 sub has_snmp_scalar {
     my ( $name, %options ) = @_;
 
@@ -139,7 +189,7 @@ sub has_snmp_scalar {
     }
 }
 
-=head2 has_snmp_table
+=method has_snmp_table( $name, %options )
 
 Creates a snmp_<columnname> accessor for each defined column.
 
@@ -178,13 +228,56 @@ sub has_snmp_table {
     }
 }
 
+=head1 SNMP ATTRIBUTES
+
+=head2 SNMPV2 MIB
+
+=over 4
+
+=item sysDescr
+
+=item sysObjectID
+
+=item sysName
+
+=item sysLocation
+
+=item sysServices
+
+=back
+
+=cut
+
 my $SNMPV2_MIB_OID = '1.3.6.1.2.1.1';
+
 has_snmp_scalar "sysDescr"    => ( oid => "$SNMPV2_MIB_OID.1" );
 has_snmp_scalar "sysObjectID" => ( oid => "$SNMPV2_MIB_OID.2" );
 has_snmp_scalar "sysUpTime"   => ( oid => "$SNMPV2_MIB_OID.3" );
 has_snmp_scalar "sysName"     => ( oid => "$SNMPV2_MIB_OID.5" );
 has_snmp_scalar "sysLocation" => ( oid => "$SNMPV2_MIB_OID.6" );
 has_snmp_scalar "sysServices" => ( oid => "$SNMPV2_MIB_OID.7" );
+
+=head2 HOST RESOURCES MIB
+
+=over 4
+
+=item hrSWInstalledTable with columns
+
+=over 4
+
+=item hrSWInstalledIndex
+
+=item hrSWInstalledName
+
+=item hrSWInstalledID
+
+=item hrSWInstalledTypem
+
+=item hrSWInstalledDate
+
+=back
+
+=cut
 
 my $HOST_RESOURCES_MIB_OID = '1.3.6.1.2.1.25';
 has_snmp_table 'hrSWInstalledTable' => (
@@ -197,6 +290,23 @@ has_snmp_table 'hrSWInstalledTable' => (
         'hrSWInstalledDate'  => [ 5, \&_munge_sw_installed_date ],
     },
 );
+
+=item hrDeviceTable
+
+=over 4
+
+=item hrDeviceType
+
+=item hrDeviceDescr
+
+=item hrDeviceID
+
+=item hrDeviceStatus which can be one of these strings: INVALID unknown running warning testing down
+
+=back
+
+=cut
+
 has_snmp_table 'hrDeviceTable' => (
     oid     => "$HOST_RESOURCES_MIB_OID.3.2",
     index   => 'hrDeviceIndex',
@@ -216,6 +326,20 @@ has_snmp_table 'hrDeviceTable' => (
     },
 );
 
+=item hrProcessorTable
+
+=over 4
+
+=item hrDeviceIndex
+
+=item hrProcessorLoad
+
+=back
+
+=back
+
+=cut
+
 has_snmp_table 'hrProcessorTable' => (
     oid     => "$HOST_RESOURCES_MIB_OID.3.3",
     index   => 'hrDeviceIndex',
@@ -224,8 +348,50 @@ has_snmp_table 'hrProcessorTable' => (
     },
 );
 
+=head2 UCD SNMP MIB
+
+=over 4
+
+=item memTotalReal
+
+=back
+
+=cut
+
 my $UCD_SNMP_MIB_OID = '.1.3.6.1.4.1.2021';
 has_snmp_scalar 'memTotalReal' => ( oid => "${UCD_SNMP_MIB_OID}.4.5", );
+
+=head2 VMWare MIBs
+
+=over 4
+
+=item vmwProdName
+
+=item vmwProdVersion
+
+=item vmwVmTable
+
+=over 4
+
+=item vmwVmIdx
+
+=item vmwVmDisplayName
+
+=item vmwVmGuestOS
+
+=item vmwVmMemSize
+
+=item vmwVmState
+
+=item vmwVmCpus
+
+=item vmwVmUUID
+
+=back
+
+=back
+
+=cut
 
 my $VMWARE_SYSTEM_MIB = '.1.3.6.1.4.1.6876.1';
 has_snmp_scalar 'vmwProdName'    => ( oid => "${VMWARE_SYSTEM_MIB}.1", );

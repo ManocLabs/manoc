@@ -1,4 +1,12 @@
 package App::Manoc::Netwalker::Control;
+#ABSTRACT: Netwalker control interface
+
+=head1 DESCRIPTION
+
+This class implements a control server for Netwalker. It is based on a simple line oriented protocol.
+
+=cut
+
 use Moose;
 
 ##VERSION
@@ -10,11 +18,25 @@ with 'App::Manoc::Logger::Role';
 use IO::Socket;
 use POE qw(Wheel::ListenAccept Wheel::ReadWrite);
 
+=attr config
+
+Netwalker configuration. Required.
+
+The value in config->control_port can be a port (TCP socket) or a path (UNIX socket)
+
+=cut
+
 has config => (
     is       => 'ro',
     isa      => 'App::Manoc::Netwalker::Config',
     required => 1
 );
+
+=attr poller
+
+Reference to poller Workers object. Required.
+
+=cut
 
 has poller => (
     is       => 'ro',
@@ -22,16 +44,34 @@ has poller => (
     required => 1,
 );
 
+=attr poller
+
+Reference to discovery workers object. Required.
+
+=cut
+
 has discoverer => (
     is       => 'ro',
     isa      => 'App::Manoc::Netwalker::Discover::Workers',
     required => 1,
 );
 
+=attr server
+
+A L<POE::Wheel::ListenAccept> creating during _start.
+
+=cut
+
 has server => (
     is  => 'rw',
     isa => 'Ref',
 );
+
+=attr session
+
+POE session. Required.
+
+=cut
 
 has session => (
     isa       => 'POE::Session',
@@ -42,6 +82,12 @@ has session => (
     clearer   => 'remove_server',
     predicate => 'has_server',
 );
+
+=attr clients
+
+Hash wheel-id to wheel, used by callbacks.
+
+=cut
 
 has clients => (
     traits   => ['Hash'],
@@ -59,6 +105,12 @@ has clients => (
         get_client_ids => 'keys',
     },
 );
+
+=function MANOC_CONSOLE_HELLO
+
+Return the welcome message
+
+=cut
 
 sub MANOC_CONSOLE_HELLO { "OK Manoc Netwalker console" }
 
@@ -113,6 +165,12 @@ sub _start {
     $self->server($server);
 }
 
+=method on_client_accept
+
+Callback on new client connection.
+
+=cut
+
 sub on_client_accept {
     my ( $self, $client_socket ) = @_[ OBJECT, ARG0 ];
     my $io_wheel = POE::Wheel::ReadWrite->new(
@@ -126,11 +184,23 @@ sub on_client_accept {
     $self->set_client( $io_wheel->ID => $io_wheel );
 }
 
+=method on_server_error( $operation, $errnum, $errstr )
+
+Callback on server error
+
+=cut
+
 sub on_server_error {
     my ( $self, $operation, $errnum, $errstr ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
     warn "Server $operation error $errnum: $errstr\n";
     $self->server(undef);
 }
+
+=method on_client_input( $input, $wheel_id )
+
+Callback for client input. Parses input line and call the corresponding command_<name> callback.
+
+=cut
 
 sub on_client_input {
     my ( $self, $input, $wheel_id ) = @_[ OBJECT, ARG0, ARG1 ];
@@ -153,6 +223,10 @@ sub on_client_input {
     }
 }
 
+=method on_client_error
+
+=cut
+
 sub on_client_error {
     my $self     = $_[OBJECT];
     my $wheel_id = $_[ARG3];
@@ -160,6 +234,12 @@ sub on_client_error {
     # Handle client error, including disconnect.
     $self->remove_client($wheel_id);
 }
+
+=method command_status
+
+Manages the C<STATUS> command.
+
+=cut
 
 sub command_status {
     my $self = shift;
@@ -173,6 +253,12 @@ sub command_status {
 
     return $output;
 }
+
+=method command_enqueue
+
+Manages the C<ENQUEUE DEVICE|SERVER <id>> command.
+
+=cut
 
 sub command_enqueue {
     my ( $self, $type, $id ) = @_;
@@ -189,6 +275,12 @@ sub command_enqueue {
 
     return "ERR unknown object $type";
 }
+
+=method command_quit
+
+Manages the C<QUIT> command closing the client connection.
+
+=cut
 
 sub command_quit {
     my $self     = $_[OBJECT];

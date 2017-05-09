@@ -40,9 +40,7 @@ __PACKAGE__->config(
     object_list_filter_columns => [qw( type vendor rack_id building_id )],
 );
 
-=head1 ACTIONS
-
-=head2 create_device
+=action create_device
 
 Create a new device using a form. Chained to base.
 
@@ -77,7 +75,7 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
     $c->detach('form');
 }
 
-=head2 list
+=action list
 
 Display a list of items. Chained to base since the table is AJAX based
 
@@ -89,7 +87,7 @@ sub list : Chained('base') : PathPart('') : Args(0) {
     $c->require_permission( $c->stash->{resultset}, 'list' );
 }
 
-=head2 list_devices
+=action list_devices
 
 Display a list of items. Chained to base since the table is AJAX based
 
@@ -101,9 +99,9 @@ sub list_devices : Chained('base') : PathPart('devices') : Args(0) {
     $c->require_permission( $c->stash->{resultset}, 'list' );
 }
 
-=head2 view
+=action view
 
-Display a single items.
+Display a single item.
 
 =cut
 
@@ -120,9 +118,10 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     $c->require_permission( $object, 'view' );
 }
 
-=head2 edit
+=action edit
 
-Use a form to edit a row.
+Use a form to edit a row. Redirect to specific controllers when the
+object is a server or a workstation.
 
 =cut
 
@@ -155,7 +154,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-=head2 delete
+=action delete
 
 =cut
 
@@ -180,11 +179,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
 
 }
 
-=head2 decommission
-
-=cut
-
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -217,7 +212,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
-=head2 restore
+=action restore
 
 =cut
 
@@ -248,9 +243,9 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-=head2 vendors_js
+=action vendors_js
 
-Get a list of vendors
+Get a list of vendors in JSON, to be used in form autocomplete.
 
 =cut
 
@@ -276,9 +271,9 @@ sub vendors_js : Chained('base') : PathPart('vendors/js') : Args(0) {
     $c->forward('View::JSON');
 }
 
-=head2 models_js
+=action models_js
 
-Get a list of models optionally filtered by vendor
+Get a list of models optionally filtered by vendor.
 
 =cut
 
@@ -307,7 +302,9 @@ sub models_js : Chained('base') : PathPart('models/js') : Args(0) {
     $c->forward('View::JSON');
 }
 
-=head1 METHODS
+=method get_form_process_params
+
+Manage the hide_location query parameter.
 
 =cut
 
@@ -319,6 +316,12 @@ sub get_form_process_params {
 
     return %params;
 }
+
+=method datatable_search_cb
+
+Add support for asset status and warehous.
+
+=cut
 
 sub datatable_search_cb {
     my ( $self, $c, $filter, $attr ) = @_;
@@ -350,6 +353,10 @@ sub datatable_search_cb {
     return ( $filter, $attr );
 }
 
+=method datatable_row
+
+=cut
+
 sub datatable_row {
     my ( $self, $c, $row ) = @_;
 
@@ -366,6 +373,12 @@ sub datatable_row {
     };
 }
 
+=action datatable_source_devices
+
+Ajax source for datatable listing device assets only.
+
+=cut
+
 sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devices') : Args(0)
 {
     my ( $self, $c ) = @_;
@@ -377,6 +390,10 @@ sub datatable_source_devices : Chained('base') : PathPart('datatable_source/devi
     );
     $c->forward('/hwasset/datatable_source');
 }
+
+=action unused_devices_js
+
+=cut
 
 sub unused_devices_js : Chained('base') : PathPart('js/device/unused') {
     my ( $self, $c ) = @_;

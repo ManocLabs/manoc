@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Config;
+#ABSTRACT: A model object for key-value configuration
 
 use strict;
 use warnings;

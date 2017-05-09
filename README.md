@@ -14,7 +14,7 @@ version 2.99.2
 
 Manoc is a web-based network monitoring/reporting platform designed for moderate to large networks.
 
-Manoc can collect:
+Manoc collects and displays:
 
 - Ports status and mac-address associations network devices via SNMP
 - Ethernet/IP address pairings via a sniffer agenta

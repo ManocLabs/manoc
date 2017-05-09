@@ -9,7 +9,15 @@ use App::Manoc::Search::Item::MacAddr;
 use App::Manoc::Search::Item::WinLogon;
 use App::Manoc::Search::Widget::ApplyRole;
 
+=attr query
+
+=cut
+
 has query => ( is => 'ro' );
+
+=attr item_by_match
+
+=cut
 
 has item_by_match => (
     is      => 'ro',
@@ -17,10 +25,21 @@ has item_by_match => (
     default => sub { {} },
 );
 
+=attr message
+
+=cut
+
 has message => (
     is  => 'rw',
     isa => 'Str',
 );
+
+=attr groups
+
+The list of L<App::Manoc::Search::Item::Group> objects which will
+contain the result items.
+
+=cut
 
 has groups => (
     is      => 'ro',
@@ -34,6 +53,13 @@ my %GROUP_ITEM = (
     'ipaddr'  => 'App::Manoc::Search::Item::IpAddr',
     'macaddr' => 'App::Manoc::Search::Item::MacAddr',
 );
+
+=method add_item
+
+Add a new L<App::Manoc::Search::Item> to the result. Creates a new
+group if the item has a new match.
+
+=cut
 
 sub add_item {
     my ( $self, $item ) = @_;
@@ -56,12 +82,24 @@ sub add_item {
     $group->add_item($item);
 }
 
+=method items
+
+Return all the result items, sorted by groups.
+
+=cut
+
 sub items {
     my $self = shift;
     $self->sort_items;
 
     return $self->groups;
 }
+
+=method sort_items
+
+Sort the result group by key.
+
+=cut
 
 sub sort_items {
     my $self = shift;
@@ -75,7 +113,12 @@ sub sort_items {
     $self->_groups( \@g );
 }
 
-# use this method if
+=method load_widgets
+
+Load widget for all result items.
+
+=cut
+
 sub load_widgets {
     my $self = shift;
 

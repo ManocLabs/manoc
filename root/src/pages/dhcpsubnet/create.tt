@@ -15,7 +15,7 @@ function on_close_create_form(data) {
 function refresh_ipblocks() {
   $('#form-dhcpsubnet\\.range').find('option').remove();
   $.ajax({
-    url: '[% c.uri_for_action('/ipblock/ipblocks_js') %]',
+    url: '[% c.uri_for_action('/ipblock/list_js') %]',
     dataType: 'json',
     success: function (res) {
       $.each(res, function(index, item) {
@@ -28,7 +28,7 @@ function refresh_ipblocks() {
 
 $( document ).ready(function() {
     $('#form-dhcpsubnet\\.ipblock_button').click(function() {
-	showDialogForm("[% c.uri_for_action('/ipblock/create_ipblock') %]", "Create IP Block", on_close_create_form);
+	showDialogForm("[% c.uri_for_action('/ipblock/create') %]", "Create IP Block", on_close_create_form);
       	return false;
    	});
 });

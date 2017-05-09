@@ -36,6 +36,9 @@ __PACKAGE__->set_primary_key(qw(user ipaddr firstseen));
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::WinLogon');
 
+=for Pod::Coverage  sqlt_deploy_hook
+=cut
+
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_schema ) = @_;
 

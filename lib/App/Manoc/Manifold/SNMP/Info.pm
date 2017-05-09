@@ -5,13 +5,34 @@ use Moose;
 
 ##VERSION
 
+=head1 DESCRIPTION
+
+A SNMP Manifold based on L<SNMP::Info>
+
+=cut
+
 with 'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::NetDevice',
     'App::Manoc::Logger::Role';
 
+=head1 CONSUMED ROLES
+
+=for :list
+* App::Manoc::ManifoldRole::Base
+* App::Manoc::ManifoldRole::NetDevice
+* App::Manoc::Logger::Role
+
+=cut
+
 use SNMP::Info;
 use Carp qw(croak);
 use Try::Tiny;
+
+=attr community
+
+SNMP community string
+
+=cut
 
 has 'community' => (
     is      => 'ro',
@@ -20,6 +41,12 @@ has 'community' => (
     builder => '_build_community',
 );
 
+=attr version
+
+SNMP version: 1, 2c or 3.
+
+=cut
+
 has 'version' => (
     is      => 'ro',
     isa     => 'Int',
@@ -27,17 +54,35 @@ has 'version' => (
     builder => '_build_version',
 );
 
+=attr is_subrequest
+
+Set to true for subrequest created for Cisco community string indexing.
+
+=cut
+
 has 'is_subrequest' => (
     is      => 'ro',
     isa     => 'Bool',
     default => 0
 );
 
+=attr snmp_info
+
+The SNMP::Info session object
+
+=cut
+
 has 'snmp_info' => (
     is     => 'ro',
     isa    => 'Object',
     writer => '_set_snmp_info',
 );
+
+=attr mat_force_vlan
+
+vlan id to use when reading mat table
+
+=cut
 
 has 'mat_force_vlan' => (
     is      => 'ro',
@@ -63,6 +108,13 @@ sub _build_mat_force_vlan {
     my $self = shift;
     return $self->extra_params->{mat_force_vlan};
 }
+
+=method conect
+
+Connect the manifold using a SNMP::Info object with autospecify enabled and set snmp_session.
+The MANOC_DEBUG_SNMPINFO enviroment variabe can be used to turn on SNMP::Info debug support.
+
+=cut
 
 sub connect {
     my ($self) = @_;

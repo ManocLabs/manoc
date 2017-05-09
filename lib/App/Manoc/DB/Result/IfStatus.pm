@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::IfStatus;
+#ABSTRACT: A model object for informaation on device interfaces
 
 use strict;
 use warnings;

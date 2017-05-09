@@ -8,11 +8,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
-=head1 METHODS
-
-=cut
-
-=head2 workstation_base
+=action workstation_base
 
 =cut
 
@@ -21,7 +17,7 @@ sub workstation_base : Chained('deserialize') PathPart('workstation') CaptureArg
     $c->stash( resultset => $c->model('ManocDB::Workstation') );
 }
 
-=head2 workstation_post
+=action workstation_post
 
 POST api/v1/workstation
 

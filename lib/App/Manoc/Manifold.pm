@@ -1,9 +1,5 @@
-# Copyright 2011-2015 by the Manoc Team
-#
-# This library is free software. You can redistribute it and/or modify
-# it under the same terms as Perl itself.
-
 package App::Manoc::Manifold;
+#ABSTRACT: Manifold registry
 
 use strict;
 use warnings;
@@ -23,6 +19,16 @@ use Class::Load qw(load_class);
 __PACKAGE__->mk_group_accessors( inherited => 'name_mappings' );
 __PACKAGE__->mk_group_accessors( inherited => 'manifold_list' );
 
+=head1 METHODS
+
+=cut
+
+=head2 load_namespace
+
+Loads all manifolds from App::Manoc::Manifold namespace
+
+=cut
+
 sub load_namespace {
     my $self      = shift;
     my @manifolds = $self->_plugins;
@@ -37,9 +43,21 @@ sub load_namespace {
     $self->manifold_list( \@manifolds );
 }
 
+=head2 manifolds
+
+Return a list of the names of all known manifolds
+
+=cut
+
 sub manifolds {
     return keys( %{ shift->name_mappings } );
 }
+
+=head2 new_manifold($name)
+
+Create a new instance of manifold $name.
+
+=cut
 
 sub new_manifold {
     my $self = shift;
@@ -54,6 +72,12 @@ sub new_manifold {
     load_class $mapped;
     return $mapped->new(@_);
 }
+
+=head2 connect($name)
+
+Create a new instance of manifold $name and call its connect method.
+
+=cut
 
 sub connect {
     shift->new_manifold( shift, @_ )->connect();

@@ -34,7 +34,7 @@ __PACKAGE__->config(
     edit_page_title   => 'Edit server',
 );
 
-=head2 create
+=action create
 
 =cut
 
@@ -59,7 +59,7 @@ before 'create' => sub {
         $c->stash( form_defaults => \%form_defaults );
 };
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -76,7 +76,7 @@ before 'edit' => sub {
     }
 };
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -100,7 +100,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     $c->detach();
 }
 
-=head2 restore
+=action restore
 
 =cut
 
@@ -131,7 +131,7 @@ sub restore : Chained('object') : PathPart('restore') : Args(0) {
     );
 }
 
-=head2 nwinfo
+=action nwinfo
 
 =cut
 
@@ -161,7 +161,7 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     $c->detach();
 }
 
-=head2 refresh
+=action refresh
 
 =cut
 
@@ -185,7 +185,7 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     $c->detach();
 }
 
-=head2 update_fromnwinfo
+=action update_from_nwinfo
 
 =cut
 

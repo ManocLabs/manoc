@@ -21,7 +21,7 @@ has csv_column_alias => (
     default => sub { {} },
 );
 
-=head2 prepare_json_object
+=method prepare_csv_object
 
 Get an hashref from a row.
 
@@ -39,7 +39,10 @@ sub prepare_csv_object {
     return $ret;
 }
 
-=head2 list_csv
+=action list_csv
+
+View chained to C<object_list> to generate a CSV file.
+File name defaults to namespace and can be overridden via filename in stash.
 
 =cut
 

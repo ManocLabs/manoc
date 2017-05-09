@@ -1,5 +1,5 @@
 package App::Manoc::DB::ResultSet::IPBlock;
-
+#ABSTRACT: ResultSet class for IPBlock
 use strict;
 use warnings;
 
@@ -8,6 +8,12 @@ use warnings;
 use parent 'App::Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
+
+=method including_address( $ipaddress )
+
+Return a resultset for all IPBlocks containing C<$ipaddress>.
+
+=cut
 
 sub including_address {
     my ( $self, $ipaddress ) = @_;
@@ -25,6 +31,12 @@ sub including_address {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method including_address_ordered
+
+Same as including_address but ordered by lower bound of the block
+
+=cut
 
 sub including_address_ordered {
     my $rs = shift->including_address(@_)->search(

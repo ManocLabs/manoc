@@ -8,20 +8,6 @@ use namespace::autoclean;
 
 use MooseX::MethodAttributes::Role;
 
-requires 'base';
-
-has object_list_filter_columns => (
-    is      => 'rw',
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] }
-);
-
-has object_list_options => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { {} }
-);
-
 =head1 DESCRIPTION
 
 This is a base role for Manoc controllers which manage a list of rows from
@@ -53,12 +39,43 @@ a resultset.
      # objects are stored in $c->{object_list}
   }
 
-=head1 ACTIONS
-
-=head2 object_list
+=action object_list
 
 Load the list of objects from the resultset into the stash. Chained to base.
-This is the point for chaining all actions using the list of object
+This is the point for chaining all actions using the list of object.
+
+Objects are fetched by C<get_object_list> and stored in $c->stash->{object_list}.
+
+=cut
+
+requires 'base';
+
+=attr object_list_filter_columns
+
+=cut
+
+has object_list_filter_columns => (
+    is      => 'rw',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [] }
+);
+
+=attr object_list_options
+
+Options for the DBIc search in C<get_object_list>.
+Can be overridden by $c->stash->{object_list_options}.
+
+=cut
+
+has object_list_options => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} }
+);
+
+=action object_list
+
+Populate object_list in stash using get_object_list method.
 
 =cut
 
@@ -67,9 +84,11 @@ sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
     $c->stash( object_list => $self->get_object_list($c) );
 }
 
-=head1 METHODS
+=method get_object_list
 
-=head2 get_object_list
+Search in $c->stash->{resultset} using the filter returned by
+C<get_object_list_filter> and the options in $c->stash->{object_list_options}
+or object_list_options.
 
 =cut
 
@@ -82,7 +101,7 @@ sub get_object_list {
     return [ $rs->search( $filter, $options )->all ];
 }
 
-=head2 get_object_list_filter
+=method get_object_list_filter
 
 =cut
 

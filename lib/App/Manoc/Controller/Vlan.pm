@@ -25,11 +25,12 @@ __PACKAGE__->config(
     json_columns            => [ 'id', 'name', 'description' ],
     enable_permission_check => 1,
     view_object_perm        => undef,
+    object_list_options     => {
+        prefetch => 'vlan_range',
+    }
 );
 
-=head1 METHODS
-
-=head2 index
+=action index
 
 =cut
 
@@ -38,7 +39,7 @@ sub index : Path : Args(0) {
     $c->res->redirect( $c->uri_for_action('vlanrange/list') );
 }
 
-=head2 create
+=action create
 
 =cut
 
@@ -49,24 +50,7 @@ before 'create' => sub {
     $c->stash( form_defaults => { vlan_range => $range_id } );
 };
 
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    my $rs      = $c->stash->{resultset};
-    my @objects = $rs->search(
-        {},
-        {
-            prefetch => 'vlan_range',
-        }
-    );
-    return \@objects;
-}
-
-=head2 object_delete
+=method object_delete
 
 =cut
 
@@ -82,7 +66,7 @@ sub object_delete {
     $vlan->delete;
 }
 
-=head2 get_form_success_url
+=method get_form_success_url
 
 =cut
 

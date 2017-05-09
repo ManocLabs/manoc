@@ -1,4 +1,5 @@
 package App::Manoc::Manifold::SSH::Fortigate;
+#ABSTRACT: Manifold for accessing Fortigate devices via SSH
 
 use Moose;
 

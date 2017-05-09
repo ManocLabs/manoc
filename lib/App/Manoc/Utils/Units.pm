@@ -1,4 +1,6 @@
 package App::Manoc::Utils::Units;
+#ABSTRACT: routines for managing unit of measure
+
 use strict;
 use warnings;
 
@@ -13,17 +15,7 @@ BEGIN {
 
 use Carp;
 
-=head1 DESCRIPTION
-
-App::Manoc::Utils::Units - routines for managing unit of measure
-
-=cut
-
-=head1 FUNCTIONS
-
-=cut
-
-=head2 parse_storage_size($str, [$unit])
+=function parse_storage_size($str, [$unit])
 
 Parse a string made by an integer and a unit of time (e.g. h for
 hours, M for months) and returns the equivalent number of seconds.
@@ -81,15 +73,6 @@ sub parse_storage_size {
 
     return $num * $map{ uc($unit) };
 }
-
-=head1 LICENSE
-
-Copyright 2011- by the Manoc Team
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
 # Local Variables:

@@ -1,4 +1,11 @@
 package App::Manoc::Model::ManocDB;
+#ABSTRACT:  Catalyst DBIC Schema Model for Manoc
+
+=head1 DESCRIPTION
+
+L<Catalyst::Model::DBIC::Schema> Model using schema L<App::Manoc::DB>
+
+=cut
 
 use Moose;
 extends 'Catalyst::Model::DBIC::Schema';
@@ -21,6 +28,12 @@ sub _build_search_engine {
     return App::Manoc::Search::Engine->new( { schema => $self->schema } );
 }
 
+=method search( $query_string, $params )
+
+Run query using L<App::Manoc::Search::Engine>.
+
+=cut
+
 sub search {
     my ( $self, $query_string, $params ) = @_;
 
@@ -39,16 +52,6 @@ sub search {
 
     return $engine->search($q);
 }
-
-=head1 NAME
-
-App::Manoc::Model::ManocDB - Catalyst DBIC Schema Model
-
-=head1 DESCRIPTION
-
-L<Catalyst::Model::DBIC::Schema> Model using schema L<App::Manoc::DB>
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 1;

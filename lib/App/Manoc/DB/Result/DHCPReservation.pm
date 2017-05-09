@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DHCPReservation;
+#ABSTRACT: A model object for DHCP reservations
 
 use strict;
 use warnings;

@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Rack;
+#ABSTRACT: A model object for racks
 
 use strict;
 use warnings;
@@ -58,6 +59,12 @@ __PACKAGE__->has_many(
     'rack_id',
     { cascade_delete => 1 }
 );
+
+=method label
+
+Return a string describing the object
+
+=cut
 
 sub label {
     my $self = shift;

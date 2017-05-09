@@ -25,7 +25,7 @@ __PACKAGE__->config(
 
 );
 
-=head2 create
+=action create
 
 Create a new object using a form. Chained to base.
 
@@ -59,7 +59,7 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     $c->detach('form');
 }
 
-=head2 view
+=action view
 
 Display a single items.
 
@@ -70,7 +70,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     $c->require_permission('dhcpserver.view');
 }
 
-=head2 edit
+=action edit
 
 Use a form to edit a row.
 
@@ -83,7 +83,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-=head2 delete
+=action delete
 
 =cut
 
@@ -107,7 +107,7 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     }
 }
 
-=head2 get_form_success_url
+=method get_form_success_url
 
 =cut
 

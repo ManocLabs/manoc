@@ -30,7 +30,7 @@ __PACKAGE__->config(
     json_columns => [ 'id', 'name' ],
 );
 
-=head2 create
+=action create
 
 =cut
 
@@ -48,7 +48,7 @@ before 'create' => sub {
     }
 };
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -66,7 +66,7 @@ before 'edit' => sub {
     }
 };
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -99,7 +99,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
-=head2 restore
+=action restore
 
 =cut
 

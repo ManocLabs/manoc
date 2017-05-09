@@ -29,19 +29,16 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [ 'id', 'name' ],
+    object_list_options     => {
+        prefetch => 'building',
+        join     => 'building',
+        order_by => 'me.name',
+    }
 );
 
-=head1 NAME
+=action create
 
-App::Manoc::Controller::Warehouse - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=head1 METHODS
-
-=head2 create
+Override default to pass building parameter to form.
 
 =cut
 
@@ -52,28 +49,9 @@ before 'create' => sub {
     $c->stash( form_defaults => { building => $building_id } );
 };
 
-=cut
+=method delete_object
 
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-
-    return [
-        $c->stash->{resultset}->search(
-            {},
-            {
-                prefetch => 'building',
-                join     => 'building',
-                order_by => 'me.name',
-            }
-        )->all
-    ];
-}
-
-=head2 delete_object
+Override default to check for assets before deleting.
 
 =cut
 

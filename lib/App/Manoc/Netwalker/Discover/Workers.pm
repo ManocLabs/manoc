@@ -45,9 +45,9 @@ sub BUILD {
         ->update( { status => DiscoverSession->STATUS_WAITING } );
 }
 
-=head2 on_tick
+=method on_tick
 
-Called by scheduler
+Called by the scheduler, calls C<schedule_hosts>.
 
 =cut
 
@@ -57,7 +57,12 @@ sub on_tick {
     $self->schedule_hosts;
 }
 
-# select a new session to be processed
+=method schedule_session
+
+Select a new session to be processed
+
+=cut
+
 sub schedule_session {
     my $self = shift;
 
@@ -80,6 +85,15 @@ sub schedule_session {
     $session->status( DiscoverSession->STATUS_RUNNING );
     $session->update;
 }
+
+=method schedule_hosts
+
+If there is a discovery session in progress generates new address to be scanned and enqueues them.
+Number of generated addresses is limited by the worker queue max lenght.
+
+When a session is over schedule the next one if exists.
+
+=cut
 
 sub schedule_hosts {
     my $self = shift;
@@ -117,6 +131,12 @@ sub schedule_hosts {
     $session->update();
 }
 
+=method worker_done
+
+Called at the end of session. Schedule the next hosts unless the session has been stopped.
+
+=cut
+
 sub worker_done {
     my $self = shift;
 
@@ -132,6 +152,12 @@ sub worker_done {
         $self->current_session(undef);
     }
 }
+
+=method discover_address( $session_id, $address )
+
+Worker entry point, starting a new L<App::Manoc::Netwalker::DiscoverTask>.
+
+=cut
 
 sub discover_address {
     my ( $self, $session_id, $address ) = @_;

@@ -1,4 +1,6 @@
 package App::Manoc::DB::ResultSet::Arp;
+#ABSTRACT: ResultSet class for Arp
+
 use strict;
 use warnings;
 
@@ -14,6 +16,13 @@ __PACKAGE__->load_components(
         /
 );
 
+=method search_by_ipaddress( $ipaddress )
+
+Search all entries for C<$ipaddress> which can be a string (in padded format)
+or a L<App::Manoc::IPAddress::IPv4> object.
+
+=cut
+
 sub search_by_ipaddress {
     my ( $self, $ipaddress ) = @_;
 
@@ -27,6 +36,12 @@ sub search_by_ipaddress {
     return wantarray ? $rs->all : $rs;
 }
 
+=method search_by_ipaddress_ordered( $ipaddress )
+
+Same as C<search_by_ipaddress> bur ordered by lastseen and firstseen.
+
+=cut
+
 sub search_by_ipaddress_ordered {
     my $rs = shift->search_by_ipaddress(@_)->search(
         {},
@@ -37,6 +52,13 @@ sub search_by_ipaddress_ordered {
     return wantarray ? $rs->all : $rs;
 
 }
+
+=method search_conflicts
+
+Return a list of IP address which have more than one active associated mac
+address. A column count contains the number of those mac addresses
+
+=cut
 
 sub search_conflicts {
     my $self = shift;
@@ -53,6 +75,13 @@ sub search_conflicts {
     return wantarray ? $rs->all : $rs;
 }
 
+=method search_multihomed
+
+Return a list of mac addresses which have more than one active associated IP
+address. A column count contains the number of those IP addresses.
+
+=cut
+
 sub search_multihomed {
     my $self = shift;
 
@@ -68,6 +97,13 @@ sub search_multihomed {
     return wantarray ? $rs->all : $rs;
 }
 
+=method first_last_seen
+
+Return for each IP address (returned as a column C<ip_address>) the minimun
+firstseen value and the maximum lastseen.
+
+=cut
+
 sub first_last_seen {
     my $self = shift;
 
@@ -81,6 +117,13 @@ sub first_last_seen {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method register_tuple( %params )
+
+Overridden in order to convert $params{ipaddr} to
+L<App::Manoc::IPAddress::IPv4> if needed.
+
+=cut
 
 sub register_tuple {
     my $self   = shift;

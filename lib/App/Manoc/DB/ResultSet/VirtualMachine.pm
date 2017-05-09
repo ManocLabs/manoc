@@ -1,4 +1,5 @@
 package App::Manoc::DB::ResultSet::VirtualMachine;
+#ABSTRACT: ResultSet class for VirtualMachine
 
 use strict;
 use warnings;
@@ -6,6 +7,13 @@ use warnings;
 ##VERSION
 
 use parent 'App::Manoc::DB::ResultSet';
+
+=method unused
+
+Resultset containing VirtualMachines which are not decommissioned and
+are not in use by any Server
+
+=cut
 
 sub unused {
     my ($self) = @_;
@@ -31,6 +39,12 @@ sub unused {
 
     return wantarray ? $rs->all : $rs;
 }
+
+=head1 SEE ALSO
+
+L<DBIx::Class::ResultSet>
+
+=cut
 
 1;
 # Local Variables:

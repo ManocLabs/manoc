@@ -5,20 +5,50 @@ use Moose;
 
 ##VERSION
 
+=head1 DESCRIPTION
+
+Use this manifold for legacy IOS based devices still accessed via telnet.
+
+At the moment only C<configuration> and C<arp_table> attributes are supported.
+
+=cut
+
 with 'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::NetDevice',
     'App::Manoc::ManifoldRole::FetchConfig',
     'App::Manoc::Logger::Role';
 
+=head1 CONSUMED ROLES
+
+=for :list
+* App::Manoc::ManifoldRole::Base
+* App::Manoc::ManifoldRole::NetDevice
+* App::Manoc::ManifoldRole::FetchConfig
+* App::Manoc::Logger::Role
+
+=cut
+
 use Try::Tiny;
 use Net::Telnet::Cisco;
 use Regexp::Common qw /net/;
+
+=attr session
+
+Net::Telnet::Cisco session
+
+=cut
 
 has 'session' => (
     is     => 'ro',
     isa    => 'Object',
     writer => '_set_session',
 );
+
+=attr username
+
+login user name
+
+=cut
 
 has 'username' => (
     is      => 'ro',
@@ -27,6 +57,12 @@ has 'username' => (
     builder => '_build_username',
 );
 
+=attr password
+
+first level password
+
+=cut
+
 has 'password' => (
     is       => 'ro',
     isa      => 'Str',
@@ -34,6 +70,12 @@ has 'password' => (
     lazy     => 1,
     builder  => '_build_password',
 );
+
+=attr enable_password
+
+second level password
+
+=cut
 
 has 'enable_password' => (
     is      => 'ro',
@@ -57,6 +99,12 @@ sub _build_eable_password {
     my $self = shift;
     return $self->credentials->{password2} || '';
 }
+
+=method connect
+
+Connect and login in enable mode
+
+=cut
 
 sub connect {
     my $self = shift;
@@ -147,6 +195,12 @@ sub _build_os_ver { }
 sub _build_serial { }
 
 sub _build_vendor { }
+
+=attr close
+
+Close telnet session.
+
+=cut
 
 sub close {
     shift->session->close();

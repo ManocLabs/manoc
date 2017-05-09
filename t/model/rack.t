@@ -7,49 +7,51 @@ use lib "t/lib";
 use ManocTest::Schema;
 
 my $schema = ManocTest::Schema->connect();
-ok($schema, "Create schema");
+ok( $schema, "Create schema" );
 
 # building used for test
 my $building = $schema->resultset("Building")->create(
     {
-        name => 'B01',
+        name        => 'B01',
         description => 'Test building',
-  }
-) or BAIL_OUT "Can't create test building";
+    }
+    ) or
+    BAIL_OUT "Can't create test building";
 
 my $rack;
-eval {
-    $rack = $schema->resultset("Rack")->create({});
-};
-ok($@, "name is required");
+eval { $rack = $schema->resultset("Rack")->create( {} ); };
+ok( $@, "name is required" );
 
-$rack = $schema->resultset("Rack")->create({
-    name     => 'W02',
-    building => $building,
-    room     => 'L01',
-    floor    => '0'
-});
-ok($rack, "Create rack in building");
+$rack = $schema->resultset("Rack")->create(
+    {
+        name     => 'W02',
+        building => $building,
+        room     => 'L01',
+        floor    => '0'
+    }
+);
+ok( $rack, "Create rack in building" );
 
 my $hwasset = $schema->resultset("HWAsset")->create(
     {
-        type       => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
-        vendor     => 'IQ',
-        model      => 'MegaPort 48',
-        serial     => 'TestHR01',
-        inventory  => 'Inv001',
-    });
+        type      => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
+        vendor    => 'IQ',
+        model     => 'MegaPort 48',
+        serial    => 'TestHR01',
+        inventory => 'Inv001',
+    }
+);
 $hwasset->move_to_rack($rack);
 $hwasset->update;
-ok($rack->hwassets->count, "Asset in rack");
+ok( $rack->hwassets->count, "Asset in rack" );
 
 my $device = $schema->resultset("Device")->create(
     {
-        name   => "D01",
+        name        => "D01",
         mng_address => "1.1.1.1",
-        rack   => $rack,
-    });
-ok($rack->devices->count, "Device in rack");
-
+        rack        => $rack,
+    }
+);
+ok( $rack->devices->count, "Device in rack" );
 
 done_testing;

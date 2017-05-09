@@ -1,4 +1,12 @@
 package App::Manoc::DB::ResultSet::HostedVm;
+#ABSTRACT: ResultSet class for HostedVm
+
+=head1 DESCRIPTION
+
+This class is needed in order to load the
+L<App::Manoc::DB::Helper::ResultSet::TupleArchive> component.
+
+=cut
 
 use strict;
 use warnings;

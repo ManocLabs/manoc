@@ -54,6 +54,12 @@ __PACKAGE__->has_many(
     { cascade_delete => 0, }
 );
 
+=method label
+
+Return a string describing the object
+
+=cut
+
 sub label {
     my $self = shift;
     return

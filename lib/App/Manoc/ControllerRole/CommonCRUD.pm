@@ -8,10 +8,6 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-with 'App::Manoc::ControllerRole::ResultSet',
-    'App::Manoc::ControllerRole::ObjectForm',
-    'App::Manoc::ControllerRole::ObjectList';
-
 =head1 DESCRIPTION
 
 Catalyst controller role for Manoc common CRUD implementation.
@@ -40,7 +36,19 @@ Catalyst controller role for Manoc common CRUD implementation.
   no Moose;
   1;
 
+=head1 ROLES CONSUMED
+
+=for :list
+
+* App::Manoc::ControllerRole::ResultSet
+* App::Manoc::ControllerRole::ObjectForm
+* App::Manoc::ControllerRole::ObjectList
+
 =cut
+
+with 'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectForm',
+    'App::Manoc::ControllerRole::ObjectList';
 
 has 'create_page_title' => ( is => 'rw', isa => 'Str' );
 has 'view_page_title'   => ( is => 'rw', isa => 'Str' );
@@ -122,9 +130,7 @@ has 'delete_object_perm' => (
     default => 'delete',
 );
 
-=head1 ACTIONS
-
-=head2 create
+=action create
 
 Create a new object using a form. Chained to base.
 
@@ -150,7 +156,7 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
     $c->detach('form');
 }
 
-=head2 list
+=action list
 
 Display a list of items.
 
@@ -169,7 +175,7 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
     );
 }
 
-=head2 view
+=action view
 
 Display a single items.
 
@@ -189,7 +195,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     );
 }
 
-=head2 edit
+=action edit
 
 Use a form to edit a row.
 
@@ -211,7 +217,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     $c->detach('form');
 }
 
-=head2 delete
+=action delete
 
 =cut
 
@@ -242,9 +248,9 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     );
 }
 
-=head1 METHODS
+=method delete_object
 
-=head2 delete_object
+Delete the object using its C<delete> method.
 
 =cut
 
@@ -254,12 +260,24 @@ sub delete_object {
     return $c->stash->{object}->delete;
 }
 
+=method get_delete_failure_url
+
+Default is the view action in current namespace.
+
+=cut
+
 sub get_delete_failure_url {
     my ( $self, $c ) = @_;
 
     my $action = $c->namespace . "/view";
     return $c->uri_for_action( $action, [ $c->stash->{object_pk} ] );
 }
+
+=method get_delete_success_url
+
+Default is the list action in current namespace.
+
+=cut
 
 sub get_delete_success_url {
     my ( $self, $c ) = @_;

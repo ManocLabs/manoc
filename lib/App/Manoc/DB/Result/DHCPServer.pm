@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DHCPServer;
+#ABSTRACT: A model object for DHCP servers
 
 use strict;
 use warnings;

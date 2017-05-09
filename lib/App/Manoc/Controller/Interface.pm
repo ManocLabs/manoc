@@ -11,7 +11,7 @@ use App::Manoc::Form::IfNotes;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 METHODS
+=method base
 
 =cut
 
@@ -20,7 +20,7 @@ sub base : Chained('/') : PathPart('interface') : CaptureArgs(0) {
     $c->stash( resultset => $c->model('ManocDB::IfStatus') );
 }
 
-=head2 object
+=method object
 
 =cut
 
@@ -40,7 +40,7 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(2) {
     $c->stash( object_pk => $object_pk );
 }
 
-=head2 view
+=method view
 
 =cut
 
@@ -65,7 +65,7 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     $c->stash( mat_history => \@mat_results );
 }
 
-=head2 edit_notes
+=method edit_notes
 
 =cut
 
@@ -91,7 +91,7 @@ sub edit_notes : Chained('object') : PathPart('edit_notes') : Args(0) {
     $c->res->redirect($dest_url);
 }
 
-=head2 delete_notes
+=method delete_notes
 
 =cut
 

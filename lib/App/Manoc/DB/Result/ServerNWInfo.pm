@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::ServerNWInfo;
+#ABSTRACT: Model object for netwalker configuration for servers
 
 use strict;
 use warnings;
@@ -142,16 +143,5 @@ __PACKAGE__->belongs_to(
     server => 'App::Manoc::DB::Result::Server',
     { 'foreign.id' => 'self.server_id' }
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::ServerNWInfo - Server Netwalker configuration and
-connection information
-
-=head1 DESCRIPTION
-
-A model object to mantain netwalker configuration for a server.
-
-=cut
 
 1;

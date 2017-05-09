@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::Role;
+#ABSTRACT:  A model object representing a class of access permissions to the system.
 
 use strict;
 use warnings;
@@ -26,17 +27,5 @@ __PACKAGE__->add_unique_constraint( ['role'] );
 
 __PACKAGE__->has_many( map_user_role => 'App::Manoc::DB::Result::UserRole', 'role_id' );
 __PACKAGE__->many_to_many( users => 'map_user_role', 'user' );
-
-=head1 NAME
-
-App::Manoc::DB::Result::Role - A model object representing a class of access permissions to
-the system.
-
-=head1 DESCRIPTION
-
-This is an object that represents a row in the 'roles' table of your
-application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
-
-=cut
 
 1;

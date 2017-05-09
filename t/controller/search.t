@@ -14,7 +14,7 @@ my $mech = get_mech();
 
 mech_login();
 
-$mech->get_ok( '/search' );
-$mech->text_contains( 'Search' );
+$mech->get_ok('/search');
+$mech->text_contains('Search');
 
 done_testing();

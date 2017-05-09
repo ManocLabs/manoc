@@ -1,9 +1,19 @@
 package App::Manoc::DB;
+#ABSTRACT: Manoc DB Schema
 
 use strict;
 use warnings;
 
 ##VERSION
+
+=head1 DESCRIPTION
+
+Manoc DB Schema extends C<DBIx::Class::Schema>.
+
+It also loads the required L<DBIx::Class::Helper> components and
+provides methods for schema configuration and initialization.
+
+=cut
 
 our $SCHEMA_VERSION = 4;
 
@@ -25,7 +35,14 @@ __PACKAGE__->load_components(
 
 __PACKAGE__->load_namespaces( default_resultset_class => '+App::Manoc::DB::ResultSet', );
 
-# add some non-standard allowed keys
+=method allowed_column_keys
+
+This method is overriden from
+C<DBIx::Class::Helper::Schema::Verifier::ColumnInfo> to add some
+non-standard confg keys used by Manoc
+
+=cut
+
 sub allowed_column_keys {
     my $self = shift;
     my @keys = $self->next::method;
@@ -36,9 +53,27 @@ sub allowed_column_keys {
     return @keys;
 }
 
+=function base_result
+
+Return C<'App::Manoc::DB::Result'>
+
+=cut
+
 sub base_result { 'App::Manoc::DB::Result' }
 
+=function base_resultset
+
+Return C<'App::Manoc::DB::ResultSet'>
+
+=cut
+
 sub base_resultset { 'App::Manoc::DB::ResultSet' }
+
+=function get_version
+
+Return the current schema version. Used tools like datadumper.
+
+=cut
 
 sub get_version {
     return $SCHEMA_VERSION;
@@ -58,6 +93,12 @@ our $DEFAULT_CONFIG = {
     },
 };
 
+=method init_admin
+
+Create or reset admin user.
+
+=cut
+
 sub init_admin {
     my ($self) = @_;
 
@@ -72,6 +113,13 @@ sub init_admin {
         }
     );
 }
+
+=method init_vlan
+
+When there is no defined VlanRange create a sample range with a sample
+vlan.
+
+=cut
 
 sub init_vlan {
     my ($self) = @_;
@@ -90,6 +138,13 @@ sub init_vlan {
     );
     $vlan_range->add_to_vlans( { name => 'native', id => 1 } );
 }
+
+=method init_ipnetwork
+
+Whene there is no defined IPNetwork rows create some sample networks
+and subnetworks.
+
+=cut
 
 sub init_ipnetwork {
     my ($self) = @_;
@@ -141,6 +196,12 @@ sub init_ipnetwork {
     );
 }
 
+=method init_roles
+
+Populate Role rows based on Manoc default roles defined in L<App::Manoc::CatalystRole::Permission>
+
+=cut
+
 sub init_roles {
     my ( $self, $conf_roles ) = @_;
 
@@ -154,6 +215,12 @@ sub init_roles {
     }
 
 }
+
+=method init_management_url
+
+Create some sample MngUrlFormat rows.
+
+=cut
 
 sub init_management_url {
     my ($self) = @_;

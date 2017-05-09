@@ -1,13 +1,15 @@
 package App::Manoc::ArpSniffer;
+#ABSTRACT: Manoc ARP sniffer daemon
 
 use Moose;
+use namespace::autoclean;
 
 ##VERSION
 
 extends 'App::Manoc::Script::Daemon';
 
 use Net::Pcap;
-use NetPacket::Ethernet qw(:types);
+use NetPacket::Ethernet;
 use NetPacket::ARP;
 
 use App::Manoc::IPAddress::IPv4;
@@ -149,6 +151,16 @@ sub _build_refresh_interval {
 #                                                                      #
 ########################################################################
 
+=head1 FUNCTIONS
+
+=cut
+
+=head2 leave
+
+Called on QUIT and INT signals. Close pcap handle and exit.
+
+=cut
+
 sub leave {
     my $self = shift;
     $self->log->info("leave: closing pcap");
@@ -156,6 +168,13 @@ sub leave {
     $self->log->info("leave: done");
     exit;
 }
+
+=head2 handle_arp_packets
+
+This is the callback called by the pcap loop. Parse ARP packets and
+updates the Arp entries when needed.
+
+=cut
 
 sub handle_arp_packets {
     my ( $self, $header, $packet ) = @_;
@@ -166,7 +185,7 @@ sub handle_arp_packets {
     my $data = $eth->{data};
 
     # check packet type
-    return unless $type == ETH_TYPE_ARP();
+    return unless $type == NetPacket::Ethernet::ETH_TYPE_ARP;
     # get vlan id
     my $vlan = $eth->{vid} || $self->default_vlan;
 
@@ -198,6 +217,13 @@ sub handle_arp_packets {
         timestamp => $timestamp,
     );
 }
+
+=head2 main
+
+The daemon main routing.
+Set up schema, create pcap handle and start the pcap loop.
+
+=cut
 
 sub main {
     my $self = shift;

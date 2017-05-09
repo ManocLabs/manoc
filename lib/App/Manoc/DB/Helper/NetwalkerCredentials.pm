@@ -1,10 +1,18 @@
 package App::Manoc::DB::Helper::NetwalkerCredentials;
+#ABSTRACT: Helper for creating credentials columns needed by netwalker pollers
+
 use strict;
 use warnings;
 
 ##VERSION
 
 use parent 'DBIx::Class';
+
+=method make_credentials_columns
+
+Add all the columns required for netwalker credentials support
+
+=cut
 
 sub make_credentials_columns {
     my $self = shift;
@@ -68,6 +76,12 @@ sub make_credentials_columns {
         },
     );
 }
+
+=method get_credentials_hash
+
+Return all credential data as a hashref
+
+=cut
 
 sub get_credentials_hash {
     my $self = shift;

@@ -1,5 +1,5 @@
 package App::Manoc::Logger;
-##ABSTRACT:  just a tiny wrapper around Log4perl
+##ABSTRACT: A tiny wrapper around Log4perl
 
 use strict;
 use warnings;
@@ -12,7 +12,19 @@ use FindBin;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 
+=function initialized
+
+Return true if the logger has been initialized.
+
+=cut
+
 sub initialized { Log::Log4perl->initialized(); }
+
+=method logger
+
+Return a Log4Perl logger.
+
+=cut
 
 sub logger {
     my $self = shift;
@@ -31,6 +43,12 @@ sub _init_screen_logger {
     $logger->add_appender($appender);
     $logger->level($DEBUG);
 }
+
+=method init
+
+Initialize Manoc loggers.
+
+=cut
 
 sub init {
     my $self  = shift;

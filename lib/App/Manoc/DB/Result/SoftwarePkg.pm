@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::SoftwarePkg;
+#ABSTRACT: A model object representing a software package name the system.
 
 use strict;
 use warnings;
@@ -29,6 +30,15 @@ __PACKAGE__->has_many(
     'software_pkg_id'
 );
 
+__PACKAGE__->many_to_many( servers => 'server_swpkg', 'server' );
+
+=method count_servers_by_version
+
+Return the number of server using this software, grouped by version.
+Returned columns are version and n_servers.
+
+=cut
+
 sub count_servers_by_version {
     my $self = shift;
 
@@ -47,14 +57,5 @@ sub count_servers_by_version {
     );
     return wantarray ? $rs->all : $rs;
 }
-
-__PACKAGE__->many_to_many( servers => 'server_swpkg', 'server' );
-
-=head1 NAME
-
-App::Manoc::DB::Result::SoftwarePkg - A model object representing a software package name
-the system.
-
-=cut
 
 1;

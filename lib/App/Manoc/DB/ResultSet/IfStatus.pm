@@ -1,11 +1,18 @@
 package App::Manoc::DB::ResultSet::IfStatus;
-
+#ABSTRACT: ResultSet class for IfStatus
 use strict;
 use warnings;
 
 ##VERSION
 
 use parent 'App::Manoc::DB::ResultSet';
+
+=method search_unused(  $device )
+
+Return a resultset containing all interfaces of <$device> which were never seen in
+mac address table.
+
+=cut
 
 sub search_unused {
     my ( $self, $device ) = @_;
@@ -22,6 +29,13 @@ sub search_unused {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method search_mat_last_activity (  $device )
+
+Return a resultset containing all interfaces of <$device> with their corresponding
+maximum value of lastseen in Mat.
+
+=cut
 
 sub search_mat_last_activity {
     my ( $self, $device ) = @_;

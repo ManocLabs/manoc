@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::IPNetwork;
+#ABSTRACT: A model object for IP network addresses
 
 use Moose;
 
@@ -79,24 +80,32 @@ has network => (
     is      => 'rw',
     isa     => 'App::Manoc::IPAddress::IPv4Network',
     lazy    => 1,
-    builder => 'build_network',
-    trigger => \&on_set_network,
+    builder => '_build_network',
+    trigger => \&_on_set_network,
 );
 
-sub build_network {
+# network attribute builder
+sub _build_network {
     my $self = shift;
     defined( $self->address ) or return;
     defined( $self->prefix )  or return;
     App::Manoc::IPAddress::IPv4Network->new( $self->address, $self->prefix );
 }
 
-sub on_set_network {
+# triggered by network attribute
+sub _on_set_network {
     my ( $self, $network, $old_network ) = @_;
 
     $self->_address( $network->address );
     $self->_prefix( $network->prefix );
     $self->_broadcast( $network->broadcast );
 }
+
+=method address
+
+Set/get network address
+
+=cut
 
 sub address {
     my ( $self, $value ) = @_;
@@ -108,6 +117,12 @@ sub address {
     }
     return $self->_address();
 }
+
+=method prefix
+
+Set/get network prefix
+
+=cut
 
 sub prefix {
     my ( $self, $value ) = @_;
@@ -124,6 +139,12 @@ sub prefix {
     return $self->_prefix();
 }
 
+=method broadcast
+
+Get network broadcast address
+
+=cut
+
 sub broadcast {
     my $self = shift;
 
@@ -133,6 +154,12 @@ sub broadcast {
     return $self->_broadcast if defined( $self->_broadcast );
     return $self->_broadcast( $self->network->broadcast );
 }
+
+=method label
+
+Return a string describing the object
+
+=cut
 
 sub label {
     my $self = shift;
@@ -188,6 +215,10 @@ sub _rebuild_subtree {
     }
 }
 
+=for Pod::Coverage
+
+=cut
+
 sub new {
     my ( $self, @args ) = @_;
     my $attrs = shift @args;
@@ -200,6 +231,10 @@ sub new {
 
     return $self->next::method( $attrs, @args );
 }
+
+=for Pod::Coverage
+
+=cut
 
 sub insert {
     my $self = shift;
@@ -234,6 +269,12 @@ sub insert {
     return $self;
 }
 
+=method is_outside_parent
+
+Check if the network is not contained in its parent
+
+=cut
+
 sub is_outside_parent {
     my $self = shift;
 
@@ -241,6 +282,12 @@ sub is_outside_parent {
     return $self->address < $self->parent->address ||
         $self->broadcast > $self->parent->broadcast;
 }
+
+=method is_inside_children
+
+Check if there is the network is contain in of its  children
+
+=cut
 
 sub is_inside_children {
     my $self = shift;
@@ -253,6 +300,10 @@ sub is_inside_children {
         ]
     )->count() > 1;
 }
+
+=for Pod::Coverage
+
+=cut
 
 sub update {
     my $self = shift;
@@ -339,6 +390,12 @@ __PACKAGE__->add_relationship(
     }
 );
 
+=method arp_entries
+
+Return a resultset for all entries in Arp with IP addresses in this network
+
+=cut
+
 sub arp_entries {
     my $self = shift;
 
@@ -354,6 +411,12 @@ sub arp_entries {
     return $rs;
 }
 
+=method ip_entries
+
+Return a resultset for all entries IP contained in this network
+
+=cut
+
 sub ip_entries {
     my $self = shift;
 
@@ -367,6 +430,12 @@ sub ip_entries {
     );
     return wantarray ? $rs->all : $rs;
 }
+
+=method ipblock_entries
+
+Return a resultset for all IPBlock entries contained in this network
+
+=cut
 
 sub ipblock_entries {
     my $self = shift;
@@ -382,11 +451,23 @@ sub ipblock_entries {
     return wantarray ? $rs->all : $rs;
 }
 
+=method supernets
+
+Contain all supernets of this network.
+
+=cut
+
 sub supernets {
     my $self = shift;
     my $rs   = $self->search_related('supernets');
     return wantarray ? $rs->all : $rs;
 }
+
+=method supernets_ordered
+
+supernets ordered by address
+
+=cut
 
 sub supernets_ordered {
     my $self = shift;
@@ -399,16 +480,32 @@ sub supernets_ordered {
     return wantarray ? $rs->all : $rs;
 }
 
+=method subnets
+
+Contain all subnets of this network.
+
+=cut
+
 sub subnets {
     my $self = shift;
     my $rs   = $self->search_related('subnets');
     return wantarray ? $rs->all : $rs;
 }
 
+=method first_supernet
+
+=cut
+
 sub first_supernet {
     my $self = shift;
     $self->supernets->first();
 }
+
+=method children_ordered
+
+Return children ordered by ascending network address
+
+=cut
 
 sub children_ordered {
     my $self = shift;
@@ -416,6 +513,10 @@ sub children_ordered {
 
     return wantarray ? $rs->all : $rs;
 }
+
+=for Pod::Coverage sqlt_deploy_hook
+
+=cut
 
 sub sqlt_deploy_hook {
     my ( $self, $sqlt_table ) = @_;

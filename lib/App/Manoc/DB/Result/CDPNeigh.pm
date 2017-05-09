@@ -1,4 +1,12 @@
 package App::Manoc::DB::Result::CDPNeigh;
+#ABSTRACT: A model object representing a CDP relationship.
+
+=head1 DESCRIPTION
+
+This is an object that represents a CDP entry. It uses L<DBIx::Class>
+(aka, DBIC) to do ORM.
+
+=cut
 
 use strict;
 use warnings;
@@ -66,16 +74,5 @@ __PACKAGE__->belongs_to(
         is_foreign_key_constraint => 0
     },
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::CDPNeigh - A model object representing a CDP relationship.
-
-=head1 DESCRIPTION
-
-This is an object that represents a CDP entry. It uses DBIx::Class
-(aka, DBIC) to do ORM.
-
-=cut
 
 1;

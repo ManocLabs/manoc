@@ -1,4 +1,5 @@
 package App::Manoc::DB::Helper::NetwalkerPoller;
+#ABSTRACT: Role for created column to support netwalker poller status
 
 use strict;
 use warnings;
@@ -6,6 +7,12 @@ use warnings;
 ##VERSION
 
 use parent 'DBIx::Class';
+
+=method make_poller_columns
+
+Add all the columns required for storing netwalker status
+
+=cut
 
 sub make_poller_columns {
     my $self = shift;

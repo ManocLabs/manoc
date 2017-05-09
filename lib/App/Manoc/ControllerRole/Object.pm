@@ -4,6 +4,7 @@ package App::Manoc::ControllerRole::Object;
 use Moose::Role;
 
 ##VERSION
+
 use namespace::autoclean;
 
 use MooseX::MethodAttributes::Role;
@@ -47,10 +48,9 @@ a resultset.
      # object will be accessible in $c->{object}
      # object id in object_pk
   }
+=cut
 
-=head1 ACTIONS
-
-=head2 object
+=action object
 
 This action is the chain root for all the actions which operate on a
 single identifer, e.g. view, edit, delete.
@@ -69,9 +69,7 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
     }
 }
 
-=head1 METHODS
-
-=head2 get_object
+=method get_object
 
 Search the object in stash->{resultset} using given the pk.
 

@@ -1,5 +1,5 @@
 package App::Manoc::View::TT::Plugin::JSON;
-
+#ABSTRACT: Template::Plugin::JSON - Adds a .json vmethod to TT values.
 use strict;
 use warnings;
 
@@ -9,13 +9,15 @@ use Template::Plugin;
 use base 'Template::Plugin';
 use JSON;
 
-=head1 NAME
-
-App::Manoc::View::TT::Plugin::JSON -  JSON Plugin for TT View
-
 =head1 DESCRIPTION
 
-JSON utilities for Manoc TT View using L<JSON|JSON> module
+This plugin provides a C<.json> vmethod to all value types when loaded.
+
+=cut
+
+=method json
+
+The C<.json> vmethod.
 
 =cut
 

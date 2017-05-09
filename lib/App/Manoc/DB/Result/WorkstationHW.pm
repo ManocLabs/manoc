@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::WorkstationHW;
+#ABSTRACT: Workstation Hardware
 
 use strict;
 use warnings;
@@ -108,6 +109,11 @@ __PACKAGE__->might_have(
     }
 );
 
+=for Pod::Coverage new
+
+=cut
+
+# override new in order to initialize the required hwasset
 sub new {
     my ( $self, @args ) = @_;
     my $attrs = shift @args;
@@ -135,6 +141,10 @@ sub new {
     return $self->next::method( $new_attrs, @args );
 }
 
+=for Pod::Coverage insert
+
+=cut
+
 sub insert {
     my ( $self, @args ) = @_;
 
@@ -153,16 +163,34 @@ sub insert {
     return $self;
 }
 
+=method cores
+
+Return the number of cores
+
+=cut
+
 sub cores {
     my ($self) = @_;
     return $self->n_procs * $self->n_cores_procs;
 }
+
+=method label
+
+Return a string describing the object
+
+=cut
 
 sub label {
     my $self = shift;
 
     return $self->inventory . " (" . $self->vendor . " - " . $self->model . ")",;
 }
+
+=method in_use
+
+True if used by a Workstation
+
+=cut
 
 sub in_use { defined( shift->workstation ); }
 

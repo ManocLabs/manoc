@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::VlanVtp;
+#ABSTRACT: A model object representing a VTP info
 
 use strict;
 use warnings;
@@ -31,16 +32,5 @@ __PACKAGE__->belongs_to(
         is_foreign_key_constraint => 0,
     }
 );
-
-=head1 NAME
-
-App::Manoc::DB::Result::VlanVtp - A model object representing a class of access permissions to the system.
-
-=head1 DESCRIPTION
-
-This is an object that represents a row in the 'vlan' table of your
-application database (retrieved  by vtp).  It uses DBIx::Class (aka, DBIC) to do ORM.
-
-=cut
 
 1;

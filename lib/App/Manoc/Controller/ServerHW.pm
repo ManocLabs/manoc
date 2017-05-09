@@ -16,10 +16,6 @@ with
     "App::Manoc::ControllerRole::JSONView",
     "App::Manoc::ControllerRole::CSVView";
 
-=head1 METHODS
-
-=cut
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -49,10 +45,7 @@ __PACKAGE__->config(
 
 );
 
-=head1 ACTIONS
-
-
-=head2 create
+=action create
 
 =cut
 
@@ -91,7 +84,7 @@ before 'create' => sub {
 
 };
 
-=head2 edit
+=action edit
 
 =cut
 
@@ -108,7 +101,7 @@ before 'edit' => sub {
     }
 };
 
-=head2 import_csv
+=action import_csv
 
 Import a server hardware list from a CSV file
 
@@ -137,7 +130,7 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     return unless $process_status;
 }
 
-=head2 decommission
+=action decommission
 
 =cut
 
@@ -170,7 +163,7 @@ sub decommission : Chained('object') : PathPart('decommission') : Args(0) {
     );
 }
 
-=head2 restore
+=action restore
 
 =cut
 

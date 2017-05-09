@@ -29,13 +29,14 @@ __PACKAGE__->config(
     enable_permission_check => 1,
     view_object_perm        => undef,
     json_columns            => [qw(id name description)],
+    object_list             => {
+        order_by => [ 'start', 'vlans.id' ],
+        prefetch => 'vlans',
+        join     => 'vlans',
+    }
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 split
+=action split
 
 =cut
 
@@ -59,6 +60,10 @@ sub split : Chained('object') : PathPart('split') : Args(0) {
     $c->detach();
 }
 
+=action merge
+
+=cut
+
 sub merge : Chained('object') : PathPart('merge') : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -79,11 +84,7 @@ sub merge : Chained('object') : PathPart('merge') : Args(0) {
     $c->detach();
 }
 
-=head1 METHODS
-
-=cut
-
-=head2 delete_object
+=method delete_object
 
 =cut
 
@@ -102,7 +103,7 @@ sub delete_object {
     return $range->delete;
 }
 
-=head2 get_form_success_url
+=method get_form_success_url
 
 =cut
 
@@ -112,25 +113,7 @@ sub get_form_success_url {
     return $c->uri_for_action( $c->namespace . "/list" );
 }
 
-=head2 get_object_list
-
-=cut
-
-sub get_object_list {
-    my ( $self, $c ) = @_;
-    return [
-        $c->stash->{'resultset'}->search(
-            {},
-            {
-                order_by => [ 'start', 'vlans.id' ],
-                prefetch => 'vlans',
-                join     => 'vlans',
-            }
-        )->all()
-    ];
-}
-
-=head2 get_delete_failure_url
+=method get_delete_failure_url
 
 =cut
 

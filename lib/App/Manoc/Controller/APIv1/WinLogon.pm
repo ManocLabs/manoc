@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'App::Manoc::Controller::APIv1' }
 
-=head1 METHODS
+=action winlogon_base
 
 =cut
 
@@ -17,7 +17,7 @@ sub winlogon_base : Chained('deserialize') PathPart('winlogon') CaptureArgs(0) {
     return;
 }
 
-=head2 winlogon_post
+=action winlogon_post
 
 POST api/v1/winlogon
 

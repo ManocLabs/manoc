@@ -1,4 +1,5 @@
 package App::Manoc::DB::Result::DHCPLease;
+#ABSTRACT: A model object for DHCP leases
 
 use strict;
 use warnings;

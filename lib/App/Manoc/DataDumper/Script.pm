@@ -1,4 +1,12 @@
 package App::Manoc::DataDumper::Script;
+#ABSTRACT: Manoc Netwalker script runner
+
+=head1 DESCRIPTION
+
+This class is responsible for running the manoc dumper scripst. It extends
+L<App::Manoc::Script> and can operate in two modes: load or save.
+
+=cut
 
 use Moose;
 
@@ -69,6 +77,12 @@ has 'exclude' => (
     default => sub { [] },
 );
 
+=method run_save
+
+Implements the save command to dump database to a datadumper file.
+
+=cut
+
 sub run_save {
     my ($self) = @_;
 
@@ -88,7 +102,11 @@ sub run_save {
     $datadumper->save;
 }
 
-######################################################################################
+=method run_load
+
+Implements the load command to restore database from a datadumper file.
+
+=cut
 
 sub run_load {
     my $self = shift;
@@ -110,7 +128,11 @@ sub run_load {
     $datadumper->load( $self->enable_fk, $self->overwrite, $self->force );
 }
 
-########################################################################
+=method run
+
+The script entry point.
+
+=cut
 
 sub run {
     my $self = shift;

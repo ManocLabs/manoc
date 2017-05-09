@@ -1,4 +1,6 @@
 package App::Manoc::Manifold::SSH::Linux;
+#ABSTRACT: Manifold for accessing Linux servers/devices
+
 use Moose;
 
 ##VERSION
@@ -338,6 +340,12 @@ sub _build_virtual_machines {
     return \@result;
 }
 
+=method dmidecode( $keyworkd )
+
+Call C<dmidecode -s $keyword> as root and return its stdout.
+
+=cut
+
 sub dmidecode {
     my ( $self, $keyword ) = @_;
     my @out = $self->root_cmd( "dmidecode", "-s", $keyword );
@@ -352,6 +360,12 @@ sub dmidecode {
     }
     return;
 }
+
+=method root_cmd ([$opts, ] @cmds)
+
+Execute command as root. If current user is not root try to use sudo.
+
+=cut
 
 sub root_cmd {
     my $self = shift;

@@ -1,4 +1,11 @@
 package App::Manoc::DB::Result::DHCPSharedNetwork;
+#ABSTRACT: A model object for DHCP shared networks
+
+=head1 DESCRIPTION
+
+A shared network belongs to a DHCPServer and contains many DHCPSubnet
+
+=cut
 
 use strict;
 use warnings;

@@ -1,4 +1,5 @@
-package App::Manoc::DataDumper::Converter::Base;
+package    # hide form CPAN
+    App::Manoc::DataDumper::Converter::Base;
 
 use Moose;
 

@@ -1,4 +1,5 @@
 package App::Manoc::Netwalker::Scheduler;
+#ABSTRACT netwalker task scheduler
 use Moose;
 use namespace::autoclean;
 
@@ -17,6 +18,12 @@ has config => (
     required => 1
 );
 
+=attr workers_manager
+
+A list L<App::Manoc::Netwalker::WorkersRole> objects.
+
+=cut
+
 has workers_manager => (
     is      => 'ro',
     isa     => 'ArrayRef[ManagerType]',
@@ -29,6 +36,12 @@ has workers_manager => (
     },
 );
 
+=attr session
+
+The POE session used to schedule the tick
+
+=cut
+
 has session => (
     isa      => 'POE::Session',
     is       => 'ro',
@@ -39,6 +52,12 @@ has session => (
     }
 );
 
+=attr tick_interval
+
+Defaults to 1 minute.
+
+=cut
+
 has tick_interval => (
     isa      => 'Int',
     is       => 'ro',
@@ -46,10 +65,22 @@ has tick_interval => (
     default  => 60,
 );
 
+=attr schema
+
+Manoc Schema. Required.
+
+=cut
+
 has schema => (
     is       => 'ro',
     required => 1
 );
+
+=attr next_alarm_time
+
+Internally used to schedule the next tick.
+
+=cut
 
 has next_alarm_time => (
     is  => 'rw',
@@ -68,6 +99,12 @@ sub _start {
     $self->next_alarm_time( time() + 1 );
     $kernel->alarm( tick => $self->next_alarm_time );
 }
+
+=method tick
+
+Call the C<on_tick> callback on all registered C<workers_manager> objects.
+
+=cut
 
 sub tick {
     my ( $self, $kernel ) = @_[ OBJECT, KERNEL ];

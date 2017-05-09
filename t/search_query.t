@@ -37,7 +37,7 @@ $q->parse;
 ok(
     @{ $q->words() } == 1 &&
         $q->words()->[0] eq 'central palace' &&
-        $q->query_type   eq 'building',
+        $q->query_type eq 'building',
     'Building shortcut'
 );
 
@@ -61,9 +61,9 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 2 &&
+        @{ $q->words() } == 2          &&
             $q->subnet eq '1.2.30.255' &&
-            $q->prefix == '3' &&
+            $q->prefix == '3'          &&
             $q->query_type eq 'subnet'
     ),
     'Tokenizer subnet 1'
@@ -74,9 +74,9 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 0 &&
+        @{ $q->words() } == 0          &&
             $q->subnet eq '1.2.30.255' &&
-            $q->prefix == '32' &&
+            $q->prefix == '32'         &&
             $q->query_type eq 'subnet' &&
             $q->limit == str2seconds('5d')
     ),
@@ -88,10 +88,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1              &&
             $q->words->[0] eq '10.1.2.234' &&
-            $q->query_type eq 'ipaddr' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'ipaddr'     &&
+            $q->match eq 'exact'
     ),
     'Guessing IPv4 address'
 );
@@ -101,10 +101,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1           &&
             $q->words->[0] eq '10.1.2.' &&
-            $q->query_type eq 'ipaddr' &&
-            $q->match      eq 'begin'
+            $q->query_type eq 'ipaddr'  &&
+            $q->match eq 'begin'
     ),
     'Guessing partial IPv4 address'
 );
@@ -114,10 +114,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1                     &&
             $q->words->[0] eq '00:50:56:c0:00:08' &&
-            $q->query_type eq 'macaddr' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'macaddr'           &&
+            $q->match eq 'exact'
     ),
     'Guessing mac address'
 );
@@ -127,10 +127,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1                     &&
             $q->words->[0] eq '00:50:56:c0:00:08' &&
-            $q->query_type eq 'macaddr' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'macaddr'           &&
+            $q->match eq 'exact'
     ),
     'Guessing mac address Windows notation'
 );
@@ -140,10 +140,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1                     &&
             $q->words->[0] eq '00:50:56:c0:00:08' &&
-            $q->query_type eq 'macaddr' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'macaddr'           &&
+            $q->match eq 'exact'
     ),
     'Guessing mac address Cisco notation'
 );
@@ -153,10 +153,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
-            $q->words->[0] eq '0a:b8:' &&
+        @{ $q->words() } == 1           &&
+            $q->words->[0] eq '0a:b8:'  &&
             $q->query_type eq 'macaddr' &&
-            $q->match      eq 'begin'
+            $q->match eq 'begin'
     ),
     'Guessing partial mac address (begin)'
 );
@@ -166,10 +166,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
-            $q->words->[0] eq ':00:08' &&
+        @{ $q->words() } == 1           &&
+            $q->words->[0] eq ':00:08'  &&
             $q->query_type eq 'macaddr' &&
-            $q->match      eq 'end'
+            $q->match eq 'end'
     ),
     'Guessing mac address (end)'
 );
@@ -179,10 +179,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1                &&
             $q->words->[0] eq '172.16.100.0' &&
-            $q->query_type eq 'subnet' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'subnet'       &&
+            $q->match eq 'exact'
     ),
     'Guessing subnet w/out prefix'
 );
@@ -192,10 +192,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
-            $q->words->[0] eq '23' &&
+        @{ $q->words() } == 1        &&
+            $q->words->[0] eq '23'   &&
             $q->query_type eq 'rack' &&
-            $q->match      eq 'partial'
+            $q->match eq 'partial'
     ),
     'Guessing rack query with specified type'
 );
@@ -205,10 +205,10 @@ $q = App::Manoc::Search::Query->new( { search_string => $s } );
 $q->parse();
 ok(
     (
-        @{ $q->words() } == 1 &&
+        @{ $q->words() } == 1               &&
             $q->words->[0] eq '172.18.19.4' &&
-            $q->query_type eq 'device' &&
-            $q->match      eq 'exact'
+            $q->query_type eq 'device'      &&
+            $q->match eq 'exact'
     ),
     'Guessing quoted string'
 );

@@ -66,14 +66,22 @@ has 'start_date' => (
     builder => '_build_start_date',
 );
 
-# shortcut for single word queries
-# and magic guessing
+=method query_as_word
+
+Shortcut for single word queries and magic guessing
+
+=cut
+
 sub query_as_word {
     return join( " ", @{ $_[0]->words } );
 }
 
-# Here we parse the user input in order to identify the scope of the query
-# according to the mini-language keywords
+=method parse
+
+Here we parse the user input in order to identify the scope of the
+ query according to the mini-language keywords.
+
+=cut
 
 sub parse {
     my $self = shift;
@@ -82,10 +90,6 @@ sub parse {
 
     # use non capturing brackets
     my @TYPES = @App::Manoc::Search::QueryType::TYPES;
-
-    # TODO!
-    # scalar(App::Manoc::Search->_plugin_types) and
-    #  push @TYPES,  App::Manoc::Search->_plugin_types;
 
     my $types_re = '(?:' . join( '|', @TYPES ) . ')';
 
@@ -189,7 +193,7 @@ sub _guess_query {
         ( !defined( $self->query_type ) || $self->query_type eq 'macaddr' ) &&
         $text =~ m{ ^(
          ( ([0-9a-f]{2})? ([-:][0-9a-f]{2})+ [-:]? ) |
-	     ([0-9a-f]{2}[-:])
+         ([0-9a-f]{2}[-:])
          )$
          }xo
         )
