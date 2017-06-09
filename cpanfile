@@ -62,7 +62,6 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Catalyst::Devel" => "0";
-  requires "Devel::NYTProf" => "0";
   requires "Dist::Zilla" => "0";
   requires "Git::Wrapper" => "0";
   requires "Perl::Tidy" => "0";
