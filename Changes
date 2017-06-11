@@ -2,6 +2,8 @@ Revision history for App-Manoc
 
 {{$NEXT}}
 
+2.99.2    2017-06-11 21:58:38+02:00 Europe/Rome (TRIAL RELEASE)
+
   - moved to App::Manoc namespace
   - restyled UI based on Bootstrap
   - controller/device: replaced popups with ajax dialogs
