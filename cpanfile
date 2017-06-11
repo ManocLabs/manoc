@@ -67,6 +67,7 @@ on 'develop' => sub {
   requires "Perl::Tidy" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::EOL" => "0";
+  requires "Test::Kwalitee" => "1.21";
   requires "Test::More" => "0.88";
   requires "Test::NoTabs" => "0";
   requires "Test::Perl::Critic" => "0";
