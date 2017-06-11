@@ -11,9 +11,8 @@ Makefile.old
 *~
 *.bak
 *.tdy
+/manoc.db
 /manoc.conf
 /manoc_log.conf
-local/
-lib/Manoc/Plugin
-log/
-t/var
+/t/var
+/App-Manoc-*
