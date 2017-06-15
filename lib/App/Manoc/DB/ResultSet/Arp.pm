@@ -8,6 +8,8 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
+use App::Manoc::DB::Search::Result::Arp;
+
 use Scalar::Util qw(blessed);
 
 __PACKAGE__->load_components(
@@ -137,4 +139,75 @@ sub register_tuple {
     $self->next::method(%params);
 }
 
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $type    = $query->query_type;
+    my $pattern = $query->sql_pattern;
+
+    my $filter = {};
+    if ( $type eq 'ipaddr' ) {
+        $filter->{ipaddr} = { like => $pattern };
+    }
+    elsif ( $type eq 'macaddr' ) {
+        $filter->{macaddr} = { like => $pattern };
+    }
+    else {
+        return;
+    }
+
+    $query->limit and
+        $filter->{lastseen} = { '>' => $query->start_date };
+
+    my $rs = $self->search(
+        $filter,
+        {
+            select   => [ 'ipaddr', 'macaddr', { max => 'lastseen' } ],
+            as       => [ 'ipaddr', 'macaddr', 'timestamp' ],
+            group_by => [qw(ipaddr macaddr)]
+        },
+    );
+
+    if ( $type eq 'ipaddr' ) {
+        while ( my $e = $rs->next ) {
+            $result->add_item(
+                App::Manoc::DB::Search::Result::Arp->new(
+                    {
+                        match      => $e->ipaddr->unpadded,
+                        macaddress => $e->macaddr,
+                        ipaddress  => $e->ipaddr,
+                        timestamp  => $e->get_column('timestamp'),
+                    }
+                )
+            );
+        }
+    }
+    elsif ( $type eq 'macaddr' ) {
+        while ( my $e = $rs->next ) {
+            $result->add_item(
+                App::Manoc::DB::Search::Result::Arp->new(
+                    {
+                        match      => $e->macaddr,
+                        macaddress => $e->macaddr,
+                        ipaddress  => $e->ipaddr,
+                        timestamp  => $e->get_column('timestamp'),
+                    }
+                )
+            );
+        }
+    }
+}
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

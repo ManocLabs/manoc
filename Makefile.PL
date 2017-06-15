@@ -2,154 +2,149 @@
 use strict;
 use warnings;
 
-
-
 use ExtUtils::MakeMaker;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS  = 1;
 install_share dist => "root";
 
-
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Network monitoring application",
-  "AUTHOR" => "Gabriele Mambrini <gmambro\@cpan.org>, Enrico Liguori",
-  "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
-  },
-  "DISTNAME" => "App-Manoc",
-  "LICENSE" => "perl",
-  "NAME" => "App::Manoc",
-  "PREREQ_PM" => {
-    "Archive::Tar" => 0,
-    "Catalyst::Action::RenderView" => 0,
-    "Catalyst::Authentication::Credential::HTTP" => 0,
-    "Catalyst::Authentication::Store::DBIx::Class" => 0,
-    "Catalyst::Plugin::ConfigLoader" => 0,
-    "Catalyst::Plugin::Session" => 0,
-    "Catalyst::Plugin::Session::State::Cookie" => 0,
-    "Catalyst::Plugin::Session::Store::DBI" => 0,
-    "Catalyst::Plugin::StackTrace" => 0,
-    "Catalyst::Plugin::Static::Simple" => 0,
-    "Catalyst::Runtime" => "5.9",
-    "Catalyst::View::CSV" => "1.7",
-    "Catalyst::View::JSON" => 0,
-    "Catalyst::View::TT" => 0,
-    "Class::Load" => 0,
-    "Config::General" => 0,
-    "Config::ZOMG" => "1.0",
-    "Crypt::Eksblowfish::Bcrypt" => 0,
-    "DBD::SQLite" => 0,
-    "DBI" => 0,
-    "DBIx::Class" => 0,
-    "DBIx::Class::EncodedColumn" => 0,
-    "DBIx::Class::Helpers" => 0,
-    "DBIx::Class::Tree" => 0,
-    "DateTime::Format::RFC3339" => 0,
-    "Digest::SHA1" => 0,
-    "HTML::FormHandler" => 0,
-    "HTML::FormHandler::Model::DBIC" => 0,
-    "Log::Log4perl" => "1.46",
-    "Module::Runtime" => 0,
-    "Moose" => 0,
-    "MooseX::Daemonize" => 0,
-    "MooseX::Getopt" => 0,
-    "MooseX::Storage" => 0,
-    "MooseX::Workers" => 0,
-    "Net::NBName" => 0,
-    "Net::OpenSSH" => 0,
-    "Net::SNMP" => 0,
-    "POE" => 0,
-    "Plack::Middleware::ReverseProxy" => 0,
-    "Regexp::Common" => 0,
-    "SQL::Translator" => 0,
-    "Text::CSV" => 0,
-    "YAML::Syck" => 0,
-    "namespace::autoclean" => 0
-  },
-  "TEST_REQUIRES" => {
-    "File::Spec" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
-    "Test::More" => 0,
-    "Test::WWW::Mechanize::Catalyst" => "0.60"
-  },
-  "VERSION" => "2.99.2",
-  "test" => {
-    "TESTS" => "t/*.t t/controller/*.t t/model/*.t"
-  }
+    "ABSTRACT"           => "Network monitoring application",
+    "AUTHOR"             => "Gabriele Mambrini <gmambro\@cpan.org>, Enrico Liguori",
+    "CONFIGURE_REQUIRES" => {
+        "ExtUtils::MakeMaker"     => 0,
+        "File::ShareDir::Install" => "0.06"
+    },
+    "DISTNAME"  => "App-Manoc",
+    "LICENSE"   => "perl",
+    "NAME"      => "App::Manoc",
+    "PREREQ_PM" => {
+        "Archive::Tar"                                 => 0,
+        "Catalyst::Action::RenderView"                 => 0,
+        "Catalyst::Authentication::Credential::HTTP"   => 0,
+        "Catalyst::Authentication::Store::DBIx::Class" => 0,
+        "Catalyst::Plugin::ConfigLoader"               => 0,
+        "Catalyst::Plugin::Session"                    => 0,
+        "Catalyst::Plugin::Session::State::Cookie"     => 0,
+        "Catalyst::Plugin::Session::Store::DBI"        => 0,
+        "Catalyst::Plugin::StackTrace"                 => 0,
+        "Catalyst::Plugin::Static::Simple"             => 0,
+        "Catalyst::Runtime"                            => "5.9",
+        "Catalyst::View::CSV"                          => "1.7",
+        "Catalyst::View::JSON"                         => 0,
+        "Catalyst::View::TT"                           => 0,
+        "Class::Load"                                  => 0,
+        "Config::General"                              => 0,
+        "Config::ZOMG"                                 => "1.0",
+        "Crypt::Eksblowfish::Bcrypt"                   => 0,
+        "DBD::SQLite"                                  => 0,
+        "DBI"                                          => 0,
+        "DBIx::Class"                                  => 0,
+        "DBIx::Class::EncodedColumn"                   => 0,
+        "DBIx::Class::Helpers"                         => 0,
+        "DBIx::Class::Tree"                            => 0,
+        "DateTime::Format::RFC3339"                    => 0,
+        "Digest::SHA1"                                 => 0,
+        "HTML::FormHandler"                            => 0,
+        "HTML::FormHandler::Model::DBIC"               => 0,
+        "Log::Log4perl"                                => "1.46",
+        "Module::Runtime"                              => 0,
+        "Moose"                                        => 0,
+        "MooseX::Daemonize"                            => 0,
+        "MooseX::Getopt"                               => 0,
+        "MooseX::Storage"                              => 0,
+        "MooseX::Workers"                              => 0,
+        "Net::NBName"                                  => 0,
+        "Net::OpenSSH"                                 => 0,
+        "Net::SNMP"                                    => 0,
+        "POE"                                          => 0,
+        "Plack::Middleware::ReverseProxy"              => 0,
+        "Regexp::Common"                               => 0,
+        "SQL::Translator"                              => 0,
+        "Text::CSV"                                    => 0,
+        "YAML::Syck"                                   => 0,
+        "namespace::autoclean"                         => 0
+    },
+    "TEST_REQUIRES" => {
+        "File::Spec"                     => 0,
+        "IO::Handle"                     => 0,
+        "IPC::Open3"                     => 0,
+        "Test::More"                     => 0,
+        "Test::WWW::Mechanize::Catalyst" => "0.60"
+    },
+    "VERSION" => "2.99.3",
+    "test"    => {
+        "TESTS" => "t/*.t t/controller/*.t t/model/*.t"
+    }
 );
-
 
 my %FallbackPrereqs = (
-  "Archive::Tar" => 0,
-  "Catalyst::Action::RenderView" => 0,
-  "Catalyst::Authentication::Credential::HTTP" => 0,
-  "Catalyst::Authentication::Store::DBIx::Class" => 0,
-  "Catalyst::Plugin::ConfigLoader" => 0,
-  "Catalyst::Plugin::Session" => 0,
-  "Catalyst::Plugin::Session::State::Cookie" => 0,
-  "Catalyst::Plugin::Session::Store::DBI" => 0,
-  "Catalyst::Plugin::StackTrace" => 0,
-  "Catalyst::Plugin::Static::Simple" => 0,
-  "Catalyst::Runtime" => "5.9",
-  "Catalyst::View::CSV" => "1.7",
-  "Catalyst::View::JSON" => 0,
-  "Catalyst::View::TT" => 0,
-  "Class::Load" => 0,
-  "Config::General" => 0,
-  "Config::ZOMG" => "1.0",
-  "Crypt::Eksblowfish::Bcrypt" => 0,
-  "DBD::SQLite" => 0,
-  "DBI" => 0,
-  "DBIx::Class" => 0,
-  "DBIx::Class::EncodedColumn" => 0,
-  "DBIx::Class::Helpers" => 0,
-  "DBIx::Class::Tree" => 0,
-  "DateTime::Format::RFC3339" => 0,
-  "Digest::SHA1" => 0,
-  "File::Spec" => 0,
-  "HTML::FormHandler" => 0,
-  "HTML::FormHandler::Model::DBIC" => 0,
-  "IO::Handle" => 0,
-  "IPC::Open3" => 0,
-  "Log::Log4perl" => "1.46",
-  "Module::Runtime" => 0,
-  "Moose" => 0,
-  "MooseX::Daemonize" => 0,
-  "MooseX::Getopt" => 0,
-  "MooseX::Storage" => 0,
-  "MooseX::Workers" => 0,
-  "Net::NBName" => 0,
-  "Net::OpenSSH" => 0,
-  "Net::SNMP" => 0,
-  "POE" => 0,
-  "Plack::Middleware::ReverseProxy" => 0,
-  "Regexp::Common" => 0,
-  "SQL::Translator" => 0,
-  "Test::More" => 0,
-  "Test::WWW::Mechanize::Catalyst" => "0.60",
-  "Text::CSV" => 0,
-  "YAML::Syck" => 0,
-  "namespace::autoclean" => 0
+    "Archive::Tar"                                 => 0,
+    "Catalyst::Action::RenderView"                 => 0,
+    "Catalyst::Authentication::Credential::HTTP"   => 0,
+    "Catalyst::Authentication::Store::DBIx::Class" => 0,
+    "Catalyst::Plugin::ConfigLoader"               => 0,
+    "Catalyst::Plugin::Session"                    => 0,
+    "Catalyst::Plugin::Session::State::Cookie"     => 0,
+    "Catalyst::Plugin::Session::Store::DBI"        => 0,
+    "Catalyst::Plugin::StackTrace"                 => 0,
+    "Catalyst::Plugin::Static::Simple"             => 0,
+    "Catalyst::Runtime"                            => "5.9",
+    "Catalyst::View::CSV"                          => "1.7",
+    "Catalyst::View::JSON"                         => 0,
+    "Catalyst::View::TT"                           => 0,
+    "Class::Load"                                  => 0,
+    "Config::General"                              => 0,
+    "Config::ZOMG"                                 => "1.0",
+    "Crypt::Eksblowfish::Bcrypt"                   => 0,
+    "DBD::SQLite"                                  => 0,
+    "DBI"                                          => 0,
+    "DBIx::Class"                                  => 0,
+    "DBIx::Class::EncodedColumn"                   => 0,
+    "DBIx::Class::Helpers"                         => 0,
+    "DBIx::Class::Tree"                            => 0,
+    "DateTime::Format::RFC3339"                    => 0,
+    "Digest::SHA1"                                 => 0,
+    "File::Spec"                                   => 0,
+    "HTML::FormHandler"                            => 0,
+    "HTML::FormHandler::Model::DBIC"               => 0,
+    "IO::Handle"                                   => 0,
+    "IPC::Open3"                                   => 0,
+    "Log::Log4perl"                                => "1.46",
+    "Module::Runtime"                              => 0,
+    "Moose"                                        => 0,
+    "MooseX::Daemonize"                            => 0,
+    "MooseX::Getopt"                               => 0,
+    "MooseX::Storage"                              => 0,
+    "MooseX::Workers"                              => 0,
+    "Net::NBName"                                  => 0,
+    "Net::OpenSSH"                                 => 0,
+    "Net::SNMP"                                    => 0,
+    "POE"                                          => 0,
+    "Plack::Middleware::ReverseProxy"              => 0,
+    "Regexp::Common"                               => 0,
+    "SQL::Translator"                              => 0,
+    "Test::More"                                   => 0,
+    "Test::WWW::Mechanize::Catalyst"               => "0.60",
+    "Text::CSV"                                    => 0,
+    "YAML::Syck"                                   => 0,
+    "namespace::autoclean"                         => 0
 );
 
-
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  delete $WriteMakefileArgs{TEST_REQUIRES};
-  delete $WriteMakefileArgs{BUILD_REQUIRES};
-  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+    delete $WriteMakefileArgs{TEST_REQUIRES};
+    delete $WriteMakefileArgs{BUILD_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+    unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
 
 {
-package
-MY;
-use File::ShareDir::Install qw(postamble);
+
+    package MY;
+    use File::ShareDir::Install qw(postamble);
 }
