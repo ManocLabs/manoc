@@ -25,7 +25,7 @@
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% print_ip(ip.ipaddr) %]</td>
+  	 <td>[% PP.manoc_print(ip.ipaddr) %]</td>
 	 <td>[% ip.count %]</td>
 	 </tr>
    [% IF loop.last %]
@@ -51,7 +51,7 @@
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% print_mac(mac.macaddr) %]</td>
+  	 <td>[% PP.manoc_print(mac.macaddr) %]</td>
 	 <td>[% mac.count %]</td>
 	 </tr>
    [% IF loop.last %]

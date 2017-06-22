@@ -44,13 +44,13 @@ page.title = 'Server Hardware'
      <tbody>
 [% FOREACH o IN object_list %]
      <tr class="[% 'warning' IF o.hwasset.is_decommissioned %]">
- 	   <td>[% print_serverhw(o) %]</td>
+ 	   <td>[% PP.manoc_print(o) %]</td>
    	   <td>[% o.vendor | html %]</td>
 	   <td>[% o.model | html%]</td>
    	   <td>[% o.ram_memory | html %]</td>
 	   <td>[% o.n_procs %]&nbsp;[% o.cpu_model%]</td>
        <td>[% o.hwasset.display_location %]</td>
-       <td>[% print_server(o.server) %]</td>
+       <td>[% PP.manoc_print(o.server) %]</td>
      </tr>
 [% END %]
      </tbody>

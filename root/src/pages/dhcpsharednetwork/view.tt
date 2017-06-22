@@ -23,7 +23,7 @@
     <div class="panel-body">
       <dl class="dl-horizontal">
         <dt>DHCP Server</dt>
-        <dd>[% print_dhcpserver( object.dhcp_server) %]</dd>
+        <dd>[% PP.manoc_print( object.dhcp_server) %]</dd>
 
   <dt>Domain Name</dt>
   <dd>
@@ -84,7 +84,7 @@
     <tbody>
       [% FOREACH s IN object.dhcp_subnets -%]
       <tr>
-	<td>[% print_dhcpsubnet(s) %]</td>
+	<td>[% PP.manoc_print(s) %]</td>
 	<td>[% s.network.address | html %]/[% s.network.prefix  | html %]</td>
 	<td>[% s.range.from_addr %] - [% s.range.to_addr %]</td>
       </tr>

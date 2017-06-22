@@ -20,22 +20,22 @@ $(function() {
 [% END -%]
 [% MACRO init_table_js(id, options) BLOCK -%]
 $("#[% id  %]").DataTable( {
-[% IF options.responsive -%]
+[% IF options.defined('responsive') -%]
    "responsive" :  true,
 [% END -%]
-[% IF options.server_source -%]
+[% IF options.defined('server_source') -%]
    "serverSide":   true,
    "processing":   true,
    "ajax":         [% options.server_source %],
 [% END -%]
-[% IF options.columns -%]
+[% IF options.defined('columns') -%]
    "columns":      [% options.columns %],
 [% END -%]
    "dom": "<'row'<'col-sm-8'<'toolbar'>><'col-sm-4'f>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-6'i><'col-sm-6'p>>"
    });
-[% IF options.toolbar -%]
+[% IF options.defined('toolbar') -%]
    $("#[% options.toolbar %]").appendTo($("#[% id %]_wrapper div.toolbar").first());
 [% END -%]
 [% END -%]

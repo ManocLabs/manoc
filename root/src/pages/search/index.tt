@@ -48,11 +48,42 @@
   </div>
 </div>
 
+[% MACRO print_search_item(item) BLOCK -%]
+[%   IF item.isa("App::Manoc::DB::Search::Result::Row") %]
+[%      PP.manoc_print(item.row) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::Hostname") -%]
+[%      PP.manoc_print(item.hostname) %] at [% PP.manoc_print(item.ipaddress) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::IPAddr") -%]
+[%      PP.manoc_print(item.address) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::MacAddr") -%]
+[%      PP.manoc_print(item.address) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::Iface") -%]
+Interface [%      PP.manoc_print(item.device) %]/
+[%-      PP.manoc_print({device => item.device, iface => item.interface}) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::IpCalc") -%]
+TODO
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::Logon") -%]
+[%      PP.manoc_print(item.username) %] at [% PP.manoc_print(item.ipaddress) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::Arp") -%]
+[%      PP.manoc_print(item.ipaddress) %] at [% PP.manoc_print(item.macaddress) %]
+[%   ELSIF item.isa("App::Manoc::DB::Search::Result::Name") -%]
+[%      item.match %]
+[%   ELSE -%]
+[%      item %]
+[%   END -%]
+[% END %]
 
 [% FOREACH item IN result.items -%]
   [% '<ul class="results">' IF loop.first %]
   <li>
-    [% item.render(c) %]
+       [% print_search_item(item) -%]
+       [% IF item.isa("App::Manoc::DB::Search::Result::Group") -%]
+       <ul>
+       [% FOREACH ii IN item.items  -%]
+         <li>[% print_search_item(ii) -%]</li>
+       [% END -%]
+       </ul>
+    [% END -%]
   </li>
   [% '</ul>' IF loop.last %]
 [% END %]

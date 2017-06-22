@@ -86,10 +86,10 @@ page.title   = 'Device ' _ object.name
 	<dd><a href="[% object.get_mng_url %]">[% object.mng_address %]</a></dd>
 
 	<dt>Building</dt>
-	<dd>[% print_building(object.rack.building) %]</dd>
+	<dd>[% PP.manoc_print(object.rack.building) %]</dd>
 
 	<dt>Rack</dt>
-	<dd>[% print_rack(object.rack) %]</dd>
+	<dd>[% PP.manoc_print(object.rack) %]</dd>
 
 [% IF hwasset -%]
 	<dt>Asset</dt>
@@ -139,7 +139,7 @@ page.title   = 'Device ' _ object.name
 	<dd>
 	[% IF nwinfo.get_arp  %]Yes
 	   [% IF nwinfo.arp_vlan -%]
-	   (VLAN [% print_vlan(nwinfo.arp_vlan) -%])
+	   (VLAN [% PP.manoc_print(nwinfo.arp_vlan) -%])
 	   [% END -%]
 	[% ELSE %]No
 	[% END %]
@@ -183,7 +183,7 @@ page.title   = 'Device ' _ object.name
       <tbody>
 	[% FOREACH if IN unused_ifaces %]
 	<tr>
-	  <td>[% print_iface(object.id,if.interface) %]</td>
+	  <td>[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
           <td>[% if.description %]</td>
 	</tr>
 	[% END %]

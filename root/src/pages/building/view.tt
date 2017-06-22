@@ -54,7 +54,7 @@ page.no_content_row = 1
 [% FOREACH r IN object.racks -%]
       <tr>
  	<td>[% r.floor | html %]</td>
- 	<td>[% print_rack(r) %]</td>
+ 	<td>[% PP.manoc_print(r) %]</td>
       </tr>
 [% END -%]
     </tbody>
@@ -83,7 +83,7 @@ page.no_content_row = 1
 [% FOREACH w IN object.warehouses -%]
       <tr>
  	<td>[% w.floor | html %]</td>
- 	<td>[% print_warehouse(w) %]</td>
+ 	<td>[% PP.manoc_print(w) %]</td>
       </tr>
 [% END -%]
     </tbody>

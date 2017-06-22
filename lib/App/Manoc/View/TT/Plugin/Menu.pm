@@ -1,5 +1,5 @@
 package App::Manoc::View::TT::Plugin::Menu;
-#ABSTRACT: Manoc menu plugin
+#ABSTRACT: Manoc menu plugin for TT
 
 use strict;
 use warnings;

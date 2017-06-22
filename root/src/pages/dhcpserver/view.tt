@@ -68,7 +68,7 @@ page.title='DHCP server ' _ object.name
                         <tr>
 	                        <td>
 	                            <a role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%s.id %]" aria-expanded="false" aria-controls="children[%range.id %]" ></a>
-                                [% print_dhcpsharednetwork(s)  %]
+                                [% PP.manoc_print(s)  %]
                             </td>
                             <td colspan="2">Shared Network</td>
                         </tr>
@@ -76,7 +76,7 @@ page.title='DHCP server ' _ object.name
                     [% FOREACH n IN s.dhcp_subnets -%]
                     <tbody id="children[%s.id%]" class="collapse" aria-labelledby="row[%range.id%]">
                         <tr class="childrow">
-     	                    <td>[% print_dhcpsubnet(n) %]</td>
+     	                    <td>[% PP.manoc_print(n) %]</td>
  	                        <td>[% n.network.network %]</td>
 	                        <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
                         </tr>
@@ -86,7 +86,7 @@ page.title='DHCP server ' _ object.name
                     <tbody>
                         <tr>
 	                        <td>
-                                [% print_dhcpsharednetwork(s)  %]
+                                [% PP.manoc_print(s)  %]
                             </td>
                             <td colspan="2">Shared Network</td>
                         </tr>
@@ -97,7 +97,7 @@ page.title='DHCP server ' _ object.name
                     [% FOREACH n IN object.dhcp_subnets -%]
                     [% UNLESS n.dhcp_shared_network %]
                     <tr>
-                        <td>[% print_dhcpsubnet(n)  %]</td>
+                        <td>[% PP.manoc_print(n)  %]</td>
 	                    <td>[% n.network.network %]</td>
   	                    <td>[% n.range.from_addr %] - [% n.range.to_addr%]</td>
                     </tr>
@@ -125,8 +125,8 @@ page.title='DHCP server ' _ object.name
                     <tbody>
                         [% FOREACH r IN object.reservations -%]
                         <tr>
-                            <td>[% print_mac(r.macaddr) %]</td>
-                            <td>[% print_ip(r.ipaddr) %]</td>
+                            <td>[% PP.manoc_print(r.macaddr) %]</td>
+                            <td>[% PP.manoc_print(r.ipaddr) %]</td>
                             <td>[% r.name %]</td>
                             <td>[% r.hostname %]</td>
                         </tr>
@@ -154,8 +154,8 @@ page.title='DHCP server ' _ object.name
                     <tbody>
                         [% FOREACH r IN object.leases -%]
                         <tr>
-                            <td>[% print_mac(r.macaddr) %]</td>
-                            <td>[% print_ip(r.ipaddr) %]</td>
+                            <td>[% PP.manoc_print(r.macaddr) %]</td>
+                            <td>[% PP.manoc_print(r.ipaddr) %]</td>
                             <td>[% r.name %]</td>
                             <td>[% r.hostname %]</td>
                         </tr>

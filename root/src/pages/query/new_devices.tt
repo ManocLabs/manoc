@@ -34,9 +34,9 @@ title='New Devices'
   [% END %]
 
  <tr>
-  	 <td>[% print_mac(u.macaddr) %]</td>
- 	 <td>[% print_device_with_name(u.device) %]</td>
-	 <td>[% print_short_iface(u.device.id,u.iface) %]</td>
+  	 <td>[% PP.manoc_print(u.macaddr) %]</td>
+ 	 <td>[% PP.manoc_print(u.device) %]</td>
+	 <td>[% PP.manoc_print(u.device.id,u.iface) %]</td>
  	 <td>[% u.from | html %]</td>
 	 </tr>
    [% IF loop.last %]

@@ -30,7 +30,7 @@
 [% FOREACH s IN object.server_swpkg %]
    <tr>
       <td>[% s.version %]</td>
-      <td>[% print_server(s.server) %]</td>
+      <td>[% PP.manoc_print(s.server) %]</td>
    </tr>
 [% END %]
    </tbody>
