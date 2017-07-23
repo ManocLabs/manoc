@@ -4,6 +4,21 @@ use Moose;
 
 ##VERSION
 
+=head1 SYNOPSYS
+
+Parameters:
+
+=for: list
+
+* If C<$enable_fk> is true foreign key are checked while data is
+loading, otherwise use deferred foreign key checks.
+
+* If C<$overwrite> is true old data is deleted before loading new.
+
+* If C<$force> is true data loading continues even if an error condition arise.
+
+=cut
+
 use App::Manoc::DB;
 use App::Manoc::DataDumper::Converter;
 
@@ -15,23 +30,25 @@ my $ROWS            = 100000;
 my $LOAD_BLOCK_SIZE = 5000;
 
 my $SOURCE_DEPENDECIES = {
-    'Server  '       => [ 'ServerHW', 'VirtualMachine' ],
-    'VirtualMachine' => 'VirtualInfr',
-    'ServerHW'       => 'HWAsset',
-    'Device'         => 'HWAsset',
-    'HWAsset'        => 'Rack',
-    'Rack'           => 'Building',
-    'Mat'            => 'Device',
-    'IfStatus'       => 'Device',
-    'IfNotes'        => 'Device',
-    'CDPNeigh'       => 'Device',
-    'DeviceConfig'   => 'Device',
-    'DeviceNWInfo'   => 'Device',
-    'Uplink'         => 'Device',
-    'SSIDList'       => 'Device',
-    'Dot11Assoc'     => 'Device',
-    'Dot11Client'    => 'Device',
-    'DiscoveredHost' => 'DiscoverSession',
+    'Server  '        => [ 'ServerHW', 'VirtualMachine' ],
+    'DHCPReservation' => 'DHCPServer',
+    'DHCPLease'       => 'DHCPServer',
+    'VirtualMachine'  => 'VirtualInfr',
+    'ServerHW'        => 'HWAsset',
+    'Device'          => 'HWAsset',
+    'HWAsset'         => 'Rack',
+    'Rack'            => 'Building',
+    'Mat'             => 'Device',
+    'IfStatus'        => 'Device',
+    'IfNotes'         => 'Device',
+    'CDPNeigh'        => 'Device',
+    'DeviceConfig'    => 'Device',
+    'DeviceNWInfo'    => 'Device',
+    'Uplink'          => 'Device',
+    'SSIDList'        => 'Device',
+    'Dot11Assoc'      => 'Device',
+    'Dot11Client'     => 'Device',
+    'DiscoveredHost'  => 'DiscoverSession',
 };
 
 has 'filename' => (
@@ -86,6 +103,27 @@ has 'source_names' => (
     isa     => 'ArrayRef',
     lazy    => 1,
     builder => '_build_source_names'
+);
+
+has 'enable_fk' => (
+    is       => 'rw',
+    isa      => 'Bool',
+    required => 0,
+    default  => 0
+);
+
+has 'overwrite' => (
+    is       => 'rw',
+    isa      => 'Bool',
+    required => 0,
+    default  => 0
+);
+
+has 'force' => (
+    is       => 'rw',
+    isa      => 'Bool',
+    required => 0,
+    default  => 0
 );
 
 sub _build_version {
@@ -147,7 +185,7 @@ sub _order_sources {
 #----------------------------------------------------------------------#
 
 sub _load_tables_loop {
-    my ( $self, $datadump, $file_set, $overwrite, $force ) = @_;
+    my ( $self, $datadump, $file_set ) = @_;
     my $converter;
 
     # try to load a converter if needed
@@ -167,6 +205,16 @@ sub _load_tables_loop {
     }
 
     my $source_names = $self->source_names;
+
+    if ( $self->overwrite ) {
+        foreach my $source_name ( reverse @$source_names ) {
+            my $source = $self->schema->source($source_name);
+
+            $self->log->debug("Cleaning $source_name");
+            $source->resultset->delete();
+        }
+    }
+
     foreach my $source_name (@$source_names) {
         my $source = $self->schema->source($source_name);
         next unless $source->isa('DBIx::Class::ResultSource::Table');
@@ -174,11 +222,6 @@ sub _load_tables_loop {
         if ( $self->skip_notempty and $source->resultset->count() ) {
             $self->log->info("Source $source_name is not empty, skip.");
             next;
-        }
-
-        if ($overwrite) {
-            $self->log->debug("Cleaning $source_name");
-            $source->resultset->delete();
         }
 
         $self->log->debug("Loading $source_name");
@@ -226,7 +269,7 @@ sub _load_tables_loop {
                     $converter->upgrade_table( $records, $source_name );
 
                 # load into db
-                $self->_load_table( $source, $records, $force );
+                $self->_load_table( $source, $records );
 
                 #free memory
                 undef @$records;
@@ -241,7 +284,7 @@ sub _load_tables_loop {
 }
 
 sub _load_table {
-    my ( $self, $source, $records, $force ) = @_;
+    my ( $self, $source, $records ) = @_;
 
     my $rs = $source->resultset;
     $self->log->debug("loading table");
@@ -258,19 +301,45 @@ sub _load_table {
 
         try {
             $self->log->debug( "populate $offset, $last_record_index - " . scalar(@$data) );
-            $rs->populate($data);
+            $self->schema->txn_do(
+                sub {
+                    if ( $self->enable_fk ) {
+                        $rs->populate($data);
+                    }
+                    else {
+                        $self->schema->storage->with_deferred_fk_checks(
+                            sub {
+                                $rs->populate($data);
+                            }
+                        );
+                    }
+                }
+            );
         }
         catch {
-            if ($force) {
-                $self->log->debug("forcing populate offset=$offset");
+            if ( $self->force ) {
+                $self->log->debug("Recovering from error: $_");
+                $self->log->debug("Forcing populate offset=$offset");
                 foreach my $row (@$data) {
                     try {
-                        $rs->populate( [$row] );
+                        $self->schema->txn_do(
+                            sub {
+                                if ( $self->enable_fk ) {
+                                    $rs->populate( [$row] );
+                                }
+                                else {
+                                    $self->schema->storage->with_deferred_fk_checks(
+                                        sub {
+                                            $rs->populate( [$row] );
+                                        }
+                                    );
+                                }
+                            }
+                        );
                     }
                     catch {
                         $count++;
-                        $self->log->debug("Recovering error: $_");
-
+                        $self->log->debug("Error while recovering: $_");
                     };
                 }
             }
@@ -286,23 +355,14 @@ sub _load_table {
     $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );
 }
 
-=method load( $enable_fk, $overwrite, $force )
+=method load( )
 
 Load data from C<$self->filename>.
-
-=for: list
-
-* If C<$enable_fk> is true foreign key are checked while data is
-loading, otherwise use deferred foreign key checks.
-
-* If C<$overwrite> is true old data is deleted before loading new.
-
-* If C<$force> is true data loading continues even if an error condition arise.
 
 =cut
 
 sub load {
-    my ( $self, $enable_fk, $overwrite, $force ) = @_;
+    my ($self) = @_;
 
     my $datadump = App::Manoc::DataDumper::Data->load( $self->filename );
 
@@ -317,20 +377,9 @@ sub load {
     my $source_names = $self->source_names;
     $self->log->debug( 'Sources: ', join( ',', @$source_names ) );
 
-    if ($enable_fk) {
-        $self->_load_tables_loop( $datadump, $file_set, $overwrite, $force );
-    }
-    else {
-        # force loading the correct storage backend before
-        # calling with_deferred_fk_checks
-        $self->schema->storage->ensure_connected();
+    $self->schema->storage->ensure_connected();
+    $self->_load_tables_loop( $datadump, $file_set );
 
-        $self->schema->storage->with_deferred_fk_checks(
-            sub {
-                $self->_load_tables_loop( $datadump, $file_set, $overwrite, $force );
-            }
-        );
-    }
     $self->log->info("Database restored!");
 }
 
@@ -388,9 +437,11 @@ sub _dump_table {
     }
 
     # split data in files of $ROWS records
-    # to optimize arrays usage set $#array=n to preallocate storage
-    # creating an array of n undefs then clear the array to be
-    # able to use push the normal way:
+
+    # trick to optimize array usage:
+    # 1) set $#array=n to preallocate storage by creating an array of n
+    # undef values
+    # 2) clear the array in order to be able to use push as usual
 
     my $page = 1;
     my @data;
