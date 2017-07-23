@@ -55,7 +55,8 @@ has_field 'network' => (
     label         => 'Subnet',
     empty_select  => '--- Select a subnet ---',
     element_class => 'selectpicker',
-    element_attr  => { 'data-live-search' => 'true' }
+    element_attr  => { 'data-live-search' => 'true' },
+    required      => 1,
 );
 
 has_block 'range_block' => (

@@ -4,7 +4,7 @@ App::Manoc - Network monitoring application
 
 # VERSION
 
-version 2.99.2
+version 2.99.3
 
 # SYNOPSIS
 

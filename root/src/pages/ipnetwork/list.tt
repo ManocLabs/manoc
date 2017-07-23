@@ -26,7 +26,7 @@
          <tr>
       	 <td><a href="[% c.uri_for_action('ipnetwork/view', [object.id]) %]">[% object.name | html %]</a></td>
   	 <td data-sort="[% object.network.address.padded  %]">[% object.network | html %]</td>
- 	 <td>[% print_vlan(object.vlan) %]</td>
+ 	 <td>[% PP.manoc_print(object.vlan) %]</td>
          </tr>
 [% END %]
    </tbody>

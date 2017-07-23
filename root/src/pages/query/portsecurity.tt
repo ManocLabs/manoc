@@ -22,8 +22,8 @@ title='Portsecurity'
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% print_device(t) %] ( [% t.device_name%] )</td>
-	 <td>[% print_short_iface(t.id,t.interface) %]</td>
+  	 <td>[% PP.manoc_print( [% t.device_name%] )</td>
+	 <td>[% PP.manoc_print(t.id,t.interface) %]</td>
  	 <td>[% t.description | html %]</td>
  	 <td>[% t.cps_count %]</td>
 	 </tr>

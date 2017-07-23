@@ -49,11 +49,11 @@
   <dt>Warehouse</dt>
   <dd>Yes</dd>
 [% ELSE -%]
-  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Building<dt><dd>[% PP.manoc_print(object.building) %]</dd>
   <dt>Floor</dt><dd>[% object.floor | html %]</dd>
   <dt>Room</dt> <dd>[% object.room | html %]</dd>
   [% IF object.rack %]
-   <dt>Rack</dt><dd>[% print_rack(object.rack) %]</dd>
+   <dt>Rack</dt><dd>[% PP.manoc_print(object.rack) %]</dd>
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
@@ -61,7 +61,7 @@
   <dt>Decommissioned</dt>
   <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
   [% END -%]
-  <dt>Used by</dt><dd>[% IF object.server %][% print_server(object.server) %][% END %]</dd>
+  <dt>Used by</dt><dd>[% IF object.server %][% PP.manoc_print(object.server) %][% END %]</dd>
   <dt>RAM</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>CPU</dt>
@@ -73,7 +73,7 @@
   <dt>Secondary storage</dt>
   <dd>[% object.storage2_size | html %]</dd>
   <dt>NICs</dt>
-  <dd>[% FOREACH n IN object.nics %][% print_mac(n.macaddr) -%] [% END -%]</dd>
+  <dd>[% FOREACH n IN object.nics %][% PP.manoc_print(n.macaddr) -%] [% END -%]</dd>
   <dt>Notes</dt>
   <dd>[% object.notes | html %]</dd>
 </dl>

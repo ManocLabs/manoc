@@ -29,7 +29,7 @@ page.no_content_row = 1
 <div class="panel panel-default">
   <div class="panel-body">
     <dl class="pull-left dl-horizontal">
-	<dt>Building</dt><dd>[% print_building(object.building) %]</dd>
+	<dt>Building</dt><dd>[% PP.manoc_print(object.building) %]</dd>
 	<dt>Floor</dt><dd>[% object.floor %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
     </dl>
@@ -59,7 +59,7 @@ page.no_content_row = 1
       [% FOREACH d IN object.devices -%]
       <tr>
 	<td>[% d.level %]</td>
-	<td>[% print_device(d) %]</td>
+	<td>[% PP.manoc_print(d) %]</td>
       </tr>
       [% END %]
     </tbody>
@@ -89,7 +89,7 @@ page.no_content_row = 1
       [% FOREACH d IN object.servers -%]
       <tr>
 	<td>[% d.level %]</td>
-	<td>[% print_serverhw(d) %]</td>
+	<td>[% PP.manoc_print(d) %]</td>
       </tr>
       [% END %]
     </tbody>

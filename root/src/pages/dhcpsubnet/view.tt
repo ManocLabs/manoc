@@ -22,14 +22,14 @@
 
 <dl class="dl-horizontal">
   <dt>DHCP Server</dt>
-  <dd>[% print_dhcpserver( object.dhcp_server) %]</dd>
+  <dd>[% PP.manoc_print( object.dhcp_server) %]</dd>
   <dt>Network</dt>
   <dd>[% object.network.address | html %]/
       [% object.network.prefix  | html %]</dd>
   <dt>Pool</dt>
   <dd>[% object.range.from_addr | html %] - [% object.range.to_addr | html %]</dd>
   <dt>Shared Network</dt>
-  <dd>[% print_dhcp_shared_network(object.dhcp_shared_network) %]</dd>
+  <dd>[% PP.manoc_print(object.dhcp_shared_network) %]</dd>
   <dt>Domain</dt>
   <dd>
       [%IF object.domain_name -%]
@@ -92,8 +92,8 @@
     <tbody>
       [% FOREACH r IN object.reservations -%]
       <tr>
-	<td>[% print_mac(r.macaddr) %]</td>
-	<td>[% print_ip(r.ipaddr) %]</td>
+	<td>[% PP.manoc_print(r.macaddr) %]</td>
+	<td>[% PP.manoc_print(r.ipaddr) %]</td>
 	<td>[% r.name %]</td>
 	<td>[% r.hostname %]</td>
       </tr>

@@ -53,19 +53,19 @@
     <div class="panel-body">
       <dl class="dl-horizontal">
           <dt>Hostname</dt><dd>[% object.hostname %] </dd>
-          <dt>Primary Address</dt><dd>[% print_ip(object.address) %] </dd>
-          <dt>Aliases</dt><dd>[% FOREACH a IN object.addresses %][% print_ip(a.ipaddr) -%] [% END -%]</dd>
+          <dt>Primary Address</dt><dd>[% PP.manoc_print(object.address) %] </dd>
+          <dt>Aliases</dt><dd>[% FOREACH a IN object.addresses %][% PP.manoc_print(a.ipaddr) -%] [% END -%]</dd>
 	      <dt>OS</dt><dd>[% object.os %] [% object.os_ver %] </dd>
           [% IF object.decommissioned -%]
           <dt>Decommissioned</dt>
           <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
           [% END -%]
           [% IF object.serverhw -%]
-          <dt>Server Hardware</dt><dd>[% print_serverhw(object.serverhw) %]</dd>
+          <dt>Server Hardware</dt><dd>[% PP.manoc_print(object.serverhw) %]</dd>
           <dt>Hypervisor</dt><dd>[% object.is_hypervisor ? "Yes" : "No" %]</dd>
           [% END -%]
           [% IF object.vm -%]
-          <dt>On Virtual Machine</dt><dd>[% print_vm(object.vm) %]</dd>
+          <dt>On Virtual Machine</dt><dd>[% PP.manoc_print(object.vm) %]</dd>
           [% END -%]
       </dl>
     </div><!-- panel body -->
@@ -134,10 +134,10 @@
   <tbody>
   [% FOREACH vm IN object.virtual_machines -%]
   <tr>
-    <td>[% print_vm(vm) -%]</td>
+    <td>[% PP.manoc_print(vm) -%]</td>
     <td>[% vm.ram_memory -%]</td>
     <td>[% vm.vcpus -%]</td>
-    <td>[% print_server(vm.server) -%]</td>
+    <td>[% PP.manoc_print(vm.server) -%]</td>
   </tr>
   [% END -%]
   </tbody>
@@ -156,7 +156,7 @@
           <tbody>
 	          [% FOREACH p IN object.installed_sw_pkgs  %]
 	          <tr>
-                  <td>[% print_softwarepkg(p.software_pkg) %]</td>
+                  <td>[% PP.manoc_print(p.software_pkg) %]</td>
                   <td>[% p.version %]</td>
 	          </tr>
 	          [% END %]

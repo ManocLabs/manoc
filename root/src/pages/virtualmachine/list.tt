@@ -36,11 +36,11 @@
    <tr class="[% 'warning' IF object.decommissioned %]">
      <td>[% IF object.decommissioned %]Decommissioned[% ELSE %]In use[% END %]</td>
   	 <td><a href=[% c.uri_for_action('virtualmachine/view', [object.id]) %]>[% object.name | html %]</a></td>
- 	 <td>[% print_vinfr(object.virtinfr) IF object.virtinfr %]</td>
- 	 <td>[% print_server(object.hypervisor) IF object.hypervisor %]</td>
+ 	 <td>[% PP.manoc_print(object.virtinfr) IF object.virtinfr %]</td>
+ 	 <td>[% PP.manoc_print(object.hypervisor) IF object.hypervisor %]</td>
  	 <td>[% object.ram_memory | html %]</td>
  	 <td>[% object.vcpus | html %]</td>
-     <td>[% print_server(object.server) IF object.server %]</td>
+     <td>[% PP.manoc_print(object.server) IF object.server %]</td>
    </tr>
 [% END %]
    </tbody>

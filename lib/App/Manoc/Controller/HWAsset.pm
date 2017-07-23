@@ -369,7 +369,7 @@ sub datatable_row {
         model     => $row->model,
         serial    => $row->serial,
         location  => $row->display_location,
-        link      => $c->uri_for_action( $action, [ $row->id ] ),
+        link      => $c->uri_for_action( $action, [ $row->id ] )->as_string,
     };
 }
 

@@ -24,26 +24,26 @@ use_table=1
   	<dd>[% ipaddress.address %]</dd>
 
 	<dt>Servers</dt>
-	<dd>[% FOREACH s IN servers %][% print_server(s) -%] [% END -%]</dd>
+	<dd>[% FOREACH s IN servers %][% PP.manoc_print(s) -%] [% END -%]</dd>
 
 	<dt>Devices</dt>
-	<dd>[% FOREACH d IN devices %][% print_device(d) -%] [% END -%]
+	<dd>[% FOREACH d IN devices %][% PP.manoc_print(d) -%] [% END -%]
 
 	<dt>Metworks</dt>
 	<dd>[% FOREACH net IN networks %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
-	  [% print_ipnetwork(net) -%]
+	  [% PP.manoc_print(net) -%]
 	  [% END -%]
 	</dd>
 
 	<dt>IP Blocks</td>
 	<dd>[% FOREACH block IN ipblocks %]
-	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
+	[% PP.manoc_print(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
 
 	<dt>Last used VLAN</dt>
-	<dd>[% print_vlan(arp.0.vlan_id) %]</dd>
+	<dd>[% PP.manoc_print(arp.0.vlan_id) %]</dd>
 	[%IF hostnames.size -%]
 	<dt>Last hostname</dt>
 	<dd>[% hostnames.0.name %]
@@ -168,8 +168,8 @@ use_table=1
       <tbody>
 	[% FOREACH r IN leases %]
          <tr>
- 	   <td>[% r.server -%]</td>
- 	   <td>[% print_mac(r.macaddr) %]</td>
+       <td>[% PP.manoc_print(r.dhcp_server) %]</td>
+ 	   <td>[% PP.manoc_print(r.macaddr) %]</td>
 	   <td>[% date.format(r.start) %]</td>
  	   <td>[% date.format(r.end) %] </td>
  	   <td>[% r.status %] </td>
@@ -182,7 +182,7 @@ use_table=1
   </div><!-- end tab dhcpleases -->
 
   <div role="tabpanel" class="tab-pane" id="dhcpres">
-    [% IF reservations.0 %]
+    [% IF reservations.size %]
     <table class="table">
       <thead>
         <tr>
@@ -195,8 +195,8 @@ use_table=1
       <tbody>
 	[% FOREACH r IN reservations %]
         <tr>
- 	  <td>[% r.server %]</td>
- 	  <td>[% print_mac(r.macaddr) %]</td>
+ 	  <td>[% PP.manoc_print(r.dhcp_server) %]</td>
+ 	  <td>[% PP.manoc_print(r.macaddr) %]</td>
 	  <td>[% r.name %]</td>
  	  <td>[% r.hostname %] </td>
 	</tr>

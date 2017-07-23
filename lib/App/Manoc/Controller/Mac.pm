@@ -51,8 +51,10 @@ sub view : Chained('/') : PathPart('mac') : Args(1) {
             )->all,
         ],
 
-        serverhw => $c->model('ManocDB::ServerHW')
-            ->search( { 'nics.macaddr' => $macaddr }, { join => 'nics' } ),
+        serverhw => [
+            $c->model('ManocDB::ServerHW')
+                ->search( { 'nics.macaddr' => $macaddr }, { join => 'nics' } )
+        ],
 
         reservations =>
             [ $c->model('ManocDB::DHCPReservation')->search( { macaddr => $macaddr } ) ],

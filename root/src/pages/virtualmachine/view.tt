@@ -41,11 +41,11 @@
   <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
   [% END -%]
   <dt>Used by</dt>
-  <dd>[% print_server(object.server) IF object.server %]</dd>
+  <dd>[% PP.manoc_print(object.server) IF object.server %]</dd>
   <dt>Virtual infrastructure</dt>
   <dd>[% object.virtinfr | html %]</dd>
   <dt>Hypervisor</dt>
-  <dd>[%  print_server(object.hypervisor) %]</dd>
+  <dd>[%  PP.manoc_print(object.hypervisor) %]</dd>
   <dt>RAM Memory</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>Virtual CPUs</dt>

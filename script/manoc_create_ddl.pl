@@ -62,7 +62,10 @@ sub _build_backend {
     my $self = shift;
 
     my $schema = $self->schema or return;
-    return $schema->storage->dbh->{Driver}->{Name};
+
+    my $name = $schema->storage->dbh->{Driver}->{Name};
+    $name eq 'Pg' and return 'PostgreSQL';
+    return $name;
 }
 
 sub run {

@@ -7,6 +7,8 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
+use App::Manoc::DB::Search::Result::Row;
+
 use Scalar::Util qw(blessed);
 
 =method including_address( $ipaddress )
@@ -46,6 +48,33 @@ sub including_address_ordered {
         }
     );
     return wantarray ? $rs->all : $rs;
+}
+
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $query_type = $query->query_type;
+    my $pattern    = $query->sql_pattern;
+
+    return unless $query_type eq 'inventory';
+
+    my $rs = $self->search( { name => { '-like' => $pattern } }, { order_by => 'name' } );
+
+    while ( my $e = $rs->next ) {
+        my $item = Manoc::DB::Search::Result::Row->new(
+            {
+                row   => $e,
+                match => $e->name,
+            }
+        );
+        $result->add_item($item);
+    }
 }
 
 1;

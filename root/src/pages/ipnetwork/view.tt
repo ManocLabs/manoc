@@ -28,7 +28,7 @@
 	<dt>Description</dt>
 	<dd>[% object.description | html %]</dd>
 	<dt>VLAN</dt>
-	<dd>[% print_vlan(object.vlan) %]</dd>
+	<dd>[% PP.manoc_print(object.vlan) %]</dd>
 	<dt>Netmask</dt>
 	<dd>[% object.network.netmask | html %]</dd>
 	<dt>Broadcast</dt>
@@ -46,12 +46,12 @@
 	<dt>Supernets</dt>
 	<dd>[% FOREACH net IN object.supernets_ordered %]
 	  [% bootstrap_icon('chevron-right') UNLESS loop.first -%]
-	  [% print_ipnetwork(net) -%]
+	  [% PP.manoc_print(net) -%]
 	  [% END -%]
 	</dd>
 	<dt>Blocks</td>
 	<dd>[% FOREACH block IN object.ipblock_entries %]
-	[% print_ipblock(block) %][% "," UNLESS loop.last -%]
+	[% PP.manoc_print(block) %][% "," UNLESS loop.last -%]
 	[%END -%]
 	</dd>
   	<dt>Notes</dt>
@@ -91,7 +91,7 @@
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>
-	<td>[% print_ipnetwork(network) %]</td>
+	<td>[% PP.manoc_print(network) %]</td>
       </tr>
       [% END -%]
     </tbody>

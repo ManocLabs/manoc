@@ -53,4 +53,46 @@ sub search_multihost {
     return wantarray ? $rs->all : $rs;
 }
 
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+
+    my ( $self, $query, $result ) = @_;
+
+    my $type = $query->query_type;
+    $type eq 'macaddr' or return;
+
+    my $pattern = $query->sql_pattern;
+
+    my $search = { macaddr => { like => $pattern } };
+
+    my $options = {
+        select =>
+            [ 'device_id', 'macaddr', 'interface', { max => 'lastseen', -as => 'timestamp' } ],
+        as       => [ 'device', 'macaddr', 'interface', 'timestamp' ],
+        group_by => [qw(device macaddr interface)],
+        #        join     => { 'device_entry' => 'mng_url_format' },
+        #        prefetch => { 'device_entry' => 'mng_url_format' },
+    };
+
+    $query->limit and
+        $options->{having} = { timestamp => { '>' => $query->start_date } };
+
+    my $rs = $self->search( $search, $options );
+    while ( my $e = $rs->next ) {
+        my $item = App::Manoc::DB::Search::Result::Iface->new(
+            {
+                match     => $e->macaddr,
+                device    => $e->device,                    #$device,
+                interface => $e->interface,
+                timestamp => $e->get_column('timestamp'),
+            }
+        );
+        $result->add_item($item);
+    }
+}
 1;

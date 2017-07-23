@@ -47,6 +47,50 @@ sub logical_servers {
     return wantarray ? $rs->all : $rs;
 }
 
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $type    = $query->query_type;
+    my $pattern = $query->sql_pattern;
+
+    my $match;
+    my $filter;
+
+    if ( $type eq 'inventory' || $type eq 'server' ) {
+        $filter = { name => { -like => $pattern } };
+        $match = sub { shift->name };
+    }
+    elsif ( $type eq 'address' ) {
+        $filter = { 'mng_address' => { -like => $pattern } };
+        $match = sub { shift->mng_address->address };
+    }
+    elsif ( $type eq 'note' ) {
+        $filter = { notes => { -like => $pattern } };
+        $match = sub { shift->name };
+    }
+    else {
+        return;
+    }
+
+    my $rs = $self->search( $filter, { order_by => ['name'] } );
+    while ( my $e = $rs->next ) {
+        my $item = App::Manoc::DB::Search::Result::Row->new(
+            {
+                device => $e,
+                match  => $match->($e)
+            }
+        );
+        $result->add_item($item);
+    }
+
+}
+
 =head1 SEE ALSO
 
 L<DBIx::Class::ResultSet>

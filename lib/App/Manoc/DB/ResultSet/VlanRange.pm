@@ -33,6 +33,35 @@ sub get_overlap_ranges {
         $self->search_rs($conditions);
 }
 
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $query_type = $query->query_type;
+
+    return unless $query_type eq 'inventory';
+
+    my $pattern = $query->sql_pattern;
+
+    my $rs = $self->search( { name => { '-like' => $pattern } }, { order_by => 'id' } );
+
+    while ( my $e = $rs->next ) {
+
+        my $item = App::Manoc::DB::Search::Result::VlanRange->new(
+            {
+                name  => $e->name,
+                match => $e->name,
+            }
+        );
+        $result->add_item($item);
+    }
+}
+
 =head1 SEE ALSO
 
 L<DBIx::Class::ResultSet>

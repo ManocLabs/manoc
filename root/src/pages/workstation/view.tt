@@ -51,9 +51,9 @@
           <dt>Decommissioned</dt>
           <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
           [% END -%]
-          <dt>Ethernet Address</dt><dd>[% print_ip(object.ethernet_ipaddr) %] </dd>
-          <dt>Wireless Address</dt><dd>[% print_ip(object.wireless_ipaddr) %] </dd>
-          <dt>Workstation Hardware</dt><dd>[% print_workstationhw(object.workstationhw) %]</dd>
+          <dt>Ethernet Address</dt><dd>[% PP.manoc_print(object.ethernet_ipaddr) %] </dd>
+          <dt>Wireless Address</dt><dd>[% PP.manoc_print(object.wireless_ipaddr) %] </dd>
+          <dt>Workstation Hardware</dt><dd>[% PP.manoc_print(object.workstationhw) %]</dd>
       </dl>
     </div><!-- panel body -->
   </div><!-- panel -->
@@ -70,7 +70,7 @@
           <tbody>
 	          [% FOREACH p IN object.installed_sw_pkgs  %]
 	          <tr>
-                  <td>[% print_softwarepkg(p.software_pkg) %]</td>
+                  <td>[% PP.manoc_print(p.software_pkg) %]</td>
                   <td>[% p.version %]</td>
 	          </tr>
 	          [% END %]

@@ -49,7 +49,7 @@
   <dt>Warehouse</dt>
   <dd>Yes</dd>
 [% ELSE -%]
-  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Building<dt><dd>[% PP.manoc_print(object.building) %]</dd>
   <dt>Floor</dt><dd>[% object.floor | html %]</dd>
   <dt>Room</dt> <dd>[% object.room | html %]</dd>
 [% END %]
@@ -57,7 +57,7 @@
   <dt>Decommissioned</dt>
   <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
   [% END -%]
-  <dt>Used by</dt><dd>[% IF object.workstation %][% print_workstation(object.workstation) %][% END %]</dd>
+  <dt>Used by</dt><dd>[% IF object.workstation %][% PP.manoc_print(object.workstation) %][% END %]</dd>
   <dt>RAM</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>CPU</dt>
