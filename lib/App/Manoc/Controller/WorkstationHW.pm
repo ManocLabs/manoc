@@ -44,10 +44,13 @@ __PACKAGE__->config(
         'storage2_size', 'display',   'notes'
     ],
 
-    datatable_row_callback    => 'datatable_row',
-    datatable_columns         => [qw(inventory type vendor model serial workstation.name)],
-    datatable_search_columns  => [qw(serial vendor model inventory workstation.name)],
-    datatable_search_options  => { prefetch => 'workstation' },
+    datatable_row_callback => 'datatable_row',
+    datatable_columns      => [
+        qw(hwasset.inventory hwasset.type hwasset.vendor hwasset.model hwasset.serial workstation.name)
+    ],
+    datatable_search_columns =>
+        [qw(hwasset.serial hwasset.vendor hwasset.model hwasset.inventory workstation.name)],
+    datatable_search_options  => { prefetch => [ 'hwasset', 'workstation' ] },
     datatable_search_callback => 'datatable_search_cb',
 
 );
