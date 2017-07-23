@@ -10,10 +10,10 @@ use parent 'DBIx::Class::ResultSet';
 
 # do not load ingnorewantarray helper since it breaks
 # HTML::FormHandler
-
+#
+# also avoid Helper::ResultSet::AutoRemoveColumns
 __PACKAGE__->load_components(
     qw{
-        Helper::ResultSet::AutoRemoveColumns
         Helper::ResultSet::CorrelateRelationship
         Helper::ResultSet::Me
         Helper::ResultSet::NoColumns
