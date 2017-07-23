@@ -34,6 +34,18 @@ has 'device_hwasset_map' => (
     default => sub { {} },
 );
 
+has 'dhcp_server_map' => (
+    isa     => 'HashRef',
+    is      => 'rw',
+    default => sub { {} },
+);
+
+has 'dhcp_server_id_counter' => (
+    isa     => 'Int',
+    is      => 'rw',
+    default => 1
+);
+
 has 'network_id_counter' => (
     isa => 'Int',
     is  => 'rw'
@@ -184,6 +196,64 @@ sub upgrade_device_config {
     }
 }
 
+sub get_table_name_DHCPServer { 'dhcp_lease' }
+
+sub upgrade_DHCPServer {
+    my ( $self, $data ) = @_;
+
+    # maps name to id
+    my %dhcp_server_map = ();
+
+    my @servers;
+
+    my $id = $self->dhcp_server_id_counter;
+
+    foreach (@$data) {
+        my $server = $_->{server};
+        next if $dhcp_server_map{$server};
+
+        my $server_id = $id++;
+
+        $self->log->info("Defined DHCP server $server (id=$server_id)");
+
+        my $r = {
+            id   => $server_id,
+            name => $server,
+        };
+        push @servers, $r;
+
+        $dhcp_server_map{$server} = $server_id;
+    }
+
+    $self->dhcp_server_id_counter($id);
+    $self->dhcp_server_map( \%dhcp_server_map );
+    @$data = @servers;
+}
+
+sub upgrade_DHCPLease {
+    my ( $self, $data ) = @_;
+
+    my $dhcp_server_map = $self->dhcp_server_map();
+
+    foreach (@$data) {
+        my $server_id = $dhcp_server_map->{ $_->{server} };
+        delete $_->{server};
+        $_->{dhcp_server_id} = $server_id;
+    }
+}
+
+sub upgrade_DHCPReservation {
+    my ( $self, $data ) = @_;
+
+    my $dhcp_server_map = $self->dhcp_server_map();
+
+    foreach (@$data) {
+        my $server_id = $dhcp_server_map->{ $_->{server} };
+        delete $_->{server};
+        $_->{dhcp_server_id} = $server_id;
+    }
+}
+
 sub upgrade_dot11_assoc {
     my ( $self, $data ) = @_;
     $self->_rewrite_device_id( $data, 'device' => 'device_id' );
@@ -295,7 +365,7 @@ sub upgrade_users {
         $_->{username} = $_->{login};
         delete $_->{login};
 
-        $_->{username} eq 'admin' and $_->{superadmin} = 1;
+        $_->{superadmin} = $_->{username} eq 'admin' ? 1 : 0;
     }
 }
 

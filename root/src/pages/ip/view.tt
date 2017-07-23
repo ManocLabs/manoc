@@ -168,7 +168,7 @@ use_table=1
       <tbody>
 	[% FOREACH r IN leases %]
          <tr>
- 	   <td>[% r.server -%]</td>
+       <td>[% PP.manoc_print(r.dhcp_server) %]</td>
  	   <td>[% PP.manoc_print(r.macaddr) %]</td>
 	   <td>[% date.format(r.start) %]</td>
  	   <td>[% date.format(r.end) %] </td>
@@ -182,7 +182,7 @@ use_table=1
   </div><!-- end tab dhcpleases -->
 
   <div role="tabpanel" class="tab-pane" id="dhcpres">
-    [% IF reservations.0 %]
+    [% IF reservations.size %]
     <table class="table">
       <thead>
         <tr>
@@ -195,7 +195,7 @@ use_table=1
       <tbody>
 	[% FOREACH r IN reservations %]
         <tr>
- 	  <td>[% r.server %]</td>
+ 	  <td>[% PP.manoc_print(r.dhcp_server) %]</td>
  	  <td>[% PP.manoc_print(r.macaddr) %]</td>
 	  <td>[% r.name %]</td>
  	  <td>[% r.hostname %] </td>

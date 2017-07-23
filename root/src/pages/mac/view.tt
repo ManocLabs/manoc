@@ -96,7 +96,7 @@
       <tbody>
 	[% FOREACH r IN leases %]
         <tr>
- 	  <td>[% r.server | html %]</td>
+ 	  <td>[% PP.manoc_print(r.dhcp_server) %]</td>
  	  <td>[% PP.manoc_print(r.ipaddr) %]</td>
 	  <td>[% date.format(r.start) %]</td>
  	  <td>[% date.format(r.end) %] </td>
@@ -111,7 +111,7 @@
 
   <div role="tabpanel" class="tab-pane" id="dhcpres">
     [% IF (reservations.size) %]
-    <table class="display" id="res">
+    <table class="table" id="res">
       <thead>
 	<tr>
  	  <th>Server</th>
@@ -123,7 +123,7 @@
       <tbody>
 	[% FOREACH r IN reservations %]
 	<tr>
- 	  <td>[% r.server %]</td>
+ 	  <td>[% PP.manoc_print(r.dhcp_server) %]</td>
  	  <td>[% PP.manoc_print(r.ipaddr) %]</td>
 	  <td>[% r.name %]</td>
  	  <td>[% r.hostname %] </td>
