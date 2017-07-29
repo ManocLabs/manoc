@@ -59,10 +59,9 @@ sub _build_config {
         my @config_paths = ( catdir( $FindBin::Bin, updir() ), '/etc/manoc', );
 
         foreach my $path (@config_paths) {
-            $config = Config::ZOMG->open(
-                path => $path,
-                name => 'manoc',
-            );
+            $config = Config::ZOMG->open( path => $path, name => 'manoc', ) ||
+                Config::ZOMG->open( path => $path, name => 'app_manoc' );
+
             if ($config) {
                 $self->manoc_config_dir($path);
                 last;
