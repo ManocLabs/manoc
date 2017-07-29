@@ -71,7 +71,7 @@ $mech->submit_form_ok(
 $mech->title_is( 'Manoc - Server Hardware S000003', "Server page" );
 
 $mech->get_ok( '/serverhw', "Server list" );
-$mech->follow_link_ok( { text => 'S000003' }, 'Follow link from list' );
+$mech->follow_link_ok( { text_regex => qr/^S000003/ }, 'Follow link from list' );
 
 $mech->follow_link_ok( { text => 'Edit' }, 'Follow edit link' );
 $mech->title_is('Manoc - Edit server hardware');
@@ -120,7 +120,7 @@ $mech->content_lacks( 'S000003', "Server no more in list" );
 is( $schema->resultset('HWAsset')->find( { inventory => 'S000003' } ),
     undef, "Device is deleted" );
 
-$mech->follow_link_ok( { text => 'S000001' },   'Get first server' );
+$mech->follow_link_ok( { text_regex => qr/^S000001/ },   'Get first server' );
 $mech->follow_link_ok( { text => 'Duplicate' }, 'Duplicate' );
 $mech->submit_form_ok(
     {
