@@ -11,6 +11,13 @@ use Scalar::Util qw(blessed);
 
 __PACKAGE__->mk_classdata( '_manoc_object_action' => {} );
 
+=method setup_finalize
+
+Register to Catalyst setup_finalize in order to scan all registered controllers
+for controller->resultset mapping.
+
+=cut
+
 sub setup_finalize {
     my $app = shift;
     $app->next::method(@_);
@@ -22,11 +29,18 @@ sub setup_finalize {
             $class =~ /^ManocDB::(.*)$/ or next;
             my $rs = $1;
             my $ns = $controller->action_namespace();
-            $app->log->debug("Registered $ns/view for rs $rs");
+            $app->debug and $app->log->debug("Registered $ns/view for rs $rs");
             $app->_manoc_object_action->{$rs} = "$ns/view";
         }
     }
 }
+
+=method  manoc_uri_for_object( $c, $obj, @args )
+
+Finds (if any) the controller which has the view action for obj and call
+uri_for_action( "controller/view", [$obj->id], @args)
+
+=cut
 
 sub manoc_uri_for_object {
     my ( $c, $obj, @args ) = @_;
