@@ -1,10 +1,13 @@
 #!/usr/bin/env perl
 
-use Manoc;
+use App::Manoc;
 use Plack::Builder;
 
 builder {
     enable 'Debug', panels =>
-        [qw(DBITrace Memory Timer Environment CatalystLog   PerlConfig Response Session)];
-    Manoc->psgi_app;
+        [ 
+	 [ 'DBIProfile', profile => 2 ],
+	 qw(Memory Timer Environment CatalystLog   PerlConfig Response Session)
+        ];
+    App::Manoc->psgi_app;
 };
