@@ -200,6 +200,7 @@ dir.
 has 'default_ssh_key' => (
     is      => 'rw',
     isa     => 'Str',
+    lazy    => 1,
     builder => '_build_default_ssh_key',
 );
 
