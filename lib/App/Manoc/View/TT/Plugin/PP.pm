@@ -56,11 +56,11 @@ sub manoc_print {
     }
 
     my $label;
-    if ( $object->can('label') ) {
-        $label = $object->label;
-    }
-    elsif ( $object->can('name') ) {
+    if ( $object->can('name') ) {
         $label = $object->name;
+    }
+    elsif ( $object->can('label') ) {
+        $label = $object->label;
     }
     elsif ( $object->isa('App::Manoc::IPAddress::IPv4') ) {
         $label = $object->unpadded;

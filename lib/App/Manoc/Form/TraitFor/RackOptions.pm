@@ -27,8 +27,7 @@ sub get_rack_options {
 
     return map +{
         value => $_->id,
-        label => $_->building ? $_->label . ' - ' . $_->building->name :
-            $_->label
+        label => $_->label
         },
         $racks->all();
 }
