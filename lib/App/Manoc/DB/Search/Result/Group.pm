@@ -3,6 +3,8 @@ package App::Manoc::DB::Search::Result::Group;
 
 use Moose::Role;
 
+##VERSION
+
 =attr items
 
 The items in this group.

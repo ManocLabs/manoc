@@ -9,6 +9,7 @@ use warnings;
 use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Search::Result::Row;
+use App::Manoc::DB::Result::HWAsset;
 
 use Carp;
 
