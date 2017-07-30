@@ -29,7 +29,7 @@ sub setup_finalize {
             $class =~ /^ManocDB::(.*)$/ or next;
             my $rs = $1;
             my $ns = $controller->action_namespace();
-            $app->debug and $app->log->debug("Registered $ns/view for rs $rs");
+            # $app->debug and $app->log->debug("Registered $ns/view for rs $rs");
             $app->_manoc_object_action->{$rs} = "$ns/view";
         }
     }
