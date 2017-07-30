@@ -7,9 +7,6 @@ use Moose;
 
 use namespace::autoclean;
 
-use App::Manoc::Search::QueryType;
-use App::Manoc::Search::Engine;
-use App::Manoc::Search::Query;
 use App::Manoc::Utils::Datetime qw(str2seconds);
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -68,8 +65,6 @@ sub index : Path : Args(0) {
                 }
             }
         }
-
-        $result->load_widgets;
     }
 
     $c->stash(

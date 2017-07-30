@@ -10,7 +10,7 @@
 [% END -%]
 
 [% IF root_network -%]
-<p>Networks contained in root network [% print_ipnetwork(root_network) %]
+<p>Networks contained in root network [% PP.manoc_print(root_network) %]
 ([% root_network.network %])</p>
 [% END -%]
 
@@ -34,7 +34,7 @@
        </td>
 
        <td data-sort="[% object.network.address.padded  %]">[% object.network | html %]</td>
-       <td>[% print_vlan(object.vlan) %]</td>
+       <td>[% PP.manoc_print(object.vlan) %]</td>
      </tr>
    </tbody>
    [% IF object.children.size %]
@@ -43,7 +43,7 @@
      <tr class="childrow">
        <td><a href="[% c.uri_for_action('ipnetwork/view', [child.id]) %]">[% child.name | html %]</a></td>
        <td data-sort="[% child.network.address.padded  %]">[% child.network | html %]</td>
-       <td>[% print_vlan(child.vlan) %]</td>
+       <td>[% PP.manoc_print(child.vlan) %]</td>
      </tr>   <!-- end of childrens -->
      [% END -%]
    </tbody>

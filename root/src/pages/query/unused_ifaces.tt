@@ -45,8 +45,8 @@ page.title='Unused interfaces'
        <tbody>
   [% END %]
        <tr>
-  	 <td>[% print_device(u) %]</td>
-	 <td>[% print_short_iface(u.id,u.interface) %]</td>
+  	 <td>[% PP.manoc_print(u) %]</td>
+	 <td>[% PP.manoc_print(u.id,u.interface) %]</td>
  	 <td>[% u.description | html %]</td>
        </tr>
    [% IF loop.last %]

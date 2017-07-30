@@ -8,7 +8,9 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
+use App::Manoc::DB::Search::Result::Row;
 use App::Manoc::DB::Result::HWAsset;
+
 use Carp;
 
 =method unused_devices
@@ -45,4 +47,40 @@ sub unused_devices {
     return wantarray ? $rs->all : $rs;
 }
 
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $type    = $query->query_type;
+    my $pattern = $query->sql_pattern;
+
+    return unless $type eq 'inventory';
+
+    foreach my $col (qw (serial inventory)) {
+        my $rs = $self->search( { $col => { -like => $pattern } }, { order_by => 'name' } );
+
+        while ( my $e = $rs->next ) {
+            my $item = App::Manoc::DB::Search::Result::Row->new(
+                {
+                    row   => $e,
+                    match => $e->$col,
+                }
+            );
+            $result->add_item($item);
+        }
+    }
+
+}
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

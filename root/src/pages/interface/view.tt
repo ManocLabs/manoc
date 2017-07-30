@@ -20,13 +20,13 @@
 	<dd>[% object.interface | html %] </dd>
 
 	<dt>Switch:</dt>
-	<dd>[% print_device(device) %]</dd>
+	<dd>[% PP.manoc_print(device) %]</dd>
 
 	<dt>Switch Model:</dt>
 	<dd>[% device.model | html %]</dd>
 
 	<dt>Switch Location:</dt>
-	<dd>Rack [% print_rack(device.rack) %] - Building [% print_building(device.rack.building) %]</dd>
+	<dd>Rack [% PP.manoc_print(device.rack.building) %]</dd>
 
 	<dt>Description:</dt>
 	<dd>[% object.description | html  %] </dd>
@@ -84,7 +84,7 @@
 	  [% FOREACH m IN mat_history %]
 	  <tr>
 	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
-	    <td> [% print_vlan(m.vlan,m.vlan) %]     </td>
+	    <td> [% PP.manoc_print(m.vlan,m.vlan) %]     </td>
 	    <td> [% date.format(m.firstseen) %]</td>
 	    <td> [% date.format(m.lastseen) %]</td>
 	  </tr>

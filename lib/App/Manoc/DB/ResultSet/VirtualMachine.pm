@@ -40,6 +40,30 @@ sub unused {
     return wantarray ? $rs->all : $rs;
 }
 
+=method manoc_search( $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $type = $query->query_type;
+
+    $type eq 'inventory' or $type eq 'server' or return;
+
+    my $pattern = $query->sql_pattern;
+    my $it =
+        $self->search( [ { uuid => { -like => $pattern } }, { name => { -like => $pattern } } ],
+        { order_by => 'name' } );
+
+    while ( my $v = $it->next ) {
+        my $item = App::Manoc::DB::Search::Result::Row->new( row => $v );
+        $result->add_item($item);
+    }
+}
+
 =head1 SEE ALSO
 
 L<DBIx::Class::ResultSet>

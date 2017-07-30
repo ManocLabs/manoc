@@ -24,7 +24,7 @@ page.title='Racks'
 [% FOREACH r IN object_list %]
          <tr>
  	 <td><a href=[% c.uri_for_action('/rack/view', [r.id]) %]> [% r.name | html %] </a></td>
- 	 <td>[% r.building.name | html %]</td>
+ 	 <td>[% PP.manoc_print(r.building) %]</td>
  	 <td>[% r.floor | html %]</td>
  	 <td>[% r.notes | html %]</td>
          </tr>

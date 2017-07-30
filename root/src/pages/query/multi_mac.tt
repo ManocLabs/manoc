@@ -17,7 +17,7 @@
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% print_mac(m.macaddr) %]</td>
+  	 <td>[% PP.manoc_print(m.macaddr) %]</td>
 	 <td>[% m.devs %]</td>
  	 </tr>
    [% IF loop.last %]

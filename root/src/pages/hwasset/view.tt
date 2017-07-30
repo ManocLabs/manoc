@@ -43,14 +43,14 @@
   <dt>Warehouse</dt>
   <dd>Yes</dd>
 [% ELSE -%]
-  <dt>Building<dt><dd>[% print_building(object.building) %]</dd>
+  <dt>Building<dt><dd>[% PP.manoc_print(object.building) %]</dd>
   <dt>Floor</dt><dd>[% object.floor | html %]</dd>
   <dt>Room</dt> <dd>[% object.room | html %]</dd>
     [% IF object.rack %]
-   <dt>Rack</dt><dd>[% print_rack(object.rack) %]</dd>
+   <dt>Rack</dt><dd>[% PP.manoc_print(object.rack) %]</dd>
    <dt>Level<dt><dd>[% object.rack_level %]</dd>
   [% END %]
 [% END %]
   <dt>Decommissioned</dt><dd>[% IF object.is_decommissioned %]Yes[% ELSE %]No[%END %]</dd>
-  <dt>Used by</dt><dd>[% print_device(object.device) IF object.device %]</dd>
+  <dt>Used by</dt><dd>[% PP.manoc_print(object.device) IF object.device %]</dd>
 </dl>

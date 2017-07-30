@@ -2,6 +2,9 @@ Revision history for App-Manoc
 
 {{$NEXT}}
 
+  - refactored search
+  - fixes for dhcp support
+
 2.99.2    2017-06-11 21:58:38+02:00 Europe/Rome (TRIAL RELEASE)
 
   - moved to App::Manoc namespace

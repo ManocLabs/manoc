@@ -21,8 +21,8 @@ title='Interfaces with Multiple Hosts'
        <tbody>
   [% END %]
          <tr>
-  	 <td>[% print_device(m) %]</td>
-	 <td>[% print_short_iface(m.device,m.interface) %]</td>
+  	 <td>[% PP.manoc_print(m) %]</td>
+	 <td>[% PP.manoc_print(m.device,m.interface) %]</td>
  	 <td>[% m.description | html %]</td>
  	 <td>[% m.count %]</td>
 	 </tr>

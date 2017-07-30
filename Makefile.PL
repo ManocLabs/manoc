@@ -76,7 +76,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::WWW::Mechanize::Catalyst" => "0.60"
   },
-  "VERSION" => "2.99.2",
+  "VERSION" => "2.99.3",
   "test" => {
     "TESTS" => "t/*.t t/controller/*.t t/model/*.t"
   }

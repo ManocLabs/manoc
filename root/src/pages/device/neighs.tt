@@ -17,9 +17,9 @@
 	        </td>
 	        [% IF  link.to_device_info  %]
             <td>[% link.to_device_info.mng_address %]</td>
-	        <td>[% print_device(link.to_device_info) %]</td>
+	        <td>[% PP.manoc_print(link.to_device_info) %]</td>
 	        [% ELSE %]
-            <td>[% print_ip(link.to_device) -%]</td>
+            <td>[% PP.manoc_print(link.to_device) -%]</td>
             <td>[% link.remote_id %]</td>
 	        [% END %]
 	        <td>[% link.remote_type %]</td>

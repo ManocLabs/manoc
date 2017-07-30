@@ -21,13 +21,13 @@ sub get_rack_options {
         {
             join     => 'building',
             prefetch => 'building',
-            order_by => 'me.name'
+            order_by => [ 'me.building_id', 'me.name' ]
         }
     );
 
     return map +{
         value => $_->id,
-        label => $_->label,
+        label => $_->label
         },
         $racks->all();
 }

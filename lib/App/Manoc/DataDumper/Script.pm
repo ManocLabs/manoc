@@ -122,10 +122,13 @@ sub run_load {
             exclude       => $self->exclude,
             config        => $self->config,
             skip_notempty => $self->skip_notempty,
+            enable_fk     => $self->enable_fk,
+            overwrite     => $self->overwrite,
+            force         => $self->force
         }
     );
 
-    $datadumper->load( $self->enable_fk, $self->overwrite, $self->force );
+    $datadumper->load();
 }
 
 =method run
@@ -136,6 +139,13 @@ The script entry point.
 
 sub run {
     my $self = shift;
+
+    if ( @{ $self->include } == 1 ) {
+        $self->include( [ split /\s*,\s*/, $self->include->[0] ] );
+    }
+    if ( @{ $self->exclude } == 1 ) {
+        $self->exclude( [ split /\s*,\s*/, $self->exclude->[0] ] );
+    }
 
     $self->load and return $self->run_load( $ARGV[1] );
     $self->save and return $self->run_save( $ARGV[1] );

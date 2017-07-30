@@ -27,7 +27,7 @@ use_table = 1
 <div class="panel panel-default">
   <div class="panel-body">
     <dl class="pull-left dl-horizontal">
-	<dt>Building</dt><dd>[% print_building(object.building) %]</dd>
+	<dt>Building</dt><dd>[% PP.manoc_print(object.building) %]</dd>
 	<dt>Floor</dt><dd>[% object.floor %]</dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
     </dl>

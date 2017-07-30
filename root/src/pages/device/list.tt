@@ -40,10 +40,10 @@ page.title = 'Devices'
 [% FOREACH d = object_list %]
      <tr class="[% 'warning' IF d.decommissioned %]">
        <td>[% d.decommissioned ? "In use" : "Decommissioned" %]</td>
- 	   <td>[% print_device(d) %]</td>
-	   <td>[% print_building(d.rack.building) %]</td>
+ 	   <td>[% PP.manoc_print(d) %]</td>
+	   <td>[% PP.manoc_print(d.rack.building) %]</td>
    	   <td>[% d.rack.floor | html %]</td>
-	   <td>[% print_rack(d.rack) %]</td>
+	   <td>[% PP.manoc_print(d.rack) %]</td>
 	   <td>[% d.hwasset.vendor | html %]</td>
    	   <td>[% d.hwasset.model | html%]</td>
        <td>[% d.netwalker_info.os | html %] [% d.netwalker_info.os_ver | html %]</td>

@@ -68,7 +68,7 @@ Return a string describing the object
 
 sub label {
     my $self = shift;
-    return $self->name . " (" . $self->building->name . ")";
+    return $self->name . ' (' . $self->building->name . ')';
 }
 
 1;

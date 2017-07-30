@@ -6,13 +6,14 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
-use Scalar::Util qw(blessed);
-
 __PACKAGE__->load_components(
     qw/
         +App::Manoc::DB::Helper::ResultSet::TupleArchive
         /
 );
+
+use Scalar::Util qw(blessed);
+use App::Manoc::DB::Search::Result::Hostname;
 
 =method register_tuple( %params )
 
@@ -31,6 +32,39 @@ sub register_tuple {
     $params{ipaddr} = $ipaddr->padded;
 
     $self->next::method(%params);
+}
+
+=method manoc_search(  $query, $result)
+
+Support for Manoc search feature
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query, $result ) = @_;
+
+    my $type    = $query->query_type;
+    my $pattern = $query->sql_pattern;
+
+    if ( $type eq 'logon' ) {
+
+        my $rs = $self->search(
+            { name => { '-like' => $pattern } },
+            {
+                order_by => 'name',
+                group_by => 'ipaddr',
+            }
+        );
+
+        while ( my $e = $rs->next ) {
+            my $item = App::Manoc::DB::Search::Result::Hostname->new(
+                ipaddress => $e->ipaddr,
+                hostname  => $e->name,
+                match     => $e->name,
+            );
+            $result->add_item($item);
+        }
+    }
 }
 
 =head1 SEE ALSO

@@ -33,6 +33,7 @@ use Catalyst qw/
     Session::Store::DBI
     Session::State::Cookie
 
+    +App::Manoc::CatalystRole::ObjectURL
     +App::Manoc::CatalystRole::RequestToken
     +App::Manoc::CatalystRole::Permission
 
@@ -53,7 +54,7 @@ with 'App::Manoc::Logger::CatalystRole';
 # local deployment.
 
 __PACKAGE__->config(
-    name => 'App::Manoc',
+    name => 'Manoc',
 
     # Views setup
     default_view => 'TT',

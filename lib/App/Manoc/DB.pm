@@ -6,6 +6,9 @@ use warnings;
 
 ##VERSION
 
+use App::Manoc::DB::Search;
+use App::Manoc::DB::Search::Query;
+
 =head1 DESCRIPTION
 
 Manoc DB Schema extends C<DBIx::Class::Schema>.
@@ -92,6 +95,35 @@ our $DEFAULT_CONFIG = {
         AutoCommit => 1,
     },
 };
+
+=method manoc_search( $query_string, $params )
+
+Run query using L<App::Manoc::DB::Search>.
+
+=cut
+
+sub manoc_search {
+    my ( $self, $query_string, $params ) = @_;
+
+    my $engine = $self->{_manoc_search};
+    if ( !$engine ) {
+        $engine = App::Manoc::DB::Search->new( schema => $self );
+        $self->{_manoc_search} = $engine;
+    }
+
+    my $q = App::Manoc::DB::Search::Query->new( { search_string => $query_string } );
+
+    # use params to refine query
+    if ( $params->{limit} && !defined( $q->limit ) ) {
+        $q->limit( ( $params->{limit} ) );
+    }
+    if ( $params->{type} && !defined( $q->query_type ) ) {
+        $q->query_type( $params->{type} );
+    }
+    $q->parse;
+
+    return $engine->search($q);
+}
 
 =method init_admin
 

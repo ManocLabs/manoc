@@ -17,7 +17,7 @@
 	    [% FOREACH if IN iface_info %]
 	    [% row_class = if.up == 'up' ? 'active' : 'warning' %]
 	    <tr class="[% row_class %]">
-            <td>[% print_iface(object.id, if.interface) %]</td>
+            <td>[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
             <td>[% if.up_admin | html %]</td>
             <td>[% if.up | html %]</td>
 	        <td>[% if.speed | html %]</td>

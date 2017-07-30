@@ -31,10 +31,10 @@
 	<dt>Description</dt>
 	<dd>[% object.description | html %]</dd>
 	<dt>In network</dt>
-	<dd>[% print_ipnetwork(object.container_network) %]</dd>
+	<dd>[% PP.manoc_print(object.container_network) %]</dd>
 	<dt>Contained networks</dt>
 	<dd>[% FOREACH net IN object.contained_networks %]
-	  [% print_ipnetwork(net) -%][% "," UNLESS loop.last -%]
+	  [% PP.manoc_print(net) -%][% "," UNLESS loop.last -%]
 	  [% END -%]
 	</dd>
       </dl>
@@ -76,7 +76,7 @@
       <tr>
 	<td>[% network.network %]</td>
 	  <td>[% network.network.broadcast %]</td>
-	<td>[% print_ipnetwork(network) %]</td>
+	<td>[% PP.manoc_print(network) %]</td>
       </tr>
       [% END -%]
     </tbody>
