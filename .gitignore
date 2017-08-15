@@ -16,3 +16,4 @@ Makefile.old
 /manoc_log.conf
 /t/var
 /App-Manoc-*
+/nytprof*
