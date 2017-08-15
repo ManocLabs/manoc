@@ -4,6 +4,7 @@ Revision history for App-Manoc
 
   - refactored search
   - fixes for dhcp support
+  - fixes for datadumper
 
 2.99.2    2017-06-11 21:58:38+02:00 Europe/Rome (TRIAL RELEASE)
 
