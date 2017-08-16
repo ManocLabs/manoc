@@ -50,9 +50,9 @@ sub _build_config {
     my $self = shift;
     my $config;
 
-    if ( $ENV{MANOC_CONF} ) {
-        $config = Config::ZOMG->open( file => $ENV{MANOC_CONF}, );
-        my $path = catdir( $ENV{MANOC_CONF}, updir() );
+    if ( $ENV{APP_MANOC_CONF} ) {
+        $config = Config::ZOMG->open( file => $ENV{APP_MANOC_CONFIG}, );
+        my $path = catdir( $ENV{APP_MANOC_CONFIG}, updir() );
         $self->manoc_config_dir($path);
     }
     else {
