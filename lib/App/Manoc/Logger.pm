@@ -67,12 +67,12 @@ sub init {
         return;
     }
 
-    my $config_file = $ENV{MANOC_LOGCONFIG};
+    my $config_file = $ENV{APP_MANOC_LOG_CONFIG};
     unless ( defined($config_file) && -f $config_file ) {
 
         my @config_paths;
-        exists $ENV{MANOC_CONFIG} and
-            push @config_paths, $ENV{MANOC_CONFIG};
+        exists $ENV{APP_MANOC_CONFIG} and
+            push @config_paths, $ENV{APP_MANOC_CONFIG};
         push @config_paths, File::Spec->catdir( $FindBin::Bin, File::Spec->updir() );
         -d '/etc' and push @config_paths, '/etc';
 

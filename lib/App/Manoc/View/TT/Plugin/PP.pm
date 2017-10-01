@@ -43,7 +43,7 @@ Pretty prints $object creating a link. Support model rows, Manoc IPv4 address
 objects and mac address strings (e.g. "11:22:33:44:55:66").
 
 Interfaces can be represented by hash, e.g.
-{ device => $device_obj, iface => 'port'}.
+{ device => $device_obj, iface => 'port'}.
 
 
 =cut
