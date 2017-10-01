@@ -64,7 +64,8 @@ sub _build_backend {
     my $schema = $self->schema or return;
 
     my $name = $schema->storage->dbh->{Driver}->{Name};
-    $name eq 'Pg' and return 'PostgreSQL';
+    $name eq 'Pg'    and return 'PostgreSQL';
+    $name eq 'mysql' and return 'MySQL';
     return $name;
 }
 
