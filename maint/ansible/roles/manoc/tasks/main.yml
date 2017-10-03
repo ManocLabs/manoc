@@ -33,7 +33,7 @@
   shell: perl /tmp/cpanmin.pl App::cpanminus
   when: cpanm_result|failed
 
-- name: MAnoc Install Manoc deps
+- name: Manoc | Install Manoc deps
   environment:
       PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
       PERL_CPANM_OPT: "--recommends"
@@ -43,17 +43,12 @@
       notest: True
       locallib: "{{manoc_local_lib}}"
 
-- name: Manoc | Install core deps
-  environment:
-      PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
-      PERL_CPANM_OPT: "--recommends --with-feature=devel"
-  cpanm:
-      installdeps: true
-      from_path: "{{manoc_home}}"
-      notest: True
-      locallib: "{{manoc_local_lib}}"
+- name: Manoc | Create profile file for local::lib
+  shell: "perl -Mlocal::lib={{manoc_local_lib}} > /etc/profile.d/manoc_lib.sh"
+  args:
+      creates: "/etc/profile.d/manoc_lib.sh"
 
-- name:  Manoc | Install additiona deps
+- name:  Manoc | Install additional deps
   environment:
       PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
   cpanm:
