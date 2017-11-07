@@ -18,7 +18,8 @@ function showDialogForm(url, title, on_close) {
                 modalBox.modal('hide');
                 on_close(data);
             }
-	    });
+	    }).fail(function() { alert( "Manoc internal error" ); } );
+  });
 	};
     $.ajax({
         type: 'GET',
