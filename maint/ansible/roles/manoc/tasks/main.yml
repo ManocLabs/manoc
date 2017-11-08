@@ -13,6 +13,8 @@
   yum: name={{item}} state=present
   with_items:
     - perl-core
+    - perl-devel
+    - gcc
     - perl-DBD-MySQL
     - net-snmp-perl
     - libpcap-devel
@@ -60,6 +62,9 @@
       - Net::Pcap
       - NetPacket::Ethernet
       - DBD::mysql
+
+- name: Manoc | Create helper script for vagrant user
+  template: src=manoc_init_db.sh dest=/usr/local/bin mode=755 
 
 - name: Manoc | Create manoc config file
   template: src=manoc.conf dest=/etc mode=644
