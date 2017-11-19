@@ -523,11 +523,11 @@ sub sqlt_deploy_hook {
 
     $sqlt_table->add_index(
         name   => 'idx_ipnet_address',
-        fields => [ 'address',]
+        fields => [ 'address', ]
     );
     $sqlt_table->add_index(
         name   => 'idx_ipnet_broadcast',
-        fields => [ 'broadcast',]
+        fields => [ 'broadcast', ]
     );
     $sqlt_table->add_index(
         name   => 'idx_ipnet_address_prefix',

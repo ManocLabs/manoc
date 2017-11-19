@@ -69,7 +69,7 @@ $mech->get( '/ipnetwork/root', "Get top level networks" );
 $mech->title_is('Manoc - Top level IP networks');
 $mech->text_contains( 'Net01', "New ipnetwork in top nets view" );
 
-$mech->follow_link_ok( { text_regex =>  qr/^Net01/ }, "Follow link to network page" );
+$mech->follow_link_ok( { text_regex => qr/^Net01/ }, "Follow link to network page" );
 $mech->title_is('Manoc - Network Net01');
 
 $mech->follow_link_ok( { text => 'Edit' }, "Edit ipnetwork page" );

@@ -52,8 +52,10 @@ __PACKAGE__->has_many( vlans => 'App::Manoc::DB::Result::Vlan', 'vlan_range_id' 
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::VlanRange');
 
-__PACKAGE__->belongs_to( lan_segment => 'App::Manoc::DB::Result::LanSegment', 'lan_segment_id' );
-
+__PACKAGE__->belongs_to(
+    lan_segment => 'App::Manoc::DB::Result::LanSegment',
+    'lan_segment_id'
+);
 
 =method get_mergeable_ranges
 
@@ -70,7 +72,8 @@ sub get_mergeable_ranges {
             [ { start => $self->end + 1 }, { end => $self->start - 1 }, ],
             { lan_segment_id => $self->lan_segment_id }
         },
-        $options );
+        $options
+    );
     return wantarray ? $rs->all : $rs;
 
 }
