@@ -31,11 +31,7 @@ __PACKAGE__->config(
     }
 );
 
-=head1 METHODS
-
-=cut
-
-=head2 delete_object
+=method delete_object
 
 =cut
 
@@ -45,30 +41,21 @@ sub delete_object {
 
     if ( $segment->vlans->count ) {
         $c->flash( error_msg => 'Segment has associated VLANs and cannot be deleted.' );
-        return undef;
+        return;
     }
 
     if ( $segment->vlan_ranges->count ) {
         $c->flash( error_msg => 'Segment has associated VLAN ranges and cannot be deleted.' );
-        return undef;
+        return;
     }
 
     if ( $segment->vlan_ranges->count ) {
         $c->flash( error_msg => 'Segment has associated devices and cannot be deleted.' );
-        return undef;
+        return;
     }
 
     return $segment->delete;
 }
-
-=head1 AUTHOR
-
-The Manoc Team
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 
