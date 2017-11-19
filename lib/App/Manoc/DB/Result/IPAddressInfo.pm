@@ -1,4 +1,4 @@
-package App::Manoc::DB::Result::Ip;
+package App::Manoc::DB::Result::IPAddressInfo;
 #ABSTRACT: A model object for information on IP addresses
 
 use strict;
@@ -10,7 +10,7 @@ use parent 'App::Manoc::DB::Result';
 
 __PACKAGE__->load_components(qw/+App::Manoc::DB::InflateColumn::IPv4/);
 
-__PACKAGE__->table('ip');
+__PACKAGE__->table('ipaddr_info');
 
 __PACKAGE__->add_columns(
     'ipaddr' => {
@@ -20,7 +20,8 @@ __PACKAGE__->add_columns(
         ipv4_address => 1,
     },
     'description' => {
-        data_type   => 'text',
+        data_type   => 'varchar',
+        size        => 255,
         is_nullable => 1,
     },
     'assigned_to' => {
@@ -35,7 +36,8 @@ __PACKAGE__->add_columns(
     },
     'email' => {
         data_type   => 'varchar',
-        is_nullable => 45,
+        size        => 45,
+        is_nullable => 1,
     },
     'notes' => {
         data_type   => 'text',

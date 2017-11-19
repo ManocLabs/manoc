@@ -420,7 +420,7 @@ Return a resultset for all entries IP contained in this network
 sub ip_entries {
     my $self = shift;
 
-    my $rs = $self->result_source->schema->resultset('Ip');
+    my $rs = $self->result_source->schema->resultset('IPAddressInfo');
     $rs = $rs->search(
         {
             'ipaddr' => {

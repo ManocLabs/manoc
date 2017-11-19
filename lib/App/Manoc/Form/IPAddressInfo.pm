@@ -1,4 +1,4 @@
-package App::Manoc::Form::Ip;
+package App::Manoc::Form::IPAddressInfo;
 
 use HTML::FormHandler::Moose;
 

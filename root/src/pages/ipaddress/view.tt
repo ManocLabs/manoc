@@ -72,10 +72,10 @@ use_table=1
       </dl>
     </div><!-- row -->
     <div class="row">
-      <a class="btn btn-default" href="[% c.uri_for_action('ip/edit', [ ipaddress.address ])%]">
+      <a class="btn btn-default" href="[% c.uri_for_action('ipaddress/edit', [ ipaddress.address ])%]">
 	[% bootstrap_icon('pencil') %] Edit Info</a>
       [% IF info != '' -%]
-      <a class="btn btn-default href="[% c.uri_for_action('ip/delete', [ ipaddress.address ])%]">
+      <a class="btn btn-default href="[% c.uri_for_action('ipaddress/delete', [ ipaddress.address ])%]">
 	[% bootstrap_icon('trash') %]Delete info</a>
       [% END -%]
     </div>
