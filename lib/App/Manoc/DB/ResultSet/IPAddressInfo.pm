@@ -1,4 +1,4 @@
-package App::Manoc::DB::ResultSet::Ip;
+package App::Manoc::DB::ResultSet::IPAddressInfo;
 #ABSTRACT: ResultSet class for Ip
 
 use strict;

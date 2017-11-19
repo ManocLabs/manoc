@@ -1,5 +1,5 @@
-package App::Manoc::Controller::Ip;
-#ABSTRACT: Ip controller
+package App::Manoc::Controller::IPAddress;
+#ABSTRACT: Controller for showing info on IP addresses
 use Moose;
 
 ##VERSION
@@ -7,7 +7,7 @@ use Moose;
 use namespace::autoclean;
 use App::Manoc::IPAddress::IPv4;
 use App::Manoc::Utils::IPAddress qw(check_addr);
-use App::Manoc::Form::Ip;
+use App::Manoc::Form::IPAddressInfo;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -26,7 +26,7 @@ sub base : Chained('/') PathPart('ip') CaptureArgs(1) {
 
     $c->stash(
         ipaddress => App::Manoc::IPAddress::IPv4->new($address),
-        object    => $c->model('ManocDB::Ip')->find( { ipaddr => $address } )
+        object    => $c->model('ManocDB::IPAddressInfo')->find( { ipaddr => $address } )
     );
 }
 
@@ -108,12 +108,12 @@ sub edit : Chained('base') PathPart('edit') Args(0) {
         $c->require_permission( $item, 'edit' );
     }
     else {
-        $item = $c->model('ManocDB::Ip')->new_result( {} );
+        $item = $c->model('ManocDB::IPAddressInfo')->new_result( {} );
         $item->ipaddr($ipaddress);
         $c->require_permission( $item, 'create' );
     }
 
-    my $form = App::Manoc::Form::Ip->new( ipaddr => $ipaddress->address );
+    my $form = App::Manoc::Form::IPAddressInfo->new( ipaddr => $ipaddress->address );
     $c->stash( form => $form );
 
     return unless $form->process(
@@ -121,7 +121,7 @@ sub edit : Chained('base') PathPart('edit') Args(0) {
         item   => $item
     );
 
-    $c->res->redirect( $c->uri_for_action( 'ip/view', [ $ipaddress->address ] ) );
+    $c->res->redirect( $c->uri_for_action( 'ipaddr/view', [ $ipaddress->address ] ) );
     $c->detach();
 }
 
@@ -135,7 +135,7 @@ sub delete : Chained('base') : PathPart('delete') : Args(0) {
     my $item      = $c->stash->{object};
     my $ipaddress = $c->stash->{ipaddress};
 
-    my $redirect_url = $c->uri_for_action( 'ip/view', [ $ipaddress->address ] );
+    my $redirect_url = $c->uri_for_action( 'ipaddr/view', [ $ipaddress->address ] );
     unless ($item) {
         $c->res->redirect($redirect_url);
         $c->detach;

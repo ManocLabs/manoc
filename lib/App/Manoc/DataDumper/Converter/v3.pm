@@ -327,6 +327,8 @@ sub upgrade_if_status {
     $self->_rewrite_device_id( $data, 'device' => 'device_id' );
 }
 
+sub get_table_name_IPAddressInfo { 'ip' }
+
 sub upgrade_mat {
     my ( $self, $data ) = @_;
     $self->_rewrite_device_id( $data, 'device', 'device_id' );

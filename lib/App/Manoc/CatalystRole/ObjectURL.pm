@@ -48,7 +48,7 @@ sub manoc_uri_for_object {
     blessed($obj) or return;
 
     if ( $obj->isa("App::Manoc::IPAddress::IPv4") ) {
-        return $c->uri_for_action( 'ip/view', [ $obj->address ] );
+        return $c->uri_for_action( 'ipaddress/view', [ $obj->address ] );
     }
 
     if ( $obj->can('result_source') ) {
