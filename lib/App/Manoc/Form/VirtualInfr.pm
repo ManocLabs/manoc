@@ -26,9 +26,7 @@ has_field 'description' => (
     label => 'Description',
 );
 
-has_field 'notes' => (
-    type => 'TextArea'
-);
+has_field 'notes' => ( type => 'TextArea' );
 
 __PACKAGE__->meta->make_immutable;
 no HTML::FormHandler::Moose;

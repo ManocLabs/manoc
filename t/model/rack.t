@@ -47,15 +47,15 @@ $hwasset->update;
 ok( $rack->hwassets->count, "Asset in rack" );
 
 $schema->init_vlan;
-my $lan_segment = $schema->resultset("LanSegment")->search({})->first();
+my $lan_segment = $schema->resultset("LanSegment")->search( {} )->first();
 my $device = $schema->resultset("Device")->create(
     {
         name        => "D01",
         mng_address => "1.1.1.1",
         rack        => $rack,
         lan_segment => $lan_segment
-    });
-ok($rack->devices->count, "Device in rack");
-
+    }
+);
+ok( $rack->devices->count, "Device in rack" );
 
 done_testing;

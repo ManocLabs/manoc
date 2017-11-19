@@ -120,8 +120,8 @@ $mech->content_lacks( 'S000003', "Server no more in list" );
 is( $schema->resultset('HWAsset')->find( { inventory => 'S000003' } ),
     undef, "Device is deleted" );
 
-$mech->follow_link_ok( { text_regex => qr/^S000001/ },   'Get first server' );
-$mech->follow_link_ok( { text => 'Duplicate' }, 'Duplicate' );
+$mech->follow_link_ok( { text_regex => qr/^S000001/ }, 'Get first server' );
+$mech->follow_link_ok( { text       => 'Duplicate' },  'Duplicate' );
 $mech->submit_form_ok(
     {
         form_number => 2,
