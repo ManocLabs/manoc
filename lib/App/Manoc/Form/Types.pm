@@ -9,6 +9,8 @@ use MooseX::Types -declare => [ 'MacAddress', ];
 
 use MooseX::Types::Moose ( 'Str', 'Num', 'Int' );
 
+use App::Manoc::Utils qw(normalize_mac_addr);
+
 =head1 DESCRIPTION
 
 Inspired by HTML::FormHandler::Types
@@ -32,15 +34,7 @@ subtype MacAddress, as Str, where {
 }, message { "Not a valid mac address in aa:bb:cc:dd:ff format" };
 
 coerce MacAddress, from Str, via {
-    /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
-        and
-        return lc
-        ("$1:$2:$3:$4:$5:$6");
-
-    /^[0-9a-fA-F]{2}[-:][0-9a-fA-F]{2}[-:][0-9a-fA-F]{2}[-:][0-9a-fA-F]{2}[-:][0-9a-fA-F]{2}[-:][0-9a-fA-F]{2}$/
-        and
-        return lc
-        ($_);
+    return normalize_mac_addr($_);
 };
 
 1;
