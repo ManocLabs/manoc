@@ -7,8 +7,11 @@ use warnings;
 
 BEGIN {
     use Exporter 'import';
-    our @EXPORT_OK = qw/clean_string
-        check_mac_addr/;
+    our @EXPORT_OK = qw/
+        clean_string
+        check_mac_addr
+        normalize_mac_addr
+        /;
 }
 
 use Regexp::Common qw/net/;
@@ -29,8 +32,36 @@ Return 1 if C<$addr> is a valid MAC address.
 =cut
 
 sub check_mac_addr {
+    return defined( normalize_mac_addr(shift) );
+}
+
+=function normalize_mac_addr($addr)
+
+Return  C<$addr>  in 'aa:bb:cc:dd:ee' format if is a valid mac address.
+Otherwise return undef.
+
+=cut
+
+sub normalize_mac_addr {
     my $addr = shift;
-    return $addr =~ /^$RE{net}{MAC}$/;
+
+    $addr =~
+        /^[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}$/
+        and
+        return lc
+        ($_);
+
+    $addr =~
+        /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
+        and
+        return lc
+        ("$1:$2:$3:$4:$5:$6");
+
+    $addr =~
+        /^([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})$/
+        and
+        return lc
+        ("$1:$2:$3:$4:$5:$6");
 }
 
 =function clean_string($s)
