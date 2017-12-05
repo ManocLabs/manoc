@@ -19,8 +19,7 @@ function showDialogForm(url, title, on_close) {
                 on_close(data);
             }
 	    }).fail(function() { alert( "Manoc internal error" ); } );
-  });
-	};
+    };
     $.ajax({
         type: 'GET',
         url: url,
