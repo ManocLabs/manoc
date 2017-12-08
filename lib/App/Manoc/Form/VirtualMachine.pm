@@ -6,7 +6,11 @@ use HTML::FormHandler::Moose;
 use namespace::autoclean;
 
 extends 'App::Manoc::Form::Base';
-with 'App::Manoc::Form::TraitFor::SaveButton', 'App::Manoc::Form::TraitFor::Horizontal';
+with
+    'App::Manoc::Form::TraitFor::SaveButton',
+    'App::Manoc::Form::TraitFor::Horizontal';
+
+use App::Manoc::Form::Types ('MacAddress');
 
 use App::Manoc::Form::Helper qw/bs_block_field_helper/;
 
@@ -21,6 +25,10 @@ sub build_render_list {
             name identifier
             resources_block
             hyper_block
+
+            nics
+
+            notes
 
             save
             csrf_token
@@ -62,10 +70,12 @@ has_field 'vcpus' => (
 );
 
 has_field 'ram_memory' => (
-    type     => 'Integer',
-    required => 1,
-    label    => 'RAM (Mb)',
-
+    type         => 'Integer',
+    required     => 1,
+    label        => 'RAM',
+    element_attr => {
+        placeholder => 'MB',
+    },
     bs_block_field_helper( { label => 2, input => 4 } )
 );
 
@@ -90,6 +100,47 @@ has_field 'hypervisor' => (
     element_attr  => { 'data-live-search' => 'true' }
 );
 
+has_field 'nics' => (
+    type   => 'Repeatable',
+    widget => '+App::Manoc::Form::Widget::Repeatable',
+);
+
+has_field 'nics.id' => (
+    type       => 'PrimaryKey',
+    do_wrapper => 0,
+);
+
+has_field 'nics.name' => (
+    type         => 'Text',
+    element_attr => {
+        placeholder => 'name',
+    },
+
+    label => 'NIC',
+
+    do_wrapper => 0,
+    tags       => {
+        before_element => '<div class="col-sm-3">',
+        after_element  => '</div>'
+    }
+);
+
+has_field 'nics.macaddr' => (
+    type         => 'Text',
+    apply        => [MacAddress],
+    element_attr => {
+        placeholder => '00:00:00:00:00:00',
+    },
+
+    do_label => 0,
+
+    do_wrapper => 0,
+    tags       => {
+        before_element => '<div class="col-sm-3">',
+        after_element  => '</div>'
+    }
+);
+
 has_field 'notes' => (
     type  => 'TextArea',
     label => 'Notes',
@@ -112,6 +163,62 @@ sub options_hypervisor {
     }
 
     return @options;
+}
+
+override validate_model => sub {
+    my $self   = shift;
+    my $item   = $self->item;
+    my $values = $self->values;
+
+    my $found_error = super() || 0;
+
+    $self->_validate_model_nics and $found_error++;
+
+    return $found_error;
+};
+
+sub _validate_model_nics {
+    my $self = shift;
+
+    my $found_error = 0;
+    my %nic_names;
+
+    foreach my $nic ( $self->field('nics')->fields ) {
+
+        # validate macaddress
+        my %conditions;
+
+        my $macaddr_field = $nic->field('macaddr');
+        my $macaddr       = $macaddr_field->value;
+        if ( defined($macaddr) ) {
+            $conditions{macaddr} = $macaddr;
+            $nic->field('id')->value and
+                $conditions{id} = { '!=' => $nic->field('id')->value };
+            my $count = $self->schema->resultset('VServerNIC')->search( \%conditions )->count;
+            if ( $count > 0 ) {
+                my $field_error = $macaddr_field->get_message('unique') ||
+                    $macaddr_field->unique_message ||
+                    'Duplicate value for [_1]';
+                $macaddr_field->add_error( $field_error, $macaddr_field->loc_label );
+                $found_error++;
+            }
+        }
+
+        # validate names (unique for each server)
+        my $name_field = $nic->field('name');
+        my $nic_name   = $name_field->value;
+        if ( $nic_name && $nic_names{$nic_name} ) {
+            # it's a dup!
+            my $field_error = $name_field->get_message('unique') ||
+                $name_field->unique_message ||
+                'Duplicate value for [_1]';
+            $name_field->add_error( $field_error, $name_field->loc_label );
+            $found_error++;
+        }
+        $nic_name and $nic_names{$nic_name} = 1;
+    }
+
+    return $found_error;
 }
 
 __PACKAGE__->meta->make_immutable;

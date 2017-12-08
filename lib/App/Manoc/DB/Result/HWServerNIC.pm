@@ -1,4 +1,4 @@
-package App::Manoc::DB::Result::ServerNIC;
+package App::Manoc::DB::Result::HWServerNIC;
 #ABSTRACT: A model object for server additional network interfaces
 
 use strict;
@@ -8,7 +8,7 @@ use warnings;
 
 use parent 'App::Manoc::DB::Result';
 
-__PACKAGE__->table('server_nic');
+__PACKAGE__->table('hw_server_nic');
 __PACKAGE__->add_columns(
     id => {
         data_type         => 'int',
@@ -22,9 +22,15 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
 
-    macaddr => {
+    name => {
         data_type   => 'varchar',
         is_nullable => 0,
+        size        => 32
+    },
+
+    macaddr => {
+        data_type   => 'varchar',
+        is_nullable => 1,
         size        => 17
     },
 
@@ -32,11 +38,27 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->add_unique_constraint( [ 'serverhw_id', 'macaddr' ] );
+__PACKAGE__->add_unique_constraints( [ 'serverhw_id', 'name' ], ['macaddr'] );
 
 __PACKAGE__->belongs_to(
     serverhw => 'App::Manoc::DB::Result::ServerHW',
     { 'foreign.id' => 'self.serverhw_id' }
 );
+
+sub insert {
+    my ( $self, @args ) = @_;
+
+    my $guard = $self->result_source->schema->txn_scope_guard;
+
+    if ( !defined( $self->name ) ) {
+        my $rs = $self->result_source->resultset;
+        my $count = $rs->search( { serverhw_id => $self->serverhw_id } )->count();
+        $self->name("nic$count");
+    }
+
+    $self->next::method(@args);
+
+    $guard->commit;
+}
 
 1;

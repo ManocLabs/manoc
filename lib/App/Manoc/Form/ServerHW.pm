@@ -48,16 +48,33 @@ has_field 'nics.id' => (
     do_wrapper => 0,
 );
 
+has_field 'nics.name' => (
+    type         => 'Text',
+    element_attr => {
+        placeholder => 'name',
+    },
+
+    label => 'NIC',
+
+    do_wrapper => 0,
+    tags       => {
+        before_element => '<div class="col-sm-3">',
+        after_element  => '</div>'
+    }
+);
+
 has_field 'nics.macaddr' => (
     type         => 'Text',
     apply        => [MacAddress],
     element_attr => {
-        placeholder => 'mac addr',
+        placeholder => '00:00:00:00:00:00',
     },
+
+    do_label => 0,
 
     do_wrapper => 0,
     tags       => {
-        before_element => '<div class="col-sm-6">',
+        before_element => '<div class="col-sm-3">',
         after_element  => '</div>'
     }
 );
@@ -194,17 +211,24 @@ has_field 'notes' => (
 
 override validate_model => sub {
     my $self = shift;
-    my $item = $self->item;
 
     my $found_error = super() || 0;
 
-    return $found_error unless $item->in_storage;
+    $self->_validate_inventory  and $found_error++;
+    $self->_validate_model_nics and $found_error++;
+
+    return $found_error;
+};
+
+sub _validate_inventory {
+    my $self = shift;
+    my $item = $self->item;
 
     my $field = $self->field('inventory');
-    return $found_error if $field->has_errors;
+    return if $field->has_errors;
 
     my $value = $field->value;
-    return $found_error unless defined $value;
+    return unless defined $value;
 
     my $rs = $self->schema->resultset('HWAsset');
     my $unique_filter = { inventory => $value };
@@ -216,11 +240,54 @@ override validate_model => sub {
             $field->unique_message ||
             'Duplicate value for [_1]';
         $field->add_error( $field_error, $field->loc_label );
-        $found_error++;
+        return 1;
+    }
+
+}
+
+sub _validate_model_nics {
+    my $self = shift;
+
+    my $found_error = 0;
+    my %nic_names;
+
+    foreach my $nic ( $self->field('nics')->fields ) {
+
+        # validate macaddress
+        my %conditions;
+
+        my $macaddr_field = $nic->field('macaddr');
+        my $macaddr       = $macaddr_field->value;
+        if ( defined($macaddr) ) {
+            $conditions{macaddr} = $macaddr;
+            $nic->field('id')->value and
+                $conditions{id} = { '!=' => $nic->field('id')->value };
+            my $count = $self->schema->resultset('HWServerNIC')->search( \%conditions )->count;
+            if ( $count > 0 ) {
+                my $field_error = $macaddr_field->get_message('unique') ||
+                    $macaddr_field->unique_message ||
+                    'Duplicate value for [_1]';
+                $macaddr_field->add_error( $field_error, $macaddr_field->loc_label );
+                $found_error++;
+            }
+        }
+
+        # validate names (unique for each server)
+        my $name_field = $nic->field('name');
+        my $nic_name   = $name_field->value;
+        if ( $nic_name && $nic_names{$nic_name} ) {
+            # it's a dup!
+            my $field_error = $name_field->get_message('unique') ||
+                $name_field->unique_message ||
+                'Duplicate value for [_1]';
+            $name_field->add_error( $field_error, $name_field->loc_label );
+            $found_error++;
+        }
+        $nic_name and $nic_names{$nic_name} = 1;
     }
 
     return $found_error;
-};
+}
 
 override 'update_model' => sub {
     my $self   = shift;
