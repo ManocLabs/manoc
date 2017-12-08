@@ -52,6 +52,8 @@
   <dd>[% object.vcpus | html %]</dd>
   <dt>Identifier</dt>
   <dd>[% object.identifier | html %]</dd>
+  <dt>NICs</dt>
+  <dd>[% FOREACH n IN object.nics %][%n.name%] [% PP.manoc_print(n.macaddr) -%]<br>[% END -%]</dd>
   <dt>Notes</dt>
   <dd>[% object.notes | html %]</dd>
 </dl>

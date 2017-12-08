@@ -92,6 +92,12 @@ __PACKAGE__->might_have(
     'vm_id',
 );
 
+__PACKAGE__->has_many(
+    nics => 'App::Manoc::DB::Result::VServerNIC',
+    { 'foreign.vm_id' => 'self.id' },
+    { cascade_delete  => 1 }
+);
+
 sub hypervisor {
     my ( $self, @args ) = @_;
 
