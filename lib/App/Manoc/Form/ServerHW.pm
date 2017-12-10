@@ -253,6 +253,7 @@ sub _validate_model_nics {
 
     my $found_error = 0;
     my %nic_names;
+    my %nic_addresses;
 
     foreach my $nic ( $self->field('nics')->fields ) {
         # validate macaddress
@@ -265,13 +266,15 @@ sub _validate_model_nics {
             $nic->field('id')->value and
                 $conditions{id} = { '!=' => $nic->field('id')->value };
             my $count = $self->schema->resultset('HWServerNIC')->search( \%conditions )->count;
-            if ( $count > 0 ) {
+            if ( $count > 0 || $nic_addresses{$macaddr} ) {
                 my $field_error = $macaddr_field->get_message('unique') ||
                     $macaddr_field->unique_message ||
                     'Duplicate value for [_1]';
                 $macaddr_field->add_error( $field_error, $macaddr_field->loc_label );
                 $found_error++;
             }
+
+            $nic_addresses{$macaddr} = 1;
         }
 
         # validate names (unique for each server)

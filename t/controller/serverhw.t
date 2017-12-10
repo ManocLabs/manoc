@@ -15,6 +15,16 @@ my $schema = ManocTest::Schema->get_schema();
 
 mech_login;
 
+# reusable fields assignments
+my %common_fields = (
+    'form-serverhw.ram_memory' => '16000',
+    'form-serverhw.cpu_model'  => 'E1234',
+    'form-serverhw.vendor'     => 'Moon',
+    'form-serverhw.model'      => 'ShinyBlade',
+    # warehouse
+    'form-serverhw.location' => 'w',
+);
+
 # visit list
 $mech->get_ok('/serverhw');
 $mech->title_is('Manoc - Server Hardware');
@@ -28,13 +38,8 @@ $mech->submit_form_ok(
     {
         form_id => 'form-serverhw',
         fields  => {
-            'form-serverhw.ram_memory' => '16000',
-            'form-serverhw.cpu_model'  => 'E1234',
-            'form-serverhw.vendor'     => 'Moon',
+            %common_fields,
             'form-serverhw.serial'     => 'moo001',
-            'form-serverhw.model'      => 'ShinyBlade',
-            # warehouse
-            'form-serverhw.location' => 'w',
         }
     },
     "Create serverhw"
@@ -57,13 +62,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-serverhw',
         fields  => {
-            'form-serverhw.ram_memory' => '16000',
-            'form-serverhw.cpu_model'  => 'E1234',
-            'form-serverhw.vendor'     => 'Moon',
+            %common_fields,
+
             'form-serverhw.serial'     => 'moo002',
-            'form-serverhw.model'      => 'ShinyBlade',
-            # warehouse
-            'form-serverhw.location' => 'w',
         }
     },
     "Create another serverhw"
@@ -79,16 +80,11 @@ $mech->submit_form_ok(
     {
         form_id => 'form-serverhw',
         fields  => {
-            'form-serverhw.ram_memory' => '16000',
-            'form-serverhw.cpu_model'  => 'E1234',
-            'form-serverhw.vendor'     => 'Moon',
-            'form-serverhw.serial'     => 'moo002',
-            'form-serverhw.model'      => 'YServer',
-            # warehouse
-            'form-serverhw.location' => 'w',
+            %common_fields,
+            'form-serverhw.serial'   => 'moo002',
+            'form-serverhw.model'    => 'YServer',
             'form-serverhw.storage1' => '10',
             'form-serverhw.storage2' => '20',
-
         }
     },
     "Edit serverhw"
@@ -131,5 +127,69 @@ $mech->submit_form_ok(
 # fooled my mysql non monotonic primary keys
 #$mech->title_is('Manoc - Server Hardware S000004', "Server page");
 $mech->text_contains( 'ShinyBlade', 'Got model from first server' );
+
+
+# test NICs
+
+$mech->get_ok('/serverhw/create');
+$mech->submit_form_ok(
+    {
+        form_id => 'form-serverhw',
+        fields  => {
+            %common_fields,
+
+            'form-serverhw.serial'     => 'moo004',
+            'form-serverhw.inventory'  => 'N01',
+
+            'form-serverhw.nics.0.macaddr' => '00:00:00:11:22:33',
+            'form-serverhw.nics.0.name'    => 'eth0',
+            'form-serverhw.nics.1.macaddr' => '00:00:00:11:22:34',
+        }
+    },
+    "Create a server with a NIC serverhw"
+);
+$mech->title_is( 'Manoc - Server Hardware N01', "Server page" );
+$mech->text_contains( 'eth0', "First nic name found" );
+$mech->text_contains( '00:00:00:11:22:33', "First nic addr found" );
+$mech->text_contains( 'nic1', "Second nic name (auto) found" );
+$mech->text_contains( '00:00:00:11:22:34', "Second nic addr found" );
+
+
+$mech->get_ok('/serverhw/create');
+$mech->submit_form_ok(
+    {
+        form_id => 'form-serverhw',
+        fields  => {
+            %common_fields,
+            'form-serverhw.inventory'  => 'N02',
+
+            'form-serverhw.nics.0.macaddr' => '00:00:00:11:22:33',
+            'form-serverhw.nics.0.name'    => 'eth0',
+        }
+    },
+    "Create a server with a NIC (duplicated maccaddr)"
+);
+$mech->text_contains( 'Duplicate value for Macaddr', "Got error for Duplicate value for Macaddr" );
+
+$mech->get_ok('/serverhw/create');
+$mech->submit_form_ok(
+    {
+        form_id => 'form-serverhw',
+        fields  => {
+            %common_fields,
+            'form-serverhw.inventory'  => 'N02',
+
+            'form-serverhw.nics.0.macaddr' => 'aa:bb:cc:dd:ee:ff',
+            'form-serverhw.nics.0.name'    => 'eth0',
+
+            'form-serverhw.nics.1.macaddr' => 'aa:bb:cc:dd:ee:ff',
+            'form-serverhw.nics.1.name'    => 'eth0',
+        }
+    },
+    "Create a server with a NIC (duplicated maccaddr)"
+);
+$mech->text_contains( 'Duplicate value for Macaddr', "Got error for  Duplicate value for Macaddr" );
+$mech->text_contains( 'Duplicate value for NIC', "Got error for Duplicate value for Name" );
+
 
 done_testing();
