@@ -73,6 +73,7 @@ function showDialogForm(url, title, on_close) {
     })
 }( jQuery ));
 
+/* Repeatable form fields */
 
 $(function() {
 
