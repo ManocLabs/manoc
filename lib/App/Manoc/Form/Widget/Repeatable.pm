@@ -19,7 +19,7 @@ around BUILDARGS => sub {
     }
 
     $args->{do_wrapper}    = 0;
-    $args->{num_extra}     = 0;
+    $args->{num_extra}     = 1;
     $args->{init_contains} = { do_wrapper => 0, };
 
     $args->{wrap_repeatable_element_method} = \&wrap_repeatable_element;
