@@ -119,6 +119,9 @@ has_field 'model' => (
     size     => 32,
     required => 1,
     label    => 'Model',
+
+    # avoid update_model called for field validation!
+    validate_method => sub { },
 );
 
 has_field 'serial' => (
@@ -252,7 +255,6 @@ sub _validate_model_nics {
     my %nic_names;
 
     foreach my $nic ( $self->field('nics')->fields ) {
-
         # validate macaddress
         my %conditions;
 

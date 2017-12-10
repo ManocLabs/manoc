@@ -89,6 +89,9 @@ has_field 'model' => (
     size     => 32,
     required => 1,
     label    => 'Model',
+
+    # avoid update_model called for field validation!
+    validate_method => sub { },
 );
 
 has_field 'serial' => (
