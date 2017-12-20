@@ -45,23 +45,19 @@ Otherwise return undef.
 sub normalize_mac_addr {
     my $addr = shift;
 
+    return unless defined( $addr );
+
     $addr =~
         /^[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}$/
-        and
-        return lc
-        ($_);
+        and return lc($addr);
 
     $addr =~
         /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})[-:]?([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
-        and
-        return lc
-        ("$1:$2:$3:$4:$5:$6");
+        and return lc("$1:$2:$3:$4:$5:$6");
 
     $addr =~
         /^([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})-([0-9a-fA-F]{2})$/
-        and
-        return lc
-        ("$1:$2:$3:$4:$5:$6");
+        and return lc("$1:$2:$3:$4:$5:$6");
 }
 
 =function clean_string($s)
