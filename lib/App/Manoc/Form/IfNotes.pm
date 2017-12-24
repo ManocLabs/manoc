@@ -5,7 +5,7 @@ use HTML::FormHandler::Moose;
 
 ##VERSION
 
-extends 'App::Manoc::Form::Base';
+extends 'App::Manoc::Form::BaseDBIC';
 
 has '+name'        => ( default => 'form-ifnotes' );
 has '+html_prefix' => ( default => 1 );

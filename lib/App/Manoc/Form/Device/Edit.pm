@@ -4,7 +4,7 @@ use HTML::FormHandler::Moose;
 
 ##VERSION
 
-extends 'App::Manoc::Form::Base';
+extends 'App::Manoc::Form::BaseDBIC';
 with 'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::RackOptions',
     'App::Manoc::Form::TraitFor::Horizontal',

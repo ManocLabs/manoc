@@ -2,7 +2,7 @@ package App::Manoc::Form::IPAddressInfo;
 
 use HTML::FormHandler::Moose;
 
-extends 'App::Manoc::Form::Base';
+extends 'App::Manoc::Form::BaseDBIC';
 
 ##VERSION
 

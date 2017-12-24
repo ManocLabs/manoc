@@ -2,18 +2,17 @@
     page.title='Uplinks for ' _ object.name
 -%]
 
-[% action -%]
-
-<form name="[% form.name %]" method="POST" >
+<form name="[% form.name %]" method="POST"  action="[% form.action %]">
   <table class="table">
     <th>Uplink</th><th>Interface</th>
     [%- FOREACH f IN form.field('interfaces').sorted_fields -%]
     <tr>
       <td> [% f.field('uplink_flag').render %]</td>
-      <td>[% f.field('name').fif %][% f.field('name').render %]
-        [% f.field('label').render %]</td>
+      <td>[% f.field('name').label %][% f.field('name').render %]
+        </td>
     </tr>
     [%- END %]
   </table>
+  [% form.field('csrf_token').render %]
   <input class="btn btn-default" name="submit" value="Save" type="submit">
 </form>

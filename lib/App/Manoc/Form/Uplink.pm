@@ -4,9 +4,7 @@ use HTML::FormHandler::Moose;
 
 ##VERSION
 
-extends 'HTML::FormHandler';
-
-has '+widget_wrapper' => ( default => 'None' );
+extends 'App::Manoc::Form::Base';
 
 has 'schema' => ( is => 'rw' );
 
