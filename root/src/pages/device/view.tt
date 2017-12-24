@@ -160,7 +160,12 @@ page.title   = 'Device ' _ object.name
 	  No backup found
 	  [% END %]
 	</dd>
-	<dt>Uplinks</dt><dd>[% object.uplinks.join(',') %]</dd>
+	<dt>Uplinks</dt>
+    <dd>
+    [%- FOR ul IN object.uplinks %]
+    [% ul.interface %][% ", " UNLESS loop.last %]
+    [% END -%]
+    </dd>
 	<dt>Notes</dt><dd>[% object.notes | html %]</dd>
       </dl>
     </div><!-- row -->
