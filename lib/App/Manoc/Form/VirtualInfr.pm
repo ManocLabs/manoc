@@ -5,7 +5,7 @@ use HTML::FormHandler::Moose;
 
 use namespace::autoclean;
 
-extends 'App::Manoc::Form::Base';
+extends 'App::Manoc::Form::BaseDBIC';
 with
     'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::Horizontal';

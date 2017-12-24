@@ -4,7 +4,7 @@ use HTML::FormHandler::Moose;
 
 ##VERSION
 
-extends 'App::Manoc::Form::Base';
+extends 'App::Manoc::Form::BaseDBIC';
 
 has '+name'        => ( default => 'form-building' );
 has '+html_prefix' => ( default => 1 );

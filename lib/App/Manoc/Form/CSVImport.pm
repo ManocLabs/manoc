@@ -5,16 +5,10 @@ use HTML::FormHandler::Moose;
 
 use namespace::autoclean;
 
-extends 'HTML::FormHandler';
-with
-    'App::Manoc::Form::TraitFor::Theme',
-    'App::Manoc::Form::TraitFor::CSRF';
+extends 'App::Manoc::Form::Base';
 
 use Text::CSV;
 use Try::Tiny;
-
-#required for CSRF
-has '+ctx' => ( required => 1, );
 
 has '+enctype' => ( default => 'multipart/form-data' );
 

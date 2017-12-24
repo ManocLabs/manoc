@@ -4,7 +4,7 @@ use HTML::FormHandler::Moose;
 
 ##VERSION
 
-extends 'HTML::FormHandler::Model::DBIC';
+extends 'HTML::FormHandler';
 with
     'App::Manoc::Form::TraitFor::Theme',
     'App::Manoc::Form::TraitFor::CSRF';
