@@ -36,16 +36,33 @@ View Vlan by vid
 
 =cut
 
-sub vid : Chained('base') : PathPart('') : CaptureArgs(1) {
+sub vid : Chained('base') : PathPart('vid') : Args(1) {
     my ( $self, $c, $vid ) = @_;
 
     if ( $self->enable_permission_check && $self->view_object_perm ) {
         $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
     }
 
+    my $qp            = $c->req->query_parameters;
+    my $segment_param = $qp->{lansegment};
+
+    my $search_params = { vid => $vid };
+    if ( defined($segment_param) ) {
+        $search_params->{lansegment_id} = $segment_param;
+    }
+
+    my $object_list = [ $c->stash->{resultset}->search($search_params)->all ];
+
+    if ( @$object_list == 1 ) {
+        my $id = $object_list->[0]->id;
+        $c->debug and
+            $c->log->debug("Only one vlan found, redirect to vlan/view $id");
+        $c->go( '/vlan/view', [$id], [] );
+    }
+
     $c->stash(
-        vid => $vid,
-        object_list => $c->stash->{resultset}->search( { vid => $vid } )
+        vid         => $vid,
+        object_list => $object_list
     );
 
 }
@@ -74,11 +91,14 @@ sub list : Chained('base') : PathPart('') : Args(0) {
 
     my $qp            = $c->req->query_parameters;
     my $segment_param = $qp->{lansegment};
-    $c->debug and $c->log->debug("looking for segment=$segment_param");
 
-    my $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_param } );
-    $c->debug and $c->log->debug( $segment ? "segment found" : "segment not foud" );
+    my $segment;
+    if ( defined($segment_param) ) {
+        $c->debug and $c->log->debug("looking for segment=$segment_param");
 
+        $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_param } );
+        $c->debug and $c->log->debug( $segment ? "segment found" : "segment not foud" );
+    }
     $segment ||= $c->model('ManocDB::LanSegment')->search()->first;
 
     $c->stash(
@@ -104,7 +124,7 @@ before 'create' => sub {
         $c->detach();
     }
 
-    $c->stash( form_parameters => { vlan_range => $range_id } );
+    $c->stash( form_parameters => { vlan_range => $range } );
 };
 
 =method object_delete
