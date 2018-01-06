@@ -3,6 +3,8 @@ package App::Manoc::Form::BaseDBIC;
 use Moose;
 use namespace::autoclean;
 
+##VERSION
+
 extends 'App::Manoc::Form::Base';
 with 'HTML::FormHandler::TraitFor::Model::DBIC';
 
