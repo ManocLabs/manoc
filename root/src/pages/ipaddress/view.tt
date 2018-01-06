@@ -75,7 +75,7 @@ use_table=1
       <a class="btn btn-default" href="[% c.uri_for_action('ipaddress/edit', [ ipaddress.address ])%]">
 	[% bootstrap_icon('pencil') %] Edit Info</a>
       [% IF info != '' -%]
-      <a class="btn btn-default href="[% c.uri_for_action('ipaddress/delete', [ ipaddress.address ])%]">
+      <a class="btn btn-default" href="[% c.uri_for_action('ipaddress/delete', [ ipaddress.address ])%]">
 	[% bootstrap_icon('trash') %]Delete info</a>
       [% END -%]
     </div>
@@ -95,8 +95,8 @@ use_table=1
       <tbody>
 	[% FOREACH r IN arp_entries %]
         <tr>
- 	  <td> <a href="[% c.uri_for_action('mac/view',r.macaddr) %]">[% r.macaddr %]</a></td>
- 	  <td> [% PP.manoc_print( { vlan => r.vlan } ) %] </td>
+ 	  <td> [% PP.manoc_print(r.macaddr) %] </td>
+ 	  <td> [% PP.manoc_print( { vlan => r.vlan } ) %] </td>
  	  <td> [% date.format(r.firstseen) %]</td>
 	  <td> [% date.format(r.lastseen)  %]</td>
         </tr>

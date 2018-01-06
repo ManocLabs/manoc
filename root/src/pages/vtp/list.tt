@@ -6,10 +6,9 @@
 -%]
 [% page.toolbar = BLOCK %]
 <div id="tabletoolbar">
- <a href="[% c.uri_for_action('vtp/compare') %]" class="btn btn-sm btn-defaulty">VLAN/VTP comparison</a>
-[% END -%]
+ <a href="[% c.uri_for_action('vtp/compare') %]" class="btn btn-sm btn-default">VLAN/VTP comparison</a>
 </div>
-[% END %]
+[% END -%]
 
 
 [% init_table('vlan_list') %]
