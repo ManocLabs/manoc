@@ -51,6 +51,13 @@ has 'network_id_counter' => (
     is  => 'rw'
 );
 
+has 'default_lan_segment_id' => (
+    isa     => 'Int',
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_default_lan_segment_id',
+);
+
 sub _build_device_id_map {
     my $self = shift;
     $self->log->info("Loading device ids from DB");
@@ -100,6 +107,19 @@ sub _rewrite_device_id {
 
     @$data = @new_data;
 }
+
+sub _build_default_lan_segment_id {
+    my $self = shift;
+
+    my $rs      = $self->schema->resultset('LanSegment');
+    my $segment = $rs->find_or_create(
+        {
+            name => 'default',
+        }
+    );
+    return $segment->id;
+}
+
 ########################################################################
 
 sub upgrade_cdp_neigh {
@@ -196,21 +216,20 @@ sub upgrade_device_config {
     }
 }
 
-sub get_table_name_DHCPServer { 'dhcp_lease' }
+sub get_table_name_DHCPServer { [ 'dhcp_lease', 'dhcp_reservation' ] }
 
 sub upgrade_DHCPServer {
     my ( $self, $data ) = @_;
 
     # maps name to id
-    my %dhcp_server_map = ();
+    my $dhcp_server_map = $self->dhcp_server_map;
+    my $id              = $self->dhcp_server_id_counter;
 
     my @servers;
 
-    my $id = $self->dhcp_server_id_counter;
-
     foreach (@$data) {
         my $server = $_->{server};
-        next if $dhcp_server_map{$server};
+        next if $dhcp_server_map->{$server};
 
         my $server_id = $id++;
 
@@ -222,11 +241,11 @@ sub upgrade_DHCPServer {
         };
         push @servers, $r;
 
-        $dhcp_server_map{$server} = $server_id;
+        $dhcp_server_map->{$server} = $server_id;
     }
 
     $self->dhcp_server_id_counter($id);
-    $self->dhcp_server_map( \%dhcp_server_map );
+    $self->dhcp_server_map($dhcp_server_map);
     @$data = @servers;
 }
 
@@ -371,12 +390,26 @@ sub upgrade_users {
     }
 }
 
-sub upgrade_vlan {
+sub upgrade_Vlan {
     my ( $self, $data ) = @_;
+    my $segment_id = $self->default_lan_segment_id;
 
     foreach (@$data) {
         $_->{vlan_range_id} = $_->{vlan_range};
         delete $_->{vlan_range};
+
+        $_->{lan_segment_id} = $segment_id;
+        $_->{vid}            = $_->{id};
+    }
+}
+
+sub upgrade_VlanRange {
+    my ( $self, $data ) = @_;
+
+    my $segment_id = $self->default_lan_segment_id;
+
+    foreach (@$data) {
+        $_->{lan_segment_id} = $segment_id;
     }
 }
 
