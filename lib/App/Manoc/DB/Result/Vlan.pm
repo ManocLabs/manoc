@@ -109,7 +109,7 @@ __PACKAGE__->has_many(
 # weak relation with interfaces
 __PACKAGE__->has_many(
     interfaces => 'App::Manoc::DB::Result::IfStatus',
-    { 'foreign.vlan' => 'self.id' },
+    { 'foreign.vlan' => 'self.vid' },
     {
         join_type                 => 'LEFT',
         cascade_delete            => 0,
@@ -121,7 +121,7 @@ __PACKAGE__->has_many(
 # weak relation with vtp entries
 __PACKAGE__->belongs_to(
     vtp_entry => 'App::Manoc::DB::Result::VlanVtp',
-    { 'foreign.id' => 'self.id' },
+    { 'foreign.id' => 'self.vid' },
     {
         join_type                 => 'LEFT',
         is_foreign_key_constraint => 0,

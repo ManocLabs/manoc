@@ -26,7 +26,7 @@ __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->belongs_to(
     vlan => 'App::Manoc::DB::Result::Vlan',
-    { 'foreign.id' => 'self.id' },
+    { 'foreign.vid' => 'self.id' },
     {
         join_type                 => 'LEFT',
         is_foreign_key_constraint => 0,
