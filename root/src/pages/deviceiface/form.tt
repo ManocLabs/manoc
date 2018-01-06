@@ -1,0 +1,6 @@
+[%
+   page.title='Interface ' _ object.device.name _ '/' _ object.name
+%]
+
+[% form.render %]
+[% ajax_form(form.name) %]

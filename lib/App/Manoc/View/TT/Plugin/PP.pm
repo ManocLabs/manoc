@@ -107,16 +107,16 @@ sub _manoc_print_hash {
     my $ctx = $self->{_CONTEXT};
     my $c   = $ctx->stash->get('c');
 
-    # an interface light object
+    # an interface pseudo-object
     if ( $object->{iface} && $object->{device} ) {
         my $iface  = $object->{iface};
         my $device = $object->{device};
-        my $url    = $c->uri_for_action( 'interface/view',
+        my $url    = $c->uri_for_action( 'device/iface',
             [ $device->id, Template::Filters::uri_filter($iface) ] );
         return _print_link( $iface, $url );
     }
 
-    # a light object made by a vlan id and an optional segment
+    # a pseudo-object made by a vlan id and an optional segment
     if ( $object->{vlan} ) {
         my $vlan    = $object->{vlan};
         my $segment = $object->{segment};

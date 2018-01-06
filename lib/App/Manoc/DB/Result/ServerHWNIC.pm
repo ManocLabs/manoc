@@ -1,4 +1,4 @@
-package App::Manoc::DB::Result::HWServerNIC;
+package App::Manoc::DB::Result::ServerHWNIC;
 #ABSTRACT: A model object for server additional network interfaces
 
 use strict;
@@ -8,7 +8,14 @@ use warnings;
 
 use parent 'App::Manoc::DB::Result';
 
-__PACKAGE__->table('hw_server_nic');
+use constant {
+    NW_STATUS_UNKNOWN   => undef,    # never checked by nw
+    NW_STATUS_FOUND     => 'F',      # nw ran and confirmed this nic
+    NW_STATUS_NOT_FOUND => 'N',      # nw ran and didn't find this nic
+    NW_STATUS_CREATED   => 'C',      # nw ran and created this nic
+};
+
+__PACKAGE__->table('serverhw_nic');
 __PACKAGE__->add_columns(
     id => {
         data_type         => 'int',
@@ -40,6 +47,11 @@ __PACKAGE__->add_columns(
         size        => 17
     },
 
+    nw_status => {
+        data_type   => 'char',
+        size        => 1,
+        is_nullable => 1,
+    },
 );
 
 __PACKAGE__->set_primary_key('id');
@@ -81,6 +93,8 @@ sub insert {
     $self->next::method(@args);
 
     $guard->commit;
+
+    return $self;
 }
 
 1;

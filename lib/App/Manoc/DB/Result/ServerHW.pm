@@ -94,7 +94,7 @@ __PACKAGE__->might_have(
 );
 
 __PACKAGE__->has_many(
-    nics => 'App::Manoc::DB::Result::HWServerNIC',
+    nics => 'App::Manoc::DB::Result::ServerHWNIC',
     { 'foreign.serverhw_id' => 'self.id' },
     { cascade_delete        => 1 }
 );

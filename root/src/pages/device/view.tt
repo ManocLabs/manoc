@@ -190,7 +190,7 @@ page.title   = 'Device ' _ object.name
       <tbody>
 	[% FOREACH if IN unused_ifaces %]
 	<tr>
-	  <td>[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
+	  <td>[% PP.manoc_print({ device => object, iface => if.name}) %]</td>
           <td>[% if.description %]</td>
 	</tr>
 	[% END %]

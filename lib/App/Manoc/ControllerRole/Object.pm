@@ -23,6 +23,11 @@ has 'view_object_perm' => (
     default => 'view',
 );
 
+has object_stash_alias => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
 =head1 DESCRIPTION
 
 This is a base role for all Manoc controllers which manage a row from
@@ -79,6 +84,15 @@ sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
         object    => $object,
         object_pk => $id
     );
+
+    if ( my $key = $self->object_stash_alias ) {
+        $c->stash(
+            $key        => $object,
+            "${key}_id" => $id,
+        );
+
+    }
+
 }
 
 =method get_object

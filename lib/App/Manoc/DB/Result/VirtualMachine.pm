@@ -75,7 +75,7 @@ __PACKAGE__->belongs_to(
     virtinfr => 'App::Manoc::DB::Result::VirtualInfr',
     'virtinfr_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 
@@ -83,7 +83,7 @@ __PACKAGE__->belongs_to(
     hypervisor => 'App::Manoc::DB::Result::Server',
     'hypervisor_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 

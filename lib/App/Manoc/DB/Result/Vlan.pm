@@ -139,13 +139,22 @@ __PACKAGE__->has_many(
 
 # weak relation with interfaces
 __PACKAGE__->has_many(
-    interfaces => 'App::Manoc::DB::Result::IfStatus',
+    interface_status => 'App::Manoc::DB::Result::DeviceIfStatus',
     { 'foreign.vlan' => 'self.vid' },
     {
         join_type                 => 'LEFT',
         cascade_delete            => 0,
         cascade_copy              => 0,
         is_foreign_key_constraint => 0,
+    }
+);
+
+__PACKAGE__->has_many(
+    interface => 'App::Manoc::DB::Result::DeviceIface',
+    { 'foreign.vlan_id' => 'self.id' },
+    {
+        cascade_delete            => 0,
+        cascade_copy              => 0,
     }
 );
 

@@ -75,4 +75,16 @@ __PACKAGE__->belongs_to(
     },
 );
 
+__PACKAGE__->belongs_to(
+    from_device_iface => 'App::Manoc::DB::Result::DeviceIface',
+    {
+        'foreign.device_id' => 'self.from_device_id',
+        'foreign.name'      => 'self.from_interface'
+    },
+    {
+        join_type                 => 'LEFT',
+        is_foreign_key_constraint => 0
+    },
+);
+
 1;
