@@ -115,6 +115,18 @@ sub _manoc_print_hash {
             [ $device->id, Template::Filters::uri_filter($iface) ] );
         return _print_link( $iface, $url );
     }
+
+    # a light object made by a vlan id and an optional segment
+    if ( $object->{vlan} ) {
+        my $vlan    = $object->{vlan};
+        my $segment = $object->{segment};
+
+        my $qp = {};
+        $segment and $qp->{lansegment} = $segment;
+
+        my $url = $c->uri_for_action( 'vlan/vid', [$vlan], $qp );
+        return _print_link( $vlan, $url );
+    }
 }
 
 sub _print_link() {

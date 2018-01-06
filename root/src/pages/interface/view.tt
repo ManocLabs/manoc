@@ -41,7 +41,7 @@
 
 	<dt>Vlan:</dt>
 	<dd>
-	  [% object.vlan | html %]
+	  [% PP.manoc_print(object.vlan) %]
 	</dd>
 
 	<dt>STP Status</dt>
@@ -83,10 +83,12 @@
 	<tbody>
 	  [% FOREACH m IN mat_history %]
 	  <tr>
-	    <td> <a href="[% c.uri_for('/mac',m.macaddr) %]">[% m.macaddr %]</a></td>
-	    <td> [% PP.manoc_print(m.vlan,m.vlan) %]     </td>
-	    <td> [% date.format(m.firstseen) %]</td>
-	    <td> [% date.format(m.lastseen) %]</td>
+	    <td> [% PP.manoc_print(m.macaddr) %] </td>
+	    <td>
+          [% PP.manoc_print({vlan => m.vlan, segment => device.lan_segment}) %]
+        </td>
+	    <td> [% date.format(m.firstseen) %] </td>
+	    <td> [% date.format(m.lastseen) %] </td>
 	  </tr>
 	  [% END %]
 	</tbody>
