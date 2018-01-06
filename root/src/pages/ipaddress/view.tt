@@ -96,7 +96,7 @@ use_table=1
 	[% FOREACH r IN arp_entries %]
         <tr>
  	  <td> <a href="[% c.uri_for_action('mac/view',r.macaddr) %]">[% r.macaddr %]</a></td>
- 	  <td> <a href="[% c.uri_for_action('vlan/view',[r.vlan]) %]">[% r.vlan %]</a></td>
+ 	  <td> [% PP.manoc_print( { vlan => r.vlan } ) %] </td>
  	  <td> [% date.format(r.firstseen) %]</td>
 	  <td> [% date.format(r.lastseen)  %]</td>
         </tr>

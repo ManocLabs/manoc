@@ -49,6 +49,9 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my $object    = $c->stash->{'object'};
     my $object_pk = $c->stash->{object_pk};
 
+    my $device = $c->model('ManocDB::Device')->find( { id => $object_pk->{device_id} } );
+    $c->stash( device => $device );
+
     my $note = $c->model('ManocDB::IfNotes')->find($object_pk);
     $c->stash( notes => defined($note) ? $note->notes : '' );
 
