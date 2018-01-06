@@ -30,6 +30,7 @@
       owner: root
       group: root
       mode: 0644
+      force: yes
 
 - name: SNMP | comment all mibs but basic ones in snmp.conf
   replace:
@@ -40,5 +41,5 @@
 - name: SNMP | replace path in snmp.conf
   replace:
       dest: /etc/snmp/snmp.conf
-      regexp: ''
+      regexp: '/usr/local/netdisco/mibs'
       replace: "{{mibs_install_dir}}/netdisco-mibs-3.1"
