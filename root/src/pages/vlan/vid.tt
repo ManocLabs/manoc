@@ -1,0 +1,20 @@
+[% page.title = 'VLAN with id ' _ vlan_id  %]
+
+<div id="tablewrapper">
+<table class="table">
+  <thead>
+    <tr>
+        <th class="col-sm-6">LAN Segment</th>
+        <th class="col-sm-6">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+  [% FOREACH vlan IN object_list -%]
+    <tr>
+        <td>[% PP.manoc_print(vlan.lan_segment) %]</td>
+        <td>[% PP.manoc_print(vlan) %]</td>
+    </tr>
+  [% END -%]
+  </tbody>
+</table>
+</div>
