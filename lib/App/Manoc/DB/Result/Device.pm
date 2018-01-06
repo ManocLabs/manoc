@@ -183,6 +183,16 @@ __PACKAGE__->belongs_to(
     { join_type => 'LEFT' }
 );
 
+__PACKAGE__->has_many(
+    cablings => 'App::Manoc::DB::Result::CablingMatrix',
+    { 'foreign.device1_id' => 'self.id' },
+    {
+        cascade_copy   => 0,
+        cascade_delete => 1,
+        cascade_update => 0,
+    }
+);
+
 =method mng_address
 
 Getter/setter for mng_address column. Both string values and
