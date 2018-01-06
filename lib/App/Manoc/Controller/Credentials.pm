@@ -21,11 +21,10 @@ __PACKAGE__->config(
             PathPart => 'credentials',
         }
     },
-    class                   => 'ManocDB::Credentials',
-    form_class              => 'App::Manoc::Form::Credentials',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    object_list_options     => {
+    class               => 'ManocDB::Credentials',
+    form_class          => 'App::Manoc::Form::Credentials',
+    view_object_perm    => undef,
+    object_list_options => {
         join      => [ 'device_nw_info', 'server_nw_info' ],
         distinct  => 1,
         '+select' => [

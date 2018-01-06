@@ -39,8 +39,8 @@ my $SOURCE_DEPENDECIES = {
     'HWAsset'         => 'Rack',
     'Rack'            => 'Building',
     'Mat'             => 'Device',
-    'IfStatus'        => 'Device',
-    'IfNotes'         => 'Device',
+    'DeviceIfStatus'  => 'DeviceIface',
+    'DeviceIface'     => 'Device',
     'CDPNeigh'        => 'Device',
     'DeviceConfig'    => 'Device',
     'DeviceNWInfo'    => [ 'Device',   'Credentials' ],
@@ -185,8 +185,8 @@ sub _order_sources {
 #                      L O A D   A C T I O N                           #
 #----------------------------------------------------------------------#
 
-sub _load_tables_loop {
-    my ( $self, $datadump, $file_set ) = @_;
+sub _load_sources {
+    my ( $self, $datadump ) = @_;
     my $converter;
 
     # try to load a converter if needed
@@ -233,33 +233,9 @@ sub _load_tables_loop {
         ref($tables) eq 'ARRAY' or $tables = [$tables];
 
         foreach my $table (@$tables) {
-            $self->log->debug("Loading $source_name from $table");
 
-            my @filenames = grep( /^$table\./, keys %{$file_set} );
-            if ( @filenames > 1 ) {
-                # sort by page
-                @filenames =
-                    map  { $_->[0] }
-                    sort { $a->[1] <=> $b->[1] }
-                    map  { [ $_, /\.(\d+)/ ] } @filenames;
-            }
-
-            foreach my $filename (@filenames) {
-                $self->log->debug("Loading $filename");
-
-                #load in RAM all the table records
-                my $records = $datadump->load_file($filename);
-                if ( !$records ) {
-                    $self->log->info("File $filename not found, skipping");
-                    next;
-                }
-
-                my $count = scalar(@$records);
-                $self->log->info("Read $count records from $filename");
-                unless ($count) {
-                    $self->log->info("Skipped empy file $filename");
-                    next;
-                }
+            my $records_callback = sub {
+                my $records = shift;
 
                 # convert records if needed
                 $converter and
@@ -270,25 +246,97 @@ sub _load_tables_loop {
                     $converter->upgrade_table( $records, $source_name );
 
                 # load into db
-                $self->_load_table( $source, $records );
+                $self->_populate_records( $source, $records );
 
-                #free memory
-                undef @$records;
-                undef $records;
+            };
+
+            $self->log->debug("Loading $table");
+            $self->_load_table_files($datadump, $table, $records_callback);
+        }
+
+        my $additional_tables;
+        $converter and $additional_tables = $converter->get_additional_table_name($source_name);
+        if ($additional_tables) {
+            ref($additional_tables) eq 'ARRAY' or $additional_tables = [$additional_tables];
+
+            foreach my $table (@$additional_tables) {
+
+                my $additional_table_cb = sub {
+                    my $records = shift;
+
+                    # convert records if needed
+                    $converter and
+                        $converter->upgrade_table( $records, $table );
+
+                    # prepare records for update
+                    $converter and
+                        $converter->process_additional_table( $records, $source_name, $table );
+
+                    $self->_update_records( $source, $records );
+                };
+                $self->log->debug("Loading additional $table");
+                $self->_load_table_files($datadump, $table, $additional_table_cb);
             }
         }
-        # converter callback
+
+        # converter final callback
         $converter and
             $converter->after_import_source($source);
 
     }
 }
 
-sub _load_table {
+# return an ordered list of the files in which $table has been saved
+sub _get_table_filenames {
+    my ($self, $datadump, $table) = @_;
+
+    my @filenames = grep( /^$table\./, @{$datadump->filelist} );
+    if ( @filenames > 1 ) {
+        # sort by page
+        @filenames =
+            map  { $_->[0] }
+            sort { $a->[1] <=> $b->[1] }
+            map  { [ $_, /\.(\d+)/ ] } @filenames;
+    }
+
+    return @filenames;
+}
+
+sub _load_table_files {
+    my ($self, $datadump, $table, $callback) = @_;
+
+    my @filenames = $self->_get_table_filenames($datadump, $table);
+
+    foreach my $filename (@filenames) {
+        $self->log->debug("Loading $table from $filename");
+
+        #load in RAM all the table records
+        my $records = $datadump->load_file($filename);
+        if ( !$records ) {
+            $self->log->info("File $filename not found, skipping");
+            next;
+        }
+
+        my $count = scalar(@$records);
+        $self->log->info("Read $count records from $filename");
+        unless ($count) {
+            $self->log->info("Skipped empy file $filename");
+            next;
+        }
+
+        $callback->($records);
+
+        #free memory
+        undef @$records;
+        undef $records;
+    }
+}
+
+sub _populate_records {
     my ( $self, $source, $records ) = @_;
 
     my $rs = $source->resultset;
-    $self->log->debug("loading table");
+    $self->log->debug("populate records");
 
     my $count      = 0;
     my $block_size = $LOAD_BLOCK_SIZE;
@@ -351,10 +399,38 @@ sub _load_table {
 
         $offset += $block_size;
     }
-
     $self->log->error("Warning: $count errors ignored!") if ($count);
     $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );
 }
+
+
+sub _update_records {
+    my ( $self, $source, $records ) = @_;
+
+    my $count      = 0;
+
+
+    my $rs = $source->resultset;
+    $self->log->debug("update records");
+
+    foreach my $row (@$records) {
+        try {
+            $rs->update_or_create( $row );
+        }
+        catch {
+            if ( $self->force ) {
+                $count++;
+                $self->log->warn("Error while updating: $_");
+            }  else {
+                $self->log->logdie("Fatal error: $_");
+            }
+        };
+    }
+
+    $self->log->error("Warning: $count errors ignored!") if ($count);
+    $self->log->info( scalar(@$records) - $count, " updated loaded in table " . $source->name );
+}
+
 
 =method load( )
 
@@ -372,14 +448,11 @@ sub load {
         return;
     }
 
-    #filter metadata file from sources
-    my $file_set = { map { $_ => 1 } @{ $datadump->filelist } };
-
     my $source_names = $self->source_names;
     $self->log->debug( 'Sources: ', join( ',', @$source_names ) );
 
     $self->schema->storage->ensure_connected();
-    $self->_load_tables_loop( $datadump, $file_set );
+    $self->_load_sources( $datadump );
 
     $self->log->info("Database restored!");
 }

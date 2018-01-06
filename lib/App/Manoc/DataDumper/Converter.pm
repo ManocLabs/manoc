@@ -106,6 +106,28 @@ sub get_table_name {
     }
 }
 
+
+=method get_table_name( $source_name )
+
+Return the table name (or a reference to a name list) to be used
+to refine data imported into DB source C<$source_name>.
+
+=cut
+
+sub get_additional_table_name {
+    my ( $self, $source_name ) = @_;
+
+    my $method_name = "get_additional_table_name_${source_name}";
+
+    # get name from lowest converter
+    foreach my $c ( @{ $self->_converters } ) {
+        next unless $c->can($method_name);
+        my $name = $c->$method_name();
+        $name and return $name;
+    }
+}
+
+
 =method upgrade_table( \@data, $name )
 
 Apply any needed transformation to records in @data for table C<$name>.
@@ -124,6 +146,28 @@ sub upgrade_table {
         $c->$method_name($data);
     }
 }
+
+
+=method process_additional_table( \@data, $source_name, $table_name )
+
+Prepare @data coming from $table_name in order to be used to further
+refine already imported records in $source_name.
+
+=cut
+
+sub process_additional_table {
+    my ( $self, $data, $source_name, $table_name  ) = @_;
+
+    my $method_name = "process_additional_table_${source_name}_${table_name}";
+
+    # use all converters
+    $self->log->info("Running additional converters for $table_name -> $source_name");
+    foreach my $c ( @{ $self->_converters } ) {
+        next unless $c->can($method_name);
+        $c->$method_name($data);
+    }
+}
+
 
 =method after_import_source( $source )
 

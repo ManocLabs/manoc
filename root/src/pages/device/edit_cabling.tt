@@ -1,0 +1,58 @@
+[%
+    page.title='Cabling for ' _ object.name
+-%]
+
+<form name="[% form.name %]" method="POST"  action="[% form.action %]">
+
+<table>
+<thead>
+  <th>Port</th>
+  <th colspan="2">Destination</th>
+  <th></th>
+</thead>
+<tbody>
+[% FOREACH c IN object.cablings -%]
+<tr>
+    <td>
+    [% PP.manoc_print({ device => object, iface => c.interface1}) %]
+    </td>
+[% IF c.device2 %]
+    <td>
+    [% PP.manoc_print( c.device2 ) %]
+    <td>
+    <td>
+        [% PP.manoc_print({ device => c.device2, iface => c.interface2}) %]
+    </td>
+[% END %]
+    <td>
+        Delete
+    </td>
+</tr>
+[% END -%]
+<tr>
+    <td>
+    [% form.field('interface1').render %]
+    </td>
+    <td>
+    [% form.field('device2').render %]
+    </td>
+    <td>
+    [% form.field('interface2').render %]
+    </td>
+    <td>
+        [% form.field('csrf_token').render %]
+        <input class="btn btn-default" name="submit" value="Add" type="submit">
+    </td>
+</tr>
+<tbody>
+</table>
+
+</form>
+[% fragment = BLOCK -%]
+
+$( document ).ready(function() {
+    interface1_select = $('#[% form.name %]\\.interface1');
+    device2_select = $('#[% form.name %]\\.device2');
+});
+[% END -%]
+[% js_scripts.push(fragment) -%]

@@ -502,17 +502,23 @@ sub update_if_table {
     my $ifstatus_table = $source->ifstatus_table;
 
     # delete old infos
-    $entry->ifstatus()->delete;
+    foreach my $inteface ( $entry->ifaces ) {
+        $inteface->status()->delete;
+    }
+
     # update
     foreach my $port ( keys %$ifstatus_table ) {
         $iface_filter && lc($port) =~ /^(vlan|null|unrouted vlan)/o and next;
+
         my $ifstatus = $ifstatus_table->{$port};
-        $entry->add_to_ifstatus(
-            {
-                interface => $port,
-                %$ifstatus
-            }
-        );
+        my $interface = $entry->find_or_new_related( ifaces => { interface => $port } );
+        if ( !$interface->in_storage ) {
+            $interface->autocreated(1);
+            $interface->insert;
+        }
+
+        # $ifstatus is supposed to have the same fields as DeviceIfStatus
+        $interface->create_related( status => $ifstatus );
     }
 }
 

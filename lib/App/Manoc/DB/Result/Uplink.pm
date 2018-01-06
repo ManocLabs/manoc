@@ -33,7 +33,7 @@ __PACKAGE__->add_unique_constraints( uplink_dev_if_idx => [ 'device_id', 'interf
 
 __PACKAGE__->might_have(
     cabling => 'App::Manoc::DB::Result::CablingMatrix',
-    { 'foreign.server_nic_id' => 'self.id' },
+    { 'foreign.hwserver_nic_id' => 'self.id' },
     {
         cascade_copy   => 0,
         cascade_delete => 1,

@@ -111,7 +111,7 @@ __PACKAGE__->belongs_to(
     virtinfr => 'App::Manoc::DB::Result::VirtualInfr',
     'virtinfr_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 

@@ -294,7 +294,7 @@ sub _validate_model_nics {
             $conditions{macaddr} = $macaddr;
             $nic->field('id')->value and
                 $conditions{id} = { '!=' => $nic->field('id')->value };
-            my $count = $self->schema->resultset('HWServerNIC')->search( \%conditions )->count;
+            my $count = $self->schema->resultset('ServerHWNIC')->search( \%conditions )->count;
             if ( $count > 0 || $nic_addresses{$macaddr} ) {
                 my $field_error = $macaddr_field->get_message('unique') ||
                     $macaddr_field->unique_message ||

@@ -74,6 +74,7 @@ on 'develop' => sub {
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Version" => "1";
+  requires "Test::Deep" => "0";
 };
 
 # used for heroku like environmens
