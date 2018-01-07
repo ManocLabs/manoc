@@ -1,0 +1,51 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+
+  vars:
+    manoc_install_dir: /opt/manoc
+
+    manoc_app_dir: /vagrant
+    manoc_download_from_git: false
+
+    manoc_db_name: manoc
+    manoc_db_user: manoc_rw
+    manoc_db_password: manoc123
+
+
+  roles:
+    - manoc
+    - role: mysql
+      mysql_databases:
+        - name: "{{manoc_db_name}}"
+          encoding: utf8
+      mysql_users:
+        - name: "{{manoc_db_user}}"
+          host: "%"
+          password: "{{manoc_db_password}}"
+          priv: "{{manoc_db_name}}.*:ALL"
+    - role: nginx
+      nginx_sites:
+        default:
+          - listen       80
+          - server_name _
+          - root "/usr/share/nginx/html"
+          - index index.html
+          - location / {
+              fastcgi_pass   unix:{{manoc_run_dir}}/manoc.sock;
+              include        fastcgi_params;
+              fastcgi_param  SCRIPT_NAME        /;
+              fastcgi_param  PATH_INFO          $fastcgi_script_name;
+              fastcgi_read_timeout 120;
+            }
+          - location /static {
+              root {{ manoc_app_dir }}/root;
+            }
+
+  post_tasks:
+      - name: Init Manoc DB schema
+        shell: "{{manoc_app_dir}}/script/manoc_create_ddl.pl | mysql -u {{manoc_db_user}} -p{{manoc_db_password}} {{manoc_db_name}}"
+      
+      - name: Init Manoc DB
+        command: "{{manoc_app_dir}}/script/manoc_initdb.pl"
