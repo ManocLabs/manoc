@@ -12,8 +12,14 @@ Vagrant.configure(2) do |config|
     config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
+  config.vm.provision "shell",
+    inline: "yum install -y git"
+
   config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "maint/ansible/site.yml"
+    ansible.galaxy_role_file = "maint/ansible/requirements.yml"
+    ansible.playbook = "maint/ansible/playbook.yml"
+    ansible.galaxy_roles_path = "/home/vagrant/ansible/roles"
+    ansible.install = true
   end
 
 end

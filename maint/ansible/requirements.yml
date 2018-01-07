@@ -1,0 +1,7 @@
+---
+- src: https://github.com/ManocLabs/ansible-role-manoc.git
+  name: manoc
+- src: geerlingguy.mysql
+  name: mysql
+- src: jdauphant.nginx
+  name: nginx
