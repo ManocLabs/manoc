@@ -2,6 +2,7 @@ Revision history for App-Manoc
 
 {{$NEXT}}
 
+  - lan segments for VLAN inventory
   - refactored search
   - fixes for dhcp support
   - fixes for datadumper
