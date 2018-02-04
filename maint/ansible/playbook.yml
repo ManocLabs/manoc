@@ -13,6 +13,11 @@
     manoc_db_user: manoc_rw
     manoc_db_password: manoc123
 
+  pre_tasks:
+   - name: Put SELinux in permissive mode
+     selinux:
+       policy: targeted
+       state: permissive
 
   roles:
     - manoc
