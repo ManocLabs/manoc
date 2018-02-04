@@ -1,6 +1,7 @@
 package App::Manoc::Script::Daemon;
 use Moose;
 
+use POSIX qw(setuid setgid);
 ##VERSION
 
 # it must be a class in order to override foreground
@@ -38,6 +39,24 @@ has cmd_status => (
     default   => sub { 0 },
 
     documentation => 'get daemon status',
+);
+
+has user => (
+    metaclass => 'Getopt',
+    isa       => 'Str',
+    is        => 'ro',
+    default   => sub { 0 },
+
+    documentation => 'set daemon user',
+);
+
+has group => (
+    metaclass => 'Getopt',
+    isa       => 'Str',
+    is        => 'ro',
+    default   => sub { 0 },
+
+    documentation => 'set daemon group',
 );
 
 =method run
@@ -83,8 +102,38 @@ sub run {
 
 after 'start' => sub {
     my $self = shift;
-    return unless $self->is_daemon;
-    $self->main;
+
+
+    $self->can('before_set_user') and $self->before_set_user;
+
+    if ( my $group = $self->group ) {
+        my $gid = getgrnam($self->group);
+        $gid or $self->log->logdie("Cannot identify group $group ");
+        setgid( $gid ) or
+            $self->log->logdie("Cannot set group $group ");;
+        $self->log->debug( "setgid($gid)" );
+    }
+
+    if ( my $user = $self->user ) {
+        my $uid = getpwnam($user);
+        $uid or $self->log->logdie("Cannot identify user $user ");
+
+        setuid( $uid ) or
+            $self->log->logdie("Cannot set user $user ");;
+
+        $ENV{USER} = $user;
+        $ENV{HOME} = ((getpwuid($uid))[7]);
+
+        $self->log->debug( "setuid($uid)" );
+        $self->log->debug( "\$ENV{USER} => " . $ENV{USER} );
+        $self->log->debug( "\$ENV{HOME} => " . $ENV{HOME} );
+    }
+
+
+    if (! $self->is_daemon ) {
+        $self->main;
+    }
+
 };
 
 # Clean up the namespace.
