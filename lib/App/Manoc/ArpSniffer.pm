@@ -218,6 +218,18 @@ sub handle_arp_packets {
     );
 }
 
+=head2 before_set_user
+
+Called before dropping root privileges. Sets pcap handle.
+
+=cut
+
+sub before_set_user {
+    my $self = shift;
+
+    my $pcap = $self->pcap_handle;
+}
+
 =head2 main
 
 The daemon main routing.
@@ -235,9 +247,7 @@ sub main {
     $self->vlan_filter;
 
     $self->log->info('starting packet capture');
-
-    my $pcap = $self->pcap_handle;
-    Net::Pcap::loop( $pcap, -1, \&handle_arp_packets, $self ) ||
+    Net::Pcap::loop( $self->pcap_handle, -1, \&handle_arp_packets, $self ) ||
         $self->log->logdie('Unable to start packet capture');
 }
 
