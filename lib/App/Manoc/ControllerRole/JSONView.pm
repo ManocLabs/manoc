@@ -38,7 +38,7 @@ sub prepare_json_object {
         $ret->{$name} = $val;
     }
     if ( $self->json_add_object_href ) {
-        $ret->{href} = $c->uri_for_action( $c->namespace . "/view", [ $row->id ] );
+        $ret->{href} = $c->uri_for_action( $c->namespace . "/view", [ $row->id ] )->as_string;
     }
     return $ret;
 }
