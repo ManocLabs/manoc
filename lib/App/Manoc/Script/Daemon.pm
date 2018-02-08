@@ -29,7 +29,7 @@ has cmd_stop => (
     documentation => 'kill the daemon',
 );
 
-has '+foreground' => ( writer => '_set_foreground', );
+has '+foreground' => ( writer => '_set_foreground', default => 0);
 
 has cmd_status => (
     metaclass => 'Getopt',
@@ -80,6 +80,7 @@ sub run {
     # when in foreground mode do not run Daemonize stuff
     # just call the main method
     if ( $self->foreground ) {
+        $self->log->debug("Start in foreground");
         return $self->main;
     }
 
@@ -91,8 +92,10 @@ sub run {
     }
     else {
         # when in debug mode do not fork
-        $self->debug and $self->_set_foreground(1);
-
+        if ( $self->debug ) {
+             $self->log->debug("Setting foreground because of debug");
+             $self->_set_foreground(1);
+        }
         $self->start;
     }
 
@@ -103,6 +106,25 @@ sub run {
 after 'start' => sub {
     my $self = shift;
 
+    return unless $self->is_daemon;
+
+    $self->log->debug("Dropping privileges (if setted)");
+    $self->drop_privileges;
+    
+    $self->log->debug("Running main server loop");
+    $self->main;
+};
+
+=method drop_privileges
+
+Set gid and uid according to user and group options.
+If defined call the before_set_user callback.
+
+=cut
+
+sub drop_privileges {
+    my $self = shift;
+    
 
     $self->can('before_set_user') and $self->before_set_user;
 
@@ -129,12 +151,7 @@ after 'start' => sub {
         $self->log->debug( "\$ENV{HOME} => " . $ENV{HOME} );
     }
 
-
-    if (! $self->is_daemon ) {
-        $self->main;
-    }
-
-};
+}
 
 # Clean up the namespace.
 no Moose;
