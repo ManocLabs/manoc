@@ -58,44 +58,6 @@ before 'view' => sub {
     $c->stash( hosts_usage => int( $hosts->count() / $max_hosts * 100 ) );
 };
 
-=action arp
-
-Show ARP activity for the IPNetwork
-
-=cut
-
-sub arp : Chained('object') {
-    my ( $self, $c ) = @_;
-
-    my $network = $c->stash->{object};
-
-    # override default title
-    $c->stash( title => 'ARP activity for Network ' . $network->name );
-
-    $c->detach('/arp/list');
-}
-
-=action arp_js
-
-Datatable AJAX support for ARP activity list
-
-=cut
-
-sub arp_js : Chained('object') {
-    my ( $self, $c ) = @_;
-
-    my $network = $c->stash->{object};
-    my $days    = int( $c->req->param('days') );
-
-    my $rs = $network->arp_entries->first_last_seen();
-    if ($days) {
-        $rs = $rs->search( { lastseen => time - str2seconds( $days, 'd' ) } );
-    }
-    $c->stash( datatable_resultset => $rs );
-
-    $c->detach('/arp/list_js');
-}
-
 =action root
 
 Show root IP networks.
