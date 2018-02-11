@@ -1,6 +1,10 @@
-[%
-   page.title='ARP activity'
--%]
+[% IF ipnetwork -%]
+[% page.title='ARP activity network ' _ ipnetwork.name -%]
+[% ELSIF ipblock -%]
+[% page.title='ARP activity block ' _ ipblock.name -%]
+[% ELSE -%]
+[% page.title='ARP activity' -%]
+[% END -%]
 [% META
   use_table = 1
 -%]
@@ -19,23 +23,10 @@ $(document).ready(function() {
     $('#arptable').DataTable( {
         "processing": true,
         "serverSide": true,
-        "ajax": "arp_js",
+        "ajax":  {
+           "url":  "[% c.uri_for_action('arp/datatable_source', { days => days, ipblock => ipblock.id, ipnetwork => ipnetwork.id}) %]",
+        },
     });
 } );
 [% END -%]
 [% js_scripts.push(script) -%]
-
-<!--
-"columnDefs": [
-            {
-                // The `data` parameter refers to the data for the cell (defined by the
-                // `data` option, which defaults to the column being worked with, in
-                // this case `data: 0`.
-                "render": function ( data, type, row ) {
-                    return data +' ('+ row[3]+')';
-                },
-                "targets": 0
-            },
-            { "visible": false,  "targets": [ 3 ] }
-        ]
--->

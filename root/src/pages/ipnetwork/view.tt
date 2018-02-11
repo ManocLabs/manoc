@@ -62,9 +62,9 @@
 </div><!-- end of col -->
 
 <div class="col-sm-4">
-    <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id])  %]">ARP activity</a></p>
+    <p><a href="[% c.uri_for_action('arp/list', { ipnetwork => object.id })  %]">ARP activity</a></p>
     [% bootstrap_progressbar(arp_usage) %]
-     <p><a href="[% c.uri_for_action('ipnetwork/arp', [object.id], {days=>60}) %]">ARP activity (last 60 days)</a></p>
+     <p><a href="[% c.uri_for_action('arp/list', { ipnetwork => object.id, days=>60}) %]">ARP activity (last 60 days)</a></p>
     [% bootstrap_progressbar(arp_usage60) %]
     <p><a href="#">Registered hosts</a></p>
     [% bootstrap_progressbar(host_usage) %]
@@ -96,8 +96,8 @@
       [% END -%]
     </tbody>
     </table>
-  </div><! -- panel body -->
-  </div><! -- panel -->
-  </div><! -- col -->
+  </div><!-- panel body -->
+  </div><!-- panel -->
+  </div><!-- col -->
 [% END %]
-</div><! -- row -->
+</div><!-- row -->
