@@ -48,7 +48,6 @@ __PACKAGE__->config(
     form_class              => 'App::Manoc::Form::Device::Edit',
     enable_permission_check => 1,
     view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
 
     object_list_options => {
         prefetch => [ { 'rack' => 'building' }, 'mng_url_format', 'hwasset', 'netwalker_info', ]
