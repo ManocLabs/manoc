@@ -115,6 +115,16 @@ sub _cmp_op {
     return -1;
 }
 
+=method TO_JSON
+
+Convert to string
+
+=cut
+
+sub TO_JSON {
+    shift->_stringify();
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 

@@ -27,6 +27,7 @@ App::Manoc::View::JSON - Catalyst JSON View
 __PACKAGE__->config( 'expose_stash' => 'json_data', );
 
 =for Pod::Coverage encode_json
+=cut
 
 sub encode_json {
     my ( $self, $c, $data ) = @_;
@@ -37,9 +38,11 @@ sub encode_json {
         return;
     }
 
-    my $encoder = JSON->new->utf8();
-    $encoder->allow_blessed(1);
-    $encoder->convert_blessed(1);
+    my $encoder = JSON::MaybeXS->new(
+        utf8            => 1,
+        allow_blessed   => 1,
+        convert_blessed => 1,
+    );
     return $encoder->encode($data);
 }
 
