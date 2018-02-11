@@ -11,9 +11,21 @@ use MooseX::MethodAttributes::Role;
 requires 'object', 'object_list';
 
 has json_columns => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+);
+
+# used when json columns are autodiscovered
+has json_extra_columns => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+);
+
+# used when json columns are autodiscovered
+has json_filter_columns => (
     is      => 'rw',
     isa     => 'ArrayRef[Str]',
-    default => sub { [] },
+    default => sub { [] }
 );
 
 has json_add_object_href => (
@@ -21,6 +33,29 @@ has json_add_object_href => (
     isa     => 'Bool',
     default => 1,
 );
+
+=method autodiscover_json_columns
+
+=cut
+
+sub autodiscover_json_columns {
+    my ( $self, $c ) = @_;
+    my @cols;
+
+    my %filter_columns = map { $_ => 1 } $self->json_filter_columns;
+
+    my $result_source = $c->stash->{resultset}->result_source;
+    foreach my $col_name ( $result_source->columns ) {
+        next if $filter_columns{$col_name};
+
+        push @cols, $col_name;
+    }
+
+    push @cols, @{ $self->json_extra_columns }
+        if defined( $self->json_extra_columns );
+
+    $self->json_columns( \@cols );
+}
 
 =method prepare_json_object
 
@@ -32,6 +67,11 @@ sub prepare_json_object {
     my ( $self, $c, $row ) = @_;
 
     my $ret = {};
+
+    if ( !defined( $self->json_columns ) ) {
+        $self->autodiscover_json_columns($c);
+    }
+
     foreach my $name ( @{ $self->json_columns } ) {
         # default accessor is preferred
         my $val = $row->can($name) ? $row->$name : $row->get_column($name);
