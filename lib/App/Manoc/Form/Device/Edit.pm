@@ -13,8 +13,7 @@ with 'App::Manoc::Form::TraitFor::SaveButton',
 use App::Manoc::DB::Result::HWAsset;
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-device' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-device' );
 
 sub build_render_list {
     return [
@@ -46,7 +45,7 @@ has_field 'hwasset' => (
         input_append_button_element_attr => {
             class => 'btn-primary',
             href  => '#',
-            id    => 'form-device.asset_button',
+            id    => 'asset_button',
         },
     },
     element_class => 'selectpicker',
@@ -193,11 +192,17 @@ override validate_model => sub {
 
     my $field;
 
-    $field = $self->field('rack');
-    if ( $self->field('hwasset')->value && !defined( $field->value ) ) {
-        my $field_error = 'Rack is required when using hardware assets';
-        $field->add_error( $field_error, $field->loc_label );
-        $found_error++;
+    # validate rack: mind inactive fields
+
+    if ( $self->field('hwasset')->is_active && $self->field('hwasset')->value ) {
+        my $rack = $self->item->rack;
+        $self->field('rack')->is_active and $rack = $self->field('rack')->value;
+
+        if ( !defined($rack) ) {
+            my $field_error = 'Rack is required when using hardware assets';
+            $field->add_error( $field_error, $field->loc_label );
+            $found_error++;
+        }
     }
 
     return $found_error || super();

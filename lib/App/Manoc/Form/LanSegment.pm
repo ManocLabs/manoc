@@ -12,9 +12,8 @@ with
 
 use namespace::autoclean;
 
-has '+item_class'  => ( default => 'LanSegment' );
-has '+name'        => ( default => 'form-lansegment' );
-has '+html_prefix' => ( default => 1 );
+has '+item_class' => ( default => 'LanSegment' );
+has '+name'       => ( default => 'form-lansegment' );
 
 has_field 'name' => (
     type     => 'Text',

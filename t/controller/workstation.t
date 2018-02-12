@@ -38,9 +38,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstation',
         fields  => {
-            'form-workstation.hostname'                => 'workstationnew',
-            'form-workstation.ethernet_static_address' => '192.168.1.1',
-            'form-workstation.wireless_static_address' => '192.168.1.2'
+            'hostname'                => 'workstationnew',
+            'ethernet_static_address' => '192.168.1.1',
+            'wireless_static_address' => '192.168.1.2'
         }
     },
     "Create workstation"
@@ -59,8 +59,8 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstation',
         fields  => {
-            'form-workstation.hostname'      => 'WORKSTATION001',
-            'form-workstation.workstationhw' => $wks_hw->id
+            'hostname'      => 'WORKSTATION001',
+            'workstationhw' => $wks_hw->id
         }
     },
     "Edit workstation"
@@ -72,7 +72,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstation-decommission',
         fields  => {
-            'form-workstation-decommission.hardware_action' => 'WAREHOUSE',
+            'hardware_action' => 'WAREHOUSE',
         }
     },
     "Submit decommission form"

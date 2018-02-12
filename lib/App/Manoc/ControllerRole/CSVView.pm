@@ -7,7 +7,7 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-requires 'object', 'object_list';
+requires 'object_list', 'serialize_objects';
 
 has csv_columns => (
     is      => 'rw',
@@ -21,22 +21,19 @@ has csv_column_alias => (
     default => sub { {} },
 );
 
-=method prepare_csv_object
+=method prepare_csv_objects
 
-Get an hashref from a row.
+Call serialize_objects. Redefine this method for custom serialization.
 
 =cut
 
-sub prepare_csv_object {
-    my ( $self, $c, $row ) = @_;
+sub prepare_csv_objects {
+    my ( $self, $c, $rows ) = shift;
 
-    my $ret = [];
-    foreach my $name ( @{ $self->csv_columns } ) {
-        # default accessor is preferred
-        my $val = $row->can($name) ? $row->$name : $row->get_column($name);
-        push @$ret, $val;
-    }
-    return $ret;
+    my $csv_columns = $self->csv_columns;
+    @$csv_columns and $c->stash( serialize_columns => $csv_columns );
+
+    return $self->serialize_objects( $c, $rows );
 }
 
 =action list_csv
@@ -52,11 +49,6 @@ sub list_csv : Chained('object_list') : PathPart('csv') : Args(0) {
     my $filename = $c->stash->{filename};
     $filename = $c->namespace();
     $filename =~ s|/|_|;
-
-    if ( !@{ $self->csv_columns } ) {
-        my @column_names = $c->stash->{resultset}->result_source->columns;
-        $self->csv_columns( \@column_names );
-    }
 
     my @headers;
     foreach my $col_name ( @{ $self->csv_columns } ) {

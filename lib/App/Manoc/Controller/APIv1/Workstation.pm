@@ -6,24 +6,30 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'App::Manoc::Controller::APIv1' }
+BEGIN { extends 'App::Manoc::ControllerBase::APIv1CRUD' }
 
-=action workstation_base
+use App::Manoc::Form::Workstation::Edit;
 
-=cut
+__PACKAGE__->config(
+    # define PathPart
+    action => {
+        setup => {
+            PathPart => 'workstation',
+        }
+    },
+    class      => 'ManocDB::Workstation',
+    form_class => 'App::Manoc::Form::Workstation::Edit',
+);
 
-sub workstation_base : Chained('deserialize') PathPart('workstation') CaptureArgs(0) {
-    my ( $self, $c ) = @_;
-    $c->stash( resultset => $c->model('ManocDB::Workstation') );
-}
+__PACKAGE__->meta->make_immutable;
 
 =action workstation_post
 
-POST api/v1/workstation
+POST api/v1/workstation/discovery
 
 =cut
 
-sub workstation_post : Chained('workstation_base') PathPart('') POST {
+sub workstation_post : Chained('base') PathPart('discovery') POST {
     my ( $self, $c ) = @_;
 
     $c->stash(

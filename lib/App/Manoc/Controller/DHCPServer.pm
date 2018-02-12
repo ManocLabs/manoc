@@ -6,8 +6,7 @@ use Moose;
 ##VERSION
 
 use namespace::autoclean;
-BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD';
+BEGIN { extends 'App::Manoc::ControllerBase::CRUD' }
 
 use App::Manoc::Form::DHCPServer;
 use App::Manoc::Form::DHCPSharedNetwork;

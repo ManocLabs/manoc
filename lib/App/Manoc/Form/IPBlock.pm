@@ -13,8 +13,7 @@ with 'App::Manoc::Form::TraitFor::Horizontal',
 
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-ipnetwork' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-ipnetwork' );
 
 has '+item_class' => ( default => 'IPBlock' );
 

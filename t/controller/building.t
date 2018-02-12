@@ -26,9 +26,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-building',
         fields  => {
-            'form-building.name'        => 'B01',
-            'form-building.description' => 'Test',
-            'form-building.notes'       => 'Test',
+            'name'        => 'B01',
+            'description' => 'Test',
+            'notes'       => 'Test',
         },
     },
     'Submit create building form',

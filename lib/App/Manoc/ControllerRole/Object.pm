@@ -17,6 +17,12 @@ has find_object_options => (
     default => sub { {} }
 );
 
+has 'view_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'view',
+);
+
 =head1 DESCRIPTION
 
 This is a base role for all Manoc controllers which manage a row from
@@ -60,13 +66,19 @@ single identifer, e.g. view, edit, delete.
 sub object : Chained('base') : PathPart('') : CaptureArgs(1) {
     my ( $self, $c, $id ) = @_;
 
-    $c->stash(
-        object    => $self->get_object( $c, $id ),
-        object_pk => $id
-    );
-    if ( !$c->stash->{object} ) {
+    my $object = $self->get_object( $c, $id );
+
+    if ( !$object ) {
         $c->detach('/error/http_404');
     }
+
+    $self->view_object_perm and
+        $c->require_permission( $object, $self->view_object_perm );
+
+    $c->stash(
+        object    => $object,
+        object_pk => $id
+    );
 }
 
 =method get_object

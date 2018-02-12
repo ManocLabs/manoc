@@ -53,9 +53,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.address' => '192.168.1.0',
-            'form-ipnetwork.prefix'  => '24',
-            'form-ipnetwork.name'    => 'Net01'
+            'address' => '192.168.1.0',
+            'prefix'  => '24',
+            'name'    => 'Net01'
         },
     },
     "Create ipnetwork",
@@ -79,7 +79,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.default_gw' => '192.168.12.0',
+            'default_gw' => '192.168.12.0',
         },
     },
     "Add a bad default gateway",
@@ -89,7 +89,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.default_gw' => '192.168.1.254',
+            'default_gw' => '192.168.1.254',
         },
     },
     "Add a default gateway",
@@ -102,7 +102,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.vlan' => '1',
+            'vlan' => '1',
         },
     },
     "Set native vlan",
@@ -115,9 +115,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.address' => '192.168.1.0',
-            'form-ipnetwork.prefix'  => '25',
-            'form-ipnetwork.name'    => 'Subnet01'
+            'address' => '192.168.1.0',
+            'prefix'  => '25',
+            'name'    => 'Subnet01'
         },
     },
     "Submit form for first subnet",
@@ -162,9 +162,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-ipnetwork',
         fields  => {
-            'form-ipnetwork.address' => '192.168.0.0',
-            'form-ipnetwork.prefix'  => '16',
-            'form-ipnetwork.name'    => 'Supernet01'
+            'address' => '192.168.0.0',
+            'prefix'  => '16',
+            'name'    => 'Supernet01'
         },
     },
     "Submit form for nested subnet",

@@ -7,9 +7,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with
-    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'list', 'view' ] },
-    "App::Manoc::ControllerRole::JSONView";
+with "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'list', 'view' ] };
 
 use App::Manoc::Form::VlanRange;
 use App::Manoc::Form::VlanRange::Merge;
@@ -24,12 +22,11 @@ __PACKAGE__->config(
             PathPart => 'vlanrange',
         }
     },
-    class                   => 'ManocDB::VlanRange',
-    form_class              => 'App::Manoc::Form::VlanRange',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [qw(id lansegment name description)],
-    object_list             => {
+    class            => 'ManocDB::VlanRange',
+    form_class       => 'App::Manoc::Form::VlanRange',
+    view_object_perm => undef,
+    json_columns     => [qw(id lansegment name description)],
+    object_list      => {
         order_by => [ 'start', 'vlans.id' ],
         prefetch => 'vlans',
         join     => 'vlans',

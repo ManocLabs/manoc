@@ -6,7 +6,7 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'App::Manoc::Controller::APIv1' }
+BEGIN { extends 'App::Manoc::ControllerBase::APIv1' }
 
 =action ping
 

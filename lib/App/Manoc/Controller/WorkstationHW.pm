@@ -7,12 +7,9 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'Catalyst::Controller'; }
-with
-    "App::Manoc::ControllerRole::CommonCRUD",
-    "App::Manoc::ControllerRole::JQDatatable",
-    "App::Manoc::ControllerRole::JSONView",
-    "App::Manoc::ControllerRole::CSVView";
+BEGIN { extends "App::Manoc::ControllerBase::CRUD" }
+
+with "App::Manoc::ControllerRole::JQDatatable";
 
 use App::Manoc::Form::WorkstationHW;
 use App::Manoc::Form::CSVImport::WorkstationHW;
@@ -24,25 +21,16 @@ __PACKAGE__->config(
             PathPart => 'workstationhw',
         }
     },
-    class                   => 'ManocDB::WorkstationHW',
-    form_class              => 'App::Manoc::Form::WorkstationHW',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
+    class            => 'ManocDB::WorkstationHW',
+    form_class       => 'App::Manoc::Form::WorkstationHW',
+    view_object_perm => undef,
 
     create_page_title => 'Create workstation hardware',
     edit_page_title   => 'Edit workstation hardware',
 
-    json_columns => [ 'id', 'inventory', 'model', 'serial' ],
-
     object_list_options => {
         prefetch => [ { 'hwasset' => 'building' }, 'workstation' ]
     },
-
-    csv_columns => [
-        'model',         'vendor',    'inventory', 'serial',
-        'ram_memory',    'cpu_model', 'proc_freq', 'storage1_size',
-        'storage2_size', 'display',   'notes'
-    ],
 
     datatable_row_callback => 'datatable_row',
     datatable_columns      => [

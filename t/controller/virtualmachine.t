@@ -28,9 +28,9 @@ $mech->submit_form_ok(
     {
         form_id => 'form-virtualmachine',
         fields  => {
-            'form-virtualmachine.ram_memory' => '16000',
-            'form-virtualmachine.vcpus'      => 1,
-            'form-virtualmachine.name'       => 'VMnew',
+            'ram_memory' => '16000',
+            'vcpus'      => 1,
+            'name'       => 'VMnew',
         }
     },
     "Create virtualmachine"
@@ -45,7 +45,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-virtualmachine',
         fields  => {
-            'form-virtualmachine.name' => 'VM001',
+            'name' => 'VM001',
         }
     },
     "Edit virtualmachine"
@@ -81,11 +81,11 @@ $mech->submit_form_ok(
     {
         form_id => 'form-virtualmachine',
         fields  => {
-            'form-virtualmachine.ram_memory' => '16000',
-            'form-virtualmachine.vcpus'      => 1,
-            'form-virtualmachine.name'       => 'VMtestNic1',
+            'ram_memory' => '16000',
+            'vcpus'      => 1,
+            'name'       => 'VMtestNic1',
 
-            'form-virtualmachine.nics.0.macaddr' => '00:aa:bb:cc:dd:ff',
+            'nics.0.macaddr' => '00:aa:bb:cc:dd:ff',
         }
     },
     "Create virtualmachine with a NIC"
@@ -99,11 +99,11 @@ $mech->submit_form_ok(
     {
         form_id => 'form-virtualmachine',
         fields  => {
-            'form-virtualmachine.ram_memory' => '16000',
-            'form-virtualmachine.vcpus'      => 1,
-            'form-virtualmachine.name'       => 'VMtestNic2',
+            'ram_memory' => '16000',
+            'vcpus'      => 1,
+            'name'       => 'VMtestNic2',
 
-            'form-virtualmachine.nics.0.macaddr' => '00:aa:bb:cc:dd:ff',
+            'nics.0.macaddr' => '00:aa:bb:cc:dd:ff',
         }
     },
     "Create virtualmachine with a NIC"

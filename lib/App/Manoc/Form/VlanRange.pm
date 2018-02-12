@@ -11,8 +11,7 @@ with
 
 use App::Manoc::Form::Types::VlanID;
 
-has '+name'        => ( default => 'form-vlanrange' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-vlanrange' );
 
 has_field 'name' => (
     label    => 'Name',

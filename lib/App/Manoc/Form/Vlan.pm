@@ -11,8 +11,7 @@ with 'App::Manoc::Form::TraitFor::SaveButton';
 
 use App::Manoc::Form::Types::VlanID;
 
-has '+name'        => ( default => 'form-vlan' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-vlan' );
 
 has '+item_class' => ( default => 'Vlan' );
 

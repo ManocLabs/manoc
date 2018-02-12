@@ -13,8 +13,7 @@ with
     'App::Manoc::Form::TraitFor::IPAddr';
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-discoversession' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-discoversession' );
 
 has '+item_class' => ( default => 'DiscoverSession' );
 

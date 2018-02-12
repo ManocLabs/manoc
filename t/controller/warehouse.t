@@ -36,7 +36,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-warehouse',
         fields  => {
-            'form-warehouse.building' => $building->id
+            'building' => $building->id
         },
     },
     "Submit uncomplete form",
@@ -48,10 +48,10 @@ $mech->submit_form_ok(
     {
         form_id => 'form-warehouse',
         fields  => {
-            'form-warehouse.name'     => 'W01',
-            'form-warehouse.floor'    => 1,
-            'form-warehouse.room'     => 'L320',
-            'form-warehouse.building' => $building->id
+            'name'     => 'W01',
+            'floor'    => 1,
+            'room'     => 'L320',
+            'building' => $building->id
         },
     },
     "Create rack in building",

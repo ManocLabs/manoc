@@ -7,15 +7,15 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'App::Manoc::Controller::APIv1' }
+BEGIN { extends 'App::Manoc::ControllerBase::APIv1' }
 
-=action lease_base
+=action base
 
 Base action lease actions
 
 =cut
 
-sub lease_base : Chained('deserialize') PathPart('dhcp/lease') CaptureArgs(0) {
+sub base : Chained('deserialize') PathPart('dhcp/lease') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     $c->stash( resultset => $c->model('ManocDB::DHCPLease') );
 }
@@ -26,7 +26,7 @@ POST api/v1/dhcp/lease
 
 =cut
 
-sub lease_post : Chained('lease_base') PathPart('') POST {
+sub lease_post : Chained('base') PathPart('') POST {
     my ( $self, $c ) = @_;
 
     $c->stash(

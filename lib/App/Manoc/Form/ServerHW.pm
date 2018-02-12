@@ -16,9 +16,8 @@ use HTML::FormHandler::Types ('IPAddress');
 use App::Manoc::Form::Types  ('MacAddress');
 use App::Manoc::DB::Result::HWAsset;
 
-has '+item_class'  => ( default => 'ServerHW' );
-has '+name'        => ( default => 'form-serverhw' );
-has '+html_prefix' => ( default => 1 );
+has '+item_class' => ( default => 'ServerHW' );
+has '+name'       => ( default => 'form-serverhw' );
 
 has hide_location => (
     isa     => 'Bool',

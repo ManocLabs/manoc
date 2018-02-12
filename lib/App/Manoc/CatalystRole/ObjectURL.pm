@@ -11,6 +11,8 @@ use Scalar::Util qw(blessed);
 
 __PACKAGE__->mk_classdata( '_manoc_object_action' => {} );
 
+__PACKAGE__->mk_classdata( '_manoc_api_object_action' => {} );
+
 =method setup_finalize
 
 Register to Catalyst setup_finalize in order to scan all registered controllers
@@ -29,8 +31,16 @@ sub setup_finalize {
             $class =~ /^ManocDB::(.*)$/ or next;
             my $rs = $1;
             my $ns = $controller->action_namespace();
-            # $app->debug and $app->log->debug("Registered $ns/view for rs $rs");
-            $app->_manoc_object_action->{$rs} = "$ns/view";
+
+            if ( $controller->isa('App::Manoc::ControllerBase::APIv1') ) {
+                # $app->debug and $app->log->debug("Registered API $ns/view for rs $rs");
+                $app->_manoc_api_object_action->{$rs} = "$ns/view";
+            }
+            else {
+                # $app->debug and $app->log->debug("Registered $ns/view for rs $rs");
+                $app->_manoc_object_action->{$rs} = "$ns/view";
+            }
+
         }
     }
 }
@@ -47,14 +57,18 @@ sub manoc_uri_for_object {
 
     blessed($obj) or return;
 
+    my $is_api = $c->stash->{is_api} || 0;
+
     if ( $obj->isa("App::Manoc::IPAddress::IPv4") ) {
         return $c->uri_for_action( 'ipaddress/view', [ $obj->address ] );
     }
 
     if ( $obj->can('result_source') ) {
         my $name = $obj->result_source->source_name;
-        # $c->log->debug("Lookup action for source $name");
-        my $action = $c->_manoc_object_action->{$name};
+        $c->log->debug("Lookup action for source $name (is_api=$is_api)");
+        my $action =
+            $is_api ? $c->_manoc_api_object_action->{$name} :
+            $c->_manoc_object_action->{$name};
         $action and
             return $c->uri_for_action( $action, [ $obj->id ], @args );
     }

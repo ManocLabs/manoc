@@ -23,11 +23,10 @@ __PACKAGE__->config(
             PathPart => 'ipnetwork',
         }
     },
-    class                   => 'ManocDB::IPNetwork',
-    form_class              => 'App::Manoc::Form::IPNetwork',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    object_list_options     => {
+    class               => 'ManocDB::IPNetwork',
+    form_class          => 'App::Manoc::Form::IPNetwork',
+    view_object_perm    => undef,
+    object_list_options => {
         prefetch => 'vlan',
         order_by => { -asc => 'address' }
     }

@@ -11,10 +11,7 @@ use App::Manoc::Form::ServerHW;
 use App::Manoc::Form::CSVImport::ServerHW;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with
-    "App::Manoc::ControllerRole::CommonCRUD",
-    "App::Manoc::ControllerRole::JSONView",
-    "App::Manoc::ControllerRole::CSVView";
+with "App::Manoc::ControllerRole::CommonCRUD";
 
 __PACKAGE__->config(
     # define PathPart
@@ -23,15 +20,12 @@ __PACKAGE__->config(
             PathPart => 'serverhw',
         }
     },
-    class                   => 'ManocDB::ServerHW',
-    form_class              => 'App::Manoc::Form::ServerHW',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
+    class            => 'ManocDB::ServerHW',
+    form_class       => 'App::Manoc::Form::ServerHW',
+    view_object_perm => undef,
 
     create_page_title => 'Create server hardware',
     edit_page_title   => 'Edit server hardware',
-
-    json_columns => [ 'id', 'inventory', 'model', 'serial' ],
 
     object_list_options => {
         prefetch => [ { 'hwasset' => { 'rack' => 'building' } }, 'server' ]

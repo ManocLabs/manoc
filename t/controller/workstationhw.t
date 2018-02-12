@@ -33,13 +33,13 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstationhw',
         fields  => {
-            'form-workstationhw.serial'     => 'w001',
-            'form-workstationhw.ram_memory' => $ram_memory,
-            'form-workstationhw.cpu_model'  => $cpu_model,
-            'form-workstationhw.vendor'     => $vendor,
-            'form-workstationhw.model'      => $model,
+            'serial'     => 'w001',
+            'ram_memory' => $ram_memory,
+            'cpu_model'  => $cpu_model,
+            'vendor'     => $vendor,
+            'model'      => $model,
             # warehouse
-            'form-workstationhw.location' => 'w',
+            'location' => 'w',
         }
     },
     "Create workstationhw"
@@ -62,13 +62,13 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstationhw',
         fields  => {
-            'form-workstationhw.ram_memory' => $ram_memory,
-            'form-workstationhw.cpu_model'  => $cpu_model,
-            'form-workstationhw.vendor'     => $vendor,
-            'form-workstationhw.model'      => $model,
-            'form-workstationhw.serial'     => 'w002',
+            'ram_memory' => $ram_memory,
+            'cpu_model'  => $cpu_model,
+            'vendor'     => $vendor,
+            'model'      => $model,
+            'serial'     => 'w002',
             # warehouse
-            'form-workstationhw.location' => 'w',
+            'location' => 'w',
         }
     },
     "Create another workstationhw"
@@ -85,15 +85,15 @@ $mech->submit_form_ok(
     {
         form_id => 'form-workstationhw',
         fields  => {
-            'form-workstationhw.ram_memory' => $ram_memory,
-            'form-workstationhw.cpu_model'  => $cpu_model,
-            'form-workstationhw.vendor'     => $vendor,
-            'form-workstationhw.serial'     => 'w002',
-            'form-workstationhw.model'      => 'YWorkstation',
+            'ram_memory' => $ram_memory,
+            'cpu_model'  => $cpu_model,
+            'vendor'     => $vendor,
+            'serial'     => 'w002',
+            'model'      => 'YWorkstation',
             # warehouse
-            'form-workstationhw.location' => 'w',
-            'form-workstationhw.storage1' => '10',
-            'form-workstationhw.storage2' => '20',
+            'location' => 'w',
+            'storage1' => '10',
+            'storage2' => '20',
 
         }
     },

@@ -79,6 +79,12 @@ has object_list_options => (
     default => sub { {} }
 );
 
+has list_objects_perm => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'view',
+);
+
 =action object_list
 
 Populate object_list in stash using get_object_list method.
@@ -87,6 +93,11 @@ Populate object_list in stash using get_object_list method.
 
 sub object_list : Chained('base') : PathPart('') : CaptureArgs(0) {
     my ( $self, $c ) = @_;
+
+    if ( $self->list_objects_perm ) {
+        $c->require_permission( $c->stash->{resultset}, $self->list_objects_perm );
+    }
+
     $c->stash( object_list => $self->get_object_list($c) );
 }
 

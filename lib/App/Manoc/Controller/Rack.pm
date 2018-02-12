@@ -19,12 +19,11 @@ __PACKAGE__->config(
             PathPart => 'rack',
         }
     },
-    class                   => 'ManocDB::Rack',
-    form_class              => 'App::Manoc::Form::Rack',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
-    object_list_options     => {
+    class               => 'ManocDB::Rack',
+    form_class          => 'App::Manoc::Form::Rack',
+    view_object_perm    => undef,
+    json_columns        => [ 'id', 'name' ],
+    object_list_options => {
         prefetch => 'building',
         join     => 'building',
         order_by => 'me.name',

@@ -9,8 +9,7 @@ with 'App::Manoc::Form::TraitFor::SaveButton';
 
 use App::Manoc::Manifold;
 
-has '+name'        => ( default => 'form-devicenwinfo' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-devicenwinfo' );
 
 has 'device' => (
     is       => 'ro',

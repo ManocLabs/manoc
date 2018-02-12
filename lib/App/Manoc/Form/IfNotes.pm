@@ -7,8 +7,7 @@ use HTML::FormHandler::Moose;
 
 extends 'App::Manoc::Form::BaseDBIC';
 
-has '+name'        => ( default => 'form-ifnotes' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-ifnotes' );
 
 has 'device' => (
     is       => 'ro',

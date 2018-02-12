@@ -8,114 +8,54 @@ use namespace::autoclean;
 
 use MooseX::MethodAttributes::Role;
 
-requires 'object', 'object_list';
-
-has json_columns => (
-    is  => 'rw',
-    isa => 'ArrayRef[Str]',
-);
-
-# used when json columns are autodiscovered
-has json_extra_columns => (
-    is  => 'rw',
-    isa => 'ArrayRef[Str]',
-);
-
-# used when json columns are autodiscovered
-has json_filter_columns => (
-    is      => 'rw',
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] }
-);
-
-has json_add_object_href => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 1,
-);
-
-=method autodiscover_json_columns
-
-=cut
-
-sub autodiscover_json_columns {
-    my ( $self, $c ) = @_;
-    my @cols;
-
-    my %filter_columns = map { $_ => 1 } $self->json_filter_columns;
-
-    my $result_source = $c->stash->{resultset}->result_source;
-    foreach my $col_name ( $result_source->columns ) {
-        next if $filter_columns{$col_name};
-
-        push @cols, $col_name;
-    }
-
-    push @cols, @{ $self->json_extra_columns }
-        if defined( $self->json_extra_columns );
-
-    $self->json_columns( \@cols );
-}
+requires 'object', 'object_list', 'serialize_objects';
 
 =method prepare_json_object
 
-Get an hashref from a row.
+Call serialize_object. Redefine this method for custom serialization.
 
 =cut
 
 sub prepare_json_object {
     my ( $self, $c, $row ) = @_;
-
-    my $ret = {};
-
-    if ( !defined( $self->json_columns ) ) {
-        $self->autodiscover_json_columns($c);
-    }
-
-    foreach my $name ( @{ $self->json_columns } ) {
-        # default accessor is preferred
-        my $val = $row->can($name) ? $row->$name : $row->get_column($name);
-        $ret->{$name} = $val;
-    }
-    if ( $self->json_add_object_href ) {
-        $ret->{href} = $c->uri_for_action( $c->namespace . "/view", [ $row->id ] )->as_string;
-    }
-    return $ret;
+    return $self->serialize_object( $c, $row );
 }
 
-=method get_json_object
+=method prepare_json_objects
 
-Call prepare_json_object. Redefine this method for custom serialization.
+Call serialize_objects. Redefine this method for custom serialization.
 
 =cut
 
-sub get_json_object {
-    my ( $self, $c, $row ) = shift;
-    return $self->prepare_json_object( $c, $row );
+sub prepare_json_objects {
+    my ( $self, $c, $rows ) = @_;
+    return $self->serialize_objects( $c, $rows );
 }
 
-=action view_js
+=method object_view_js
 
 =cut
 
-sub view_js : Chained('object') : PathPart('js') : Args(0) {
+sub object_view_js : Private {
     my ( $self, $c ) = @_;
 
-    my $r = $self->prepare_json_object( $c, $c->stash->{object} );
-    $c->stash( json_data => $r );
-    $c->forward('View::JSON');
+    $c->stash(
+        json_data    => $self->prepare_json_object( $c, $c->stash->{object} ),
+        current_view => 'JSON'
+    );
 }
 
-=action list_js
+=method object_list_js
 
 =cut
 
-sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
+sub object_list_js : Private {
     my ( $self, $c ) = @_;
 
-    my @r = map { $self->prepare_json_object( $c, $_ ) } @{ $c->stash->{object_list} };
-    $c->stash( json_data => \@r );
-    $c->forward('View::JSON');
+    $c->stash(
+        json_data    => $self->prepare_json_objects( $c, $c->stash->{object_list} ),
+        current_view => 'JSON'
+    );
 }
 
 1;

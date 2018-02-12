@@ -22,8 +22,7 @@ sub build_render_list {
     ];
 }
 
-has '+name'        => ( default => 'form-dhcpsubnet' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-dhcpsubnet' );
 
 has '+item_class' => ( default => 'DHCPSubnet' );
 

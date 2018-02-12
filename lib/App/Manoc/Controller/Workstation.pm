@@ -24,10 +24,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 =cut
 
-with "App::Manoc::ControllerRole::CommonCRUD",
-    "App::Manoc::ControllerRole::JQDatatable",
-    "App::Manoc::ControllerRole::JSONView",
-    "App::Manoc::ControllerRole::CSVView";
+with "App::Manoc::ControllerRole::CommonCRUD", "App::Manoc::ControllerRole::JQDatatable";
 
 use App::Manoc::Form::Workstation::Edit;
 use App::Manoc::Form::Workstation::Decommission;
@@ -39,16 +36,11 @@ __PACKAGE__->config(
             PathPart => 'workstation',
         }
     },
-    class                   => 'ManocDB::Workstation',
-    form_class              => 'App::Manoc::Form::Workstation::Edit',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'hostname', 'os', 'os_ver' ],
+    class      => 'ManocDB::Workstation',
+    form_class => 'App::Manoc::Form::Workstation::Edit',
 
     create_page_title => 'Create workstation',
     edit_page_title   => 'Edit workstation',
-
-    csv_columns => [ 'hostname', 'os', 'os_ver', 'notes' ],
 
     datatable_row_callback    => 'datatable_row',
     datatable_search_columns  => [qw( hostname os os_ver hwasset.model )],
@@ -217,13 +209,13 @@ sub datatable_row {
     my $json_data = {
         hostname => $row->hostname,
         os       => $row->os,
-        href     => $c->uri_for_action( 'workstation/view', [ $row->id ] )->as_string,
+        href     => $c->manoc_uri_for_object($row),
         hardware => undef
     };
     if ( my $hw = $row->workstationhw ) {
         $json_data->{hardware} = {
             label    => $hw->label,
-            href     => $c->uri_for_action( 'workstationhw/view', [ $hw->id ] )->as_string,
+            href     => $c->manoc_uri_for_object("hw"),
             location => $hw->display_location
         };
     }

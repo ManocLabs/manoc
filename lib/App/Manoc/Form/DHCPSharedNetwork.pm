@@ -11,8 +11,7 @@ with 'App::Manoc::Form::TraitFor::SaveButton';
 
 use HTML::FormHandler::Types ('IPAddress');
 
-has '+name'        => ( default => 'form-dhcpsharednetwork' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-dhcpsharednetwork' );
 
 has '+item_class' => ( default => 'DHCPSharedNetwork' );
 

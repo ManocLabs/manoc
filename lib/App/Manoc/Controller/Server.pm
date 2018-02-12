@@ -22,11 +22,10 @@ __PACKAGE__->config(
             PathPart => 'server',
         }
     },
-    class                   => 'ManocDB::Server',
-    form_class              => 'App::Manoc::Form::Server',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
+    class            => 'ManocDB::Server',
+    form_class       => 'App::Manoc::Form::Server',
+    view_object_perm => undef,
+    json_columns     => [ 'id', 'name' ],
 
     find_object_options => { prefetch => { installed_sw_pkgs => 'software_pkg' } },
 

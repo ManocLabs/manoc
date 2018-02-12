@@ -56,7 +56,7 @@ sub create : Chained('base') : PathPart('create') : Args(0) {
         title         => 'New shared network',
     );
 
-    $c->detach('form');
+    $c->forward('object_form');
 }
 
 =action view
@@ -80,7 +80,7 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->require_permission('dhcpserver.edit');
-    $c->detach('form');
+    $c->forward('object_form');
 }
 
 =action delete

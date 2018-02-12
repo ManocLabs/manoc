@@ -28,10 +28,10 @@ $mech->submit_form_ok(
     {
         form_id => 'form-server',
         fields  => {
-            'form-server.hostname'      => 'servernew',
-            'form-server.address'       => '192.168.1.1',
-            'form-server.type'          => 'l',
-            'form-server.is_hypervisor' => 0,
+            'hostname'      => 'servernew',
+            'address'       => '192.168.1.1',
+            'type'          => 'l',
+            'is_hypervisor' => 0,
         }
     },
     "Create server"
@@ -46,7 +46,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-server',
         fields  => {
-            'form-server.hostname' => 'SERVER001',
+            'hostname' => 'SERVER001',
         }
     },
     "Edit server"

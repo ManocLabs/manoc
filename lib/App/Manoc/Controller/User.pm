@@ -22,10 +22,9 @@ __PACKAGE__->config(
             PathPart => 'user',
         }
     },
-    class                   => 'ManocDB::User',
-    create_form_class       => 'App::Manoc::Form::User::Create',
-    edit_form_class         => 'App::Manoc::Form::User::Edit',
-    enable_permission_check => 1,
+    class             => 'ManocDB::User',
+    create_form_class => 'App::Manoc::Form::User::Create',
+    edit_form_class   => 'App::Manoc::Form::User::Edit',
 );
 
 =action admin_password
