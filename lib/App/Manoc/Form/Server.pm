@@ -16,8 +16,7 @@ use HTML::FormHandler::Types ('IPAddress');
 
 has '+item_class' => ( default => 'Server' );
 
-has '+name'        => ( default => 'form-server' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-server' );
 
 has '+widget_wrapper' => ( default => 'None' );
 
@@ -110,11 +109,11 @@ has_field 'vm_btn' => (
 );
 
 has_field 'is_hypervisor' => (
-    type     => 'Select',
-    required => 1,
-    label    => 'Hypervisor',
-    widget   => 'RadioGroup',
-    options  => [ { value => 1, label => 'True' }, { value => 0, label => 'False' } ],
+    type         => 'Select',
+    required     => 1,
+    label        => 'Hypervisor',
+    widget       => 'RadioGroup',
+    options      => [ { value => 1, label => 'True' }, { value => 0, label => 'False' } ],
     wrapper_tags => { inline => 1 },
 );
 

@@ -13,9 +13,8 @@ with 'App::Manoc::Form::TraitFor::Horizontal',
 
 use aliased 'App::Manoc::DB::Result::HWAsset' => 'DB::HWAsset';
 
-has '+item_class'  => ( default => 'HWAsset' );
-has '+name'        => ( default => 'form-hwasset' );
-has '+html_prefix' => ( default => 1 );
+has '+item_class' => ( default => 'HWAsset' );
+has '+name'       => ( default => 'form-hwasset' );
 
 has hide_location => (
     isa     => 'Bool',

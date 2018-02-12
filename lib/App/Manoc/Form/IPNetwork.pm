@@ -15,8 +15,7 @@ use HTML::FormHandler::Types ('IPAddress');
 use App::Manoc::IPAddress::IPv4Network;
 use App::Manoc::IPAddress::IPv4;
 
-has '+name'        => ( default => 'form-ipnetwork' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-ipnetwork' );
 
 has '+item_class' => ( default => 'IPNetwork' );
 

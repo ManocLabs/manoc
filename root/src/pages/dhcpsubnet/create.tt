@@ -8,26 +8,28 @@ page.section='Assets'
 [% fragment = BLOCK -%]
 
 function on_close_create_form(data) {
-  refresh_ipblocks();
-  $('#form-dhcpsubnet\\.range').selectpicker('val', data.object_id);
+  refresh_ipblocks( data.object_id );
 }
 
-function refresh_ipblocks() {
-  $('#form-dhcpsubnet\\.range').find('option').remove();
+function refresh_ipblocks(selection) {
   $.ajax({
     url: '[% c.uri_for_action('/ipblock/list_js') %]',
     dataType: 'json',
     success: function (res) {
+      $('#form-dhcpsubnet #range').find('option').remove();
       $.each(res, function(index, item) {
-        $('#form-dhcpsubnet\\.range').append('<option value="' + item.id + '">' + item.name + '</option>');
+        $('#form-dhcpsubnet #range').append('<option value="' + item.id + '">' + item.name + '</option>');
       });
+      $('#form-dhcpsubnet #range').selectpicker('refresh');
+      if (selection) {
+          $('#form-dhcpsubnet #range').selectpicker('val',selection);
+      }
     }
   });
-   $('#form-dhcpsubnet\\.range').selectpicker('refresh');
 }
 
 $( document ).ready(function() {
-    $('#form-dhcpsubnet\\.ipblock_button').click(function() {
+    $('#form-dhcpsubnet #ipblock_button').click(function() {
 	showDialogForm("[% c.uri_for_action('/ipblock/create') %]", "Create IP Block", on_close_create_form);
       	return false;
    	});

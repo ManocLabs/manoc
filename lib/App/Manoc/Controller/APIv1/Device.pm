@@ -1,25 +1,24 @@
-package App::Manoc::Controller::Group;
-#ABSTRACT: Group controller
+package App::Manoc::Controller::APIv1::Device;
+#ABSTRACT: Controller for Device APIs
 
 use Moose;
-
 ##VERSION
 
 use namespace::autoclean;
-BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD';
 
-use App::Manoc::Form::Group;
+BEGIN { extends 'App::Manoc::ControllerBase::APIv1CRUD' }
+
+use App::Manoc::Form::Device::Edit;
 
 __PACKAGE__->config(
     # define PathPart
     action => {
         setup => {
-            PathPart => 'group',
+            PathPart => 'device',
         }
     },
-    class      => 'ManocDB::Group',
-    form_class => 'App::Manoc::Form::Group',
+    class      => 'ManocDB::Device',
+    form_class => 'App::Manoc::Form::Device::Edit',
 );
 
 __PACKAGE__->meta->make_immutable;

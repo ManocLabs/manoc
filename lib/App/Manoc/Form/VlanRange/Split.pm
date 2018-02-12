@@ -7,8 +7,7 @@ use HTML::FormHandler::Moose;
 extends 'App::Manoc::Form::BaseDBIC';
 with 'App::Manoc::Form::TraitFor::SaveButton';
 
-has '+name'        => ( default => 'form-vlanrangesplit' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-vlanrangesplit' );
 
 has_field 'new_name' => (
     label    => 'New range name',

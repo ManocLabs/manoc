@@ -36,7 +36,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-rack',
         fields  => {
-            'form-rack.building' => $building->id
+            'building' => $building->id
         },
     },
     "Submit uncomplete form",
@@ -50,10 +50,10 @@ $mech->submit_form_ok(
     {
         form_id => 'form-rack',
         fields  => {
-            'form-rack.name'     => 'Rack01',
-            'form-rack.floor'    => 1,
-            'form-rack.room'     => 'L320',
-            'form-rack.building' => $building->id
+            'name'     => 'Rack01',
+            'floor'    => 1,
+            'room'     => 'L320',
+            'building' => $building->id
         },
     },
     "Create rack in building",
@@ -78,6 +78,6 @@ $mech->content_lacks( 'Rack01', "Rack is no longer in the list" );
 $mech->get_ok( '/rack/create?building=' . $building->id,
     "Rack create page with default building" );
 $mech->form_id('form-rack');
-cmp_ok( $mech->value('form-rack.building'), 'eq', $building->id, "Preset building id found" );
+cmp_ok( $mech->value('building'), 'eq', $building->id, "Preset building id found" );
 
 done_testing();

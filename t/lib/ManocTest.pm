@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Exporter);
 our @EXPORT = qw(
-    init_manoctest get_mech mech_login
+    init_manoctest get_mech mech_login mech_init_httpbasic
 );
 
 # Include our application dir
@@ -57,10 +57,21 @@ sub get_mech {
     return $Mech;
 }
 
-sub mech_login {
-    my $user = shift || $ADMIN_USER, my $pass = shift || $ADMIN_PASS,
+sub mech_init_httpbasic {
+    my $user     = shift || $ADMIN_USER;
+    my $password = shift || $ADMIN_PASS;
 
-        my $mech = get_mech;
+    my $mech = get_mech;
+    $mech->credentials( $user, $password );
+
+    return $mech;
+}
+
+sub mech_login {
+    my $user = shift || $ADMIN_USER;
+    my $pass = shift || $ADMIN_PASS;
+
+    my $mech = get_mech;
 
     $mech->get_ok('/auth/login');
     $mech->text_contains( "Manoc login", "Make sure we are on the login page" );

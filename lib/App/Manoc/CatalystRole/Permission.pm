@@ -193,6 +193,8 @@ check_permission or detach to access denied page.
 sub require_permission {
     my $c = shift;
 
+    return if $c->stash->{skip_permission_check};
+
     $c->check_permission(@_) or
         $c->detach('/access_denied');
 }

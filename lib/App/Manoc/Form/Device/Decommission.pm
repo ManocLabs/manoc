@@ -6,8 +6,7 @@ use HTML::FormHandler::Moose;
 
 extends 'App::Manoc::Form::BaseDBIC';
 
-has '+name'        => ( default => 'form-decommission' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-decommission' );
 
 has_field 'submit' => (
     type           => 'Submit',

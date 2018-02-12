@@ -10,8 +10,7 @@ with
     'App::Manoc::Form::TraitFor::Horizontal',
     'App::Manoc::Form::TraitFor::SaveButton';
 
-has '+name'        => ( default => 'form-rack' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-rack' );
 
 has_field 'name' => (
     type     => 'Text',

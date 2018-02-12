@@ -16,30 +16,30 @@
 </div>
 [% END -%]
 
-<form class="form-horizontal" id="form-server" method="post">
+<form class="form-horizontal" id="[% form.name %]" method="post">
     <fieldset>
          [% SET f = form.field('hostname') -%]
         <div class="form-group [% 'has-error' IF f.has_errors %]">
-            <label class="col-sm-2 required-label control-label" for="form-server.hostname">Hostname</label>
+            <label class="col-sm-2 required-label control-label" for="hostname">Hostname</label>
             <div class="col-sm-10">
                 [% form.field('hostname').render %]
             </div>
         </div>
         [% SET f = form.field('address') -%]
         <div class="form-group [% 'has-error' IF f.has_errors %]">
-            <label class="col-sm-2 required-label control-label" for="form-server.address">IP Address</label>
+            <label class="col-sm-2 required-label control-label" for="address">IP Address</label>
             <div class="col-sm-10">
                 [% f.render %]
                 [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
         <div class="form-group [% 'has-error' IF  form.field('os').has_errors ||  form.field('os_ver').has_errors %]">
-            <label class="col-sm-2 control-label" for="form-server.os">OS Name</label>
+            <label class="col-sm-2 control-label" for="os">OS Name</label>
             <div class="col-sm-4">
                 [% form.field('os').render %]
                 [% FOR err IN form.field('os').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
-            <label class="col-sm-2 control-label" for="form-server.os_ver">OS Version</label>
+            <label class="col-sm-2 control-label" for="os_ver">OS Version</label>
             <div class="col-sm-4">
                 [% form.field('os_ver').render %]
                 [% FOR err IN form.field('os_ver').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
@@ -60,26 +60,26 @@
             [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
-        <div class="form-group" id="form-server.vm-group">
-            <label class="col-sm-2 control-label" for="form-server.vm">Virtual Machine</label>
+        <div class="form-group" id="vm-group">
+            <label class="col-sm-2 control-label" for="vm">Virtual Machine</label>
             <div class="col-sm-10">
                 <div class="input-group">
                     [% form.field('vm').render %]
                     <span class="input-group-btn">
-                        <button type="button" name="form-server.vm_btn" id="form-server.vm_btn" class="btn btn-primary" href="#">Add</button>
+                        <button type="button" name="vm_btn" id="vm_btn" class="btn btn-primary" href="#">Add</button>
                     </span>
                 </div>
                [% FOR err IN form.field('vm').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
 
-        <div class="form-group" id="form-server.serverhw-group">
-            <label class="col-sm-2 control-label" for="form-server.serverhw">Hardware</label>
+        <div class="form-group" id="serverhw-group">
+            <label class="col-sm-2 control-label" for="serverhw">Hardware</label>
             <div class="col-sm-10">
                 <div class="input-group">
                     [% form.field('serverhw').render %]
                     <span class="input-group-btn">
-                        <button type="brn" name="form-server.serverhw_btn" id="form-server.serverhw_btn" class="btn btn-primary" href="#">Add</button>
+                        <button type="brn" name="serverhw_btn" id="serverhw_btn" class="btn btn-primary" href="#">Add</button>
                     </span>
                 </div>
                [% FOR err IN form.field('serverhw').all_errors %]<span class="help-block">[% err %]</span>[% END -%]
@@ -99,23 +99,23 @@
             [% END %]
             [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
-            <label class="col-sm-3 control-label" for="form-server.virtinfr">Virtual Infrastructure</label>
+            <label class="col-sm-3 control-label" for="virtinfr">Virtual Infrastructure</label>
             <div class="col-sm-4">
                 [% SET f = form.field('virtinfr') %]
                 [% f.render %]
                 [% FOR err IN f.all_errors %]<span class="help-block">[% err %]</span>[% END -%]
             </div>
         </div>
-         <div id="form-server.addresses">
+         <div id="addresses">
             [% FOR element IN form.field('addresses').fields -%]
             [% SET i = element.name %]
-            <div class="form-group hfh-repinst" id="form-server.addresses.[% i %]">
+            <div class="form-group hfh-repinst" id="addresses.[% i %]">
                 [% element.field('id').render %]
                 <label class="col-sm-2 control-label" for="[% element.field('ipaddr').id %]">IP Address</label>
 
                 <div class="col-sm-8">
                     [% element.field('ipaddr').render %]
-                        <button data-rep-id="form-server.addresses"
+                        <button data-rep-id="addresses"
                                 class="btn [% loop.last ? 'btn-success form-btn-add' : 'btn-danger form-btn-remove' %]" type="button">
                             <span class="glyphicon [% loop.last ? 'glyphicon-plus' : 'glyphicon-minus' %]"></span>
                         </button>
@@ -125,7 +125,7 @@
             [% END %]
         </div>
         <div class="form-group">
-            <button type="submit" name="form-server.save" id="form-server.save" class="btn btn-primary">Save</button>
+            <button type="submit" name="save" id="save" class="btn btn-primary">Save</button>
         </div>
         [% form.field('csrf_token').render %]
     </fieldset>
@@ -133,18 +133,17 @@
 
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
-	$('#[% form.name %]\\.serverhw_btn').click(function() {
+	$('#[% form.name %] #serverhw_btn').click(function() {
       showDialogForm("[% createhw_url %]", "Create server hardware", on_close_hwcreate_form);
       return false;
     });
 
-	$('#[% form.name %]\\.vm_btn').click(function() {
+	$('#[% form.name %] #vm_btn').click(function() {
       showDialogForm("[% createvm_url %]", "Create virtual machine", on_close_vmcreate_form);
       return false;
     });
 
     form_refresh();
-
     $('#[% form.name %] input').on('change', function() {
       form_refresh();
      });
@@ -152,42 +151,42 @@ $( document ).ready(function() {
 
 function on_close_hwcreate_form(data) {
   if (data.object_id) {
-    $("#[% form.name %]\\.serverhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
-    $("#[% form.name %]\\.serverhw").selectpicker('val', data.object_id);
-    $("#[% form.name %]\\.serverhw").selectpicker('refresh');
+    $("#[% form.name %] #serverhw").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+    $("#[% form.name %] #serverhw").selectpicker('val', data.object_id);
+    $("#[% form.name %] #serverhw").selectpicker('refresh');
   }
 }
 
 function on_close_vmcreate_form(data) {
   if (data.object_id) {
-    $("#[% form.name %]\\.vm").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
-    $("#[% form.name %]\\.vm").selectpicker('val', data.object_id);
-    $("#[% form.name %]\\.vm").selectpicker('refresh');
+    $("#[% form.name %] #vm").append('<option value="' + data.object_id + '">' + data.object_label + '</option');
+    $("#[% form.name %] #vm").selectpicker('val', data.object_id);
+    $("#[% form.name %] #vm").selectpicker('refresh');
   }
 }
 
 
 function form_refresh() {
-  l=$('input[name="[% form.name %].type"]:checked').val();
+  l=$('input[name=type]:checked').val();
 
-  $("#[% form.name %]\\.serverhw").prop('disabled', l != 'p');
-  $("#[% form.name %]\\.serverhw_btn").prop('disabled', l != 'p');
-  $("#[% form.name %]\\.serverhw").selectpicker('refresh');
+  $("#[% form.name %] #serverhw").prop('disabled', l != 'p');
+  $("#[% form.name %] #serverhw_btn").prop('disabled', l != 'p');
+  $("#[% form.name %] #serverhw").selectpicker('refresh');
 
-  $("#[% form.name %]\\.vm").prop('disabled', l != 'v');
-  $("#[% form.name %]\\.vm_btn").prop('disabled', l != 'v');
-  $("#[% form.name %]\\.vm").selectpicker('refresh');
+  $("#[% form.name %] #vm").prop('disabled', l != 'v');
+  $("#[% form.name %] #vm_btn").prop('disabled', l != 'v');
+  $("#[% form.name %] #vm").selectpicker('refresh');
 
   if ( l == 'v') {
-      $("#[% form.name %]\\.vm-group").show();
+      $("#[% form.name %] #vm-group").show();
   } else {
-      $("#[% form.name %]\\.vm-group").hide();
+      $("#[% form.name %] #vm-group").hide();
   }
 
   if ( l == 'p') {
-      $("#[% form.name %]\\.serverhw-group").show();
+      $("#[% form.name %] #serverhw-group").show();
   } else {
-     $("#[% form.name %]\\.serverhw-group").hide();
+     $("#[% form.name %] #serverhw-group").hide();
   }
 }
 

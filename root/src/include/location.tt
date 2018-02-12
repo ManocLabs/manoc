@@ -1,8 +1,8 @@
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
-    $("#[% form.name %]\\.rack").selectpicker();
-    $("#[% form.name %]\\.building").selectpicker();
-    $("#[% form.name %]\\.warehouse").selectpicker();
+    $("#[% form.name %] #rack").selectpicker();
+    $("#[% form.name %] #building").selectpicker();
+    $("#[% form.name %] #warehouse").selectpicker();
 
     form_location_refresh();
 });
@@ -13,14 +13,14 @@ $('#[% form.name %] input').on('change', function() {
 function form_location_refresh() {
   l=$('input[name="[% form.name %].location"]:checked').val();
 
-  $("#[% form.name %]\\.building").prop('disabled', l != 'o').selectpicker('refresh');
-  $("#[% form.name %]\\.room").prop('disabled', l != 'o');
-  $("#[% form.name %]\\.floor").prop('disabled', l != 'o');
+  $("#[% form.name %] #building").prop('disabled', l != 'o').selectpicker('refresh');
+  $("#[% form.name %] #room").prop('disabled', l != 'o');
+  $("#[% form.name %] #floor").prop('disabled', l != 'o');
 
-  $("#[% form.name %]\\.warehouse").prop('disabled', l != 'w').selectpicker('refresh');
+  $("#[% form.name %] #warehouse").prop('disabled', l != 'w').selectpicker('refresh');
 
-  $("#[% form.name %]\\.rack").prop('disabled', l != 'r').selectpicker('refresh');
-  $("#[% form.name %]\\.rack_level").prop('disabled', l != 'r');
+  $("#[% form.name %] #rack").prop('disabled', l != 'r').selectpicker('refresh');
+  $("#[% form.name %] #rack_level").prop('disabled', l != 'r');
 }
 [% END %]
 [% js_scripts.push(fragment) -%]

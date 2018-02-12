@@ -35,10 +35,10 @@ function refresh_assets(options) {
 }
 
 $( document ).ready(function() {
-    rack_select = $('#[% form.name %]\\.rack');
-    asset_select = $('#[% form.name %]\\.hwasset');
+    rack_select = $('#[% form.name %] #rack');
+    asset_select = $('#[% form.name %] #hwasset');
 
-	$('#form-device\\.asset_button').click(function() {
+	$('#[% form.name %] #asset_button').click(function() {
       showDialogForm("[% createhw_url  %]", "Create asset", on_close_create_form);
       return false;
     });

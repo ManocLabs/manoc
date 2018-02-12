@@ -8,9 +8,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with
-    'App::Manoc::ControllerRole::CommonCRUD',
-    'App::Manoc::ControllerRole::JSONView';
+with 'App::Manoc::ControllerRole::CommonCRUD';
 
 use App::Manoc::Form::VirtualMachine;
 
@@ -27,7 +25,6 @@ __PACKAGE__->config(
     create_page_title => 'Create virtual machine',
     edit_page_title   => 'Edit virtual machine',
 
-    json_columns => [ 'id', 'name' ],
 );
 
 =action create

@@ -15,8 +15,7 @@ use HTML::FormHandler::Types ('IPAddress');
 
 has '+item_class' => ( default => 'Workstation' );
 
-has '+name'        => ( default => 'form-workstation' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-workstation' );
 
 has_field 'hostname' => (
     type         => 'Text',
@@ -74,7 +73,7 @@ has_field 'workstationhw' => (
         input_append_button_element_attr => {
             class => 'btn-primary',
             href  => '#',
-            id    => 'form-workstation.asset_button',
+            id    => 'asset_button',
         },
     },
     element_class => 'selectpicker',

@@ -9,9 +9,7 @@ use namespace::autoclean;
 use App::Manoc::Form::Vlan;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with
-    'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' },
-    'App::Manoc::ControllerRole::JSONView';
+with 'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' };
 
 __PACKAGE__->config(
     # define PathPart
@@ -20,12 +18,11 @@ __PACKAGE__->config(
             PathPart => 'vlan',
         }
     },
-    class                   => 'ManocDB::Vlan',
-    form_class              => 'App::Manoc::Form::Vlan',
-    json_columns            => [ 'id', 'name', 'description' ],
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    object_list_options     => {
+    class               => 'ManocDB::Vlan',
+    form_class          => 'App::Manoc::Form::Vlan',
+    json_columns        => [ 'id', 'name', 'description' ],
+    view_object_perm    => undef,
+    object_list_options => {
         prefetch => 'vlan_range',
     }
 );
@@ -39,9 +36,8 @@ View Vlan by vid
 sub vid : Chained('base') : PathPart('vid') : Args(1) {
     my ( $self, $c, $vid ) = @_;
 
-    if ( $self->enable_permission_check && $self->view_object_perm ) {
+    $self->view_object_perm and
         $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
-    }
 
     my $qp            = $c->req->query_parameters;
     my $segment_param = $qp->{lansegment};
@@ -76,9 +72,8 @@ Display a list of items.
 sub list : Chained('base') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
 
-    if ( $self->enable_permission_check && $self->view_object_perm ) {
+    $self->view_object_perm and
         $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
-    }
 
     my $segment_list = [
         $c->model('ManocDB::LanSegment')->search(

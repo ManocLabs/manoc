@@ -28,11 +28,11 @@ $mech->submit_form_ok(
     {
         form_id => 'form-hwasset',
         fields  => {
-            'form-hwasset.vendor' => 'Cisco',
-            'form-hwasset.serial' => 'FDO00001',
-            'form-hwasset.model'  => 'ShinySwitch',
+            'vendor' => 'Cisco',
+            'serial' => 'FDO00001',
+            'model'  => 'ShinySwitch',
             # warehouse
-            'form-hwasset.location' => 'w',
+            'location' => 'w',
         }
     },
     "Create device"

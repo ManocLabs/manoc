@@ -1,6 +1,6 @@
 [% fragment = BLOCK -%]
 $( document ).ready(function() {
-    $("#[% form.name %]\\.vendor").typeahead({
+    $("#[% form.name %] #vendor").typeahead({
         source: function (query, process) {
             return $.get(
                 '[% c.uri_for_action("hwasset/vendors_js") %]',
@@ -11,13 +11,13 @@ $( document ).ready(function() {
         },
         minLength: 0
     }).attr('autocomplete', 'off');
-    $("#[% form.name %]\\.model").typeahead({
+    $("#[% form.name %] #model").typeahead({
         source: function (query, process) {
             return $.get(
                 '[% c.uri_for_action("hwasset/models_js") %]',
                 {
                     q:      query,
-                    vendor: $('#[% form.name %]\\.vendor').val()
+                    vendor: $('#[% form.name %] #vendor').val()
                 },
                 function (data) {
                    return process(data);

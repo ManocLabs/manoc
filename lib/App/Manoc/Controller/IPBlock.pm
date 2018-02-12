@@ -7,10 +7,7 @@ use Moose;
 use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 
-with
-    'App::Manoc::ControllerRole::CommonCRUD',
-    'App::Manoc::ControllerRole::ObjectForm',
-    'App::Manoc::ControllerRole::JSONView';
+with 'App::Manoc::ControllerRole::CommonCRUD';
 
 use App::Manoc::Form::IPBlock;
 use App::Manoc::Utils::Datetime qw(str2seconds);
@@ -22,11 +19,10 @@ __PACKAGE__->config(
             PathPart => 'ipblock',
         }
     },
-    class                   => 'ManocDB::IPBlock',
-    form_class              => 'App::Manoc::Form::IPBlock',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [qw( id name from_addr to_addr )],
+    class            => 'ManocDB::IPBlock',
+    form_class       => 'App::Manoc::Form::IPBlock',
+    view_object_perm => undef,
+    json_columns     => [qw( id name from_addr to_addr )],
 );
 
 =action view

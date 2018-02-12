@@ -13,8 +13,7 @@ use App::Manoc::Manifold;
 
 use constant EMPTY_PASSWORD => '######';
 
-has '+name'        => ( default => 'form-servernwinfo' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-servernwinfo' );
 
 has 'server' => (
     is       => 'ro',

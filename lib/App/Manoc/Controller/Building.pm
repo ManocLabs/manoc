@@ -9,10 +9,7 @@ use namespace::autoclean;
 
 use App::Manoc::Form::Building;
 
-BEGIN { extends 'Catalyst::Controller'; }
-with
-    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => 'delete_object', },
-    "App::Manoc::ControllerRole::JSONView"   => { -excludes => 'get_json_object', };
+BEGIN { extends 'App::Manoc::ControllerBase::CRUD'; }
 
 __PACKAGE__->config(
     # define PathPart
@@ -21,11 +18,9 @@ __PACKAGE__->config(
             PathPart => 'building',
         }
     },
-    class                   => 'ManocDB::Building',
-    form_class              => 'App::Manoc::Form::Building',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'name', 'description', 'label' ],
+    class               => 'ManocDB::Building',
+    form_class          => 'App::Manoc::Form::Building',
+    view_object_perm    => undef,
     object_list_options => { prefetch => 'racks' },
 );
 
@@ -53,19 +48,19 @@ sub delete_object {
     return $building->delete;
 }
 
-=method get_json_object
+=method serialize_object
 
 Override to add rack information
 
 =cut
 
-sub get_json_object {
+override 'serialize_object' => sub {
     my ( $self, $c, $building ) = @_;
 
-    my $r = $self->prepare_json_object( $c, $building );
+    my $r = super();
     $r->{racks} = [ map +{ id => $_->id, name => $_->name }, $building->racks ];
     return $r;
-}
+};
 
 __PACKAGE__->meta->make_immutable;
 

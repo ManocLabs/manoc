@@ -19,11 +19,10 @@ __PACKAGE__->config(
             PathPart => 'autodiscover',
         }
     },
-    class                   => 'ManocDB::DiscoverSession',
-    form_class              => 'App::Manoc::Form::DiscoverSession',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    object_list_options     => {
+    class               => 'ManocDB::DiscoverSession',
+    form_class          => 'App::Manoc::Form::DiscoverSession',
+    view_object_perm    => undef,
+    object_list_options => {
         join      => 'discovered_hosts',
         distinct  => 1,
         '+select' => [ { count => 'discovered_hosts.id' } ],

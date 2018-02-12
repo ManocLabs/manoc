@@ -20,9 +20,8 @@ use App::Manoc::DB::Result::HWAsset;
 use App::Manoc::Form::Helper qw/bs_block_field_helper/;
 use App::Manoc::Form::Types ('MacAddress');
 
-has '+item_class'  => ( default => 'WorkstationHW' );
-has '+name'        => ( default => 'form-workstationhw' );
-has '+html_prefix' => ( default => 1 );
+has '+item_class' => ( default => 'WorkstationHW' );
+has '+name'       => ( default => 'form-workstationhw' );
 
 has hide_location => (
     isa     => 'Bool',

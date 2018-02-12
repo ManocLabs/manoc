@@ -10,7 +10,7 @@ use namespace::autoclean;
 use App::Manoc::Form::MngUrlFormat;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => 'view' };
+with "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'view', 'view_js' ] };
 
 __PACKAGE__->config(
     # define PathPart
@@ -19,11 +19,9 @@ __PACKAGE__->config(
             PathPart => 'mngurlformat',
         }
     },
-    class                   => 'ManocDB::MngUrlFormat',
-    form_class              => 'App::Manoc::Form::MngUrlFormat',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-
+    class            => 'ManocDB::MngUrlFormat',
+    form_class       => 'App::Manoc::Form::MngUrlFormat',
+    view_object_perm => undef,
 );
 
 =method delete_object

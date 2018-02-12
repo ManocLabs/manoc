@@ -10,9 +10,8 @@ with
     'App::Manoc::Form::TraitFor::SaveButton',
     'App::Manoc::Form::TraitFor::Horizontal';
 
-has '+item_class'  => ( default => 'VirtualInfr' );
-has '+name'        => ( default => 'form-virtualinfr' );
-has '+html_prefix' => ( default => 1 );
+has '+item_class' => ( default => 'VirtualInfr' );
+has '+name'       => ( default => 'form-virtualinfr' );
 
 has_field 'name' => (
     type  => 'Text',

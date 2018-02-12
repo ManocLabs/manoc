@@ -14,8 +14,7 @@ use App::Manoc::Form::Types ('MacAddress');
 
 use App::Manoc::Form::Helper qw/bs_block_field_helper/;
 
-has '+name'        => ( default => 'form-virtualmachine' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-virtualmachine' );
 
 has '+item_class' => ( default => 'VirtualMachine' );
 

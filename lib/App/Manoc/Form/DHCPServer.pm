@@ -9,8 +9,7 @@ use namespace::autoclean;
 extends 'App::Manoc::Form::BaseDBIC';
 with 'App::Manoc::Form::TraitFor::SaveButton';
 
-has '+name'        => ( default => 'form-dhcpserver' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-dhcpserver' );
 
 has '+item_class' => ( default => 'DHCPServer' );
 

@@ -7,9 +7,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with
-    'App::Manoc::ControllerRole::CommonCRUD',
-    'App::Manoc::ControllerRole::JSONView';
+with 'App::Manoc::ControllerRole::CommonCRUD';
 
 use App::Manoc::Form::Warehouse;
 
@@ -26,10 +24,9 @@ __PACKAGE__->config(
     edit_page_title   => 'Edit warehouse',
     create_page_title => 'New warehouse',
 
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    json_columns            => [ 'id', 'name' ],
-    object_list_options     => {
+    view_object_perm    => undef,
+    json_columns        => [ 'id', 'name' ],
+    object_list_options => {
         prefetch => 'building',
         join     => 'building',
         order_by => 'me.name',

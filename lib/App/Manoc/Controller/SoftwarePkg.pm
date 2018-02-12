@@ -23,9 +23,8 @@ __PACKAGE__->config(
             PathPart => 'softwarepkg',
         }
     },
-    class                   => 'ManocDB::SoftwarePkg',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
+    class            => 'ManocDB::SoftwarePkg',
+    view_object_perm => undef,
 
     datatable_columns        => [ 'name', 'n_servers' ],
     datatable_row_callback   => 'datatable_row',

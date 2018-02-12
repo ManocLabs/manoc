@@ -20,10 +20,9 @@ __PACKAGE__->config(
             PathPart => 'vtp',
         }
     },
-    class                   => 'ManocDB::VlanVtp',
-    enable_permission_check => 1,
-    view_object_perm        => undef,
-    object_list_options     => {
+    class               => 'ManocDB::VlanVtp',
+    view_object_perm    => undef,
+    object_list_options => {
         prefetch => 'vlan'
     }
 );

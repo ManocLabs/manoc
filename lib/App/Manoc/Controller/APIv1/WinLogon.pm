@@ -7,13 +7,13 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'App::Manoc::Controller::APIv1' }
+BEGIN { extends 'App::Manoc::ControllerBase::APIv1' }
 
-=action winlogon_base
+=action base
 
 =cut
 
-sub winlogon_base : Chained('deserialize') PathPart('winlogon') CaptureArgs(0) {
+sub base : Chained('deserialize') PathPart('winlogon') CaptureArgs(0) {
     return;
 }
 
@@ -23,7 +23,7 @@ POST api/v1/winlogon
 
 =cut
 
-sub winlogon_post : Chained('winlogon_base') PathPart('') Args(0) POST {
+sub winlogon_post : Chained('base') PathPart('') Args(0) POST {
     my ( $self, $c ) = @_;
 
     $c->stash(

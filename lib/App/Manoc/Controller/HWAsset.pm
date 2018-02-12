@@ -9,11 +9,7 @@ use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller'; }
 
 # Not using CommonCRUD
-with 'App::Manoc::ControllerRole::ResultSet',
-    'App::Manoc::ControllerRole::ObjectForm',
-    'App::Manoc::ControllerRole::ObjectList',
-    'App::Manoc::ControllerRole::JSONView',
-    'App::Manoc::ControllerRole::JQDatatable';
+with 'App::Manoc::ControllerRole::CommonCRUD', 'App::Manoc::ControllerRole::JQDatatable';
 
 use App::Manoc::DB::Result::HWAsset;
 use App::Manoc::Form::HWAsset;
@@ -27,9 +23,6 @@ __PACKAGE__->config(
     },
     class      => 'ManocDB::HWAsset',
     form_class => 'App::Manoc::Form::HWAsset',
-
-    json_columns =>
-        [qw(id serial vendor model inventory rack_id rack_level building_id room label)],
 
     datatable_row_callback    => 'datatable_row',
     datatable_columns         => [qw(inventory type vendor model serial rack.name)],
@@ -59,6 +52,7 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
         title           => 'Create device hardware',
         form_class      => 'App::Manoc::Form::HWAsset',
         form_parameters => { type => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE },
+        template        => 'hwasset/form.tt'
     );
 
     if ( my $nwinfo_id = $c->req->query_parameters->{'nwinfo'} ) {
@@ -72,7 +66,9 @@ sub create_device : Chained('base') : PathPart('create_device') : Args(0) {
         }
     }
 
-    $c->detach('form');
+    $c->forward('object_form');
+    $c->stash->{form}->is_valid and
+        $c->res->redirect( $self->get_form_success_url($c) );
 }
 
 =action list
@@ -151,7 +147,9 @@ sub edit : Chained('object') : PathPart('update') : Args(0) {
     }
 
     $c->stash->{form_parameters}->{type} = $object->type;
-    $c->detach('form');
+    $c->forward('object_form');
+    $c->stash->{form}->is_valid and
+        $c->res->redirect( $self->get_form_success_url($c) );
 }
 
 =action delete

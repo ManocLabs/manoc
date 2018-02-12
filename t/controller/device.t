@@ -39,8 +39,8 @@ $mech->submit_form_ok(
     {
         form_id => 'form-device',
         fields  => {
-            'form-device.name'        => 'Device 01',
-            'form-device.mng_address' => '10.0.0.1',
+            'name'        => 'Device 01',
+            'mng_address' => '10.0.0.1',
         },
     },
     "Create device",
@@ -85,10 +85,10 @@ $mech->submit_form_ok(
     {
         form_id => 'form-device',
         fields  => {
-            'form-device.name'        => 'Device 02',
-            'form-device.mng_address' => '10.0.0.1',
-            'form-device.hwasset'     => $hwasset->id,
-            'form-device.rack'        => $rack->id,
+            'name'        => 'Device 02',
+            'mng_address' => '10.0.0.2',
+            'hwasset'     => $hwasset->id,
+            'rack'        => $rack->id,
         },
     },
     "Create device",
@@ -108,7 +108,7 @@ $mech->submit_form_ok(
     {
         form_number => 2,
         fields      => {
-            'form-decommission.asset_action' => 'DECOMMISSION'
+            'asset_action' => 'DECOMMISSION'
         },
     },
     "Submit decommission form"

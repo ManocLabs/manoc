@@ -1,4 +1,4 @@
-package App::Manoc::Controller::APIv1;
+package App::Manoc::ControllerBase::APIv1;
 #ABSTRACT: Base class for API controllers
 
 use Moose;
@@ -72,13 +72,13 @@ sub begin : Private {
     $c->stash( is_api => 1 );
 }
 
-=action base
+=action api_setup
 
 Path api/v1. Require HTTP Authentication
 
 =cut
 
-sub base : Chained('/') PathPart('api/v1') CaptureArgs(0) {
+sub api_setup : Chained('/') PathPart('api/v1') CaptureArgs(0) {
     my ( $self, $c ) = @_;
 
     # require HTTP Authentication
@@ -92,15 +92,15 @@ Chained to base, stores request body data in C<api_request_data> in stash.
 
 =cut
 
-sub deserialize : Chained('base') CaptureArgs(0) PathPart('') {
+sub deserialize : Chained('api_setup') CaptureArgs(0) PathPart('') {
     my ( $self, $c ) = @_;
 
     if ( $c->req->body_data && scalar( keys %{ $c->req->body_data } ) ) {
-        $c->log->debug('Deserializing body data for API input');
+        $c->debug and $c->log->debug('Deserializing body data for API input');
         $c->stash( api_request_data => $c->req->body_data );
     }
     else {
-        $c->log->debug('No body data for API input');
+        $c->debug and $c->log->debug('No body data for API input');
     }
 }
 
@@ -130,21 +130,32 @@ sub end : Private {
     }
 
     if ( $c->res->status == 200 ) {
-        $c->log->debug("Building response");
-        my $data = $c->stash->{api_response_data};
+        $c->log->debug("Building API response status=200");
+        my $data = $c->stash->{api_response_data} || $c->stash->{json_data};
+        $c->stash->{$expose_stash} = $data;
+    }
+    elsif ( $c->res->status == 401 ) {
+        my $data = {};
+        $data->{message} = "Permission denied";
+        $c->stash->{$expose_stash} = $data;
+    }
+    elsif ( $c->res->status == 404 ) {
+        my $data = {};
+        $data->{message} = "Object not found";
         $c->stash->{$expose_stash} = $data;
     }
     else {
         # build the response data using error message
         $c->log->debug("Building error response");
-        my $data          = {};
-        my $field_errors  = $c->stash->{api_field_errors};
+        my $data = {};
+
+        my $field_errors = $c->stash->{api_field_errors};
+        $field_errors and
+            $data->{errors} = $field_errors;
+
         my $error_message = $c->stash->{api_error_message} ||
             'Error processing request';
-
-        if ( $field_errors and scalar(@$field_errors) ) {
-            push @{ $data->{errors} }, @{$field_errors};
-        }
+        $data->{message} = $error_message;
 
         $c->stash->{$expose_stash} = $data;
     }
