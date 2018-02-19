@@ -177,6 +177,11 @@ my @DEFAULT_MENU_ITEMS = (
                 action     => '/mngurlformat/list',
                 permission => 'mngurlformat.view',
             },
+            {
+                name       => 'Credentials',
+                action     => '/credentials/list',
+                permission => 'credentials.view',
+            },
         ]
     }
 );
