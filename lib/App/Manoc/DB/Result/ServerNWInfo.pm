@@ -9,13 +9,20 @@ use warnings;
 use parent 'App::Manoc::DB::Result';
 
 __PACKAGE__->load_components(
-    qw/+App::Manoc::DB::Helper::NetwalkerCredentials
-        +App::Manoc::DB::Helper::NetwalkerPoller/
+    qw/
+        +App::Manoc::DB::Helper::NetwalkerPoller
+        /
 );
 
 __PACKAGE__->table('server_nwinfo');
 __PACKAGE__->add_columns(
     server_id => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+
+    credentials_id => {
         data_type      => 'int',
         is_foreign_key => 1,
         is_nullable    => 0,
@@ -134,7 +141,6 @@ __PACKAGE__->add_columns(
     },
 );
 
-__PACKAGE__->make_credentials_columns;
 __PACKAGE__->make_poller_columns;
 
 __PACKAGE__->set_primary_key("server_id");
@@ -142,6 +148,11 @@ __PACKAGE__->set_primary_key("server_id");
 __PACKAGE__->belongs_to(
     server => 'App::Manoc::DB::Result::Server',
     { 'foreign.id' => 'self.server_id' }
+);
+
+__PACKAGE__->belongs_to(
+    credentials => 'App::Manoc::DB::Result::Credentials',
+    { 'foreign.id' => 'self.credentials_id' }
 );
 
 1;
