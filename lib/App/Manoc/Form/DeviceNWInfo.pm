@@ -7,8 +7,6 @@ use HTML::FormHandler::Moose;
 extends 'App::Manoc::Form::BaseDBIC';
 with 'App::Manoc::Form::TraitFor::SaveButton';
 
-use constant EMPTY_PASSWORD => '######';
-
 use App::Manoc::Manifold;
 
 has '+name'        => ( default => 'form-devicenwinfo' );
@@ -70,83 +68,26 @@ has_field 'get_vtp' => (
     label          => 'Download VTP database',
 );
 
-#Credentials, don't use username/password to avoid autofilling
-
-has_field 'nw_username' => (
-    type     => 'Text',
-    label    => 'Username',
-    accessor => 'username',
+has_field 'credentials' => (
+    type  => 'Select',
+    label => 'Credentials',
 );
 
-has_field 'nw_password' => (
-    type      => 'Text',
-    label     => 'First level password',
-    widget    => 'Password',
-    writeonly => 1,
-);
-
-sub default_nw_password {
+sub options_credentials {
     my $self = shift;
-    my $item = $self->item;
-
-    return unless $item;
-
-    $item->password and return EMPTY_PASSWORD;
-    return '';
+    return unless $self->schema;
+    my @credentials =
+        $self->schema->resultset('Credentials')->search( {}, { order_by => 'name' } )->all();
+    my @selections;
+    foreach my $b (@credentials) {
+        my $option = {
+            label => $b->name,
+            value => $b->id
+        };
+        push @selections, $option;
+    }
+    return @selections;
 }
-has_field 'nw_password2' => (
-    type      => 'Text',
-    label     => 'Sudo password',
-    widget    => 'Password',
-    writeonly => 1,
-);
-
-sub default_nw_password2 {
-    my $self = shift;
-    my $item = $self->item;
-
-    return unless $item;
-
-    $item->password2 and return EMPTY_PASSWORD;
-    return '';
-}
-
-has_field 'use_ssh_key' => (
-    type  => 'Checkbox',
-    label => 'Use private key for SSH',
-);
-
-has_field 'key_path' => (
-    type  => 'Text',
-    label => 'Path to SSH key',
-);
-
-has_field 'snmp_version' => (
-    type    => 'Select',
-    label   => 'SNMP version',
-    options => [
-        { value => 0, label => 'Use Default', selected => '1' },
-        { value => 1, label => 1 },
-        { value => 2, label => '2c' },
-        { value => 3, label => 3 }
-    ],
-);
-
-has_field 'snmp_community' => (
-    type  => 'Text',
-    label => 'SNMP community string'
-);
-
-has_field 'snmp_user' => (
-    type  => 'Text',
-    label => 'SNMP user'
-);
-
-has_field 'snmp_password' => (
-    type   => 'Text',
-    label  => 'SNMP password',
-    widget => 'Password',
-);
 
 sub options_manifold {
     return shift->_manifold_list;
@@ -191,12 +132,6 @@ sub _get_vlan_list {
 override 'update_model' => sub {
     my $self   = shift;
     my $values = $self->values;
-
-    # do not overwrite passwords when are not edited
-    $values->{nw_password} ne EMPTY_PASSWORD and
-        $values->{password} = $values->{nw_password};
-    $values->{nw_password2} ne EMPTY_PASSWORD and
-        $values->{password2} = $values->{nw_password2};
 
     $values->{device} = $self->{device};
     $self->_set_value($values);
