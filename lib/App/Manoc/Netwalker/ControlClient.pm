@@ -86,7 +86,7 @@ sub _build_socket {
 
     chomp($line);
     $self->log->debug("Hello from netwalker: $line");
-    if ( !$self->check_response($line) ) {
+    if ( !$self->_check_response($line) ) {
         $self->log->error("Protocol error after connecting netwalker");
         return;
     }

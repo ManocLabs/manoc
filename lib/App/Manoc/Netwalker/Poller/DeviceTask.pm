@@ -281,6 +281,8 @@ sub _build_uplinks {
     my $source     = $self->source;
     my $device_set = $self->device_set;
 
+    return unless $source->can('neighbors');
+
     my %uplinks;
 
     # get uplink from CDP
@@ -411,7 +413,12 @@ sub update_device_info {
     $nw_entry->vendor( $source->vendor );
     $nw_entry->serial( $source->serial );
 
-    $nw_entry->vtp_domain( $source->vtp_domain );
+    if ( $source->can('vtp_domain') ) {
+        $nw_entry->vtp_domain( $source->vtp_domain );
+    }
+    else {
+        $nw_entry->vtp_domain(undef);
+    }
     $nw_entry->boottime( $source->boottime || 0 );
 
     $nw_entry->update;
@@ -429,10 +436,12 @@ sub update_cdp_neighbors {
     my $source      = $self->source;
     my $entry       = $self->device_entry;
     my $schema      = $self->schema;
-    my $neighbors   = $source->neighbors;
     my $new_dev     = 0;
     my $cdp_entries = 0;
 
+    return unless $source->can('neighbors');
+
+    my $neighbors = $source->neighbors;
     while ( my ( $p, $n ) = each(%$neighbors) ) {
         foreach my $s (@$n) {
             my $from_dev_id = $entry->id;
@@ -487,6 +496,8 @@ sub update_if_table {
     my $source       = $self->source;
     my $entry        = $self->device_entry;
     my $iface_filter = $self->config->{iface_filter};
+
+    return unless $source->can('ifstatus_table');
 
     my $ifstatus_table = $source->ifstatus_table;
 
