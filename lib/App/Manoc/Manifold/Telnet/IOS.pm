@@ -97,7 +97,7 @@ sub _build_password {
 
 sub _build_eable_password {
     my $self = shift;
-    return $self->credentials->{password2} || '';
+    return $self->credentials->{become_password} || '';
 }
 
 =method connect

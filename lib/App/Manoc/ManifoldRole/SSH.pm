@@ -6,6 +6,8 @@ with 'App::Manoc::Logger::Role';
 ##VERSION
 
 use Net::OpenSSH;
+use Cwd;
+use File::Temp;
 
 has 'username' => (
     is      => 'rw',
@@ -14,18 +16,25 @@ has 'username' => (
     builder => '_build_username'
 );
 
-has 'use_ssh_key' => (
-    is      => 'rw',
-    isa     => 'Maybe[Bool]',
-    lazy    => 1,
-    builder => '_build_use_ssh_key'
-);
-
-has 'key_path' => (
+has 'ssh_key' => (
     is      => 'rw',
     isa     => 'Maybe[Str]',
     lazy    => 1,
-    builder => '_build_key_path'
+    builder => '_build_ssh_key'
+);
+
+has 'ssh_key_file' => (
+    is      => 'rw',
+    isa     => 'Maybe[Object]',
+    lazy    => 1,
+    builder => '_build_ssh_key_file'
+);
+
+has 'ssh_key_path' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_ssh_key_path'
 );
 
 has 'password' => (
@@ -52,16 +61,29 @@ sub _build_username {
     return $self->credentials->{username};
 }
 
-sub _build_use_ssh_key {
+sub _build_ssh_key {
     my $self = shift;
 
-    return $self->credentials->{use_ssh_key};
+    return $self->credentials->{ssh_key};
 }
 
-sub _build_key_path {
+sub _build_ssh_key_file {
     my $self = shift;
 
-    return $self->credentials->{key_path};
+    my $dir = getcwd;
+    my $tmp = File::Temp->new( DIR => $dir );
+    print $tmp $self->credentials->{ssh_key};
+
+    return $tmp;
+}
+
+sub _build_ssh_key_path {
+    my $self = shift;
+
+    $self->ssh_key_file and
+        return $self->ssh_key_file->filename;
+
+    return;
 }
 
 sub _build_password {
@@ -113,8 +135,9 @@ sub connect {
 
     my %opts;
     $opts{user} = $self->username;
-    if ( $self->use_ssh_key ) {
-        my $key_path = $self->key_path;
+    if ( $self->ssh_key ) {
+        my $key_path = $self->ssh_key_path;
+
         $self->log->info("Connecting to $host using key $key_path");
         $opts{key_path} = $key_path;
         $self->password and
