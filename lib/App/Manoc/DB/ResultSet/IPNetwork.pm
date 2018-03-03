@@ -10,6 +10,7 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use Scalar::Util qw(blessed);
 use App::Manoc::DB::Search::Result::Row;
+use App::Manoc::Utils::IPAddress qw(check_addr);
 
 =method get_root_networks
 
