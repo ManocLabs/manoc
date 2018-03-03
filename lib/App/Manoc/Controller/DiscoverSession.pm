@@ -28,7 +28,6 @@ __PACKAGE__->config(
         distinct  => 1,
         '+select' => [ { count => 'discovered_hosts.id' } ],
         '+as'     => [qw/num_hosts/],
-
     }
 );
 
