@@ -34,7 +34,7 @@ has 'sudo_password' => (
 
 sub _build_sudo_password {
     my $self = shift;
-    return $self->credentials->{password2};
+    return $self->credentials->{become_password};
 }
 
 has has_perl => (
@@ -375,7 +375,7 @@ sub root_cmd {
 
     if ( $self->username ne 'root' ) {
         if ( $self->use_sudo ) {
-            my $sudo_passwd = $self->credentials->{password2};
+            my $sudo_passwd = $self->credentials->{become_password};
 
             if ($sudo_passwd) {
                 $opts->{stdin_data} = $sudo_passwd;
