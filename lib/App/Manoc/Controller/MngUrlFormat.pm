@@ -53,4 +53,15 @@ sub get_delete_failure_url {
     return $c->uri_for_action($action);
 }
 
+=action get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    my $action = $c->namespace . "/list";
+    return $c->uri_for_action($action);
+}
+
 1;

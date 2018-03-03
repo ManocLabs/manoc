@@ -80,6 +80,17 @@ sub change_password : Chained('base') : PathPart('password') : Args(0) {
     );
 }
 
+=action get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    my $action = $c->namespace . "/list";
+    return $c->uri_for_action($action);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
