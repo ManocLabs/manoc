@@ -11,7 +11,7 @@ use App::Manoc::Form::Credentials;
 
 BEGIN { extends 'Catalyst::Controller'; }
 with
-    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => 'delete_object', },
+    "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'delete_object', 'view' ] },
     "App::Manoc::ControllerRole::JSONView";
 
 __PACKAGE__->config(
@@ -25,6 +25,15 @@ __PACKAGE__->config(
     form_class              => 'App::Manoc::Form::Credentials',
     enable_permission_check => 1,
     view_object_perm        => undef,
+    object_list_options     => {
+        join      => [ 'device_nw_info', 'server_nw_info' ],
+        distinct  => 1,
+        '+select' => [
+            { count => 'device_nw_info.device_id' },
+            { count => 'server_nw_info.server_id' },
+        ],
+        '+as' => [qw/num_devices num_servers/],
+    }
 );
 
 =method delete_object
@@ -45,6 +54,30 @@ sub delete_object {
     }
 
     return $credentials->delete;
+}
+
+=method view
+
+Redirect to edit
+
+=cut
+
+sub view : Chained('object') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->response->redirect( $c->uri_for_action( 'credentials/edit', [ $object->id ] ) );
+}
+
+=action get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    my $action = $c->namespace . "/list";
+    return $c->uri_for_action($action);
 }
 
 __PACKAGE__->meta->make_immutable;
