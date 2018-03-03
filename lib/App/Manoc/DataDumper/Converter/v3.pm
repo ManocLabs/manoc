@@ -34,6 +34,18 @@ has 'device_hwasset_map' => (
     default => sub { {} },
 );
 
+has 'device_credentials_map' => (
+    isa     => 'HashRef',
+    is      => 'rw',
+    default => sub { {} },
+);
+
+has 'device_credentials_id_counter' => (
+    isa     => 'Int',
+    is      => 'rw',
+    default => 1
+);
+
 has 'dhcp_server_map' => (
     isa     => 'HashRef',
     is      => 'rw',
@@ -86,6 +98,7 @@ sub _build_hwasset_id_counter {
     return defined($id) ? $id + 1 : 1;
 }
 
+# use $self->device_id_map to rewrite an ip-based device foreign key
 sub _rewrite_device_id {
     my ( $self, $data, $column_name, $new_column_name ) = @_;
     my $map = $self->device_id_map;
@@ -168,28 +181,103 @@ sub upgrade_Device {
     $self->device_id_map( \%device_id_map );
 }
 
-sub get_table_name_DeviceNWInfo { 'devices' }
+sub get_table_name_Credentials { 'devices' }
 
-sub upgrade_DeviceNWInfo {
+# NOTE: devices should fill a block
+sub upgrade_Credentials {
     my ( $self, $data ) = @_;
 
     my @new_data;
 
+    my $credentials_map = $self->device_credentials_map;
+    my $id_counter      = $self->device_credentials_id_counter;
+
+    # create a default set
+    push @new_data,
+        {
+        id              => $id_counter++,
+        name            => 'Default credentials',
+        username        => undef,
+        password        => undef,
+        become_password => undef,
+        snmp_community  => 'public',
+        snmp_user       => undef,
+        snmp_password   => undef,
+        snmp_version    => 2,
+        };
+
     foreach (@$data) {
         my $r = {};
+
+        $r->{username}        = '';
+        $r->{password}        = $_->{telnet_pwd};
+        $r->{become_password} = $_->{enable_pwd};
+        $r->{snmp_community}  = $_->{snmp_com};
+        $r->{snmp_user}       = $_->{snmp_user};
+        $r->{snmp_password}   = $_->{snmp_password};
+        $r->{snmp_version}    = $_->{snmp_ver};
+
+        my $credentials_id;
+
+        # search if there is already a compatible credentials row
+        # NOTE: this is not an optimal solution since there is no order in the input
+        # it is just an heuristic
+
+        foreach my $cred (@new_data) {
+
+            # check if entries in $r have no mismatch,
+            #e.g. all entries defined in $r have the same value
+            my $mismatch = 0;
+            while ( my ( $k, $v ) = each(%$r) ) {
+                next unless defined($v);
+                next if defined( $cred->{$k} ) && $v eq $cred->{$k};
+
+                # mismatch found
+                $mismatch = 1;
+                last;
+            }
+            next if $mismatch;
+
+            $credentials_id = $cred->{id};
+        }
+
+        if ( !defined($credentials_id) ) {
+            $credentials_id = $id_counter++;
+            $r->{id}        = $credentials_id;
+            $r->{name}      = "Credentials $credentials_id";
+            push @new_data, $r;
+        }
+
+        $credentials_map->{ $_->{id} } = $credentials_id;
+    }
+
+    $self->device_credentials_map($credentials_map);
+    $self->device_credentials_id_counter($id_counter);
+
+    @$data = @new_data;
+}
+
+sub get_table_name_DeviceNWInfo { 'devices' }
+
+sub upgrade_DeviceNWInfo {
+    my ( $self, $data ) = @_;
+    my @new_data;
+
+    my $credentials_map = $self->device_credentials_map;
+
+    foreach (@$data) {
+        my $r = {};
+
+        my $device_id = $_->{id};
+
         $r->{get_config}         = $_->{backup_enable};
         $r->{get_arp}            = $_->{get_arp};
         $r->{get_mat}            = $_->{get_mat};
         $r->{get_dot11}          = $_->{get_dot11};
         $r->{mat_native_vlan_id} = $_->{mat_native_vlan};
         $r->{arp_vlan_id}        = $_->{vlan_arpinfo};
-        $r->{username}           = '';
-        $r->{password}           = $_->{telnet_pwd};
-        $r->{password2}          = $_->{enable_pwd};
-        $r->{snmp_community}     = $_->{snmp_com};
-        $r->{snmp_user}          = $_->{snmp_user};
-        $r->{snmp_password}      = $_->{snmp_password};
-        $r->{snmp_version}       = $_->{snmp_ver};
+
+        $r->{credentials_id} = $credentials_map->{$device_id};
 
         $r->{model}      = $_->{model};
         $r->{serial}     = $_->{serial};
@@ -197,7 +285,7 @@ sub upgrade_DeviceNWInfo {
         $r->{os_ver}     = $_->{os_ver};
         $r->{vtp_domain} = $_->{vtp_domain};
 
-        $r->{device}   = $_->{id};
+        $r->{device}   = $device_id;
         $r->{manifold} = 'SNMP::Info';
 
         push @new_data, $r;
