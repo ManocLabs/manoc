@@ -81,6 +81,32 @@ sub including_address_ordered {
     return wantarray ? $rs->all : $rs;
 }
 
+=method included_by_subnet( $network, [$prefix] )
+
+Return a resultset for all IPNetwork contained in  C<$network>.
+
+=cut
+
+sub included_by_subnet {
+    my ( $self, $network, $prefix ) = @_;
+
+    if ( !blessed($network) || !$network->isa('App::Manoc::IPAddress::IPv4Network') ) {
+        $prefix //= 24;
+        $network = App::Manoc::IPAddress::IPv4Network->new( $network, $prefix );
+    }
+
+    my $start_addr = $network->address->padded;
+    my $end_addr   = $network->broadcast->padded;
+
+    my $rs = $self->search(
+        {
+            'address'   => { '>=' => $start_addr },
+            'broadcast' => { '<=' => $end_addr },
+        }
+    );
+    return wantarray ? $rs->all : $rs;
+}
+
 =method manoc_search(  $query, $result)
 
 Support for Manoc search feature
@@ -92,32 +118,31 @@ sub manoc_search {
 
     my $query_type = $query->query_type;
     my $pattern    = $query->sql_pattern;
+    my $subnet     = $query->subnet;
 
-    my $filter;
+    my $rs;
 
     if ( $query_type eq 'subnet' ) {
 
-        # if subnet isn't defined, the scope is specified
-        # by the user
-        my $subnet = $query->subnet || $pattern;
-        return unless ( check_addr($subnet) );
-
-        my $prefix = $query->prefix || '24';
-
-        my $addr = App::Manoc::IPAddress::IPv4->new($subnet);
-
-        $filter = { address => $addr->unpadded };
-        $prefix and $filter->{prefix} = $prefix;
+        if ( defined($subnet) ) {
+            return unless ( check_addr($subnet) );
+            my $prefix = $query->prefix // '24';
+            $rs = $self->included_by_subnet( $subnet, $prefix );
+        }
+        else {
+            # if subnet isn't defined, the scope was specified
+            # by the user and we have a pattern
+            $rs = $self->search( address => { -like => $pattern } );
+        }
     }
     elsif ( $query_type eq 'inventory' ) {
-        $filter = { name => { '-like' => $pattern } };
+        $rs = $self->search( { name => { '-like' => $pattern } } );
     }
     else {
         return;
     }
 
-    my $rs = $self->search( $filter, { order_by => 'name' } );
-
+    $rs = $rs->search( {}, { order_by => 'name' } );
     while ( my $e = $rs->next ) {
         my $item = App::Manoc::DB::Search::Result::Row->new(
             {

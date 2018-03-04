@@ -67,7 +67,7 @@ sub manoc_search {
     my $rs = $self->search( { name => { '-like' => $pattern } }, { order_by => 'name' } );
 
     while ( my $e = $rs->next ) {
-        my $item = Manoc::DB::Search::Result::Row->new(
+        my $item = App::Manoc::DB::Search::Result::Row->new(
             {
                 row   => $e,
                 match => $e->name,

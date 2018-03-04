@@ -77,7 +77,7 @@ TODO
   [% '<ul class="results">' IF loop.first %]
   <li>
        [% print_search_item(item) -%]
-       [% IF item.isa("App::Manoc::DB::Search::Result::Group") -%]
+       [% IF item.can("items") -%]
        <ul>
        [% FOREACH ii IN item.items  -%]
          <li>[% print_search_item(ii) -%]</li>

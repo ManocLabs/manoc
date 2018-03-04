@@ -73,8 +73,8 @@ sub manoc_search {
     my $options = {
         select =>
             [ 'device_id', 'macaddr', 'interface', { max => 'lastseen', -as => 'timestamp' } ],
-        as       => [ 'device', 'macaddr', 'interface', 'timestamp' ],
-        group_by => [qw(device macaddr interface)],
+        as       => [ 'device_id', 'macaddr', 'interface', 'timestamp' ],
+        group_by => [qw(device_id macaddr interface)],
         #        join     => { 'device_entry' => 'mng_url_format' },
         #        prefetch => { 'device_entry' => 'mng_url_format' },
     };
