@@ -25,7 +25,7 @@ __PACKAGE__->add_columns(
     credentials_id => {
         data_type      => 'int',
         is_foreign_key => 1,
-        is_nullable    => 0,
+        is_nullable    => 1,
     },
 
     manifold => {
@@ -152,7 +152,8 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->belongs_to(
     credentials => 'App::Manoc::DB::Result::Credentials',
-    { 'foreign.id' => 'self.credentials_id' }
+    { 'foreign.id' => 'self.credentials_id' },
+    { join_type    => 'left', on_delete => 'SET NULL' },
 );
 
 1;

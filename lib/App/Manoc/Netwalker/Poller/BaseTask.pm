@@ -46,7 +46,8 @@ has 'credentials' => (
 sub _build_credentials {
     my $self = shift;
 
-    my $credentials = $self->nwinfo->credentials->get_credentials_hash;
+    my $credentials =
+        $self->nwinfo->credentials ? $self->nwinfo->credentials->get_credentials_hash : {};
     $credentials->{snmp_community} ||= $self->config->snmp_community;
     $credentials->{snmp_version}   ||= $self->config->snmp_version;
 
