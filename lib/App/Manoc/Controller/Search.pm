@@ -55,14 +55,32 @@ sub index : Path : Args(0) {
         my $type  = $query->query_type;
 
         if ( !$advanced && $redirectable_types->{$type} ) {
-            # search for an exact match and redirect
+            # search for an exact match and redirect if found
+            my $selected_item;
+
             foreach my $item ( @{ $result->items } ) {
-                my $item2 = $item->items->[0];
-                if ( lc( $item2->match ) eq lc( $query->query_as_word ) ) {
-                    $c->response->redirect(
-                        $c->uri_for_action( $redirectable_types->{$type}, [ $item2->id ] ) );
-                    $c->detach();
+                if ( $item->can('items') ) {
+                    my $item2 = $item->items->[0];
+                    if ( lc( $item2->match ) eq lc( $query->query_as_word ) ) {
+                        $selected_item = $item2;
+                        last;
+                    }
                 }
+                else {
+                    if ( lc( $item->match ) eq lc( $query->query_as_word ) ) {
+                        $selected_item = $item;
+                        last;
+                    }
+                }
+            }
+            if ($selected_item) {
+                $c->response->redirect(
+                    $c->uri_for_action(
+                        $redirectable_types->{$type},
+                        [ $selected_item->row->id ]
+                    )
+                );
+                $c->detach();
             }
         }
     }

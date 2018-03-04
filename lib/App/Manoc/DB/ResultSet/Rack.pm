@@ -18,7 +18,7 @@ sub manoc_search {
     my ( $self, $query, $result ) = @_;
 
     my $type = $query->query_type;
-    return unless $type eq 'asset' or $type eq 'building';
+    return unless $type eq 'asset' or $type eq 'rack';
 
     my $pattern = $query->sql_pattern;
 

@@ -46,7 +46,10 @@ __PACKAGE__->set_tuple_archive_columns( 'macaddr', 'device_id', 'interface', 'vl
 
 __PACKAGE__->set_primary_key( 'macaddr', 'device_id', 'firstseen', 'vlan' );
 
-__PACKAGE__->belongs_to( 'device' => 'App::Manoc::DB::Result::Device', 'device_id' );
+__PACKAGE__->belongs_to(
+    'device' => 'App::Manoc::DB::Result::Device',
+    { 'foreign.id' => 'self.device_id' }
+);
 
 __PACKAGE__->resultset_class('App::Manoc::DB::ResultSet::Mat');
 
