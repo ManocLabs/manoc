@@ -55,16 +55,15 @@ __PACKAGE__->add_columns(
         size          => '1',
         default_value => '0',
     },
-    snmp_community => {
-        data_type     => 'varchar',
-        size          => 64,
-        default_value => 'NULL',
-        is_nullable   => 1,
-    },
     use_netbios => {
         data_type     => 'int',
         size          => '1',
         default_value => '0',
+    },
+    credentials_id => {
+        data_type      => 'int',
+        is_foreign_key => 1,
+        is_nullable    => 0,
     },
 );
 
@@ -73,6 +72,11 @@ __PACKAGE__->set_primary_key(qw(id));
 __PACKAGE__->has_many(
     discovered_hosts => 'App::Manoc::DB::Result::DiscoveredHost',
     'session_id', { cascade_delete => 1 }
+);
+
+__PACKAGE__->belongs_to(
+    credentials => 'App::Manoc::DB::Result::Credentials',
+    { 'foreign.id' => 'self.credentials_id' }
 );
 
 =method is_new
