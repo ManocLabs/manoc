@@ -53,7 +53,7 @@ sub manoc_uri_for_object {
 
     if ( $obj->can('result_source') ) {
         my $name = $obj->result_source->source_name;
-        $c->log->debug("Lookup action for source $name");
+        # $c->log->debug("Lookup action for source $name");
         my $action = $c->_manoc_object_action->{$name};
         $action and
             return $c->uri_for_action( $action, [ $obj->id ], @args );
