@@ -101,7 +101,7 @@ has '_ping_handler' => (
 sub _build_credentials {
     my $self = shift;
 
-    my $credentials = { snmp_community => $self->session->snmp_community };
+    my $credentials = $self->session->credentials->get_credentials_hash;
     $credentials->{snmp_community} ||= $self->config->snmp_community;
     $credentials->{snmp_version} = $self->config->snmp_version;
 

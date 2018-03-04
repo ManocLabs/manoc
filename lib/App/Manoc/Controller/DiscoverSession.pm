@@ -102,6 +102,17 @@ sub command : Chained('base') : PathPart('command') : POST {
     $c->forward('View::JSON');
 }
 
+=action get_form_success_url
+
+=cut
+
+sub get_form_success_url {
+    my ( $self, $c ) = @_;
+
+    my $action = $c->namespace . "/list";
+    return $c->uri_for_action($action);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

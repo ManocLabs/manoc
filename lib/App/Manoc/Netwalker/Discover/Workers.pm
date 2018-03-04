@@ -40,9 +40,11 @@ sub BUILD {
 
     my $self = shift;
 
-    $self->schema->resultset('DiscoverSession')
-        ->search( { status => DiscoverSession->STATUS_RUNNING } )
-        ->update( { status => DiscoverSession->STATUS_WAITING } );
+    try {
+        $self->schema->resultset('DiscoverSession')
+            ->search( { status => DiscoverSession->STATUS_RUNNING } )
+            ->update( { status => DiscoverSession->STATUS_WAITING } );
+    }
 }
 
 =method on_tick
@@ -82,8 +84,14 @@ sub schedule_session {
     return unless $session;
 
     $self->log->debug( "found waiting discover session " . $session->id );
-    $session->status( DiscoverSession->STATUS_RUNNING );
-    $session->update;
+
+    try {
+        $session->status( DiscoverSession->STATUS_RUNNING );
+        $session->update;
+    }
+    catch {
+        $self->log->error( "error updating discover session " . $session->id );
+    }
 }
 
 =method schedule_hosts
@@ -128,7 +136,13 @@ sub schedule_hosts {
         $self->current_session(undef);
     }
 
-    $session->update();
+    try {
+        $session->update;
+    }
+    catch {
+        $self->log->error( "error updating discover session " . $session->id );
+    }
+
 }
 
 =method worker_done
@@ -155,14 +169,14 @@ sub worker_done {
 
 =method discover_address( $session_id, $address )
 
-Worker entry point, starting a new L<App::Manoc::Netwalker::DiscoverTask>.
+Worker entry point, starting a new L<App::Manoc::Netwalker::Discover::Task>.
 
 =cut
 
 sub discover_address {
     my ( $self, $session_id, $address ) = @_;
 
-    my $updater = App::Manoc::Netwalker::DiscoverTask->new(
+    my $updater = App::Manoc::Netwalker::Discover::Task->new(
         {
             schema     => $self->schema,
             config     => $self->config,

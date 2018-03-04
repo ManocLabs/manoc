@@ -8,6 +8,7 @@
 <table class="table" id="sessionTable">
   <thead>
      <tr>
+       <th>ID</th>
        <th>From</th>
        <th>To</th>
        <th>Progress</th>
@@ -18,6 +19,7 @@
   <tbody>
     [% FOREACH object IN object_list %]
     <tr>
+      <td>[% object.id %]</td>
       <td data-sort="[% object.from_addr.padded %]">[% object.from_addr | html %]</td>
       <td data-sort="[% object.to_addr.padded %]">[% object.to_addr | html %]</td>
       <td>
