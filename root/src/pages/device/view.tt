@@ -78,7 +78,9 @@ page.title   = 'Device ' _ object.name
     <dt>Detected name</dt>
     <dd class="text-warning">
      [% nwinfo.name %]
+     [% IF nwinfo.name -%]
      <a href="#" data-manoc-action="from-nwinfo" data-manoc-what="name">[% fa_icon('exchange') %]</a>
+     [% END -%]
     </dd>
 [% END -%]
 
