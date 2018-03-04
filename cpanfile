@@ -75,3 +75,17 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Version" => "1";
 };
+
+# used for heroku like environmens
+
+feature 'sqlite', 'SQLite support' => sub {
+   requires 'DBD::SQLite';
+};
+
+feature 'mysql', 'MySQL support' => sub {
+   requires 'DBD::mysql';
+};
+
+feature 'postgres', 'PostgreSQL support' => sub {
+   requires 'DBD::Pg';
+}
