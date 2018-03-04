@@ -418,7 +418,10 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     {
         my $nwinfo = $device->netwalker_info;
         my $what   = lc( $c->req->params->{what} );
-        $what eq 'name' and $device->name( $nwinfo->name );
+
+        if ( $what eq 'name' ) {
+            $nwinfo->name and $device->name( $nwinfo->name );
+        }
         $device->update();
         $response->{success} = 1;
     }
