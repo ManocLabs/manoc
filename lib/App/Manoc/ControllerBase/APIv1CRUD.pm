@@ -70,7 +70,7 @@ sub create : Chained('base') PathPart('') Args(0) POST {
     $c->forward("api_form");
 }
 
-=action edit
+=action update
 
 POST api/v1/<namespace>/<id>
 
@@ -83,7 +83,7 @@ sub update : Chained('object') PathPart('') Args(0) POST {
     $c->forward("api_form");
 }
 
-=mehod api_form
+=for Pod::Coverage  api_form
 
 =cut
 

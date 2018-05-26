@@ -10,7 +10,7 @@ use MooseX::MethodAttributes::Role;
 
 requires 'base', 'object';
 
-=action view_js
+=action create_js
 
 =cut
 
@@ -22,7 +22,7 @@ sub create_js : Chained('base') : PathPart('create/js') : Args(0) {
     $c->forward('object_form_create');
 }
 
-=action list_js
+=action edit_js
 
 =cut
 
