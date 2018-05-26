@@ -230,7 +230,9 @@ sub get_form_success_url {
     return $form_success_url;
 }
 
-=action object_edit
+=action object_form_delete
+
+Private action which handle deleting of resources.
 
 =cut
 
