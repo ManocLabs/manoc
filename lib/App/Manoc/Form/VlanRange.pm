@@ -26,20 +26,22 @@ has_field 'name' => (
     ],
 );
 
-has 'lan_segment' => (
-    is       => 'ro',
-    required => 1,
+has_field 'lan_segment' => (
+    type         => 'Select',
+    empty_select => '--- Choose a LAN Segment ---',
+    required     => 1,
+    label        => 'LAN Segment',
 );
 
 has_field 'start' => (
-    label    => 'From VLAN',
+    label    => 'From id',
     type     => 'Integer',
     apply    => ['VlanID'],
     required => 1,
 );
 
 has_field 'end' => (
-    label    => 'To VLAN',
+    label    => 'To id ',
     type     => 'Integer',
     apply    => ['VlanID'],
     required => 1,
@@ -61,38 +63,36 @@ override validate_model => sub {
     my $self = shift;
 
     # some handy shortcuts
-    my $start = $self->field('start')->value;
-    my $end   = $self->field('end')->value;
-    my $item  = $self->item;
+    my $start          = $self->field('start')->value;
+    my $end            = $self->field('end')->value;
+    my $lan_segment_id = $self->field('lan_segment')->value;
+
+    my $item = $self->item;
 
     # check for overlapping ranges (excluding self!)
     my $rs = $self->source->resultset;
-    my $overlap = $rs->get_overlap_ranges( $self->lan_segment, $start, $end );
+    my $overlap = $rs->get_overlap_ranges( $lan_segment_id, $start, $end );
     $overlap = $overlap->search( id => { '<>' => $self->item->id } )
         if $item->in_storage;
     $overlap->count() > 0 and
         $self->add_form_error('Overlaps with existing range');
+};
 
-    # check for vlans outside boundaries
-    if ( $item->in_storage ) {
-        $item->vlans->search( { id => { '<' => $start } } )->count() > 0 and
-            $self->field('start')
-            ->add_error(
-            'There are associated vlans which will be below the lower end of the range');
-        $item->vlans->search( { id => { '>' => $end } } )->count() > 0 and
-            $self->field('end')
-            ->add_error(
-            'There are associated vlans which will be above the upper end of the range');
+sub options_lan_segment {
+    my $self = shift;
+    return unless $self->schema;
+    my @lan_segments =
+        $self->schema->resultset('LanSegment')->search( {}, { order_by => 'name' } )->all();
+    my @selections;
+    foreach my $s (@lan_segments) {
+        my $option = {
+            label => $s->name,
+            value => $s->id
+        };
+        push @selections, $option;
     }
-};
-
-before 'update_model' => sub {
-    my $self   = shift;
-    my $values = $self->value;
-    my $item   = $self->item;
-
-    $item->lan_segment( $self->lan_segment );
-};
+    return @selections;
+}
 
 =head1 LICENSE
 

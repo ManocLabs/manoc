@@ -576,7 +576,8 @@ sub update_vtp_database {
     my $source = $self->source;
     my $entry  = $self->device_entry;
 
-    my $vlan_db = $source->vtp_database;
+    my $vtp_domain = $source->vtp_domain;
+    my $vlan_db    = $source->vtp_database;
 
     $self->log->info( "getting vtp info from ", $entry->mng_address );
     if ( !defined($vlan_db) ) {
@@ -588,12 +589,13 @@ sub update_vtp_database {
     $self->task_report->add_warning("Vtp Vlan DB up to date");
 
     my $rs = $self->schema->resultset('VlanVtp');
-    $rs->delete();
+    $rs->search( { vtp_domain => $vtp_domain } )->delete();
     while ( my ( $id, $name ) = each(%$vlan_db) ) {
         $rs->find_or_create(
             {
-                'id'   => $id,
-                'name' => $name
+                'vid'        => $id,
+                'name'       => $name,
+                'vtp_domain' => $vtp_domain,
             }
         );
     }

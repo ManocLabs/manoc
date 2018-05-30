@@ -1,131 +1,86 @@
 [% page.title = 'VLAN list' %]
 
-[% IF segment_list.size > 1 %]
-<div class="pull-right">
-<form id="segmentform" method="GET">
-<label for="segment">LAN Segment
- <select name="lansegment" id="selectsegment" class="selectpicker" data-style="btn-default btn-sm">
-[% FOREACH segment IN segment_list %]
-  <option value="[% segment.id %]" [% "selected" IF segment.id == cur_segment.id %]>[% segment.name %]</option>
-[% END %]
-</select>
-</label>
-</form>
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+[%- IF c.check_permission('vlan.create') -%]
+  <a href="[% c.uri_for_action('vlan/create', [], {lansegment => cur_segment.id}) %]" class="btn btn-sm btn-primary">[%bootstrap_icon('plus')%] Add VLAN</a>
+[%- END -%]
+[%- IF c.check_permission('vlanrange.create') -%]
+   <a href="[% c.uri_for_action('vlanrange/create') %]" class="btn btn-sm  btn-default">[%bootstrap_icon('plus')%] Add VLAN Range</a>
+[%- END -%]
+
+[% IF segment_list.size > 1 -%]
+<div class="btn-group" role="group">
+<div id="lansegmentfilter_wrapper" class="filtermenu">
+    <form id="segmentform" method="GET">
+    <select name="lansegment" id="lansegmentfilter" class="selectpicker" data-style="btn-default btn-sm">
+    [% FOREACH segment IN segment_list -%]
+    <option value="[% segment.id %]" [% 'selected' IF segment.id == cur_segment.id %]>[% segment.name %]</option>
+    [% END -%]
+    </select>
+    </form>
+</div>
 </div>
 [% END %]
+
+</div>
 
 <div id="tablewrapper">
   <table class="table">
   <thead>
     <tr>
-        <th class="col-sm-4">Range</th>
-        <th class="col-sm-1">Start</th>
-        <th class="col-sm-1">End</th>
+        <th class="col-sm-4">Name</th>
+        <th class="col-sm-2">ID</th>
         <th class="col-sm-5">Description</th>
    	    <th class="col-sm-1"></th>
     </tr>
-  </thead>
-  [%- FOREACH range IN cur_segment.vlan_ranges %]
-  <tbody>
-    <tr id="row[%range.id%]">
-      <td>
-	<a role="button" class="collapsed collapse-chevron" data-toggle="collapse" href="#children[%range.id %]" aria-expanded="false" aria-controls="children[%range.id %]"></a>[%range.name | html %]
-      </td>
-      <td>[%range.start | html %]</td>
-      <td>[%range.end | html %]</td>
-      <td>[%range.description | html %]</td>
-      <td>
- [%- IF c.check_permission('vlan.create') ||  c.check_permission(range, 'edit') || c.check_permission(range, 'delete') -%]
-	<div class="btn-group" role="group">
-	  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="sr-only">Actions</span>
-	    <span class="caret"></span>
-	  </button>
-	  <ul class="dropdown-menu dropdown-menu-right">
-        [%- IF c.check_permission('vlan.create') -%]
-	    <li>
-	      <a href="[% c.uri_for_action('vlan/create', {range => range.id })%]">[%bootstrap_icon('plus')%] Add VLAN</a>
-	    </li>
-	    <li role="separator" class="divider"></li>
-        [%- END -%]
-        [%- IF c.check_permission(range, 'edit') -%]
-	    <li>
-	      <a href="[% c.uri_for_action('vlanrange/edit',[range.id])%]">[% bootstrap_icon('pencil') %] Edit</a>
-	    </li>
-        [%- END -%]
-        [%- IF c.check_permission(range, 'delete') -%]
-	    <li>
-	      <a href="[% c.uri_for_action('vlanrange/delete',[range.id])%]">[% bootstrap_icon('trash') %] Delete</a>
-	    </li>
-        [%- END -%]
-        [%- IF c.check_permission(range, 'edit') -%]
-	    <li>
-	      <a href="[% c.uri_for_action('vlanrange/split',[range.id])%]">[% bootstrap_icon('resize-full') %] Split</a>
-	    </li>
-        [%- END -%]
-        [%- IF c.check_permission(range, 'edit') -%]
-	    <li>
-	      <a href="[% c.uri_for_action('vlanrange/merge',[range.id])%]">[% bootstrap_icon('resize-small') %] Merge</a>
-	    </li>
-        [%- END -%]
-	  </ul>
-	</div>
- [%- END -%]
-      </td>
-    </tr>
-  </tbody>
-  [% IF range.vlans %]
-  <tbody id="children[%range.id%]" class="collapse" aria-labelledby="row[%range.id%]">
-    [% FOREACH vlan  IN range.vlans %]
-    <tr class="childrow">
-      <td><a href="[% c.uri_for_action('vlan/view', [vlan.id]) %]">[% vlan.name | html %]</a></td>
-      <td colspan="2">[% vlan.id | html %]</td>
-      <td>[% vlan.description | truncate(40) | html %]</td>
-      <td>
+ </thead>
+ <tbody>
+
+[% FOREACH object IN mixed_vlan_range_list -%]
+  [%- IF object.range -%]
+  [%- SET range = object.range -%]
+  <tr class="manoc-vlanrange-header">
+    <td>[% PP.manoc_print(range) %] </td>
+    <td>[% range.start %] - [% range.end %]</td>
+    <td>[% range.description | truncate(40) | html %]</td>
+    <td>
+       [%- IF c.check_permission(range, 'edit') -%]
+         <a href="[% c.uri_for_action('vlanrange/edit',[range.id]) %]">[% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span></a>
+       [%- END -%]
+       [%- IF c.check_permission(range, 'delete') -%]
+         <a href="[% c.uri_for_action('vlanrange/delete',[range.id]) %]">[% bootstrap_icon('trash') %]<span class="sr-only">Delete</span></a>
+       [%- END -%]
+    <td>
+  </tr>
+  [% ELSE -%]
+  [%- SET vlan = object.vlan -%]
+  <tr [% 'class="manoc-child-vlan"' IF vlan.vlan_range %]>
+    <td class="manoc-vlan-name">[% PP.manoc_print(vlan) %]</td>
+    <td>[% vlan.vid | html %]</td>
+    <td>[% vlan.description | truncate(40) | html %]</td>
+    <td>
       [% IF c.check_permission(vlan, 'edit') -%]
-	<a href="[% c.uri_for_action('vlan/edit',[vlan.id] )%]">[% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span></a>
+	  <a href="[% c.uri_for_action('vlan/edit',[vlan.id] )%]">[% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span></a>
       [%- END -%]
       [%- IF c.check_permission(vlan, 'delete') -%]
-	<a href="[% c.uri_for_action('vlan/delete',[vlan.id] )%]">[% bootstrap_icon('trash')%]<span class="sr-only">Delete</span></a>
+	  <a href="[% c.uri_for_action('vlan/delete',[vlan.id] )%]">[% bootstrap_icon('trash')%]<span class="sr-only">Delete</span></a>
       [%- END -%]
-      </td>
-    </tr>   <!-- end of specific vlans-->
-    [% END -%]
-  </tbody>
-  [% END -%]
-  [% END -%]
-
-[%- IF c.check_permission('vlanrange', 'create') -%]
-  <tr>
-    <td colspan="5" style="text-align: right">
-  <a href="[% c.uri_for_action('/vlanrange/create', { lansegment => cur_segment.id }) %]" class="btn btn-primary btn-xs">[% fa_icon('plus')%] Add</a>
     </td>
   </tr>
-
-[%- END -%]
+  [% END -%]
+[% END -%]
+  </tbody>
   </table>
 </div><!-- tablewrapper -->
-
-[% IF segment_list.size > 1 %]
 
 [% fragment = BLOCK -%]
 $(document).ready(function() {
 
-  $("#selectsegment").on('changed.bs.select',
+  $("#lansegmentfilter").on('changed.bs.select',
     function(e) {
       $('#segmentform').submit();
   });
-
-  $('#segmentform').submit( function() {
-      var url = "[% c.uri_for_action('vlan/list') %] #tablewrapper";
-      var data = $('#segmentform').serialize();
-      $('#tablewrapper').load(url, data);
-      return false;
-  });
-
 });
 
 [% END %]
 [% js_scripts.push(fragment) -%]
-
-[% END %]

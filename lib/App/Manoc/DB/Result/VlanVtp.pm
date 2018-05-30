@@ -15,6 +15,15 @@ __PACKAGE__->add_columns(
         data_type   => 'int',
         is_nullable => 0
     },
+    vid => {
+        data_type   => 'int',
+        is_nullable => 0
+    },
+    vtp_domain => {
+        data_type   => 'varchar',
+        size        => 64,
+        is_nullable => 0
+    },
     name => {
         data_type   => 'varchar',
         size        => 255,
@@ -23,14 +32,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-
-__PACKAGE__->belongs_to(
-    vlan => 'App::Manoc::DB::Result::Vlan',
-    { 'foreign.vid' => 'self.id' },
-    {
-        join_type                 => 'LEFT',
-        is_foreign_key_constraint => 0,
-    }
-);
+__PACKAGE__->add_unique_constraints( [ 'vtp_domain', 'vid' ] );
 
 1;

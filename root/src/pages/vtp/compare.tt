@@ -9,17 +9,30 @@
 <table class="table" id="vlan_list">
   <thead>
     <tr>
-      <th>VLAN ID</th>
-      <th>VTP Name</th>
-      <th>Manoc VLAN</th>
+        <th>VTP Domain</th>
+        <th>VLAN ID</th>
+        <th>VTP Name</th>
+        <th>VLAN Name</th>
+        <th data-orderable="false"></th>
     </tr>
   </thead>
   <tbody>
-    [% FOREACH v IN diff %]
+    [% FOREACH v IN items %]
     <tr>
-      <td>[% v.id %]</td>
-      <td>[% v.vtp_name | html %]</td>
-      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.vlan_name | html %]</a></td>
+        <td>[% v.vtp_domain %]</td>
+        <td>[% v.vid %]</td>
+        <td>[% v.vtp_name | html %]</td>
+        <td>
+        [% IF v.vlan -%]
+           [% PP.manoc_print(v.vlan) %]
+        [%- ELSE -%]
+          [% IF c.check_permission('vlan.create') && v.lan_segment -%]
+          <a href="[% c.uri_for_action('vlan/create', [], {lansegment => v.lan_segment.id, name=>v.vtp_name, vid=>v.vid}) %]">
+            [%bootstrap_icon('plus')%]<span class="sr-only">Add VLAN</class>
+           </a>
+           [%- END -%]
+        [%- END -%]
+        </td>
     </tr>
     [% END %]
   </tbody>

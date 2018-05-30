@@ -20,6 +20,11 @@ __PACKAGE__->add_columns(
         size        => 64,
         is_nullable => 0
     },
+    vtp_domain => {
+        data_type   => 'varchar',
+        size        => 64,
+        is_nullable => 1
+    },
     notes => {
         data_type   => 'text',
         is_nullable => 1,

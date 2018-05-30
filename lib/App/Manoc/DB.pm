@@ -180,7 +180,7 @@ sub init_vlan {
         }
     );
 
-    $vlan_range->add_to_vlans( { name => 'native', vid => 1 } );
+    $segment->add_to_vlans( { name => 'native', vid => 1 } );
 
     return 1;
 }

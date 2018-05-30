@@ -15,9 +15,11 @@ has '+name' => ( default => 'form-vlan' );
 
 has '+item_class' => ( default => 'Vlan' );
 
-has 'vlan_range' => (
-    is       => 'ro',
-    required => 1,
+has_field 'lan_segment' => (
+    type         => 'Select',
+    empty_select => '--- Choose a LAN Segment ---',
+    required     => 1,
+    label        => 'LAN Segment',
 );
 
 has_field 'vid' => (
@@ -45,33 +47,21 @@ has_field 'description' => (
     type  => 'TextArea'
 );
 
-override validate_model => sub {
+sub options_lan_segment {
     my $self = shift;
-
-    my $vlan_id   = $self->field('vid')->value;
-    my $range     = $self->vlan_range;
-    my $vlan_from = $range->start;
-    my $vlan_to   = $range->end;
-
-    my $error = 0;
-
-    if ( $vlan_id < $vlan_from || $vlan_id > $vlan_to ) {
-        $self->field('vid')->add_error("VLAN ID must be within range $vlan_from-$vlan_to");
-        $error++;
+    return unless $self->schema;
+    my @lansegments =
+        $self->schema->resultset('LanSegment')->search( {}, { order_by => 'name' } )->all();
+    my @selections;
+    foreach my $b (@lansegments) {
+        my $option = {
+            label => $b->name,
+            value => $b->id
+        };
+        push @selections, $option;
     }
-
-    super() or $error++;
-
-    return $error ? undef : 1;
-};
-
-before 'update_model' => sub {
-    my $self   = shift;
-    my $values = $self->value;
-    my $item   = $self->item;
-
-    $item->vlan_range( $self->vlan_range );
-};
+    return @selections;
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

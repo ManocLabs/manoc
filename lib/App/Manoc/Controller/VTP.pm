@@ -23,7 +23,7 @@ __PACKAGE__->config(
     class               => 'ManocDB::VlanVtp',
     view_object_perm    => undef,
     object_list_options => {
-        prefetch => 'vlan'
+        order_by => { -asc => [ 'vtp_domain', 'vid' ] }
     }
 );
 
@@ -32,7 +32,32 @@ __PACKAGE__->config(
 =cut
 
 sub list : Chained('object_list') : PathPart('') : Args(0) {
-    # just use defaults
+    my ( $self, $c ) = @_;
+
+    # vtp entry id => vlan object
+    my $vtp2vlans = {};
+
+    # search vtp entries with missing or mismatched vlan
+    my $vtp_entries = $c->stash->{object_list};
+
+    my $vlan_rs      = $c->model('ManocDB::Vlan');
+    my @vlan_entries = $vlan_rs->search(
+        {},
+        {
+            prefetch => 'lan_segment',
+        }
+    );
+    my $vlan_index = {};
+    foreach my $vlan (@vlan_entries) {
+        $vlan_index->{ $vlan->lan_segment->vtp_domain }->{ $vlan->vid } = $vlan;
+    }
+
+    foreach my $vtp (@$vtp_entries) {
+        my $vlan = $vlan_index->{ $vtp->vtp_domain }->{ $vtp->vid };
+        $vtp2vlans->{ $vtp->id } = $vlan;
+    }
+
+    $c->stash( vtp2vlans => $vtp2vlans );
 }
 
 =action compare
@@ -42,49 +67,58 @@ sub list : Chained('object_list') : PathPart('') : Args(0) {
 sub compare : Chained('base') : PathPart('compare') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $vtp_rs  = $c->stash->{resultset};
-    my $vlan_rs = $c->model('ManocDB::Vlan');
+    my $vtp_rs         = $c->stash->{resultset};
+    my $vlan_rs        = $c->model('ManocDB::Vlan');
+    my $lan_segment_rs = $c->model('ManocDB::LanSegment');
 
-    my @diff;
-
-    # search vtp entries with missing or mismatched vlan
-    my @vtp_entries = $vtp_rs->search(
-        [ { 'vlan.id' => undef }, { 'vlan.name' => { '!=' => { -ident => 'me.name' } } } ],
-        {
-            prefetch => 'vlan'
-        }
-    );
-    foreach my $vtp (@vtp_entries) {
-        push @diff,
-            {
-            id        => $vtp->id,
-            vlan_name => $vtp->vlan ? $vtp->vlan->name : '',
-            vtp_name  => $vtp->name,
-            };
+    my $domain2segment = {};
+    foreach my $segment ( $lan_segment_rs->all ) {
+        $segment->vtp_domain and
+            $domain2segment->{ $segment->vtp_domain } = $segment;
     }
 
-    # search vlans with missing vtp
+    my $vlan_index = {};
+
+    # search vtp entries with missing or mismatched vlan
+    my @vtp_entries = $vtp_rs->all();
+    foreach my $vtp (@vtp_entries) {
+        my $domain = $vtp->vtp_domain;
+        $vlan_index->{$domain}->{ $vtp->vid } = {
+            vid         => $vtp->vid,
+            vtp_name    => $vtp->name,
+            vtp_domain  => $domain,
+            lan_segment => $domain2segment->{$domain},
+        };
+    }
+
     my @vlan_entries = $vlan_rs->search(
+        {},
         {
-            'vtp_entry.id' => undef,
-        },
-        {
-            prefetch => 'vtp_entry',
+            prefetch => 'lan_segment',
         }
     );
     foreach my $vlan (@vlan_entries) {
-        push @diff,
-            {
-            id        => $vlan->id,
-            vlan_name => $vlan->name,
-            vtp_name  => '',
-            };
+        my $domain = $vlan->lan_segment->vtp_domain;
+        $domain ||= $vlan->lan_segment->name . "*";
+
+        my $old_values = $vlan_index->{$domain}->{ $vlan->vid } || {};
+
+        $vlan_index->{$domain}->{ $vlan->vid } = {
+            %$old_values,
+            vid         => $vlan->vid,
+            vlan        => $vlan,
+            vtp_domain  => $domain,
+            lan_segment => $vlan->lan_segment,
+        };
     }
 
     # sort diff entries by id
-    @diff = sort { $a->{id} <=> $a->{id} } @diff;
+    my @items;
+    foreach my $domain_values ( values %$vlan_index ) {
+        push @items, values %$domain_values;
+    }
 
-    $c->stash( diff => \@diff );
+    $c->stash( items => \@items );
 }
 
 __PACKAGE__->meta->make_immutable;
