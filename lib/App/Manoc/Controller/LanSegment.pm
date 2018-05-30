@@ -31,6 +31,19 @@ __PACKAGE__->config(
     }
 );
 
+=action view
+
+Redirect to edit
+
+=cut
+
+sub view : Chained('object') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->response->redirect( $c->uri_for_action( 'lansegment/edit', [ $object->id ] ) );
+}
+
 =method delete_object
 
 =cut

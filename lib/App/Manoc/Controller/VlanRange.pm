@@ -7,11 +7,9 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
-with "App::Manoc::ControllerRole::CommonCRUD" => { -excludes => [ 'list', 'view' ] };
+with "App::Manoc::ControllerRole::CommonCRUD";
 
 use App::Manoc::Form::VlanRange;
-use App::Manoc::Form::VlanRange::Merge;
-use App::Manoc::Form::VlanRange::Split;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -22,64 +20,13 @@ __PACKAGE__->config(
             PathPart => 'vlanrange',
         }
     },
-    class            => 'ManocDB::VlanRange',
-    form_class       => 'App::Manoc::Form::VlanRange',
-    view_object_perm => undef,
-    json_columns     => [qw(id lansegment name description)],
-    object_list      => {
-        order_by => [ 'start', 'vlans.id' ],
-        prefetch => 'vlans',
-        join     => 'vlans',
+    class        => 'ManocDB::VlanRange',
+    form_class   => 'App::Manoc::Form::VlanRange',
+    json_columns => [qw(id lansegment name description)],
+    object_list  => {
+        order_by => [ 'lan_segment_id', 'start' ],
     }
 );
-
-=action split
-
-=cut
-
-sub split : Chained('object') : PathPart('split') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->require_permission( $c->stash->{object}, 'edit' );
-
-    my $form = App::Manoc::Form::VlanRange::Split->new( { ctx => $c } );
-
-    $c->stash(
-        form   => $form,
-        action => $c->uri_for( $c->action, $c->req->captures ),
-    );
-    return unless $form->process(
-        item   => $c->stash->{object},
-        params => $c->req->parameters,
-    );
-
-    $c->response->redirect( $c->uri_for_action('vlan/list') );
-    $c->detach();
-}
-
-=action merge
-
-=cut
-
-sub merge : Chained('object') : PathPart('merge') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->require_permission( $c->stash->{object}, 'edit' );
-
-    my $form = App::Manoc::Form::VlanRange::Merge->new( { ctx => $c } );
-
-    $c->stash(
-        form   => $form,
-        action => $c->uri_for( $c->action, $c->req->captures ),
-    );
-    return unless $form->process(
-        item   => $c->stash->{object},
-        params => $c->req->parameters,
-    );
-
-    $c->response->redirect( $c->uri_for_action('vlan/list') );
-    $c->detach();
-}
 
 =head1 METHODS
 
@@ -93,14 +40,33 @@ before 'create' => sub {
 
     my $segment_id = $c->req->query_parameters->{'lansegment'};
     my $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_id } );
-
-    if ( !$segment ) {
-        $c->response->redirect( $c->uri_for_action('vlan/list') );
-        $c->detach();
-    }
-
-    $c->stash( form_parameters => { lan_segment => $segment } );
+    $c->stash( form_defaults => { lan_segment => $segment } );
 };
+
+=action list
+
+Redirect to vlan list
+
+=cut
+
+sub list : Chained('object_list') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->response->redirect( $c->uri_for_action('vlan/list') );
+}
+
+=action view
+
+Redirect to edit
+
+=cut
+
+sub view : Chained('object') : PathPart('') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $object = $c->stash->{object};
+    $c->response->redirect( $c->uri_for_action( 'vlanrange/edit', [ $object->id ] ) );
+}
 
 =cut
 

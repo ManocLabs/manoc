@@ -20,6 +20,11 @@ has_field 'name' => (
     required => 1,
 );
 
+has_field 'vtp_domain' => (
+    type     => 'Text',
+    required => 0,
+);
+
 has_field 'notes' => ( type => 'TextArea' );
 
 __PACKAGE__->meta->make_immutable;

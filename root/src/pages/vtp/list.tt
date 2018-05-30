@@ -15,18 +15,21 @@
 <table class="table" id="vlan_list">
   <thead>
     <tr>
+      <th>VTP Domain</th>
       <th>VLAN ID</th>
-      <th>VTP Name</th>
+      <th>Name</th>
       <th>Manoc VLAN</th>
     </tr>
   </thead>
   <tbody>
     [% FOREACH v IN object_list %]
-    [%- SET warning =  v.vlan.name != v.name ? 1 : 0 -%]
+    [% SET vlan = vtp2vlans.item(v.id) %]
+    [%- SET warning = vlan.name != v.name ? 1 : 0 -%]
     <tr[% ' class="warning"' IF warning %]>
-      <td>[% v.id %]</td>
+      <td>[% v.vtp_domain %]</td>
+      <td>[% v.vid %]</td>
       <td>[% v.name | html %]</td>
-      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% v.vlan.name | html %]</a></td>
+      <td><a href="[%c.uri_for_action('vlan/view', [v.id])%]">[% vlan.name | html %]</a></td>
     </tr>
     [% END %]
   </tbody>

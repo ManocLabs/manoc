@@ -8,8 +8,7 @@ use Moose;
 use namespace::autoclean;
 use App::Manoc::Form::Vlan;
 
-BEGIN { extends 'Catalyst::Controller'; }
-with 'App::Manoc::ControllerRole::CommonCRUD' => { -excludes => 'list' };
+BEGIN { extends 'App::Manoc::ControllerBase::CRUD'; }
 
 __PACKAGE__->config(
     # define PathPart
@@ -24,6 +23,7 @@ __PACKAGE__->config(
     view_object_perm    => undef,
     object_list_options => {
         prefetch => 'vlan_range',
+        order_by => { -asc => [ 'segment_id', 'vid' ] }
     }
 );
 
@@ -63,18 +63,10 @@ sub vid : Chained('base') : PathPart('vid') : Args(1) {
 
 }
 
-=action list
-
-Display a list of items.
-
-=cut
-
-sub list : Chained('base') : PathPart('') : Args(0) {
+before 'list' => sub {
     my ( $self, $c ) = @_;
 
-    $self->view_object_perm and
-        $c->require_permission( $c->stash->{resultset}, $self->view_object_perm );
-
+    my $segment      = $c->stash->{cur_segment};
     my $segment_list = [
         $c->model('ManocDB::LanSegment')->search(
             {},
@@ -84,24 +76,70 @@ sub list : Chained('base') : PathPart('') : Args(0) {
         )->all()
     ];
 
-    my $qp            = $c->req->query_parameters;
-    my $segment_param = $qp->{lansegment};
+    my @range_list = $c->model('ManocDB::VlanRange')->search(
+        {
+            lan_segment_id => $segment->id,
+        },
+        {
+            order_by => { -asc => ['me.start'] },
+        }
+    )->all();
+    my @vlan_list = @{ $c->stash->{object_list} };
 
-    my $segment;
-    if ( defined($segment_param) ) {
-        $c->debug and $c->log->debug("looking for segment=$segment_param");
-
-        $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_param } );
-        $c->debug and $c->log->debug( $segment ? "segment found" : "segment not foud" );
+    my @mixed_vlan_range_list;
+    while ( @vlan_list && @range_list ) {
+        if ( $range_list[0]->start <= $vlan_list[0]->vid ) {
+            my $range = shift @range_list;
+            push @mixed_vlan_range_list, { range => $range };
+        }
+        else {
+            my $vlan = shift @vlan_list;
+            push @mixed_vlan_range_list, { vlan => $vlan };
+        }
     }
-    $segment ||= $c->model('ManocDB::LanSegment')->search()->first;
+    while ( my $range = shift @range_list ) {
+        push @mixed_vlan_range_list, { range => $range };
+    }
+    while ( my $vlan = shift @vlan_list ) {
+        push @mixed_vlan_range_list, { vlan => $vlan };
+    }
 
     $c->stash(
-        segment_list => $segment_list,
-        cur_segment  => $segment,
+        segment_list          => $segment_list,
+        mixed_vlan_range_list => \@mixed_vlan_range_list,
     );
 
-}
+};
+
+=method get_object_list_filter
+
+=cut
+
+override get_object_list_filter => sub {
+    my ( $self, $c ) = @_;
+
+    my %filter;
+
+    my $qp = $c->req->query_parameters;
+
+    my $segment;
+    if ( my $segment_param = $qp->{lansegment} ) {
+        $c->debug and $c->log->debug("looking for segment=$segment_param");
+        $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_param } );
+        $c->debug and $c->log->debug( $segment ? "segment found" : "segment not found" );
+    }
+    if ( !$segment ) {
+        $segment =
+            $c->model('ManocDB::LanSegment')->search( {}, { order_by => { -asc => ['id'] } } )
+            ->first();
+        $c->debug and $c->log->debug("Use first segment found");
+    }
+
+    $filter{"me.lan_segment_id"} = $segment->id;
+    $c->stash( cur_segment => $segment );
+
+    return \%filter;
+};
 
 =action create
 
@@ -110,16 +148,28 @@ sub list : Chained('base') : PathPart('') : Args(0) {
 before 'create' => sub {
     my ( $self, $c ) = @_;
 
-    my $range_id = $c->req->query_parameters->{'range'};
+    my $form_defaults = {};
 
-    my $range = $c->model('ManocDB::VlanRange')->find( { id => $range_id } );
-
-    if ( !$range ) {
-        $c->response->redirect( $c->uri_for_action('vlan/list') );
-        $c->detach();
+    my $lan_segment_id = $c->req->query_parameters->{'lansegment'};
+    my $lan_segment;
+    if ( defined($lan_segment_id) ) {
+        $lan_segment = $c->model('ManocDB::LanSegment')->find( { id => $lan_segment_id } );
     }
+    else {
+        if ( $c->model('ManocDB::LanSegment')->count == 1 ) {
+            $lan_segment = $c->model('ManocDB::LanSegment')->single();
+        }
+    }
+    $c->debug and $c->log->debug( $lan_segment ? "segment found" : "segment not foud" );
+    $form_defaults->{lan_segment} = $lan_segment;
 
-    $c->stash( form_parameters => { vlan_range => $range } );
+    my $vid = $c->req->query_parameters->{'vid'};
+    $vid and $form_defaults->{vid} = $vid;
+
+    my $name = $c->req->query_parameters->{'name'};
+    $name and $form_defaults->{name} = $name;
+
+    $c->stash( form_defaults => $form_defaults );
 };
 
 =method object_delete
@@ -145,7 +195,10 @@ sub object_delete {
 sub get_form_success_url {
     my ( $self, $c ) = @_;
 
-    return $c->uri_for_action("vlan/list");
+    my $vlan           = $c->stash->{object};
+    my $lan_segment_id = $vlan->lan_segment_id;
+
+    return $c->uri_for_action( "vlan/list", { lansegment => $lan_segment_id } );
 }
 
 __PACKAGE__->meta->make_immutable;

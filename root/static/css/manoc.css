@@ -1,3 +1,11 @@
+tr.manoc-vlanrange-header {
+    font-weight: bold;
+}
+
+.table > tbody > tr.manoc-child-vlan > .manoc-vlan-name {
+    padding-left : 3ex;
+}
+
 /**********************************************************************/
 /* Expand Table trick by GM                                           */
 /* Used for indenting child rows                                      */
