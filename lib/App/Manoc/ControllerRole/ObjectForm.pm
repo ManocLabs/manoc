@@ -128,7 +128,12 @@ sub object_form : Private {
             my $name = $field->name;
             next if exists $data->{$name};
 
-            $c->debug and $c->log->debug("Removing $name from active fields");
+            next if $field->type eq 'Button';
+            next if $field->type eq 'ButtonTag';
+            next if $field->type eq 'Submit';
+
+            $c->debug and
+                $c->log->debug( "Removing $name" . $field->type . " from active fields" );
             push @inactive_fields, $name;
         }
 
