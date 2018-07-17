@@ -9,6 +9,7 @@
     manoc_app_dir: /vagrant
     manoc_download_from_git: false
 
+    manoc_db_backend: mysql
     manoc_db_name: manoc
     manoc_db_user: manoc_rw
     manoc_db_password: manoc123
