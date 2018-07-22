@@ -28,6 +28,12 @@ __PACKAGE__->add_columns(
         size        => 32
     },
 
+    nic_type_id => {
+        data_type   => 'varchar',
+        is_nullable => 0,
+        size        => 32
+    },
+
     macaddr => {
         data_type   => 'varchar',
         is_nullable => 1,
@@ -44,6 +50,22 @@ __PACKAGE__->belongs_to(
     serverhw => 'App::Manoc::DB::Result::ServerHW',
     { 'foreign.id' => 'self.serverhw_id' }
 );
+
+__PACKAGE__->belongs_to(
+    nic_type => 'App::Manoc::DB::Result::NICType',
+    { 'foreign.id' => 'self.nic_type_id' }
+);
+
+__PACKAGE__->might_have(
+    cabling => 'App::Manoc::DB::Result::CablingMatrix',
+    'interface1_id'
+);
+
+=method insert
+
+Override to allow automatic name creation
+
+=cut
 
 sub insert {
     my ( $self, @args ) = @_;

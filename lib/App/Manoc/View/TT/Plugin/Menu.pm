@@ -178,6 +178,11 @@ my @DEFAULT_MENU_ITEMS = (
                 permission => 'mngurlformat.view',
             },
             {
+                name       => 'NIC types',
+                action     => '/nictype/list',
+                permission => 'nictype.view',
+            },
+            {
                 name       => 'Credentials',
                 action     => '/credentials/list',
                 permission => 'credentials.view',
