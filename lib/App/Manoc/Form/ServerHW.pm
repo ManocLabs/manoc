@@ -62,6 +62,21 @@ has_field 'nics.name' => (
     }
 );
 
+has_field 'nics.nic_type' => (
+    type         => 'Select',
+    element_attr => {
+        placeholder => 'type',
+    },
+
+    do_label => 0,
+
+    do_wrapper => 0,
+    tags       => {
+        before_element => '<div class="col-sm-2">',
+        after_element  => '</div>'
+    }
+);
+
 has_field 'nics.macaddr' => (
     type         => 'Text',
     apply        => [MacAddress],
@@ -210,6 +225,21 @@ has_field 'notes' => (
     type  => 'Text',
     label => 'Notes',
 );
+
+sub options_nics_type {
+    my $self = shift;
+    return unless $self->schema;
+
+    my @options;
+    push @options,
+        map +{
+        value => $_->id,
+        label => $_->name,
+        },
+        $self->schema->resultset('NICType')->all();
+
+    return @options;
+}
 
 override validate_model => sub {
     my $self = shift;

@@ -49,12 +49,22 @@ before 'create' => sub {
     if ( my $copy_id = $c->req->query_parameters->{'copy'} ) {
         my $original = $c->stash->{resultset}->find($copy_id);
         if ($original) {
-            $c->log->debug("copy server from $copy_id");
+            $c->debug and $c->log->debug("copy server from $copy_id");
+
             my %cols = $original->get_columns;
             delete $cols{'hwasset_id'};
             delete $cols{'id'};
             foreach (qw(model vendor)) {
                 $cols{$_} = $original->hwasset->get_column($_);
+            }
+
+            $cols{nics} = [];
+            foreach my $nic ( $original->nics ) {
+                push @{ $cols{nics} },
+                    {
+                    name     => $nic->name,
+                    nic_type => $nic->nic_type,
+                    };
             }
 
             $c->stash( form_defaults => \%cols );

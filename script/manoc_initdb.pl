@@ -43,10 +43,12 @@ sub run {
     $self->schema->init_roles($conf_roles);
     $self->log->info('Creating vlan.');
     $self->schema->init_vlan;
-    $self->log->info('Creating ip network.');
+    $self->log->info('Creating IP network.');
     $self->schema->init_ipnetwork;
     $self->log->info('Creating management urls.');
     $self->schema->init_management_url;
+    $self->log->info('Creating sample NIC types.');
+    $self->schema->init_nic_type;
 }
 
 no Moose;
