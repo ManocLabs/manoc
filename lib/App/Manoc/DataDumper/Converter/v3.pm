@@ -63,11 +63,11 @@ has 'network_id_counter' => (
     is  => 'rw'
 );
 
-has 'default_lan_segment_id' => (
-    isa     => 'Int',
+has 'default_lan_segment' => (
+    isa     => 'Object',
     is      => 'rw',
     lazy    => 1,
-    builder => '_build_default_lan_segment_id',
+    builder => '_build_default_lan_segment',
 );
 
 sub _build_device_id_map {
@@ -121,7 +121,7 @@ sub _rewrite_device_id {
     @$data = @new_data;
 }
 
-sub _build_default_lan_segment_id {
+sub _build_default_lan_segment {
     my $self = shift;
 
     my $rs      = $self->schema->resultset('LanSegment');
@@ -130,7 +130,12 @@ sub _build_default_lan_segment_id {
             name => 'default',
         }
     );
-    return $segment->id;
+
+    return $segment;
+}
+
+sub default_lan_segment_id {
+    shift->default_lan_segment->id;
 }
 
 ########################################################################
@@ -488,6 +493,16 @@ sub upgrade_Vlan {
 
         $_->{lan_segment_id} = $segment_id;
         $_->{vid}            = $_->{id};
+    }
+}
+
+sub upgrade_VlanVtp {
+    my ( $self, $data ) = @_;
+    my $segment_name = $self->default_lan_segment->name;
+
+    foreach (@$data) {
+        $_->{vid}        = $_->{id};
+        $_->{vtp_domain} = $segment_name;
     }
 }
 
