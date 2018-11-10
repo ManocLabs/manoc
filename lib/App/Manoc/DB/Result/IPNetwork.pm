@@ -173,6 +173,7 @@ sub _find_and_update_parent {
         {
             address   => { '<=' => $self->address->padded },
             broadcast => { '>=' => $self->broadcast->padded },
+            id        => { '!=' => $self->id },
         },
         {
             order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ]
@@ -367,7 +368,7 @@ __PACKAGE__->add_relationship(
         };
     },
     {
-        order_by => { -asc => [ 'me.address', 'me.broadcast' ] },
+        order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ]
     }
 );
 
@@ -492,13 +493,16 @@ sub subnets {
     return wantarray ? $rs->all : $rs;
 }
 
-=method first_supernet
+=method smallest_supernet
+
+Returns the first (smallest) super network
 
 =cut
 
-sub first_supernet {
+sub smallest_supernet {
     my $self = shift;
-    $self->supernets->first();
+    $self->supernets->search( {},
+        { order_by => [ { -desc => 'me.address' }, { -asc => 'me.broadcast' } ] } )->first();
 }
 
 =method children_ordered

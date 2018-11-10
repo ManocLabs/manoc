@@ -66,8 +66,8 @@ my $net03 = $schema->resultset("IPNetwork")->create(
 ok( $net02, "Created 192.168.1.0/26 using network object" );
 
 cmp_ok( $net03->supernets->count, '==', 2, "192.168.1.0/26 has 2 supernets" );
-cmp_ok( $net03->first_supernet->id,
-    '==', $net02->id, "192.168.1.0/26 first supernet is 192.168.1.0/25" );
+cmp_ok( $net03->smallest_supernet->id,
+    '==', $net02->id, "192.168.1.0/26 smallest supernet is 192.168.1.0/25" );
 
 my $net02b = $schema->resultset("IPNetwork")->create(
     {

@@ -39,7 +39,7 @@ sub rebuild_tree {
     my @nodes = $self->all();
 
     foreach my $node (@nodes) {
-        my $supernet = $node->first_supernet();
+        my $supernet = $node->smallest_supernet();
         $supernet //= 0;
         $node->parent($supernet);
     }
