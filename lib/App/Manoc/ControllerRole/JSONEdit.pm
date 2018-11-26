@@ -17,9 +17,8 @@ requires 'base', 'object';
 sub create_js : Chained('base') : PathPart('create/js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash( current_view => 'JSON' );
-
     $c->forward('object_form_create');
+    $c->forward('prepare_form_json_response');
 }
 
 =action edit_js
@@ -29,9 +28,24 @@ sub create_js : Chained('base') : PathPart('create/js') : Args(0) {
 sub edit_js : Chained('object') : PathPart('edit/js') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash( current_view => 'JSON' );
-
     $c->forward('object_form_edit');
+    $c->forward('prepare_form_json_response');
+}
+
+sub prepare_form_json_response : Private {
+    my ( $self, $c ) = @_;
+
+    my $form           = $c->stash->{form};
+    my $process_status = $form->is_valid;
+
+    my $json_data = {};
+    $json_data->{form_ok} = $process_status ? 1 : 0;
+    if ( !$process_status ) {
+        $json_data->{errors} = $form->form_errors || "";
+        $json_data->{field_errors} = [ $form->errors_by_name, ];
+    }
+    $c->stash( current_view => 'JSON' );
+    $c->stash( json_data    => $json_data );
 }
 
 1;
