@@ -1,31 +1,122 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+<form name="[% form.name %]" id="[% form.name %]" method="POST">
+
 <table class="table">
     <thead>
 	    <tr>
             <th>Interface</th>
-            <th>Device/Server </th>
+            <th>To</th>
 	        <th>Interface</th>
+            <th></th>
 	    </tr>
     </thead>
     <tbody>
-	    [% FOREACH if IN iface_info %]
-	    [% row_class = if.up == 'up' ? 'active' : 'warning' %]
+	    [% FOREACH cabling IN cablings %]
 	    <tr class="[% row_class %]">
-            <td>[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
-            <td>[% if.up_admin | html %]</td>
-            <td>[% if.up | html %]</td>
-	        <td>[% if.speed | html %]</td>
-	        <td>[% if.duplex | html %]/[% if.duplex_admin | html %]</td>
-	        <td>[% if.vlan | html %]</td>
-	        <td>
-                [% IF if.cps_enable -%]
-	            [% if.cps_status | html %] ([% if.cps_count | html %])
-	            [% ELSE %]
-  	            Disabled
-	            [% END -%]
-	        <td>[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
-	        <td>[% if.description | html %]</td>
+            <td>[% PP.manoc_print( cabling.interface1 ) %]</td>
+            [% IF cabling.interface2 -%]
+            <td>[% PP.manoc_print( cabling.device2 ) %]</td>
+            <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
+	        [% ELSE %]
+  	        <td>-</td>
+            <td>-</td>
+	        [% END -%]
+            <td>delete</dt>
 	    </tr>
 	    [% END -%]
+        <tr>
+            <td>
+                <select name="[% form.name %].interface1" id="[% form.name %].interface1" class="form-control selectpicker" data-live-search="true">
+                </select>
+            </td>
+            <td>
+                <select name="[% form.name %].device2" id="[% form.name %].device2" class="form-control selectpicker" data-live-search="true">
+                </select>
+            </td>
+            <td>
+                <select name="[% form.name %].interface2" id="[% form.name %].interface2" class="form-control selectpicker" data-live-search="true">
+                <option value="">-</option>
+                </select>
+            </td>
+            <td>
+                [% form.field('csrf_token').render %]
+                <input class="btn btn-default" name="submit" value="Add" type="submit">
+            </td>
+        </tr>
     </tbody>
 </table>
+
+<script type="text/javascript">
+function refresh_device2(options) {
+  $.ajax({
+    url: '[% c.uri_for_action('/device/list_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      device2_select.find('option').remove();
+      device2_select.append('<option value="">-</option>')
+      $.each(res, function(index, item) {
+        device2_select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      if (options && "success" in options && typeof options.success === "function") {
+        options.success();
+      }
+      device2_select.selectpicker('refresh');
+    }
+  });
+}
+
+function refresh_interface(select, device, options) {
+  $.ajax({
+    url: '[% c.uri_for_action('/deviceiface/list_uncabled') %]?device='+device,
+    dataType: 'json',
+    success: function (res) {
+      select.find('option').remove();
+      select.append('<option value="">-</option>')
+      $.each(res, function(index, item) {
+        select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      if (options && "success" in options && typeof options.success === "function") {
+        options.success();
+      }
+      select.selectpicker('refresh');
+    }
+  });
+}
+
+$( document ).ready(function() {
+    interface1_select = $('#[% form.name %]\\.interface1');
+    device2_select = $('#[% form.name %]\\.device2');
+    interface2_select = $('#[% form.name %]\\.interface2');
+
+    refresh_interface(interface1_select, [% object.id %]);
+    refresh_device2();
+    interface2_select.selectpicker('refresh');
+    device2_select.on('change', function() {
+        val = device2_select.val();
+        if (val != "") {
+            refresh_interface(interface2_select, val);
+        }
+     });
+
+     var submit_func = function(form) {
+         $.ajax({
+ 	        data: form.serialize(),
+ 	        type: form.attr('method'),
+ 	        url:  "[% c.uri_for_action('device/cablings', [object.id ]) %]",
+ 	        success: function(data) {
+                if (data.form_ok ) {
+                    $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
+                    form.submit(function(e) { e.preventDefault(e); submit_func(form); });
+                }
+             }
+ 	       }).fail(function() { alert( "Manoc internal error" ); } );
+         return false;
+     };
+
+     myform = $('#[% form.name %]');
+     myform.submit(function(e) {
+         e.preventDefault(e); submit_func(myform);
+     });
+});
+</script>

@@ -32,14 +32,14 @@ sub search_unused {
     return wantarray ? $rs->all : $rs;
 }
 
-=method search_unused(  $device )
+=method search_uncabled(  $device )
 
 Return a resultset containing all interfaces of <$device> which are not in
 the cabling matrix
 
 =cut
 
-sub search_not_cabled {
+sub search_uncabled {
     my ( $self, $device ) = @_;
 
     my $conditions = { 'cabling.interface2_id' => undef };
