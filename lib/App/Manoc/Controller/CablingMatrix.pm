@@ -5,6 +5,8 @@ use Moose;
 
 ##VERSION
 
+#TODO: if this controller should be used, it's jus for matrix view
+
 use namespace::autoclean;
 
 BEGIN { extends 'App::Manoc::ControllerBase::CRUD'; }
@@ -21,30 +23,6 @@ __PACKAGE__->config(
     view_object_perm    => undef,
     object_list_options => { prefetch => [ 'interface2', 'serverhw_nic' ] },
 );
-
-=action uncabled_iface_js
-
-
-=cut
-
-sub uncabled_iface_js : Chained('base') : PathPart('uncabled_iface/js') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->require_permission( $c->stash->{resultset}, 'list' );
-
-    my $device = $c->req->query_parameters->{device};
-
-    my $filter;
-
-    my $q = $c->req->query_parameters->{'q'};
-    $q and $filter->{name} = { -like => "$q%" };
-
-    my @data =
-        $c->$c->model('DeviceIface')->search_uncabled($device)->search( $filter, {} )->all();
-
-    $c->stash( json_data => \@data );
-    $c->forward('View::JSON');
-}
 
 __PACKAGE__->meta->make_immutable;
 

@@ -57,18 +57,18 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
     interface2 => 'App::Manoc::DB::Result::DeviceIface',
     { 'foreign.id' => 'self.interface2_id' },
-    { join_type => 'LEFT' }
+    { join_type    => 'LEFT' }
 );
 
 __PACKAGE__->belongs_to(
     serverhw_nic => 'App::Manoc::DB::Result::ServerHWNIC',
     { 'foreign.id' => 'self.hwserver_nic_id' },
-    { join_type => 'LEFT' }
+    { join_type    => 'LEFT' }
 );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraints(
-    cabling_matrix_iface_idx => [ 'interface1_id' ],
+    cabling_matrix_iface_idx => ['interface1_id'],
     cabling_matrix_nic_idx   => ['hwserver_nic_id'],
 );
 
@@ -80,7 +80,7 @@ sub device2 {
     my $self = shift;
     $self->interface2 or return;
     return $self->interface2->device;
- }
+}
 
 =method serverhw
 
@@ -113,7 +113,8 @@ sub _validate {
 sub insert {
     my ( $self, @args ) = @_;
 
-    $self->_device1_id($self->interface1->device_id);
+    $self->_device1_id( $self->interface1->device_id );
+
     $self->_validate;
     $self->next::method(@args);
 

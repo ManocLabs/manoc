@@ -219,14 +219,34 @@ sub cablings : Chained('object') : PathPart('cablings') : Args(0) {
     my $device = $c->stash->{'object'};
     $c->require_permission( $device, 'view' );
 
-    my @cablings = map +{
-        to_interface  => $_->interface2,
-        to_server_nic => $_->serverhw_nic,
-        },
-        $device->cablings;
-    $c->stash->{cablings} = \@cablings;
-
     $c->stash->{no_wrapper} = 1;
+
+    $c->stash->{cablings} = [ $device->cablings->all ];
+
+    my $form = App::Manoc::Form::DeviceCabling->new(
+        {
+            device => $device->id,
+            ctx    => $c,
+        }
+    );
+    $c->stash( form => $form );
+
+    if ( $c->stash->{is_xhr} && $c->req->method eq 'POST' ) {
+        my $process_status = $form->process(
+            params => $c->req->params,
+            item   => $c->model('ManocDB::CablingMatrix')->new_result( {} )
+        );
+        $c->debug and $c->log->debug("Form process status = $process_status");
+
+        my $json_data = {};
+        $json_data->{form_ok} = $process_status ? 1 : 0;
+        if ( !$process_status ) {
+            $json_data->{errors} = $form->form_errors || "";
+            $json_data->{field_errors} = [ $form->errors_by_name, ];
+        }
+        $c->stash( current_view => 'JSON' );
+        $c->stash( json_data    => $json_data );
+    }
 }
 
 =action refresh
@@ -250,29 +270,6 @@ sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     }
 
     $c->response->redirect( $c->uri_for_action( '/device/view', [$device_id] ) );
-    $c->detach();
-}
-
-=action edit_cabling
-
-=cut
-
-sub edit_cabling : Chained('object') : PathPart('edit_cabling') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    my $device = $c->stash->{'object'};
-    $c->require_permission( $device, 'edit' );
-
-    my $form = App::Manoc::Form::DeviceCabling->new( { device1 => $device, ctx => $c } );
-
-    $c->stash(
-        form   => $form,
-        action => $c->uri_for( $c->action, $c->req->captures ),
-    );
-    return
-        unless $form->process( params => $c->req->parameters, );
-
-    $c->response->redirect( $c->uri_for_action( 'device/view', [ $device->id ] ) );
     $c->detach();
 }
 

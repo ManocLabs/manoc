@@ -56,6 +56,8 @@ page.title   = 'Device ' _ object.name
   [% bootstrap_nav_tab_remote("ifstatus", "Interface Status",
                       c.uri_for_action('/device/ifstatus', [object.id])  0) -%]
   [% bootstrap_nav_tab("ifunused", "Unused Intefaces", 0)-%]
+  [% bootstrap_nav_tab_remote("cablings", "Cablings",
+    c.uri_for_action('/device/cablings', [object.id]), 0) -%]
   [% bootstrap_nav_tab_remote("neighs", "Neighbours",
     c.uri_for_action('/device/neighs', [object.id]), 0) -%]
   [% bootstrap_nav_tab_remote("ssid", "SSID List",
@@ -172,6 +174,9 @@ page.title   = 'Device ' _ object.name
       </dl>
     </div><!-- row -->
   </div>
+
+  <div role="tabpanel" class="tab-pane" id="cablings">
+  </div> <!-- cablings -->
 
   <div role="tabpanel" class="tab-pane" id="neighs">
   </div> <!-- neighs -->

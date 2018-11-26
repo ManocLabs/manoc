@@ -39,18 +39,46 @@ __PACKAGE__->config(
 use App::Manoc::Form::DeviceIface::Create;
 use App::Manoc::Form::DeviceIface::Edit;
 
-=method get_form
+=method create
 
 =cut
 
 before 'create' => sub {
     my ( $self, $c ) = @_;
-
     my $device_id = $c->{stash}->{object}->device_id;
     $c->stash( form_parameters => { device_id => $device_id } );
 };
 
-=method view2
+=action uncabled_iface_js
+
+=cut
+
+sub list_uncabled : Chained('base') : PathPart('uncabled') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->require_permission( $c->stash->{resultset}, 'list' );
+
+    my $device_id = $c->req->query_parameters->{'device'};
+    my $q         = $c->req->query_parameters->{'q'};
+
+    my $filter;
+    $q and $filter->{name} = { -like => "$q%" };
+
+    my @ifaces =
+        $c->model('ManocDB::DeviceIface')->search_uncabled($device_id)->search( $filter, {} )
+        ->all();
+
+    my @data = map +{
+        device_id => $_->device_id,
+        id        => $_->id,
+        name      => $_->name
+    }, @ifaces;
+
+    $c->stash( json_data => \@data );
+    $c->forward('View::JSON');
+}
+
+=method view
 
 =cut
 
