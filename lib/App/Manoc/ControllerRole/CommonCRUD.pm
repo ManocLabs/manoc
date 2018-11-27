@@ -223,6 +223,23 @@ sub delete : Chained('object') : PathPart('delete') : Args(0) {
     );
 
     $c->forward('object_form_delete');
+
+    if ( $c->stash->{is_xhr} ) {
+        $c->forward('object_form_delete_ajax_response');
+        return;
+    }
+
+    if ( $c->stash->{form_delete_posted} ) {
+        if ( $c->stash->{form_delete_success} ) {
+            $c->flash( message => $self->object_deleted_message );
+            $c->res->redirect( $self->get_delete_success_url($c) );
+            $c->detach();
+        }
+        else {
+            $c->res->redirect( $self->get_delete_failure_url($c) );
+            $c->detach();
+        }
+    }
 }
 
 1;

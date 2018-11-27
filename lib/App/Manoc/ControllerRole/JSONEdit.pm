@@ -32,6 +32,30 @@ sub edit_js : Chained('object') : PathPart('edit/js') : Args(0) {
     $c->forward('prepare_form_json_response');
 }
 
+=action delete_js
+
+=cut
+
+sub delete_js : Chained('object') : PathPart('delete/js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->forward('object_form_delete');
+
+    my $success = $c->stash->{form_delete_success};
+
+    my $json_data = {};
+    $json_data->{form_ok} = $success;
+    if ( !$success ) {
+        $json_data->{errors} = $c->stash->{form_delete_error} || "";
+    }
+    $c->stash( current_view => 'JSON' );
+    $c->stash( json_data    => $json_data );
+}
+
+=method prepare_form_json_response
+
+=cut
+
 sub prepare_form_json_response : Private {
     my ( $self, $c ) = @_;
 
