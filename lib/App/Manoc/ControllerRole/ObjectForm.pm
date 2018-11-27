@@ -2,6 +2,7 @@ package App::Manoc::ControllerRole::ObjectForm;
 #ABSTRACT: Role for editing objects with a form
 
 use Moose::Role;
+use Try::Tiny;
 
 ##VERSION
 
@@ -248,19 +249,55 @@ sub object_form_delete : Private {
     $self->delete_object_perm and
         $c->require_permission( $object, $self->delete_object_perm );
 
-    ## TODO implement Ajax support
     if ( $c->req->method eq 'POST' ) {
-        if ( $self->delete_object($c) ) {
-            $c->debug and $c->log->debug("Deleting object $object");
-            $c->flash( message => $self->object_deleted_message );
-            $c->res->redirect( $self->get_delete_success_url($c) );
-            $c->detach();
-        }
-        else {
-            $c->res->redirect( $self->get_delete_failure_url($c) );
-            $c->detach();
+        my $success = $self->delete_object($c) || 0;
+        $c->stash(
+            {
+                form_delete_posted  => 1,
+                form_delete_success => $success
+            }
+        );
+    }
+    else {
+        $c->stash( form_delete_posted => 0 );
+    }
+
+}
+
+=action object_form_delete_ajax_response
+
+=cut
+
+sub object_form_delete_ajax_response : Private {
+    my ( $self, $c ) = @_;
+
+    my $process_status = $c->stask->{form_delete_posted} && $c->stash->{form_delete_success};
+
+    my $json_data = {};
+
+    $json_data->{form_ok} = $process_status ? 1         : 0;
+    $json_data->{status}  = $process_status ? 'success' : 'error';
+
+    if ($process_status) {
+        $json_data->{message}  = $self->object_deleted_message;
+        $json_data->{redirect} = $self->get_delete_success_url($c)->as_string;
+    }
+    else {
+        $json_data->{object_id} = $c->stash->{object_id};
+
+        if ( $c->stash->{object_form_ajax_add_html} ) {
+            my $template_name = $c->stash->{ajax_delete_form_template};
+            $template_name ||= "generic_delete.tt";
+
+            # render as a fragment{
+            $c->stash->{no_wrapper} = 1;
+            my $html = $c->forward( "View::TT", "render", [ $template_name, $c->stash ] );
+
+            $json_data->{html} = $html;
         }
     }
+    $c->stash->{json_data}    = $json_data;
+    $c->stash->{current_view} = 'JSON';
 }
 
 =method delete_object
@@ -272,7 +309,12 @@ Delete the object using its C<delete> method.
 sub delete_object {
     my ( $self, $c ) = @_;
 
-    return $c->stash->{object}->delete;
+    my $success = 0;
+    try {
+        $c->stash->{object}->delete;
+        $success = 1;
+    };
+    return $success;
 }
 
 =method get_delete_failure_url
