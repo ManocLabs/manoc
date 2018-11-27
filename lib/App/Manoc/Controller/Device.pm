@@ -26,7 +26,7 @@ use Text::Diff;
 
 use App::Manoc::Form::Device::Edit;
 use App::Manoc::Form::DeviceNWInfo;
-use App::Manoc::Form::DeviceCabling;
+use App::Manoc::Form::Cabling;
 use App::Manoc::Form::Uplink;
 use App::Manoc::Form::Device::Decommission;
 
@@ -223,30 +223,12 @@ sub cablings : Chained('object') : PathPart('cablings') : Args(0) {
 
     $c->stash->{cablings} = [ $device->cablings->all ];
 
-    my $form = App::Manoc::Form::DeviceCabling->new(
+    my $form = App::Manoc::Form::Cabling->new(
         {
-            device => $device->id,
-            ctx    => $c,
+            ctx => $c,
         }
     );
     $c->stash( form => $form );
-
-    if ( $c->stash->{is_xhr} && $c->req->method eq 'POST' ) {
-        my $process_status = $form->process(
-            params => $c->req->params,
-            item   => $c->model('ManocDB::CablingMatrix')->new_result( {} )
-        );
-        $c->debug and $c->log->debug("Form process status = $process_status");
-
-        my $json_data = {};
-        $json_data->{form_ok} = $process_status ? 1 : 0;
-        if ( !$process_status ) {
-            $json_data->{errors} = $form->form_errors || "";
-            $json_data->{field_errors} = [ $form->errors_by_name, ];
-        }
-        $c->stash( current_view => 'JSON' );
-        $c->stash( json_data    => $json_data );
-    }
 }
 
 =action refresh

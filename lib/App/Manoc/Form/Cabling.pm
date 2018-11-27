@@ -1,4 +1,4 @@
-package App::Manoc::Form::DeviceCabling;
+package App::Manoc::Form::Cabling;
 
 use HTML::FormHandler::Moose;
 
@@ -6,20 +6,12 @@ use HTML::FormHandler::Moose;
 
 extends 'App::Manoc::Form::BaseDBIC';
 
-has '+name'        => ( default => 'form-devcabling' );
-has '+html_prefix' => ( default => 1 );
+has '+name' => ( default => 'form-devcabling' );
 
 has 'schema' => ( is => 'rw' );
 
-has 'device' => (
-    is       => 'ro',
-    isa      => 'Int',
-    required => 1,
-);
-
 has_field 'interface1' => (
     type         => 'Select',
-    label        => 'Interface1',
     empty_select => '--- Select ---',
     required     => 1,
     do_wrapper   => 0,
@@ -27,7 +19,6 @@ has_field 'interface1' => (
 
 has_field 'interface2' => (
     type         => 'Select',
-    label        => 'Interface1',
     empty_select => '--- Select ---',
     required     => 0,
     do_wrapper   => 0,
@@ -36,7 +27,6 @@ has_field 'interface2' => (
 
 has_field 'serverhw_nic' => (
     type         => 'Select',
-    label        => 'Interface1',
     empty_select => '--- Select ---',
     required     => 0,
     do_wrapper   => 0,
@@ -51,9 +41,12 @@ override validate_model => sub {
     my $self = shift;
 
     # some handy shortcuts
-    my $interface1   = $self->field('interface1')->value;
-    my $serverhw_nic = $self->field('serverhw_nic')->value;
-    my $interface2   = $self->field('interface2')->value;
+    my %active_fields = map { $_->name => 1 } $self->sorted_fields;
+
+    my $interface1 = $active_fields{interface1} ? $self->field('interface1')->value : undef;
+    my $serverhw_nic =
+        $active_fields{serverhw_nic} ? $self->field('serverhw_nic')->value : undef;
+    my $interface2 = $active_fields{interface2} ? $self->field('interface2')->value : undef;
 
     my $item = $self->item;
 
