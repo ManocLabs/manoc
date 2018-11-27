@@ -1,6 +1,6 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
 
-<form name="[% form.name %]" id="[% form.name %]" method="POST">
+<form id="[% form.name %]" name="[% form.name %]" method="POST">
 
 <table class="table">
     <thead>
@@ -22,30 +22,36 @@
   	        <td>-</td>
             <td>-</td>
 	        [% END -%]
-            <td>delete</dt>
+            <td>
+                <a href="#" data-manoc-action="cabling-delete" data-manoc-what="[%cabling.id%]">
+                    [% bootstrap_icon('trash') %]<span class="sr-only" Delete
+                </a>
+            </dt>
 	    </tr>
 	    [% END -%]
         <tr>
             <td>
-                <select name="[% form.name %].interface1" id="[% form.name %].interface1" class="form-control selectpicker" data-live-search="true">
+                <select name="interface1" id="[% form.name %].interface1" class="form-control selectpicker" data-live-search="true">
                 </select>
             </td>
             <td>
-                <select name="[% form.name %].device2" id="[% form.name %].device2" class="form-control selectpicker" data-live-search="true">
+                <select name="device2" id="[% form.name %].device2" class="form-control selectpicker" data-live-search="true">
                 </select>
             </td>
             <td>
-                <select name="[% form.name %].interface2" id="[% form.name %].interface2" class="form-control selectpicker" data-live-search="true">
+                <select name="interface2" id="[% form.name %].interface2" class="form-control selectpicker" data-live-search="true">
                 <option value="">-</option>
                 </select>
             </td>
             <td>
-                [% form.field('csrf_token').render %]
                 <input class="btn btn-default" name="submit" value="Add" type="submit">
             </td>
         </tr>
     </tbody>
 </table>
+
+[% form.field('csrf_token').render %]
+</form>
 
 <script type="text/javascript">
 function refresh_device2(options) {
@@ -85,13 +91,33 @@ function refresh_interface(select, device, options) {
 }
 
 $( document ).ready(function() {
+
+    $('a[data-manoc-action="cabling-delete"]').on( 'click', function (e) {
+      url_base = '[% c.uri_for_action("/cabling/delete_js", [ ":cabling" ]) %]';
+      id = $(this).attr('data-manoc-what');
+      url = url_base.replace(":cabling", id);
+      $.post({
+        url : url,
+        data: {
+          ['csrf_token']: '[% c.get_token %]'
+        },
+        success: function() {
+            $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
+        }
+      });
+    });
+
     interface1_select = $('#[% form.name %]\\.interface1');
     device2_select = $('#[% form.name %]\\.device2');
     interface2_select = $('#[% form.name %]\\.interface2');
 
-    refresh_interface(interface1_select, [% object.id %]);
-    refresh_device2();
+    interface1_select.selectpicker('refresh');
+    device2_select.selectpicker('refresh');
     interface2_select.selectpicker('refresh');
+
+    refresh_device2();
+    refresh_interface(interface1_select, [% object.id %]);
+
     device2_select.on('change', function() {
         val = device2_select.val();
         if (val != "") {
@@ -103,7 +129,7 @@ $( document ).ready(function() {
          $.ajax({
  	        data: form.serialize(),
  	        type: form.attr('method'),
- 	        url:  "[% c.uri_for_action('device/cablings', [object.id ]) %]",
+ 	        url:  "[% c.uri_for_action('cabling/create_js',) %]",
  	        success: function(data) {
                 if (data.form_ok ) {
                     $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
