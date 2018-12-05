@@ -68,10 +68,6 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     # uplinks
     $c->stash( uplinks => [ map { $_->interface } $device->uplinks->all() ] );
 
-    #Unused interfaces
-    my @unused_ifaces = $c->model('ManocDB::DeviceIface')->search_unused( $device->id );
-    $c->stash( unused_ifaces => \@unused_ifaces );
-
     # prepare template
     $c->stash( template => 'device/view.tt' );
 }

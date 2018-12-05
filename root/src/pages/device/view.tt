@@ -55,7 +55,6 @@ page.title   = 'Device ' _ object.name
   [% bootstrap_nav_tab("general", "General", 1) -%]
   [% bootstrap_nav_tab_remote("ifstatus", "Interface Status",
                       c.uri_for_action('/device/ifstatus', [object.id])  0) -%]
-  [% bootstrap_nav_tab("ifunused", "Unused Intefaces", 0)-%]
   [% bootstrap_nav_tab_remote("cablings", "Cablings",
     c.uri_for_action('/device/cablings', [object.id]), 0) -%]
   [% bootstrap_nav_tab_remote("neighs", "Neighbours",
@@ -183,25 +182,6 @@ page.title   = 'Device ' _ object.name
 
   <div role="tabpanel" class="tab-pane" id="ifstatus">
   </div> <!-- ifstatus  -->
-
-  <div role="tabpanel" class="tab-pane" id="ifunused">
-    <table class="table">
-      <thead>
-	<tr>
-	  <th>Interface</th>
-	  <th>Description</th>
-	</tr>
-      </thead>
-      <tbody>
-	[% FOREACH if IN unused_ifaces %]
-	<tr>
-	  <td>[% PP.manoc_print({ device => object, iface => if.name}) %]</td>
-          <td>[% if.description %]</td>
-	</tr>
-	[% END %]
-      </tbody>
-    </table>
-  </div> <!-- unused  -->
 
   <div role="tabpanel" class="tab-pane" id="ssid">
 
