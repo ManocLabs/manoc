@@ -94,32 +94,14 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
         $if_last_mat{ $e->get_column('interface') } = $e->get_column('lastseen');
     }
 
-    my @iface_info;
+    my @iface_info = $device->interfaces->all;
 
     foreach my $r ( $device->interfaces->all ) {
-        my ( $controller, $port ) = split /[.\/]/, $r->name;
-        my $lc_if = lc( $r->name );
-
-        push @iface_info, {
-            controller   => $controller,                                  # for sorting
-            port         => $port,                                        # for sorting
-            interface    => $r->name,
-            speed        => $r->speed || 'n/a',
-            up           => $r->up || 'n/a',
-            up_admin     => $r->up_admin || '',
-            duplex       => $r->duplex || '',
-            duplex_admin => $r->duplex_admin || '',
-            cps_enable   => $r->cps_enable && $r->cps_enable eq 'true',
-            cps_status   => $r->cps_status || '',
-            cps_count    => $r->cps_count || '',
-            description  => $r->description || '',
-            vlan         => $r->vlan || '',
-            last_mat     => $if_last_mat{ $r->name },
-            has_notes    => ( defined( $r->name ) ? 1 : 0 ),
-        };
+        $r->{last_mat} = $if_last_mat{ $r->name },;
     }
+
     @iface_info =
-        sort { $a->{controller} cmp $b->{controller} || $a->{port} cmp $b->{port} } @iface_info;
+        sort { $a->controller cmp $b->controller || $a->port <=> $b->port } @iface_info;
 
     $c->stash->{no_wrapper} = 1;
     $c->stash->{iface_info} = \@iface_info;

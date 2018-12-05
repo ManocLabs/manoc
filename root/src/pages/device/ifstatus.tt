@@ -10,25 +10,31 @@
 	        <th>Sec</th>
             <th>Last activity</th>
 	        <th>Description</th>
+            <th data-orderable="false"></th>
 	    </tr>
     </thead>
     <tbody>
 	    [% FOREACH if IN iface_info %]
 	    [% row_class = if.up == 'up' ? '' : 'warning' %]
 	    <tr class="[% row_class %]">
-            <td data-order="[% loop.count %]">[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
+            <td data-order="[% loop.count %]">[% PP.manoc_print({ device => object, iface => if.name}) %]</td>
             <td>[% if.up_admin | html %]/[% if.up | html %]</td>
 	        <td>[% if.speed | html %]</td>
 	        <td>[% if.duplex | html %]/[% if.duplex_admin | html %]</td>
 	        <td>[% if.vlan | html %]</td>
 	        <td>
-                [% IF if.cps_enable -%]
-	            [% if.cps_status | html %] ([% if.cps_count | html %])
+                [% IF if.cps_enable  == 'true' -%]
+	            On ([% if.cps_count | html %])
 	            [% ELSE %]
-  	            -
+  	            Off
 	            [% END -%]
 	        <td data-order="[% if.last_mat %]">[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
 	        <td>[% if.description | html %]</td>
+            <td>
+                <a href="#" data-manoc-action="iface-delete" data-manoc-what="[%if.id%]">
+                    [% bootstrap_icon('trash') %]<span class="sr-only" Delete
+                </a>
+            </dt>
 	    </tr>
 	    [% END -%]
     </tbody>
@@ -47,5 +53,20 @@ var table = $("#ifstatus_table").DataTable( {
    ],*/
    //"dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
  });
+
+    $('a[data-manoc-action="iface-delete"]').on( 'click', function (e) {
+      url_base = '[% c.uri_for_action("/deviceiface/delete_js", [ ":iface" ]) %]';
+      id = $(this).attr('data-manoc-what');
+      url = url_base.replace(":iface", id);
+      $.post({
+        url : url,
+        data: {
+          ['csrf_token']: '[% c.get_token %]'
+        },
+        success: function() {
+            $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
+        }
+      });
+    });
 });
 </script>

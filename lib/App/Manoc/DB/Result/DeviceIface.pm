@@ -37,6 +37,12 @@ __PACKAGE__->add_columns(
         size          => 1,
         default_value => 0,
     },
+    'nw_confirmed' => {
+        data_type     => 'int',
+        is_nullable   => 0,
+        size          => 1,
+        default_value => 0,
+    },
     'routed' => {
         data_type     => 'int',
         is_nullable   => 0,
@@ -97,6 +103,34 @@ __PACKAGE__->might_have(
         cascade_update => 0,
     }
 );
+
+sub controller {
+    my $self = shift;
+
+    if ( !defined( $self->{_controller} ) ) {
+        $self->_init_controller_port();
+    }
+
+    $self->{_controller};
+}
+
+sub port {
+    my $self = shift;
+
+    if ( !defined( $self->{_port} ) ) {
+        $self->_init_controller_port();
+    }
+
+    $self->{_port};
+}
+
+sub _init_controller_port {
+    my $self = shift;
+
+    my ( $controller, $port ) = split /[.\/]/, $self->name;
+    $self->{_controller} = $controller;
+    $self->{_port}       = $port;
+}
 
 sub remove_cabling {
     my $self = shift;

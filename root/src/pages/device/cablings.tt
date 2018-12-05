@@ -74,7 +74,7 @@ function refresh_device2(options) {
 
 function refresh_interface(select, device, options) {
   $.ajax({
-    url: '[% c.uri_for_action('/deviceiface/list_uncabled') %]?device='+device,
+    url: '[% c.uri_for_action('/deviceiface/list_uncabled_js') %]?device='+device,
     dataType: 'json',
     success: function (res) {
       select.find('option').remove();
