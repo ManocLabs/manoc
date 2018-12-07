@@ -120,7 +120,7 @@ sub import_csv : Chained('base') : PathPart('importcsv') : Args(0) {
     my $upload;
     $c->req->method eq 'POST' and $upload = $c->req->upload('file');
 
-    my $form = App::Manoc::Form::CVSImport::ServerHW->new(
+    my $form = App::Manoc::Form::CSVImport::ServerHW->new(
         ctx       => $c,
         resultset => $rs,
     );
