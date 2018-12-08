@@ -150,6 +150,10 @@ sub object_form : Private {
         %process_params = $self->get_form_process_params( $c, %process_params );
     }
 
+    if ( $c->stash->{form_require_post} ) {
+        $process_params{posted} = $c->req->method eq 'POST';
+    }
+
     # the "process" call has all the saving logic,
     #   if it returns False, then a validation error happened
     my $process_status = $form->process(%process_params);
