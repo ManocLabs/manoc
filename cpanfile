@@ -26,6 +26,7 @@ requires "DateTime::Format::RFC3339" => "0";
 requires "Digest::SHA1" => "0";
 requires "HTML::FormHandler" => "0";
 requires "HTML::FormHandler::Model::DBIC" => "0";
+requires "JSON::MaybeXS" => "0";
 requires "Log::Log4perl" => "1.46";
 requires "Module::Runtime" => "0";
 requires "Moose" => "0";
@@ -40,6 +41,7 @@ requires "POE" => "0";
 requires "Plack::Middleware::ReverseProxy" => "0";
 requires "Regexp::Common" => "0";
 requires "SQL::Translator" => "0";
+requires "Test::Deep" => "0";
 requires "Text::CSV" => "0";
 requires "YAML::Syck" => "0";
 requires "namespace::autoclean" => "0";
@@ -74,19 +76,4 @@ on 'develop' => sub {
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Version" => "1";
-  requires "Test::Deep" => "0";
 };
-
-# used for heroku like environmens
-
-feature 'sqlite', 'SQLite support' => sub {
-   requires 'DBD::SQLite';
-};
-
-feature 'mysql', 'MySQL support' => sub {
-   requires 'DBD::mysql';
-};
-
-feature 'postgres', 'PostgreSQL support' => sub {
-   requires 'DBD::Pg';
-}
