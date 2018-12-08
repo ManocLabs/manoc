@@ -23,7 +23,7 @@ __PACKAGE__->config(
     view_object_perm    => undef,
     object_list_options => {
         prefetch => 'vlan_range',
-        order_by => { -asc => [ 'segment_id', 'vid' ] }
+        order_by => { -asc => [ 'lan_segment_id', 'vid' ] }
     }
 );
 
