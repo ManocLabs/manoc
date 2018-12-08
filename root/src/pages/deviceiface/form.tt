@@ -1,5 +1,5 @@
 [%
-   page.title='Interface ' _ object.device.name _ '/' _ object.name
+   page.title =  title || 'Interface ' _ object.device.name _ '/' _ object.name
 %]
 
 [% form.render %]

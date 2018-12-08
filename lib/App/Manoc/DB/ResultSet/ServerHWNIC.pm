@@ -9,26 +9,22 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Search::Result::Iface;
 
-=method search_not_cabled( $server )
+=method search_not_cabled( )
 
-Return a resultset containing all NICs belonging to $server which are not
-in the cabling matrix.
+Return a resultset containing all NICs which are not in the cabling matrix.
 
 =cut
 
-sub search_not_cabled {
-    my ( $self, $server ) = @_;
+sub search_uncabled {
+    my ( $self, $args ) = @_;
 
+    my $search_opts = {
+        alias    => 'me',
+        prefetch => ['cabling']
+    };
     my $conditions = { 'cabling.hwserver_nic_id' => undef };
-    $server and $conditions->{'me.server_id'} = $server;
 
-    my $rs = $self->search(
-        $conditions,
-        {
-            alias => 'me',
-            join  => 'cabling',
-        }
-    );
+    my $rs = $self->search( $conditions, $search_opts );
     return wantarray ? $rs->all : $rs;
 }
 

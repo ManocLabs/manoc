@@ -97,4 +97,6 @@ sub insert {
     return $self;
 }
 
+sub label { shift->name }
+
 1;

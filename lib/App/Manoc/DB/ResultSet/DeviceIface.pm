@@ -9,18 +9,17 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Search::Result::Iface;
 
-=method search_unused(  $device )
+=method search_unused
 
-Return a resultset containing all interfaces of <$device> which were never seen in
+Return a resultset containing all interfaces which were never seen in
 mac address table.
 
 =cut
 
 sub search_unused {
-    my ( $self, $device ) = @_;
+    my ($self) = @_;
 
     my $conditions = { 'mat_entry.macaddr' => undef };
-    $device and $conditions->{'me.device_id'} = $device;
 
     my $rs = $self->search(
         $conditions,
@@ -32,18 +31,17 @@ sub search_unused {
     return wantarray ? $rs->all : $rs;
 }
 
-=method search_uncabled(  $device )
+=method search_uncabled
 
-Return a resultset containing all interfaces of <$device> which are not in
+Return a resultset containing all interfaces which are not in
 the cabling matrix
 
 =cut
 
 sub search_uncabled {
-    my ( $self, $device ) = @_;
+    my ($self) = @_;
 
     my $conditions = { 'cabling.interface2_id' => undef };
-    $device and $conditions->{'me.device_id'} = $device;
 
     my $rs = $self->search(
         $conditions,

@@ -450,6 +450,32 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     $c->forward('View::JSON');
 }
 
+=action ifacecreate
+
+Redirect to deviceiface method
+
+=cut
+
+sub ifacecreate : Chained('object') : PathPart('ifacecreate') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    # device is already in stash
+    $c->forward('/deviceiface/create');
+}
+
+=action ifacepopulate
+
+Redirect to deviceiface method
+
+=cut
+
+sub ifacepopulate : Chained('object') : PathPart('ifacepopulate') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    # device is already in stash
+    $c->forward('/deviceiface/populate');
+}
+
 =method get_object
 
 Find by id or mng_address.

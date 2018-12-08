@@ -19,8 +19,8 @@
             <td>[% PP.manoc_print( cabling.device2 ) %]</td>
             <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
 	        [% ELSE %]
-  	        <td>-</td>
-            <td>-</td>
+  	        <td>[% PP.manoc_print( cabling.serverhw.server ) %]</td>
+            <td>[% cabling.serverhw_nic.name %]</td>
 	        [% END -%]
             <td>
                 <a href="#" data-manoc-action="cabling-delete" data-manoc-what="[%cabling.id%]">
@@ -35,39 +35,55 @@
                 </select>
             </td>
             <td>
-                <select name="device2" id="[% form.name %].device2" class="form-control selectpicker" data-live-search="true">
+                <select name="destination_host" id="[% form.name %].destination_host" class="form-control selectpicker" data-live-search="true">
+                <optgroup label="Devices">
+                    <option value="">-</option>
+                </optgroup>
+                <optgroup label="Servers">
+                    <option value="">-</option>
+                </optgroup>
                 </select>
             </td>
             <td>
-                <select name="interface2" id="[% form.name %].interface2" class="form-control selectpicker" data-live-search="true">
+                <select name="destination_port" id="[% form.name %].destination_port" class="form-control selectpicker" data-live-search="true">
                 <option value="">-</option>
                 </select>
             </td>
             <td>
-                <input class="btn btn-default" name="submit" value="Add" type="submit">
+                <button class="btn btn-primary" type="submit">Add</button>
             </td>
         </tr>
     </tbody>
 </table>
-
-[% form.field('csrf_token').render %]
+<input type="hidden" name="destination_type" value="" id="[% form.name %].destination_type" />
+<input type="hidden" name="csrf_token" value="[% c.get_token %]" id="[% form.name %].csrf_token" />
 </form>
 
 <script type="text/javascript">
-function refresh_device2(options) {
+function refresh_destination_host() {
   $.ajax({
     url: '[% c.uri_for_action('/device/list_js') %]',
     dataType: 'json',
     success: function (res) {
-      device2_select.find('option').remove();
-      device2_select.append('<option value="">-</option>')
+      optgroup = destination_host_select.find('optgroup[label="Devices"]');
+      optgroup.find('option').remove();
       $.each(res, function(index, item) {
-        device2_select.append('<option value="' + item.id + '">' + item.name + '</option>');
+        optgroup.append('<option value="device:' + item.id + '">' + item.name + '</option>');
       });
-      if (options && "success" in options && typeof options.success === "function") {
-        options.success();
-      }
-      device2_select.selectpicker('refresh');
+      destination_host_select.selectpicker('refresh');
+    }
+  });
+
+  $.ajax({
+    url: '[% c.uri_for_action('/server/list_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      optgroup = destination_host_select.find('optgroup[label="Servers"]');
+      optgroup.find('option').remove();
+      $.each(res, function(index, item) {
+        optgroup.append('<option value="server:' + item.id + '">' + item.label + '</option>');
+      });
+      destination_host_select.selectpicker('refresh');
     }
   });
 }
@@ -75,6 +91,24 @@ function refresh_device2(options) {
 function refresh_interface(select, device, options) {
   $.ajax({
     url: '[% c.uri_for_action('/deviceiface/list_uncabled_js') %]?device='+device,
+    dataType: 'json',
+    success: function (res) {
+      select.find('option').remove();
+      select.append('<option value="">-</option>')
+      $.each(res, function(index, item) {
+        select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      if (options && "success" in options && typeof options.success === "function") {
+        options.success();
+      }
+      select.selectpicker('refresh');
+    }
+  });
+}
+
+function refresh_nic(select, server, options) {
+  $.ajax({
+    url: '[% c.uri_for_action('/serverhwnic/list_uncabled_js') %]?server='+server,
     dataType: 'json',
     success: function (res) {
       select.find('option').remove();
@@ -108,26 +142,47 @@ $( document ).ready(function() {
     });
 
     interface1_select = $('#[% form.name %]\\.interface1');
-    device2_select = $('#[% form.name %]\\.device2');
-    interface2_select = $('#[% form.name %]\\.interface2');
+    destination_host_select = $('#[% form.name %]\\.destination_host');
+    destination_port_select = $('#[% form.name %]\\.destination_port');
 
     interface1_select.selectpicker('refresh');
-    device2_select.selectpicker('refresh');
-    interface2_select.selectpicker('refresh');
+    destination_host_select.selectpicker('refresh');
+    destination_port_select.selectpicker('refresh');
 
-    refresh_device2();
+    refresh_destination_host();
     refresh_interface(interface1_select, [% object.id %]);
 
-    device2_select.on('change', function() {
-        val = device2_select.val();
-        if (val != "") {
-            refresh_interface(interface2_select, val);
+    destination_host_select.on('change', function() {
+        val = destination_host_select.val();
+        if (val == "") {
+            return;
         }
+        tokens = val.split(":");
+        type = tokens[0];
+        id = tokens[1];
+
+        if (type == 'device') {
+            $('#[% form.name %]\\.destination_type').val('interface2');
+            refresh_interface(destination_port_select, id);
+        }
+        if (type == 'server') {
+            $('#[% form.name %]\\.destination_type').val('serverhw_nic');
+            refresh_nic(destination_port_select, id);
+        }
+
      });
 
      var submit_func = function(form) {
+         var data = {};
+
+         port_id   = destination_port_select.val();
+         port_type = form.find('input[name="destination_type"]').val();
+         data[port_type] = port_id;
+         data.interface1 = form.find('select[name="interface1"]').val();
+         data.csrf_token = form.find('input[name="csrf_token"]').val();
+
          $.ajax({
- 	        data: form.serialize(),
+ 	        data: data,
  	        type: form.attr('method'),
  	        url:  "[% c.uri_for_action('cabling/create_js',) %]",
  	        success: function(data) {

@@ -66,7 +66,7 @@ override update_model => sub {
         sub {
             super();
 
-            if ( $self->field('interface2')->value ) {
+            if ( $self->values->{interface2} ) {
                 my $item   = $self->item;
                 my $source = $self->source;
                 my $rs     = $self->schema->resultset( $source->source_name );

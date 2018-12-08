@@ -1,4 +1,13 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+
+[%- IF c.check_permission('device.edit') -%]
+  <a href="[% c.uri_for_action('/device/ifacecreate', [object.id]) %]" class="btn btn-sm">[% fa_icon("plus") %] Add interface</a>
+  <a href="[% c.uri_for_action('/device/ifacepopulate', [object.id] ) %]" class="btn btn-sm">[% fa_icon("clone") %] Add range</a>
+[% END -%]
+</div>
+
 <table id="ifstatus_table"  class="table display">
     <thead>
 	    <tr>
@@ -31,28 +40,28 @@
 	        <td data-order="[% if.last_mat %]">[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
 	        <td>[% if.description | html %]</td>
             <td>
-                <a href="#" data-manoc-action="iface-delete" data-manoc-what="[%if.id%]">
+                [% IF ! if.autocreated %]
+                <a href="[% c.uri_for_action("/deviceiface/delete", [if.id]) %]" data-manoc-action="iface-delete" data-manoc-what="[%if.id%]">
                     [% bootstrap_icon('trash') %]<span class="sr-only" Delete
                 </a>
+                [% END %]
             </dt>
 	    </tr>
 	    [% END -%]
     </tbody>
 </table>
 <script lang="text/javascript">
+function refresh_tab() {
+    $('#ifstatus').load("[% c.uri_for_action('device/ifstatus', [object.id ]) %]");
+}
 $(document).ready(function() {
 
-var table = $("#ifstatus_table").DataTable( {
-     "paging":   false,
-     "info":     false
- /*  "columnDefs":      [
-                     {
-                     'targets' : [ 0 ],
-                     'visible' : false
-                     }
-   ],*/
-   //"dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
- });
+    var table = $("#ifstatus_table").DataTable( {
+         "paging":   false,
+         "info":     false,
+         "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+     });
+    $("#tabletoolbar").appendTo($("div.toolbar").first());
 
     $('a[data-manoc-action="iface-delete"]').on( 'click', function (e) {
       url_base = '[% c.uri_for_action("/deviceiface/delete_js", [ ":iface" ]) %]';
@@ -63,10 +72,13 @@ var table = $("#ifstatus_table").DataTable( {
         data: {
           ['csrf_token']: '[% c.get_token %]'
         },
-        success: function() {
-            $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
-        }
+        success: refresh_tab
       });
+      return false;
+    });
+    $('#tabletoolbar a').click(function() {
+        showDialogForm($(this).attr('href'), $(this).text(), refresh_tab);
+        return false;
     });
 });
 </script>

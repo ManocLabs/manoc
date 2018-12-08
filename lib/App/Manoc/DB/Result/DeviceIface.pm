@@ -76,6 +76,16 @@ __PACKAGE__->might_have(
     }
 );
 
+__PACKAGE__->might_have(
+    cabling_in => 'App::Manoc::DB::Result::CablingMatrix',
+    'interface2_id',
+    {
+        cascade_copy   => 0,
+        cascade_delete => 1,
+        cascade_update => 0,
+    }
+);
+
 __PACKAGE__->add_relationship(
     mat_entry => 'App::Manoc::DB::Result::Mat',
     {
@@ -167,5 +177,7 @@ sub add_cabling_to_nic {
 
     $self->create_related( cabling => { serverhw_nic => $nic } );
 }
+
+sub label { shift->name }
 
 1;

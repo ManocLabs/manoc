@@ -19,7 +19,7 @@
         <dt>Interface:</dt>
 	<dd>[% object.name  | html %] </dd>
 
-	<dt>Switch:</dt>
+	<dt>Device:</dt>
 	<dd>[% PP.manoc_print(device) %]</dd>
 
 	<dt>Switch Location:</dt>
@@ -54,14 +54,26 @@
 	  [% END %]
 	</dd>
 
+[% IF object.cabling %]
+    <dt>Connected to</dt>
+    <dd>
+        [% IF object.cabling.interface2 %]
+        [% PP.manoc_print(object.cabling.interface2.device) %] -
+        [% PP.manoc_print(object.cabling.interface2) %]
+        [% END %]
+    </dd>
+[% END %]
+
 	<dt>Notes: </dt>
 	<dd>[% object.notes | html %]
 	  <a href="[% c.uri_for_action('deviceiface/edit', [object.id])%]">
 	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span></a>
-      </dl>
+    </dd>
+
+    </dl>
 
       [% UNLESS object.autocreated -%]
-	  <a href="[% c.uri_for_action('deviceiface/delete', object.id)%]">
+	  <a href="[% c.uri_for_action('deviceiface/delete', [ object.id ])%]">
 	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Interface</span></a>
 	  [% END -%]
     </div><!-- row -->
