@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use MooseX::MethodAttributes::Role;
 
-requires 'object', 'object_list', 'serialize_objects';
+requires 'serialize_objects';
 
 =method prepare_json_object
 
