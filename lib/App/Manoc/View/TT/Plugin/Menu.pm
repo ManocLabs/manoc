@@ -72,9 +72,13 @@ my @DEFAULT_MENU_ITEMS = (
                 ]
             },
             {
-                name => 'WLAN',
-                path => '#',
+                name   => "Cabling Matrix",
+                action => 'cabling/list'
             },
+            #{
+            #    name => 'WLAN',
+            #    path => '#',
+            #},
             {
                 name   => 'DHCP Servers',
                 action => '/dhcpserver/list',

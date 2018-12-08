@@ -9,7 +9,13 @@ use Moose;
 
 use namespace::autoclean;
 
-BEGIN { extends 'App::Manoc::ControllerBase::CRUD'; }
+BEGIN { extends 'Catalyst::Controller'; }
+
+with
+    'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectList',
+    'App::Manoc::ControllerRole::ObjectSerializer',
+    "App::Manoc::ControllerRole::JSONView";
 
 __PACKAGE__->config(
     # define PathPart
@@ -19,29 +25,29 @@ __PACKAGE__->config(
         }
     },
     class               => 'ManocDB::CablingMatrix',
-    form_class          => 'App::Manoc::Form::Cabling',
     view_object_perm    => undef,
     object_list_options => { prefetch => [ 'interface2', 'serverhw_nic' ] },
 );
 
-sub test_form {
+=action list
+
+Display a list of items.
+
+=cut
+
+sub list : Chained('object_list') : PathPart('') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $form = App::Manoc::Form::Cabling->new(
-        {
-            ctx => $c,
-        }
-    );
-    $c->stash( form => $form );
+}
 
-    if ( $c->stash->{is_xhr} && $c->req->method eq 'POST' ) {
-        my $process_status = $form->process(
-            params => $c->req->params,
-            item   => $c->model('ManocDB::CablingMatrix')->new_result( {} )
-        );
-        $c->debug and $c->log->debug("Form process status = $process_status");
+=action list_js
 
-    }
+=cut
+
+sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->forward('object_list_js');
 }
 
 __PACKAGE__->meta->make_immutable;
