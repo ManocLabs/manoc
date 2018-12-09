@@ -48,6 +48,8 @@ requires "namespace::autoclean" => "0";
 recommends "Net::Pcap" => "0";
 recommends "NetPacket" => "0";
 recommends "SNMP::Info" => "3.27";
+suggests "DBD::Pg" => "0";
+suggests "DBD::mysql" => "0";
 
 on 'test' => sub {
   requires "File::Spec" => "0";
@@ -58,12 +60,16 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
+  requires "CPAN::Meta::Requirements" => "2.120620";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::ShareDir::Install" => "0.06";
+  requires "Module::Metadata" => "0";
 };
 
 on 'develop' => sub {
   requires "Catalyst::Devel" => "0";
+  requires "DBD::Pg" => "0";
+  requires "DBD::mysql" => "0";
   requires "Dist::Zilla" => "0";
   requires "Git::Wrapper" => "0";
   requires "Perl::Tidy" => "0";
