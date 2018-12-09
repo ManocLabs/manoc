@@ -150,11 +150,11 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->has_many(
-    interface => 'App::Manoc::DB::Result::DeviceIface',
+    interfaces => 'App::Manoc::DB::Result::DeviceIface',
     { 'foreign.vlan_id' => 'self.id' },
     {
-        cascade_delete            => 0,
-        cascade_copy              => 0,
+        cascade_delete => 0,
+        cascade_copy   => 0,
     }
 );
 
