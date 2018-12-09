@@ -13,6 +13,8 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 with
     'App::Manoc::ControllerRole::ResultSet',
+    'App::Manoc::ControllerRole::ObjectForm',
+    'App::Manoc::ControllerRole::JSONEdit',
     'App::Manoc::ControllerRole::ObjectList',
     'App::Manoc::ControllerRole::ObjectSerializer',
     "App::Manoc::ControllerRole::JSONView";
