@@ -36,6 +36,7 @@
             </td>
             <td>
                 <select name="destination_host" id="[% form.name %].destination_host" class="form-control selectpicker" data-live-search="true">
+                <option value="">-</option>
                 <optgroup label="Devices">
                     <option value="">-</option>
                 </optgroup>
