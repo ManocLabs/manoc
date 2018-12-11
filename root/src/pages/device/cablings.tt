@@ -20,7 +20,7 @@
             <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
 	        [% ELSE %]
   	        <td>[% PP.manoc_print( cabling.serverhw.server ) %]</td>
-            <td>[% cabling.serverhw_nic.name %]</td>
+            <td>[% PP.manoc_print( cabling.serverhw_nic ) %]</td>
 	        [% END -%]
             <td>
                 <a href="#" data-manoc-action="cabling-delete" data-manoc-what="[%cabling.id%]">

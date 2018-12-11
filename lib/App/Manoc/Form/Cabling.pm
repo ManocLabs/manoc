@@ -22,7 +22,6 @@ has_field 'interface2' => (
     empty_select => '--- Select ---',
     required     => 0,
     do_wrapper   => 0,
-
 );
 
 has_field 'serverhw_nic' => (

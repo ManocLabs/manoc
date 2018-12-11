@@ -1,0 +1,55 @@
+[% form.render %]
+
+[% fragment = BLOCK -%]
+//<script>
+function refresh_cabling_device() {
+  $.ajax({
+    url: '[% c.uri_for_action('/device/list_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      cabling_device_select.find('option').remove();
+      cabling_device_select.append('<option value="">--- Select ---</option>')
+      $.each(res, function(index, item) {
+        cabling_device_select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      preselected = $('#cabling_device_val').val();
+      if (preselected) {
+          cabling_device_select.val(preselected);
+          refresh_interface(preselected);
+      }
+      cabling_device_select.selectpicker('refresh');
+    }
+  });
+}
+
+function refresh_interface(device) {
+  $.ajax({
+    url: '[% c.uri_for_action('/deviceiface/list_uncabled_js') %]?device='+device,
+    dataType: 'json',
+    success: function (res) {
+      cabling_interface_select.find('option').remove();
+      cabling_interface_select.append('<option value="">--- Select ---</option>')
+      $.each(res, function(index, item) {
+        cabling_interface_select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      cabling_interface_select.val($('#cabling_interface_val').val());
+      cabling_interface_select.selectpicker('refresh');
+    }
+  });
+}
+
+$( function() {
+    cabling_device_select = $('#cabling_device');
+    cabling_interface_select = $('#cabling_interface');
+    cabling_device_select.selectpicker({'liveSearch': "true"});
+    cabling_interface_select.selectpicker({'liveSearch': "true"});
+
+    refresh_cabling_device();
+
+    cabling_device_select.on('change', function() {
+        refresh_interface(cabling_device_select.val());
+    });
+
+});
+[% END %]
+[% js_scripts.push(fragment) -%]

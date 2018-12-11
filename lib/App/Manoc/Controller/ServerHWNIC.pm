@@ -15,12 +15,12 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 =cut
 
-with
-    'App::Manoc::ControllerRole::ResultSet',
-    'App::Manoc::ControllerRole::Object',
-    'App::Manoc::ControllerRole::ObjectList',
-    'App::Manoc::ControllerRole::ObjectSerializer',
-    "App::Manoc::ControllerRole::JSONView";
+BEGIN { extends 'Catalyst::Controller'; }
+
+with 'App::Manoc::ControllerRole::CommonCRUD' =>
+    { -excludes => [ 'list', 'list_js', 'create' ] };
+
+use App::Manoc::Form::ServerHWNIC;
 
 use namespace::autoclean;
 
@@ -30,8 +30,26 @@ __PACKAGE__->config(
             PathPart => 'serverhwnic',
         }
     },
-    class => 'ManocDB::ServerHWNIC',
+    class      => 'ManocDB::ServerHWNIC',
+    form_class => 'App::Manoc::Form::ServerHWNIC'
 );
+
+=action cabling
+
+=cut
+
+sub cabling : Chained('object') : PathPart('cabling') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $nic = $c->stash->{'object'};
+    $c->require_permission( $nic->serverhw, 'view' );
+    my $form = App::Manoc::Form::Cabling->new(
+        {
+            ctx => $c,
+        }
+    );
+    $c->stash( form => $form );
+}
 
 =action list_uncabled_js
 

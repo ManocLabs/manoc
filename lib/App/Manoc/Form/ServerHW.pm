@@ -64,6 +64,8 @@ has_field 'nics.name' => (
 
 has_field 'nics.nic_type' => (
     type         => 'Select',
+    empty_select => '--',
+
     element_attr => {
         placeholder => 'type',
     },
@@ -225,21 +227,6 @@ has_field 'notes' => (
     type  => 'Text',
     label => 'Notes',
 );
-
-sub options_nics_type {
-    my $self = shift;
-    return unless $self->schema;
-
-    my @options;
-    push @options,
-        map +{
-        value => $_->id,
-        label => $_->name,
-        },
-        $self->schema->resultset('NICType')->all();
-
-    return @options;
-}
 
 override validate_model => sub {
     my $self = shift;
