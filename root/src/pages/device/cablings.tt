@@ -19,7 +19,12 @@
             <td>[% PP.manoc_print( cabling.device2 ) %]</td>
             <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
 	        [% ELSE %]
-  	        <td>[% PP.manoc_print( cabling.serverhw.server ) %]</td>
+  	        <td>[% IF cabling.serverhw.server -%]
+                [% PP.manoc_print( cabling.serverhw.server ) %]
+                [% ELSE -%]
+                [% PP.manoc_print( cabling.serverhw ) %]
+                [% END -%]
+            </td>
             <td>[% PP.manoc_print( cabling.serverhw_nic ) %]</td>
 	        [% END -%]
             <td>
