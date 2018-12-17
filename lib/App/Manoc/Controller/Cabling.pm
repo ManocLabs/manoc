@@ -14,10 +14,11 @@ BEGIN { extends 'Catalyst::Controller'; }
 with
     'App::Manoc::ControllerRole::ResultSet',
     'App::Manoc::ControllerRole::ObjectForm',
-    'App::Manoc::ControllerRole::JSONEdit',
     'App::Manoc::ControllerRole::ObjectList',
     'App::Manoc::ControllerRole::ObjectSerializer',
-    "App::Manoc::ControllerRole::JSONView";
+    'App::Manoc::ControllerRole::JSONEdit',
+    'App::Manoc::ControllerRole::JSONView',
+    'App::Manoc::ControllerRole::CSVView';
 
 use App::Manoc::Form::Cabling;
 
@@ -53,6 +54,42 @@ sub list_js : Chained('object_list') : PathPart('js') : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->forward('object_list_js');
+}
+
+=method prepare_csv_objects
+
+Custom serialization for CSV export
+
+=cut
+
+sub prepare_csv_objects {
+    my ( $self, $c, $rows ) = @_;
+
+    my $csv_columns =
+        [ "Source device", "Source interface", "Destination target", "Destination interface", ];
+    $c->stash( serialized_columns => $csv_columns );
+
+    my @data;
+    foreach my $cabling (@$rows) {
+        my $row = [ $cabling->interface1->device->label, $cabling->interface1->label, ];
+        if ( $cabling->interface2 ) {
+            push @$row, $cabling->interface2->device->label, $cabling->interface2->label;
+        }
+        elsif ( $cabling->serverhw_nic ) {
+            my $serverhw = $cabling->serverhw_nic->serverhw;
+            if ( $serverhw->server ) {
+                push @$row, $serverhw->server->label;
+            }
+            else {
+                push @$row, $serverhw->label;
+            }
+            push @$row, $cabling->serverhw_nic->label;
+        }
+
+        push @data, $row;
+    }
+
+    return \@data;
 }
 
 __PACKAGE__->meta->make_immutable;
