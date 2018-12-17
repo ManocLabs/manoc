@@ -26,6 +26,7 @@ use Text::Diff;
 
 use App::Manoc::Form::Device::Edit;
 use App::Manoc::Form::DeviceNWInfo;
+use App::Manoc::Form::Cabling;
 use App::Manoc::Form::Uplink;
 use App::Manoc::Form::Device::Decommission;
 
@@ -35,8 +36,6 @@ use App::Manoc::Netwalker::ControlClient;
 # moved  App::Manoc::Netwalker::DeviceUpdater to conditional block in refresh
 # where we need it
 
-BEGIN { extends 'Catalyst::Controller'; }
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -44,16 +43,18 @@ __PACKAGE__->config(
             PathPart => 'device',
         }
     },
+
     class            => 'ManocDB::Device',
     form_class       => 'App::Manoc::Form::Device::Edit',
     view_object_perm => undef,
+    json_columns     => [ 'id', 'name' ],
 
     object_list_options => {
         prefetch => [ { 'rack' => 'building' }, 'mng_url_format', 'hwasset', 'netwalker_info', ]
     },
 
-    edit_page_title   => 'Edit device',
     create_page_title => 'New device',
+    edit_page_title   => 'Edit device',
 );
 
 =action view
@@ -66,10 +67,6 @@ sub view : Chained('object') : PathPart('') : Args(0) {
 
     # uplinks
     $c->stash( uplinks => [ map { $_->interface } $device->uplinks->all() ] );
-
-    #Unused interfaces
-    my @unused_ifaces = $c->model('ManocDB::IfStatus')->search_unused( $device->id );
-    $c->stash( unused_ifaces => \@unused_ifaces );
 
     # prepare template
     $c->stash( template => 'device/view.tt' );
@@ -86,45 +83,25 @@ sub ifstatus : Chained('object') : PathPart('ifstatus') : Args(0) {
     my $device = $c->stash->{'object'};
     my $id     = $device->id;
 
-    # prefetch notes
-    my %if_notes = map { $_->interface => 1 } $device->ifnotes;
+    # TODO prefetch cabling
+    my %cabling = map { $_->interface1 => 1 } $device->cablings;
 
     # prefetch interfaces last activity
     my %if_last_mat;
     my ( $e, $it );
-    $it = $c->model('ManocDB::IfStatus')->search_mat_last_activity($id);
+    $it = $c->model('ManocDB::DeviceIface')->search_mat_last_activity($id);
     while ( $e = $it->next ) {
-        $if_last_mat{ $e->interface } = $e->get_column('lastseen');
+        $if_last_mat{ $e->get_column('interface') } = $e->get_column('lastseen');
     }
 
-    my @iface_info;
+    my @iface_info = $device->interfaces->all;
 
-    # fetch ifstatus and build result array
-    my @ifstatus = $device->ifstatus;
-    foreach my $r (@ifstatus) {
-        my ( $controller, $port ) = split /[.\/]/, $r->interface;
-        my $lc_if = lc( $r->interface );
-
-        push @iface_info, {
-            controller   => $controller,                                  # for sorting
-            port         => $port,                                        # for sorting
-            interface    => $r->interface,
-            speed        => $r->speed || 'n/a',
-            up           => $r->up || 'n/a',
-            up_admin     => $r->up_admin || '',
-            duplex       => $r->duplex || '',
-            duplex_admin => $r->duplex_admin || '',
-            cps_enable   => $r->cps_enable && $r->cps_enable eq 'true',
-            cps_status   => $r->cps_status || '',
-            cps_count    => $r->cps_count || '',
-            description  => $r->description || '',
-            vlan         => $r->vlan || '',
-            last_mat     => $if_last_mat{ $r->interface },
-            has_notes    => ( exists( $if_notes{$lc_if} ) ? 1 : 0 ),
-        };
+    foreach my $r ( $device->interfaces->all ) {
+        $r->{last_mat} = $if_last_mat{ $r->name },;
     }
+
     @iface_info =
-        sort { $a->{controller} cmp $b->{controller} || $a->{port} cmp $b->{port} } @iface_info;
+        sort { $a->controller cmp $b->controller || $a->port <=> $b->port } @iface_info;
 
     $c->stash->{no_wrapper} = 1;
     $c->stash->{iface_info} = \@iface_info;
@@ -146,6 +123,7 @@ sub neighs : Chained('object') : PathPart('neighs') : Args(0) {
         map +{
         expired        => time - $_->last_seen > $time_limit,
         local_iface    => $_->from_interface,
+        remote_iface   => $_->to_interface,
         to_device      => $_->to_device,
         to_device_info => $_->to_device_info,
         remote_id      => $_->remote_id,
@@ -207,6 +185,30 @@ sub dot11clients : Chained('object') : PathPart('dot11clients') : Args(0) {
     $c->stash->{no_wrapper} = 1;
 }
 
+=action cablings
+
+Called via xhr by view
+
+=cut
+
+sub cablings : Chained('object') : PathPart('cablings') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $device = $c->stash->{'object'};
+    $c->require_permission( $device, 'view' );
+
+    $c->stash->{no_wrapper} = 1;
+
+    $c->stash->{cablings} = [ $device->cablings->all ];
+
+    my $form = App::Manoc::Form::Cabling->new(
+        {
+            ctx => $c,
+        }
+    );
+    $c->stash( form => $form );
+}
+
 =action refresh
 
 =cut
@@ -243,7 +245,7 @@ sub uplinks : Chained('object') : PathPart('uplinks') : Args(0) {
 
     my $form = App::Manoc::Form::Uplink->new( { device => $device, ctx => $c } );
 
-    if ( $device->ifstatus->count() == 0 ) {
+    if ( $device->interfaces->count() == 0 ) {
         $c->flash( error_msg => 'No known interfaces on this device' );
         $c->uri_for_action( 'device/view', [ $device->id ] );
         $c->detach();
@@ -286,6 +288,26 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
     );
 
     $c->response->redirect( $c->uri_for_action( 'device/view', [$device_id] ) );
+    $c->detach();
+}
+
+=method iface
+
+Get interface by names
+
+=cut
+
+sub iface : Chained('object') : PathPart('iface') : Args(1) {
+    my ( $self, $c, $name ) = @_;
+
+    my $iface = $c->model('ManocDB::DeviceIface')->find(
+        {
+            device_id => $c->stash->{device_id},
+            name      => $name
+        }
+    );
+
+    $c->response->redirect( $c->uri_for_action( 'deviceiface/view', [ $iface->id ] ) );
     $c->detach();
 }
 
@@ -428,6 +450,32 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     $c->forward('View::JSON');
 }
 
+=action ifacecreate
+
+Redirect to deviceiface method
+
+=cut
+
+sub ifacecreate : Chained('object') : PathPart('ifacecreate') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    # device is already in stash
+    $c->forward('/deviceiface/create');
+}
+
+=action ifacepopulate
+
+Redirect to deviceiface method
+
+=cut
+
+sub ifacepopulate : Chained('object') : PathPart('ifacepopulate') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    # device is already in stash
+    $c->forward('/deviceiface/populate');
+}
+
 =method get_object
 
 Find by id or mng_address.
@@ -441,6 +489,14 @@ sub get_object {
     if ( !defined($object) ) {
         $object = $c->stash->{resultset}->find( { mng_address => $id } );
     }
+
+    if ($object) {
+        $c->stash(
+            device    => $object,
+            device_id => $id,
+        );
+    }
+
     return $object;
 }
 
@@ -453,7 +509,7 @@ sub delete_object {
     my $device = $c->stash->{'object'};
     my $name   = $device->name;
 
-    my $has_related_info = $device->ifstatus->count() ||
+    my $has_related_info = $device->interfaces->count() ||
         $device->uplinks->count()      ||
         $device->mat_assocs()->count() ||
         $device->dot11assocs->count()  ||

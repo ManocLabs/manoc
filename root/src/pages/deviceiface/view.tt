@@ -17,16 +17,13 @@
     <div class="row">
       <dl class="dl-horizontal">
         <dt>Interface:</dt>
-	<dd>[% object.interface | html %] </dd>
+	<dd>[% object.name  | html %] </dd>
 
-	<dt>Switch:</dt>
+	<dt>Device:</dt>
 	<dd>[% PP.manoc_print(device) %]</dd>
 
-	<dt>Switch Model:</dt>
-	<dd>[% device.model | html %]</dd>
-
 	<dt>Switch Location:</dt>
-	<dd>Rack [% PP.manoc_print(device.rack.building) %]</dd>
+	<dd>Rack [% PP.manoc_print(object.rack) %] / [% PP.manoc_print(device.rack.building) %]</dd>
 
 	<dt>Description:</dt>
 	<dd>[% object.description | html  %] </dd>
@@ -57,15 +54,28 @@
 	  [% END %]
 	</dd>
 
+[% IF object.cabling %]
+    <dt>Connected to</dt>
+    <dd>
+        [% IF object.cabling.interface2 %]
+        [% PP.manoc_print(object.cabling.interface2.device) %] -
+        [% PP.manoc_print(object.cabling.interface2) %]
+        [% END %]
+    </dd>
+[% END %]
+
 	<dt>Notes: </dt>
-	<dd>[% notes | html %]
-	  <a href="[% c.uri_for_action('interface/edit_notes', [object.device, object.interface])%]">
-	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span>	</a>
-	  [% IF notes != '' -%]
-	  <a href="[% c.uri_for_action('interface/delete_notes', [object.device, object.interface])%]">
-	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Note</span></a>
+	<dd>[% object.notes | html %]
+	  <a href="[% c.uri_for_action('deviceiface/edit', [object.id])%]">
+	    [% bootstrap_icon('pencil') %]<span class="sr-only">Edit note</span></a>
+    </dd>
+
+    </dl>
+
+      [% UNLESS object.autocreated -%]
+	  <a href="[% c.uri_for_action('deviceiface/delete', [ object.id ])%]">
+	    [% bootstrap_icon('trash') %]<span class="sr-only">Delete Interface</span></a>
 	  [% END -%]
-      </dl>
     </div><!-- row -->
   </div>  <!-- end tab -->
 

@@ -1,0 +1,34 @@
+[%
+   page.title="Management URL List"
+-%]
+
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+
+<div id="create">
+  <a href="[% c.uri_for_action('/nictype/create') %]" class="btn btn-sm btn-default">[% bootstrap_icon("plus") %] Add</a>
+</div>
+
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH o IN object_list %]
+    <tr>
+      <td>[% o.name | html %]</td>
+      <td>
+	<a href="[% c.uri_for_action('/mngurlformat/edit', [o.id]) %] ">
+	  [% bootstrap_icon('pencil') %]<span class="sr-only">Edit</span>
+	</a>
+        <a href="[% c.uri_for_action('/mngurlformat/delete',[o.id]) %] ">
+	  [% bootstrap_icon('trash') %]<span class="sr-only">Delete</span>
+	</a>
+      </td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>

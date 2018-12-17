@@ -26,6 +26,7 @@ requires "DateTime::Format::RFC3339" => "0";
 requires "Digest::SHA1" => "0";
 requires "HTML::FormHandler" => "0";
 requires "HTML::FormHandler::Model::DBIC" => "0";
+requires "JSON::MaybeXS" => "0";
 requires "Log::Log4perl" => "1.46";
 requires "Module::Runtime" => "0";
 requires "Moose" => "0";
@@ -40,12 +41,15 @@ requires "POE" => "0";
 requires "Plack::Middleware::ReverseProxy" => "0";
 requires "Regexp::Common" => "0";
 requires "SQL::Translator" => "0";
+requires "Test::Deep" => "0";
 requires "Text::CSV" => "0";
 requires "YAML::Syck" => "0";
 requires "namespace::autoclean" => "0";
 recommends "Net::Pcap" => "0";
 recommends "NetPacket" => "0";
 recommends "SNMP::Info" => "3.27";
+suggests "DBD::Pg" => "0";
+suggests "DBD::mysql" => "0";
 
 on 'test' => sub {
   requires "File::Spec" => "0";
@@ -56,12 +60,16 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
+  requires "CPAN::Meta::Requirements" => "2.120620";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::ShareDir::Install" => "0.06";
+  requires "Module::Metadata" => "0";
 };
 
 on 'develop' => sub {
   requires "Catalyst::Devel" => "0";
+  requires "DBD::Pg" => "0";
+  requires "DBD::mysql" => "0";
   requires "Dist::Zilla" => "0";
   requires "Git::Wrapper" => "0";
   requires "Perl::Tidy" => "0";
@@ -75,17 +83,3 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Version" => "1";
 };
-
-# used for heroku like environmens
-
-feature 'sqlite', 'SQLite support' => sub {
-   requires 'DBD::SQLite';
-};
-
-feature 'mysql', 'MySQL support' => sub {
-   requires 'DBD::mysql';
-};
-
-feature 'postgres', 'PostgreSQL support' => sub {
-   requires 'DBD::Pg';
-}

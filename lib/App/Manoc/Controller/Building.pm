@@ -45,7 +45,8 @@ sub delete_object {
         return;
     }
 
-    return $building->delete;
+    $building->delete;
+    return 1;
 }
 
 =method serialize_object

@@ -18,7 +18,22 @@ has 'device_id_map' => (
 has 'device_id_counter' => (
     isa     => 'Int',
     is      => 'rw',
-    default => 1
+    lazy    => 1,
+    builder => '_build_device_id_counter',
+);
+
+has 'interface_id_counter' => (
+    isa     => 'Int',
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_device_id_counter',
+);
+
+has 'interface_id_map' => (
+    isa     => 'HashRef',
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_interface_id_map',
 );
 
 has 'hwasset_id_counter' => (
@@ -88,6 +103,39 @@ sub _build_device_id_map {
     my %id_map = map { $_->mng_address->padded => $_->id } @devices;
     $self->log->info("Loaded idmap (@devices)");
     return \%id_map;
+}
+
+sub _build_interface_id_map {
+    my $self = shift;
+    $self->log->info("Loading interface ids from DB");
+
+    my @ifaces = $self->schema->resultset('DeviceIface')->search(
+        undef,
+        {
+            columns => [qw/ id  device_id name /]
+        }
+    );
+
+    my %id_map = map { $_->device_id . ":" . $_->name => $_->id } @ifaces;
+
+    $self->log->info("Loaded idmap ifaces");
+    return \%id_map;
+}
+
+sub _build_device_id_counter {
+    my $self = shift;
+
+    my $id = $self->schema->resultset('Device')->search( {} )->get_column('id')->max();
+
+    return defined($id) ? $id + 1 : 1;
+}
+
+sub _build_interface_id_counter {
+    my $self = shift;
+
+    my $id = $self->schema->resultset('DeviceIface')->search( {} )->get_column('id')->max();
+
+    return defined($id) ? $id + 1 : 1;
 }
 
 sub _build_hwasset_id_counter {
@@ -437,6 +485,92 @@ sub upgrade_if_notes {
 sub upgrade_if_status {
     my ( $self, $data ) = @_;
     $self->_rewrite_device_id( $data, 'device' => 'device_id' );
+}
+
+sub get_table_name_DeviceIface { 'if_status' }
+
+sub get_additional_table_name_DeviceIface { 'if_notes' }
+
+sub upgrade_DeviceIface {
+    my ( $self, $data ) = @_;
+    my @new_data;
+
+    my $id_map = $self->interface_id_map;
+    my $id     = $self->interface_id_counter;
+
+    foreach (@$data) {
+        my $r = {};
+
+        my $iface_id  = $id++;
+        my $name      = $_->{interface};
+        my $device_id = $_->{device_id};
+
+        $r->{id}        = $iface_id;
+        $r->{name}      = $name;
+        $r->{device_id} = $device_id;
+        $r->{routed}    = 0;
+
+        # use name in lower case for idmap
+        $id_map->{ "${device_id}:" . lc($name) } = $iface_id;
+        push @new_data, $r;
+    }
+
+    @$data = @new_data;
+
+    $self->interface_id_counter($id);
+}
+
+sub process_additional_table_DeviceIface_if_notes {
+    my ( $self, $data ) = @_;
+    my @new_data;
+
+    my $id_map = $self->interface_id_map;
+    use Data::Dumper;
+    print STDERR Dumper($id_map);
+
+ROW:
+    foreach (@$data) {
+        # use name in lower case for idmap
+        my $name      = lc( $_->{interface} );
+        my $device_id = $_->{device_id};
+
+        my $iface_id = $id_map->{"${device_id}:${name}"};
+        if ( !defined($iface_id) ) {
+            $self->log->info("Skipping notes for interface  ${device_id}:${name}");
+            next ROW;
+        }
+
+        my $r = {};
+
+        $r->{id}    = $iface_id;
+        $r->{notes} = $_->{notes};
+
+        push @new_data, $r;
+
+    }
+
+    @$data = @new_data;
+
+}
+
+sub get_table_name_DeviceIfStatus { 'if_status' }
+
+sub upgrade_DeviceIfStatus {
+    my ( $self, $data ) = @_;
+
+    my $id_map = $self->interface_id_map;
+
+    foreach (@$data) {
+        my $device_id = $_->{device_id};
+        # use name in lower case for idmap
+        my $name     = lc( $_->{interface} );
+        my $iface_id = $id_map->{"${device_id}:${name}"};
+
+        $_->{interface_id} = $iface_id;
+
+        # cleanup attributes
+        delete @$_{qw(device_id interface )};
+    }
 }
 
 sub get_table_name_IPAddressInfo { 'ip' }

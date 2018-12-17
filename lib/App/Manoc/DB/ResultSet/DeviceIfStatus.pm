@@ -1,5 +1,5 @@
-package App::Manoc::DB::ResultSet::IfNotes;
-#ABSTRACT: ResultSet class for IfNotes
+package App::Manoc::DB::ResultSet::DeviceIfStatus;
+#ABSTRACT: ResultSet class for IfStatus
 use strict;
 use warnings;
 
@@ -18,27 +18,29 @@ Support for Manoc search feature
 sub manoc_search {
     my ( $self, $query, $result ) = @_;
 
-    my $type = $query->query_type;
-
-    return unless $type eq 'notes';
-
+    my $type    = $query->query_type;
     my $pattern = $query->sql_pattern;
 
-    my $rs = $self->search( { notes => { '-like' => $pattern } }, { order_by => 'notes' } );
+    return unless $type eq 'inventory';
+
+    my $rs = $self->search(
+        {
+            description => { '-like' => $pattern }
+        },
+        {
+            order_by => 'description',
+            prefetch => { 'interface' => 'device' },
+        },
+    );
     while ( my $e = $rs->next ) {
         my $item = App::Manoc::DB::Search::Result::Iface->new(
             {
-                device    => $e->device,
                 interface => $e->interface,
+                text      => $e->description,
             }
         );
         $result->add_item($item);
     }
 }
+
 1;
-# Local Variables:
-# mode: cperl
-# indent-tabs-mode: nil
-# cperl-indent-level: 4
-# cperl-indent-parens-as-block: t
-# End:

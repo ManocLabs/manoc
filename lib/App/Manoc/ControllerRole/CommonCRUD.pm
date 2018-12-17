@@ -93,12 +93,6 @@ has 'object_deleted_message' => (
     default => 'Deleted',
 );
 
-has 'delete_object_perm' => (
-    is      => 'rw',
-    isa     => 'Maybe[Str]',
-    default => 'delete',
-);
-
 =action list
 
 Display a list of items.

@@ -9,14 +9,8 @@ extends 'App::Manoc::DB::Search::Result::Item';
 
 has 'interface' => (
     is       => 'ro',
-    isa      => 'Str',
-    required => 1
-);
-
-has 'device' => (
-    is       => 'ro',
     isa      => 'Object',
-    required => 1,
+    required => 1
 );
 
 around BUILDARGS => sub {
@@ -24,9 +18,10 @@ around BUILDARGS => sub {
     my $class = shift;
 
     if ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) {
-        my $args   = $_[0];
-        my $device = $args->{device};
-        my $iface  = $args->{interface};
+        my $args  = $_[0];
+        my $iface = $args->{interface};
+
+        my $device = $iface->device;
 
         if ( $device && $iface ) {
             $args->{match} ||= $device->name . '/' . $iface;

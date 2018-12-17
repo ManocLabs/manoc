@@ -145,19 +145,19 @@ __PACKAGE__->add_unique_constraints( [qw/inventory/] );
 __PACKAGE__->belongs_to(
     building => 'App::Manoc::DB::Result::Building',
     'building_id',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 __PACKAGE__->belongs_to(
     rack => 'App::Manoc::DB::Result::Rack',
     'rack_id',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 __PACKAGE__->belongs_to(
     warehouse => 'App::Manoc::DB::Result::Warehouse',
     'warehouse_id',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 __PACKAGE__->might_have(

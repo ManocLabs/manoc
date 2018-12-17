@@ -42,8 +42,7 @@ our %DEFAULT_ROLES = (
     'WinlogonAgent'  => [ 'api:winlogon.*', ],
     'AssetManager'   => [ 'device.*', 'building.*', 'rack.*', 'uplink.*', ],
     'NetworkManager' => [
-        'ifnotes.*', 'ip.*',   'ipblock.*', 'ipnetwork.*',
-        'uplink.*',  'vlan.*', 'vlanrange.*',
+        'device.*', 'ip.*', 'ipblock.*', 'ipnetwork.*', 'uplink.*', 'vlan.*', 'vlanrange.*',
     ],
 );
 

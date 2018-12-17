@@ -62,6 +62,23 @@ has_field 'nics.name' => (
     }
 );
 
+has_field 'nics.nic_type' => (
+    type         => 'Select',
+    empty_select => '--',
+
+    element_attr => {
+        placeholder => 'type',
+    },
+
+    do_label => 0,
+
+    do_wrapper => 0,
+    tags       => {
+        before_element => '<div class="col-sm-2">',
+        after_element  => '</div>'
+    }
+);
+
 has_field 'nics.macaddr' => (
     type         => 'Text',
     apply        => [MacAddress],
@@ -264,7 +281,7 @@ sub _validate_model_nics {
             $conditions{macaddr} = $macaddr;
             $nic->field('id')->value and
                 $conditions{id} = { '!=' => $nic->field('id')->value };
-            my $count = $self->schema->resultset('HWServerNIC')->search( \%conditions )->count;
+            my $count = $self->schema->resultset('ServerHWNIC')->search( \%conditions )->count;
             if ( $count > 0 || $nic_addresses{$macaddr} ) {
                 my $field_error = $macaddr_field->get_message('unique') ||
                     $macaddr_field->unique_message ||

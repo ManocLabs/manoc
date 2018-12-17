@@ -96,7 +96,7 @@ __PACKAGE__->belongs_to(
     workstationhw => 'App::Manoc::DB::Result::WorkstationHW',
     'workstationhw_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 
@@ -104,7 +104,7 @@ __PACKAGE__->belongs_to(
     ethernet_reservation => 'App::Manoc::DB::Result::DHCPReservation',
     'ethernet_reservation_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 
@@ -112,7 +112,7 @@ __PACKAGE__->belongs_to(
     wireless_reservation => 'App::Manoc::DB::Result::DHCPReservation',
     'wireless_reservation_id',
     {
-        join_type => 'left',
+        join_type => 'LEFT',
     }
 );
 

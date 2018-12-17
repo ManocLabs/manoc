@@ -132,7 +132,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
 
             as       => [ 'device',    'interface', 'count', 'description', ],
             group_by => [ 'me.device', 'me.interface' ],
-            having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
+            having   => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
             order_by => [ 'me.device', 'me.interface' ],
             alias    => 'me',
             from     => [
@@ -304,7 +304,7 @@ sub multi_mac : Chained('base') : PathPart('multi_mac') : Args(0) {
             select   => [ 'macaddr', { count => 'device' } ],
             as       => [ 'macaddr', 'devs' ],
             group_by => ['macaddr'],
-            having => { 'COUNT(device)' => { '>', 1 } },
+            having   => { 'COUNT(device)' => { '>', 1 } },
         }
     );
 
@@ -346,7 +346,7 @@ sub new_devices : Chained('base') : PathPart('new_devices') : Args(0) {
                     [ 'macaddr', 'device', 'interface', 'firstseen', { min => 'firstseen' } ],
                 as       => [ 'macaddr', 'device', 'interface', 'firstseen', 'fs' ],
                 group_by => ['macaddr'],
-                having => { 'MIN(firstseen)' => { '>', $query_time } },
+                having   => { 'MIN(firstseen)' => { '>', $query_time } },
             }
         );
 

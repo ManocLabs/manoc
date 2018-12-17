@@ -44,7 +44,7 @@ sub stats : Private {
 
         tot_racks   => $schema->resultset('Rack')->count,
         tot_devices => $schema->resultset('Device')->count,
-        tot_ifaces  => $schema->resultset('IfStatus')->count,
+        tot_ifaces  => $schema->resultset('DeviceIfStatus')->count,
         tot_cdps    => $schema->resultset('CDPNeigh')->count,
         mat_entries => $schema->resultset('Mat')->count,
         arp_entries => $schema->resultset('Arp')->count

@@ -58,8 +58,8 @@
 [%   ELSIF item.isa("App::Manoc::DB::Search::Result::MacAddr") -%]
 [%      PP.manoc_print(item.address) %]
 [%   ELSIF item.isa("App::Manoc::DB::Search::Result::Iface") -%]
-Interface [%      PP.manoc_print(item.device) %]/
-[%-      PP.manoc_print({device => item.device, iface => item.interface}) %]
+Interface [%      PP.manoc_print(item.interface.device) %]/
+[%-      PP.manoc_print( item.interface ) %]
 [%   ELSIF item.isa("App::Manoc::DB::Search::Result::IpCalc") -%]
 TODO
 [%   ELSIF item.isa("App::Manoc::DB::Search::Result::Logon") -%]

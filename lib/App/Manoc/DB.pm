@@ -302,4 +302,30 @@ sub init_management_url {
     return 1;
 }
 
+=method init_nic_type
+
+Create some sample nic type rows.
+
+=cut
+
+sub init_nic_type {
+    my ($self)    = @_;
+    my $rs        = $self->resultset('NICType');
+    my @nic_types = (
+        { name => 'Eth 100M' },
+        { name => 'Eth 1G' },
+        { name => 'Eth 10G' }
+
+    );
+    foreach my $n (@nic_types) {
+        $rs->update_or_create($n);
+    }
+}
+
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

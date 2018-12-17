@@ -1,4 +1,4 @@
-package App::Manoc::Form::IfNotes;
+package App::Manoc::Form::DeviceIface::Create;
 #ABSTRACT: Manoc Form for entering interface notes.
 
 use HTML::FormHandler::Moose;
@@ -9,16 +9,21 @@ extends 'App::Manoc::Form::BaseDBIC';
 
 has '+name' => ( default => 'form-ifnotes' );
 
-has 'device' => (
+has 'device_id' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
 );
 
-has 'interface' => (
-    is       => 'ro',
-    isa      => 'Str',
+has_field 'name' => (
+    label    => 'Name',
+    type     => 'Text',
     required => 1,
+);
+
+has_field 'routed' => (
+    label => 'Routed',
+    type  => 'Checkbox',
 );
 
 has_field 'notes' => (
@@ -38,13 +43,7 @@ override 'update_model' => sub {
     my $self   = shift;
     my $values = $self->values;
 
-    if ( $values->{notes} =~ /^\s*$/o && $self->item->in_storage ) {
-        $self->item->delete();
-        return 1;
-    }
-
-    $values->{device}    = $self->{device};
-    $values->{interface} = $self->{interface};    #
+    $values->{device_id} = $self->{device_id};
     $self->_set_value($values);
 
     super();

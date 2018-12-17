@@ -1,5 +1,5 @@
-package App::Manoc::DB::ResultSet::IfStatus;
-#ABSTRACT: ResultSet class for IfStatus
+package App::Manoc::DB::ResultSet::DeviceIface;
+#ABSTRACT: ResultSet class for IfNotes
 use strict;
 use warnings;
 
@@ -9,24 +9,45 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Search::Result::Iface;
 
-=method search_unused(  $device )
+=method search_unused
 
-Return a resultset containing all interfaces of <$device> which were never seen in
+Return a resultset containing all interfaces which were never seen in
 mac address table.
 
 =cut
 
 sub search_unused {
-    my ( $self, $device ) = @_;
+    my ($self) = @_;
 
     my $conditions = { 'mat_entry.macaddr' => undef };
-    $device and $conditions->{'me.device_id'} = $device;
 
     my $rs = $self->search(
         $conditions,
         {
             alias => 'me',
             join  => 'mat_entry',
+        }
+    );
+    return wantarray ? $rs->all : $rs;
+}
+
+=method search_uncabled
+
+Return a resultset containing all interfaces which are not in
+the cabling matrix
+
+=cut
+
+sub search_uncabled {
+    my ($self) = @_;
+
+    my $conditions = { 'cabling.interface2_id' => undef };
+
+    my $rs = $self->search(
+        $conditions,
+        {
+            alias => 'me',
+            join  => 'cabling',
         }
     );
     return wantarray ? $rs->all : $rs;
@@ -49,8 +70,8 @@ sub search_mat_last_activity {
         $conditions,
         {
             alias    => 'me',
-            group_by => [qw(me.device_id me.interface)],
-            select   => [ 'me.interface', { max => 'mat_entry.lastseen' }, ],
+            group_by => [qw(me.device_id me.name)],
+            select   => [ 'me.name', { max => 'mat_entry.lastseen' }, ],
             as       => [qw(interface lastseen)],
             join     => 'mat_entry',
         }
@@ -70,14 +91,15 @@ sub manoc_search {
     my $type    = $query->query_type;
     my $pattern = $query->sql_pattern;
 
-    return unless $type eq 'inventory';
+    return unless $type eq 'notes';
+
+    my $filter;
+    $type eq 'notes' and $filter = { notes => { '-like' => $pattern } };
 
     my $rs = $self->search(
+        $filter,
         {
-            description => { '-like' => $pattern }
-        },
-        {
-            order_by => 'description',
+            order_by => '',
             prefetch => 'device',
         },
     );
@@ -94,3 +116,9 @@ sub manoc_search {
 }
 
 1;
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 4
+# cperl-indent-parens-as-block: t
+# End:

@@ -31,8 +31,8 @@
   </dd>
   <dt>Used in</dt>
   <dd>
-    [% FOREACH device IN object.devices %]
-    [% PP.manoc_print(device)%]
+    [% FOREACH i IN object.interface_status %]
+    [% PP.manoc_print(i.device) %] [% PP.manoc_print(i.interface)%]<br/>
     [% END -%]
   </dd>
 </dl>
