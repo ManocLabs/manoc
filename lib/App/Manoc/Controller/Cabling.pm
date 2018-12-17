@@ -19,6 +19,8 @@ with
     'App::Manoc::ControllerRole::ObjectSerializer',
     "App::Manoc::ControllerRole::JSONView";
 
+use App::Manoc::Form::Cabling;
+
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -27,6 +29,7 @@ __PACKAGE__->config(
         }
     },
     class               => 'ManocDB::CablingMatrix',
+    form_class          => 'App::Manoc::Form::Cabling',
     view_object_perm    => undef,
     object_list_options => { prefetch => [ 'interface2', 'serverhw_nic' ] },
 );
