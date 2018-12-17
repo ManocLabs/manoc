@@ -43,7 +43,7 @@ my $SOURCE_DEPENDECIES = {
     'DeviceIface'     => 'Device',
     'CDPNeigh'        => 'Device',
     'DeviceConfig'    => 'Device',
-    'DeviceNWInfo'    => [ 'Device',   'Credentials' ],
+    'DeviceNWInfo'    => [ 'Device', 'Credentials' ],
     'Credentials'     => 'Device',
     'Uplink'          => 'Device',
     'SSIDList'        => 'Device',
@@ -251,7 +251,7 @@ sub _load_sources {
             };
 
             $self->log->debug("Loading $table");
-            $self->_load_table_files($datadump, $table, $records_callback);
+            $self->_load_table_files( $datadump, $table, $records_callback );
         }
 
         my $additional_tables;
@@ -275,7 +275,7 @@ sub _load_sources {
                     $self->_update_records( $source, $records );
                 };
                 $self->log->debug("Loading additional $table");
-                $self->_load_table_files($datadump, $table, $additional_table_cb);
+                $self->_load_table_files( $datadump, $table, $additional_table_cb );
             }
         }
 
@@ -288,9 +288,9 @@ sub _load_sources {
 
 # return an ordered list of the files in which $table has been saved
 sub _get_table_filenames {
-    my ($self, $datadump, $table) = @_;
+    my ( $self, $datadump, $table ) = @_;
 
-    my @filenames = grep( /^$table\./, @{$datadump->filelist} );
+    my @filenames = grep( /^$table\./, @{ $datadump->filelist } );
     if ( @filenames > 1 ) {
         # sort by page
         @filenames =
@@ -303,9 +303,9 @@ sub _get_table_filenames {
 }
 
 sub _load_table_files {
-    my ($self, $datadump, $table, $callback) = @_;
+    my ( $self, $datadump, $table, $callback ) = @_;
 
-    my @filenames = $self->_get_table_filenames($datadump, $table);
+    my @filenames = $self->_get_table_filenames( $datadump, $table );
 
     foreach my $filename (@filenames) {
         $self->log->debug("Loading $table from $filename");
@@ -403,25 +403,24 @@ sub _populate_records {
     $self->log->info( scalar(@$records) - $count, " records loaded in table " . $source->name );
 }
 
-
 sub _update_records {
     my ( $self, $source, $records ) = @_;
 
-    my $count      = 0;
-
+    my $count = 0;
 
     my $rs = $source->resultset;
     $self->log->debug("update records");
 
     foreach my $row (@$records) {
         try {
-            $rs->update_or_create( $row );
+            $rs->update_or_create($row);
         }
         catch {
             if ( $self->force ) {
                 $count++;
                 $self->log->warn("Error while updating: $_");
-            }  else {
+            }
+            else {
                 $self->log->logdie("Fatal error: $_");
             }
         };
@@ -430,7 +429,6 @@ sub _update_records {
     $self->log->error("Warning: $count errors ignored!") if ($count);
     $self->log->info( scalar(@$records) - $count, " updated loaded in table " . $source->name );
 }
-
 
 =method load( )
 
@@ -452,7 +450,7 @@ sub load {
     $self->log->debug( 'Sources: ', join( ',', @$source_names ) );
 
     $self->schema->storage->ensure_connected();
-    $self->_load_sources( $datadump );
+    $self->_load_sources($datadump);
 
     $self->log->info("Database restored!");
 }

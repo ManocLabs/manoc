@@ -116,14 +116,11 @@ sub _build_interface_id_map {
         }
     );
 
-    my %id_map = map {
-        $_->device_id . ":" . $_->name => $_->id
-    } @ifaces;
+    my %id_map = map { $_->device_id . ":" . $_->name => $_->id } @ifaces;
 
     $self->log->info("Loaded idmap ifaces");
     return \%id_map;
 }
-
 
 sub _build_device_id_counter {
     my $self = shift;
@@ -508,13 +505,13 @@ sub upgrade_DeviceIface {
         my $name      = $_->{interface};
         my $device_id = $_->{device_id};
 
-        $r->{id}           = $iface_id;
-        $r->{name}         = $name;
-        $r->{device_id}    = $device_id;
-        $r->{routed}       = 0;
+        $r->{id}        = $iface_id;
+        $r->{name}      = $name;
+        $r->{device_id} = $device_id;
+        $r->{routed}    = 0;
 
         # use name in lower case for idmap
-        $id_map->{"${device_id}:". lc($name)} = $iface_id;
+        $id_map->{ "${device_id}:" . lc($name) } = $iface_id;
         push @new_data, $r;
     }
 
@@ -534,19 +531,19 @@ sub process_additional_table_DeviceIface_if_notes {
 ROW:
     foreach (@$data) {
         # use name in lower case for idmap
-        my $name      = lc($_->{interface});
+        my $name      = lc( $_->{interface} );
         my $device_id = $_->{device_id};
 
-        my $iface_id  = $id_map->{"${device_id}:${name}"};
-        if (!defined($iface_id)) {
+        my $iface_id = $id_map->{"${device_id}:${name}"};
+        if ( !defined($iface_id) ) {
             $self->log->info("Skipping notes for interface  ${device_id}:${name}");
             next ROW;
         }
 
         my $r = {};
 
-        $r->{id}           = $iface_id;
-        $r->{notes}        = $_->{notes};
+        $r->{id}    = $iface_id;
+        $r->{notes} = $_->{notes};
 
         push @new_data, $r;
 
@@ -566,13 +563,13 @@ sub upgrade_DeviceIfStatus {
     foreach (@$data) {
         my $device_id = $_->{device_id};
         # use name in lower case for idmap
-        my $name      = lc($_->{interface});
-        my $iface_id  = $id_map->{"${device_id}:${name}"};
+        my $name     = lc( $_->{interface} );
+        my $iface_id = $id_map->{"${device_id}:${name}"};
 
         $_->{interface_id} = $iface_id;
 
         # cleanup attributes
-        delete @$_{ qw(device_id interface ) };
+        delete @$_{qw(device_id interface )};
     }
 }
 

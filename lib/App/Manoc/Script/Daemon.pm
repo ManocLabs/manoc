@@ -29,7 +29,7 @@ has cmd_stop => (
     documentation => 'kill the daemon',
 );
 
-has '+foreground' => ( writer => '_set_foreground', default => 0);
+has '+foreground' => ( writer => '_set_foreground', default => 0 );
 
 has cmd_status => (
     metaclass => 'Getopt',
@@ -93,8 +93,8 @@ sub run {
     else {
         # when in debug mode do not fork
         if ( $self->debug ) {
-             $self->log->debug("Setting foreground because of debug");
-             $self->_set_foreground(1);
+            $self->log->debug("Setting foreground because of debug");
+            $self->_set_foreground(1);
         }
         $self->start;
     }
@@ -110,7 +110,7 @@ after 'start' => sub {
 
     $self->log->debug("Dropping privileges (if setted)");
     $self->drop_privileges;
-    
+
     $self->log->debug("Running main server loop");
     $self->main;
 };
@@ -124,29 +124,28 @@ If defined call the before_set_user callback.
 
 sub drop_privileges {
     my $self = shift;
-    
 
     $self->can('before_set_user') and $self->before_set_user;
 
     if ( my $group = $self->group ) {
-        my $gid = getgrnam($self->group);
+        my $gid = getgrnam( $self->group );
         $gid or $self->log->logdie("Cannot identify group $group ");
-        setgid( $gid ) or
-            $self->log->logdie("Cannot set group $group ");;
-        $self->log->debug( "setgid($gid)" );
+        setgid($gid) or
+            $self->log->logdie("Cannot set group $group ");
+        $self->log->debug("setgid($gid)");
     }
 
     if ( my $user = $self->user ) {
         my $uid = getpwnam($user);
         $uid or $self->log->logdie("Cannot identify user $user ");
 
-        setuid( $uid ) or
-            $self->log->logdie("Cannot set user $user ");;
+        setuid($uid) or
+            $self->log->logdie("Cannot set user $user ");
 
         $ENV{USER} = $user;
-        $ENV{HOME} = ((getpwuid($uid))[7]);
+        $ENV{HOME} = ( ( getpwuid($uid) )[7] );
 
-        $self->log->debug( "setuid($uid)" );
+        $self->log->debug("setuid($uid)");
         $self->log->debug( "\$ENV{USER} => " . $ENV{USER} );
         $self->log->debug( "\$ENV{HOME} => " . $ENV{HOME} );
     }

@@ -35,7 +35,7 @@ sub search_multihost {
 
             as       => [ 'device', 'interface', 'count', 'description', ],
             group_by => [ 'device', 'interface' ],
-            having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
+            having   => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
             order_by => [ 'me.device_id', 'me.interface' ],
             alias    => 'me',
             from     => [

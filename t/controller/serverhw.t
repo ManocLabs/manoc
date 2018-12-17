@@ -28,10 +28,10 @@ my %common_fields = (
 # create a nic type
 my $nic_type = $schema->resultset("NICType")->find_or_create(
     {
-        name     => 'Eth 100',
+        name => 'Eth 100',
     }
 );
-ok( $nic_type, "Create a test NIC type");
+ok( $nic_type, "Create a test NIC type" );
 
 # visit list
 $mech->get_ok('/serverhw');
@@ -46,8 +46,7 @@ $mech->submit_form_ok(
     {
         form_id => 'form-serverhw',
         fields  => {
-            %common_fields,
-            'serial'     => 'moo001',
+            %common_fields, 'serial' => 'moo001',
         }
     },
     "Create serverhw"
@@ -72,7 +71,7 @@ $mech->submit_form_ok(
         fields  => {
             %common_fields,
 
-            'serial'     => 'moo002',
+            'serial' => 'moo002',
         }
     },
     "Create another serverhw"
@@ -136,7 +135,6 @@ $mech->submit_form_ok(
 #$mech->title_is('Manoc - Server Hardware S000004', "Server page");
 $mech->text_contains( 'ShinyBlade', 'Got model from first server' );
 
-
 # test NICs
 
 $mech->get_ok('/serverhw/create');
@@ -146,24 +144,41 @@ $mech->submit_form_ok(
         fields  => {
             %common_fields,
 
-            'serial'     => 'moo004',
-            'inventory'  => 'N01',
+            'serial'    => 'moo004',
+            'inventory' => 'N01',
 
             'nics.0.macaddr'  => '00:00:00:11:22:33',
             'nics.0.name'     => 'eth0',
-            'nics.0.nic_type' =>  $nic_type->id,
+            'nics.0.nic_type' => $nic_type->id,
             'nics.1.macaddr'  => '00:00:00:11:22:34',
-            'nics.1.nic_type' =>  $nic_type->id,
+            'nics.1.nic_type' => $nic_type->id,
         }
     },
     "Create a server with a NIC serverhw"
 );
 $mech->title_is( 'Manoc - Server Hardware N01', "Server page" );
-$mech->text_contains( 'eth0', "First nic name found" );
+$mech->text_contains( 'eth0',              "First nic name found" );
 $mech->text_contains( '00:00:00:11:22:33', "First nic addr found" );
-$mech->text_contains( 'nic1', "Second nic name (auto) found" );
+$mech->text_contains( 'nic1',              "Second nic name (auto) found" );
 $mech->text_contains( '00:00:00:11:22:34', "Second nic addr found" );
 
+$mech->get_ok('/serverhw/create');
+$mech->submit_form_ok(
+    {
+        form_id => 'form-serverhw',
+        fields  => {
+            %common_fields,
+            'inventory' => 'N02',
+
+            'nics.0.macaddr'  => '00:00:00:11:22:33',
+            'nics.0.name'     => 'eth0',
+            'nics.0.nic_type' => $nic_type->id,
+        }
+    },
+    "Create a server with a NIC (duplicated maccaddr)"
+);
+$mech->text_contains( 'Duplicate value for Macaddr',
+    "Got error for Duplicate value for Macaddr" );
 
 $mech->get_ok('/serverhw/create');
 $mech->submit_form_ok(
@@ -171,38 +186,21 @@ $mech->submit_form_ok(
         form_id => 'form-serverhw',
         fields  => {
             %common_fields,
-            'inventory'  => 'N02',
+            'inventory' => 'N02',
 
-            'nics.0.macaddr' => '00:00:00:11:22:33',
-            'nics.0.name'    => 'eth0',
-            'nics.0.nic_type' =>  $nic_type->id,
+            'nics.0.macaddr'  => 'aa:bb:cc:dd:ee:ff',
+            'nics.0.name'     => 'eth0',
+            'nics.0.nic_type' => $nic_type->id,
+
+            'nics.1.macaddr'  => 'aa:bb:cc:dd:ee:ff',
+            'nics.1.name'     => 'eth0',
+            'nics.1.nic_type' => $nic_type->id,
         }
     },
     "Create a server with a NIC (duplicated maccaddr)"
 );
-$mech->text_contains( 'Duplicate value for Macaddr', "Got error for Duplicate value for Macaddr" );
-
-$mech->get_ok('/serverhw/create');
-$mech->submit_form_ok(
-    {
-        form_id => 'form-serverhw',
-        fields  => {
-            %common_fields,
-            'inventory'  => 'N02',
-
-            'nics.0.macaddr' => 'aa:bb:cc:dd:ee:ff',
-            'nics.0.name'    => 'eth0',
-            'nics.0.nic_type' =>  $nic_type->id,
-
-            'nics.1.macaddr' => 'aa:bb:cc:dd:ee:ff',
-            'nics.1.name'    => 'eth0',
-            'nics.1.nic_type' =>  $nic_type->id,
-        }
-    },
-    "Create a server with a NIC (duplicated maccaddr)"
-);
-$mech->text_contains( 'Duplicate value for Macaddr', "Got error for  Duplicate value for Macaddr" );
+$mech->text_contains( 'Duplicate value for Macaddr',
+    "Got error for  Duplicate value for Macaddr" );
 $mech->text_contains( 'Duplicate value for NIC', "Got error for Duplicate value for Name" );
-
 
 done_testing();

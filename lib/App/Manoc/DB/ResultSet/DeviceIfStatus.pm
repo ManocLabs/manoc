@@ -29,7 +29,7 @@ sub manoc_search {
         },
         {
             order_by => 'description',
-            prefetch =>  { 'interface' => 'device' },
+            prefetch => { 'interface' => 'device' },
         },
     );
     while ( my $e = $rs->next ) {

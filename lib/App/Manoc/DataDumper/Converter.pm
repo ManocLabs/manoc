@@ -106,7 +106,6 @@ sub get_table_name {
     }
 }
 
-
 =method get_table_name( $source_name )
 
 Return the table name (or a reference to a name list) to be used
@@ -127,7 +126,6 @@ sub get_additional_table_name {
     }
 }
 
-
 =method upgrade_table( \@data, $name )
 
 Apply any needed transformation to records in @data for table C<$name>.
@@ -147,7 +145,6 @@ sub upgrade_table {
     }
 }
 
-
 =method process_additional_table( \@data, $source_name, $table_name )
 
 Prepare @data coming from $table_name in order to be used to further
@@ -156,7 +153,7 @@ refine already imported records in $source_name.
 =cut
 
 sub process_additional_table {
-    my ( $self, $data, $source_name, $table_name  ) = @_;
+    my ( $self, $data, $source_name, $table_name ) = @_;
 
     my $method_name = "process_additional_table_${source_name}_${table_name}";
 
@@ -167,7 +164,6 @@ sub process_additional_table {
         $c->$method_name($data);
     }
 }
-
 
 =method after_import_source( $source )
 

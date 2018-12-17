@@ -71,7 +71,7 @@ sub search_conflicts {
             select   => [ 'ipaddr', { count => { distinct => 'macaddr' } } ],
             as       => [ 'ipaddr', 'count' ],
             group_by => ['ipaddr'],
-            having => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
+            having   => { 'COUNT(DISTINCT(macaddr))' => { '>', 1 } },
         }
     );
     return wantarray ? $rs->all : $rs;
@@ -93,7 +93,7 @@ sub search_multihomed {
             select   => [ 'macaddr', { count => { distinct => 'ipaddr' } } ],
             as       => [ 'macaddr', 'count' ],
             group_by => ['macaddr'],
-            having => { 'COUNT(DISTINCT(ipaddr))' => { '>', 1 } },
+            having   => { 'COUNT(DISTINCT(ipaddr))' => { '>', 1 } },
         }
     );
     return wantarray ? $rs->all : $rs;
@@ -112,7 +112,7 @@ sub first_last_seen {
     my $rs = $self->search(
         {},
         {
-            select => [ 'ipaddr', { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
+            select   => [ 'ipaddr', { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
             as       => [ 'ip_address', 'lastseen', 'firstseen' ],
             group_by => ['ipaddr'],
         }

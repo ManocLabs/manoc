@@ -18,8 +18,8 @@ around BUILDARGS => sub {
     my $class = shift;
 
     if ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) {
-        my $args   = $_[0];
-        my $iface  = $args->{interface};
+        my $args  = $_[0];
+        my $iface = $args->{interface};
 
         my $device = $iface->device;
 

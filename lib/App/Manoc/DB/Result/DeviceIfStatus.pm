@@ -86,10 +86,9 @@ __PACKAGE__->add_columns(
 __PACKAGE__->belongs_to(
     interface => 'App::Manoc::DB::Result::DeviceIface',
     'interface_id'
-    );
+);
 
-
-__PACKAGE__->set_primary_key( 'interface_id' );
+__PACKAGE__->set_primary_key('interface_id');
 
 sub device { shift->interface->device }
 

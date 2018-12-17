@@ -149,7 +149,7 @@ needed.
 =cut
 
 sub decommission {
-    my $self = shift;
+    my $self      = shift;
     my $timestamp = shift // time();
 
     $self->decommissioned and return 1;
