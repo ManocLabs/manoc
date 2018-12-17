@@ -90,6 +90,12 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->set_primary_key('interface_id');
 
+=method device
+
+Shortcut to for $row->interface->device
+
+=cut
+
 sub device { shift->interface->device }
 
 1;

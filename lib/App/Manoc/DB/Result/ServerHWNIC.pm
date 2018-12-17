@@ -97,6 +97,10 @@ sub insert {
     return $self;
 }
 
+=method label
+
+=cut
+
 sub label { shift->name }
 
 1;

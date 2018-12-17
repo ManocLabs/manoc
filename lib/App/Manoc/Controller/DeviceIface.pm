@@ -70,7 +70,9 @@ before 'create' => sub {
     $c->stash( title => 'New interface' );
 };
 
-=action uplinks
+=action populate
+
+For interfaces batch creation
 
 =cut
 

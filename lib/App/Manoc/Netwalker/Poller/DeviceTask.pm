@@ -502,10 +502,10 @@ sub update_if_table {
     my $ifstatus_table = $source->ifstatus_table;
 
     # delete old infos
-    foreach my $inteface ( $entry->interfaces ) {
-        $inteface->status()->delete;
+    foreach my $interface ( $entry->interfaces ) {
+        $interface->status()->delete;
 
-        if ( exists $ifstatus_table->{ $inteface->name } ) {
+        if ( exists $ifstatus_table->{ $interface->name } ) {
 
             if ( $interface->autocreated ) {
                 $interface->delete;

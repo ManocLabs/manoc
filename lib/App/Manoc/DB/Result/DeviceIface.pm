@@ -114,6 +114,12 @@ __PACKAGE__->might_have(
     }
 );
 
+=method controller
+
+Split name in controller+port pair and return controller.
+
+=cut
+
 sub controller {
     my $self = shift;
 
@@ -123,6 +129,12 @@ sub controller {
 
     $self->{_controller};
 }
+
+=method port
+
+Split name in controller+port pair and return port.
+
+=cut
 
 sub port {
     my $self = shift;
@@ -141,6 +153,37 @@ sub _init_controller_port {
     $self->{_controller} = $controller;
     $self->{_port}       = $port;
 }
+
+=method add_cabling_to_interface($iface)
+
+=cut
+
+sub add_cabling_to_interface {
+    my ( $self, $interface2 ) = @_;
+
+    $self->result_source->schema->txn_do(
+        sub {
+            $self->create_related( cabling => { interface2 => $interface2 } );
+            $interface2->create_related( cabling => { interface2 => $self } );
+        }
+    );
+}
+
+=method add_cabling_to_nic($nic)
+
+=cut
+
+sub add_cabling_to_nic {
+    my ( $self, $nic ) = @_;
+
+    $self->create_related( cabling => { serverhw_nic => $nic } );
+}
+
+=method remove_cabling
+
+Remove a cabling from this interface
+
+=cut
 
 sub remove_cabling {
     my $self = shift;
@@ -161,22 +204,9 @@ sub remove_cabling {
     }
 }
 
-sub add_cabling_to_interface {
-    my ( $self, $interface2 ) = @_;
+=method label
 
-    $self->result_source->schema->txn_do(
-        sub {
-            $self->create_related( cabling => { interface2 => $interface2 } );
-            $interface2->create_related( cabling => { interface2 => $self } );
-        }
-    );
-}
-
-sub add_cabling_to_nic {
-    my ( $self, $nic ) = @_;
-
-    $self->create_related( cabling => { serverhw_nic => $nic } );
-}
+=cut
 
 sub label { shift->name }
 

@@ -7,11 +7,16 @@ use warnings;
 
 use parent 'App::Manoc::DB::ResultSet';
 
+=method check_connection
+
+EXPERIMENTAL Flexible check to verify cdp links or forms
+
+=cut
+
 sub check_connection {
     my ( $self, $from, $to ) = @_;
 
     # TODO
-    # flexible check to verify cdp links or forms
 }
 
 1;

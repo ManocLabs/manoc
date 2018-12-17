@@ -9,7 +9,7 @@ use parent 'App::Manoc::DB::ResultSet';
 
 use App::Manoc::DB::Search::Result::Iface;
 
-=method search_not_cabled( )
+=method search_uncabled( )
 
 Return a resultset containing all NICs which are not in the cabling matrix.
 

@@ -19,6 +19,9 @@ my $hwserver_nic1 = $schema->resultset("ServerHWNIC")->create(
             vendor     => 'Moon',
             model      => 'ShinyBlade',
         },
+        nic_type => {
+            name => 'FastEthernet 100'
+        }
     }
 );
 ok( $hwserver_nic1, "Create server NIC" );
@@ -31,12 +34,15 @@ eval {
             serverhw => {
                 ram_memory => '16000',
                 cpu_model  => 'E1234',
-                vendor     => 'Moon',
-                model      => 'ShinyBlade',
+                vendor     => 'HAL',
+                model      => 'Cosmo',
             },
+            nic_type => {
+                name => 'GbEth'
+            }
         }
     );
 };
-ok( $@, "Cannot server  NIC with duplicated macaddr" );
+ok( $@, "Cannot create server  NIC with duplicated macaddr" );
 
 done_testing;

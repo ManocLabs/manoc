@@ -106,7 +106,7 @@ sub get_table_name {
     }
 }
 
-=method get_table_name( $source_name )
+=method get_additional_table_name( $source_name )
 
 Return the table name (or a reference to a name list) to be used
 to refine data imported into DB source C<$source_name>.
