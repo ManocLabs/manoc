@@ -8,7 +8,7 @@ extends 'App::Manoc::Form::BaseDBIC';
 
 has '+name' => ( default => 'form-devcabling' );
 
-has 'schema' => ( is => 'rw' );
+# has 'schema' => ( is => 'rw' );
 
 has_field 'interface1' => (
     type         => 'Select',
@@ -36,25 +36,87 @@ has_field 'save' => (
     value => "Save"
 );
 
+has 'interface1_obj' => (
+    isa => 'Object',
+    is  => 'rw',
+);
+
+has 'interface1_obj' => (
+    isa => 'Object',
+    is  => 'rw',
+);
+
+has 'interface2_obj' => (
+    isa => 'Object',
+    is  => 'rw',
+);
+
+has 'serverhw_nic_obj' => (
+    isa => 'Object',
+    is  => 'rw',
+);
+
+sub validate_interface1 {
+    my ( $self, $field ) = @_;
+
+    my $id = $self->field('interface1')->value;
+    defined($id) or return;
+
+    my $interface = $self->schema->resultset('DeviceIface')->find($id);
+
+    if ($interface) {
+        $self->interface1_obj($interface);
+    }
+    else {
+        $field->add_error("Interface not found");
+    }
+}
+
+sub validate_interface2 {
+    my ( $self, $field ) = @_;
+
+    my $id = $self->field('interface2')->value;
+    defined($id) or return;
+
+    my $interface = $self->schema->resultset('DeviceIface')->find($id);
+    if ($interface) {
+        $self->interface2_obj($interface);
+    }
+    else {
+        $field->add_error("Interface not found");
+    }
+}
+
+sub validate_serverhw_nic {
+    my ( $self, $field ) = @_;
+
+    my $id = $self->field('serverhw_nic')->value;
+    defined($id) or return;
+
+    my $nic = $self->schema->resultset('ServerHWNIC')->find($id);
+    if ($nic) {
+        $self->serverhw_nic_obj($nic);
+    }
+    else {
+        $field->add_error("NIC not found");
+    }
+}
+
 override validate_model => sub {
     my $self = shift;
 
-    # some handy shortcuts
-    my %active_fields = map { $_->name => 1 } $self->sorted_fields;
+    super();
 
-    my $interface1 = $active_fields{interface1} ? $self->field('interface1')->value : undef;
-    my $serverhw_nic =
-        $active_fields{serverhw_nic} ? $self->field('serverhw_nic')->value : undef;
-    my $interface2 = $active_fields{interface2} ? $self->field('interface2')->value : undef;
-
-    my $item = $self->item;
-
-    if ( !defined($interface2) && !defined($serverhw_nic) ) {
+    if ( !defined( $self->interface2_obj ) && !defined( $self->serverhw_nic_obj ) ) {
         $self->add_form_error('Missing destination');
     }
 
-    # check for overlapping cablings
-    #TODO
+    if ( defined( $self->interface2_obj ) ) {
+        if ( $self->interface1_obj->device_id == $self->interface2_obj->device_id ) {
+            $self->add_form_error(
+                'Loop detected: both source and destination on the same device');
+        }
+    }
 };
 
 override update_model => sub {
@@ -63,19 +125,11 @@ override update_model => sub {
 
     $self->schema->txn_do(
         sub {
-            super();
-
-            if ( $self->values->{interface2} ) {
-                my $item   = $self->item;
-                my $source = $self->source;
-                my $rs     = $self->schema->resultset( $source->source_name );
-
-                my $item2 = $rs->create(
-                    {
-                        interface1 => $item->interface2,
-                        interface2 => $item->interface1,
-                    }
-                );
+            if ( $self->interface2_obj ) {
+                $self->interface1_obj->add_cabling_to_interface( $self->interface2_obj );
+            }
+            if ( $self->serverhw_nic_obj ) {
+                $self->interface1_obj->add_cabling_to_nic( $self->serverhw_nic_obj );
             }
         }
     );
