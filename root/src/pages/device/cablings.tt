@@ -8,7 +8,7 @@
             <th>Interface</th>
             <th>To</th>
 	        <th>Interface</th>
-            <th></th>
+            <th data-orderable="false"></th>
 	    </tr>
     </thead>
     <tbody>
@@ -195,6 +195,10 @@ $( document ).ready(function() {
                 if (data.form_ok ) {
                     $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
                     form.submit(function(e) { e.preventDefault(e); submit_func(form); });
+                } else {
+                    if (data.errors) {
+                        alert(data.errors);
+                    }
                 }
              }
  	       }).fail(function() { alert( "Manoc internal error" ); } );
