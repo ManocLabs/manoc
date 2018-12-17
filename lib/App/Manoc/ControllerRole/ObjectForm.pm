@@ -52,6 +52,12 @@ has 'edit_object_perm' => (
     default => 'edit',
 );
 
+has 'delete_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'delete',
+);
+
 =action object_form_create
 
 =cut
