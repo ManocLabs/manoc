@@ -2,6 +2,8 @@ Revision history for App-Manoc
 
 {{$NEXT}}
 
+2.99.3    2018-12-17 22:36:29+01:00 Europe/Rome (TRIAL RELEASE)
+
   - cabling matrix
   - lan segments for VLAN inventory
   - unified credentials management
