@@ -194,6 +194,12 @@ __PACKAGE__->has_many(
     }
 );
 
+=method label
+
+=cut
+
+sub label { shift->name }
+
 =method mng_address
 
 Getter/setter for mng_address column. Both string values and
@@ -294,7 +300,7 @@ needed.
 =cut
 
 sub decommission {
-    my $self = shift;
+    my $self      = shift;
     my $timestamp = shift // time();
 
     $self->decommissioned and return;
