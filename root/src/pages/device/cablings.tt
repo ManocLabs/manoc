@@ -1,0 +1,213 @@
+[% USE date format= "%d/%m/%Y %H:%M:%S" -%]
+
+<form id="[% form.name %]" name="[% form.name %]" method="POST">
+
+<table class="table">
+    <thead>
+	    <tr>
+            <th>Interface</th>
+            <th>To</th>
+	        <th>Interface</th>
+            <th data-orderable="false"></th>
+	    </tr>
+    </thead>
+    <tbody>
+	    [% FOREACH cabling IN cablings %]
+	    <tr class="[% row_class %]">
+            <td>[% PP.manoc_print( cabling.interface1 ) %]</td>
+            [% IF cabling.interface2 -%]
+            <td>[% PP.manoc_print( cabling.device2 ) %]</td>
+            <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
+	        [% ELSE %]
+  	        <td>[% IF cabling.serverhw.server -%]
+                [% PP.manoc_print( cabling.serverhw.server ) %]
+                [% ELSE -%]
+                [% PP.manoc_print( cabling.serverhw ) %]
+                [% END -%]
+            </td>
+            <td>[% PP.manoc_print( cabling.serverhw_nic ) %]</td>
+	        [% END -%]
+            <td>
+                <a href="#" data-manoc-action="cabling-delete" data-manoc-what="[%cabling.id%]">
+                    [% bootstrap_icon('trash') %]<span class="sr-only" Delete
+                </a>
+            </dt>
+	    </tr>
+	    [% END -%]
+        <tr>
+            <td>
+                <select name="interface1" id="[% form.name %].interface1" class="form-control selectpicker" data-live-search="true">
+                </select>
+            </td>
+            <td>
+                <select name="destination_host" id="[% form.name %].destination_host" class="form-control selectpicker" data-live-search="true">
+                <option value="">-</option>
+                <optgroup label="Devices">
+                    <option value="">-</option>
+                </optgroup>
+                <optgroup label="Servers">
+                    <option value="">-</option>
+                </optgroup>
+                </select>
+            </td>
+            <td>
+                <select name="destination_port" id="[% form.name %].destination_port" class="form-control selectpicker" data-live-search="true">
+                <option value="">-</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn btn-primary" type="submit">Add</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="destination_type" value="" id="[% form.name %].destination_type" />
+<input type="hidden" name="csrf_token" value="[% c.get_token %]" id="[% form.name %].csrf_token" />
+</form>
+
+<script type="text/javascript">
+function refresh_destination_host() {
+  $.ajax({
+    url: '[% c.uri_for_action('/device/list_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      optgroup = destination_host_select.find('optgroup[label="Devices"]');
+      optgroup.find('option').remove();
+      $.each(res, function(index, item) {
+        optgroup.append('<option value="device:' + item.id + '">' + item.name + '</option>');
+      });
+      destination_host_select.selectpicker('refresh');
+    }
+  });
+
+  $.ajax({
+    url: '[% c.uri_for_action('/server/list_js') %]',
+    dataType: 'json',
+    success: function (res) {
+      optgroup = destination_host_select.find('optgroup[label="Servers"]');
+      optgroup.find('option').remove();
+      $.each(res, function(index, item) {
+        optgroup.append('<option value="server:' + item.id + '">' + item.label + '</option>');
+      });
+      destination_host_select.selectpicker('refresh');
+    }
+  });
+}
+
+function refresh_interface(select, device, options) {
+  $.ajax({
+    url: '[% c.uri_for_action('/deviceiface/list_uncabled_js') %]?device='+device,
+    dataType: 'json',
+    success: function (res) {
+      select.find('option').remove();
+      select.append('<option value="">-</option>')
+      $.each(res, function(index, item) {
+        select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      if (options && "success" in options && typeof options.success === "function") {
+        options.success();
+      }
+      select.selectpicker('refresh');
+    }
+  });
+}
+
+function refresh_nic(select, server, options) {
+  $.ajax({
+    url: '[% c.uri_for_action('/serverhwnic/list_uncabled_js') %]?server='+server,
+    dataType: 'json',
+    success: function (res) {
+      select.find('option').remove();
+      select.append('<option value="">-</option>')
+      $.each(res, function(index, item) {
+        select.append('<option value="' + item.id + '">' + item.name + '</option>');
+      });
+      if (options && "success" in options && typeof options.success === "function") {
+        options.success();
+      }
+      select.selectpicker('refresh');
+    }
+  });
+}
+
+$( document ).ready(function() {
+
+    $('a[data-manoc-action="cabling-delete"]').on( 'click', function (e) {
+      url_base = '[% c.uri_for_action("/cabling/delete_js", [ ":cabling" ]) %]';
+      id = $(this).attr('data-manoc-what');
+      url = url_base.replace(":cabling", id);
+      $.post({
+        url : url,
+        data: {
+          ['csrf_token']: '[% c.get_token %]'
+        },
+        success: function() {
+            $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
+        }
+      });
+    });
+
+    interface1_select = $('#[% form.name %]\\.interface1');
+    destination_host_select = $('#[% form.name %]\\.destination_host');
+    destination_port_select = $('#[% form.name %]\\.destination_port');
+
+    interface1_select.selectpicker('refresh');
+    destination_host_select.selectpicker('refresh');
+    destination_port_select.selectpicker('refresh');
+
+    refresh_destination_host();
+    refresh_interface(interface1_select, [% object.id %]);
+
+    destination_host_select.on('change', function() {
+        val = destination_host_select.val();
+        if (val == "") {
+            return;
+        }
+        tokens = val.split(":");
+        type = tokens[0];
+        id = tokens[1];
+
+        if (type == 'device') {
+            $('#[% form.name %]\\.destination_type').val('interface2');
+            refresh_interface(destination_port_select, id);
+        }
+        if (type == 'server') {
+            $('#[% form.name %]\\.destination_type').val('serverhw_nic');
+            refresh_nic(destination_port_select, id);
+        }
+
+     });
+
+     var submit_func = function(form) {
+         var data = {};
+
+         port_id   = destination_port_select.val();
+         port_type = form.find('input[name="destination_type"]').val();
+         data[port_type] = port_id;
+         data.interface1 = form.find('select[name="interface1"]').val();
+         data.csrf_token = form.find('input[name="csrf_token"]').val();
+
+         $.ajax({
+ 	        data: data,
+ 	        type: form.attr('method'),
+ 	        url:  "[% c.uri_for_action('cabling/create_js',) %]",
+ 	        success: function(data) {
+                if (data.form_ok ) {
+                    $('#cablings').load("[% c.uri_for_action('device/cablings', [object.id ]) %]");
+                    form.submit(function(e) { e.preventDefault(e); submit_func(form); });
+                } else {
+                    if (data.errors) {
+                        alert(data.errors);
+                    }
+                }
+             }
+ 	       }).fail(function() { alert( "Manoc internal error" ); } );
+         return false;
+     };
+
+     myform = $('#[% form.name %]');
+     myform.submit(function(e) {
+         e.preventDefault(e); submit_func(myform);
+     });
+});
+</script>

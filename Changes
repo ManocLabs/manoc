@@ -2,10 +2,12 @@ Revision history for App-Manoc
 
 {{$NEXT}}
 
+  - cabling matrix
   - lan segments for VLAN inventory
+  - unified credentials management
   - refactored search
-  - fixes for dhcp support
-  - fixes for datadumper
+  - new API support classes
+  - fixes for dhcp support, datadumper and a lot more
 
 2.99.2    2017-06-11 21:58:38+02:00 Europe/Rome (TRIAL RELEASE)
 

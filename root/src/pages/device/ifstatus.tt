@@ -1,37 +1,84 @@
 [% USE date format= "%d/%m/%Y %H:%M:%S" -%]
-<table class="table">
+
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+
+[%- IF c.check_permission('device.edit') -%]
+  <a href="[% c.uri_for_action('/device/ifacecreate', [object.id]) %]" class="btn btn-sm">[% fa_icon("plus") %] Add interface</a>
+  <a href="[% c.uri_for_action('/device/ifacepopulate', [object.id] ) %]" class="btn btn-sm">[% fa_icon("clone") %] Add range</a>
+[% END -%]
+</div>
+
+<table id="ifstatus_table"  class="table display">
     <thead>
 	    <tr>
             <th>Interface</th>
-            <th>Adm </th>
 	        <th>Status</th>
 	        <th>Speed</th>
 	        <th>Duplex</th>
-	        <th>Vlan</th>
+	        <th>VLAN</th>
 	        <th>Sec</th>
             <th>Last activity</th>
 	        <th>Description</th>
+            <th data-orderable="false"></th>
 	    </tr>
     </thead>
     <tbody>
 	    [% FOREACH if IN iface_info %]
-	    [% row_class = if.up == 'up' ? 'active' : 'warning' %]
+	    [% row_class = if.up == 'up' ? '' : 'warning' %]
 	    <tr class="[% row_class %]">
-            <td>[% PP.manoc_print({ device => object, iface => if.interface}) %]</td>
-            <td>[% if.up_admin | html %]</td>
-            <td>[% if.up | html %]</td>
+            <td data-order="[% loop.count %]">[% PP.manoc_print({ device => object, iface => if.name}) %]</td>
+            <td>[% if.up_admin | html %]/[% if.up | html %]</td>
 	        <td>[% if.speed | html %]</td>
 	        <td>[% if.duplex | html %]/[% if.duplex_admin | html %]</td>
 	        <td>[% if.vlan | html %]</td>
 	        <td>
-                [% IF if.cps_enable -%]
-	            [% if.cps_status | html %] ([% if.cps_count | html %])
+                [% IF if.cps_enable  == 'true' -%]
+	            On ([% if.cps_count | html %])
 	            [% ELSE %]
-  	            Disabled
+  	            Off
 	            [% END -%]
-	        <td>[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
+	        <td data-order="[% if.last_mat %]">[% IF if.last_mat %][% date.format(if.last_mat) %][% ELSE %]- [% END %]</td>
 	        <td>[% if.description | html %]</td>
+            <td>
+                [% IF ! if.autocreated %]
+                <a href="[% c.uri_for_action("/deviceiface/delete", [if.id]) %]" data-manoc-action="iface-delete" data-manoc-what="[%if.id%]">
+                    [% bootstrap_icon('trash') %]<span class="sr-only" Delete
+                </a>
+                [% END %]
+            </dt>
 	    </tr>
 	    [% END -%]
     </tbody>
 </table>
+<script lang="text/javascript">
+function refresh_tab() {
+    $('#ifstatus').load("[% c.uri_for_action('device/ifstatus', [object.id ]) %]");
+}
+$(document).ready(function() {
+
+    var table = $("#ifstatus_table").DataTable( {
+         "paging":   false,
+         "info":     false,
+         "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+     });
+    $("#tabletoolbar").appendTo($("div.toolbar").first());
+
+    $('a[data-manoc-action="iface-delete"]').on( 'click', function (e) {
+      url_base = '[% c.uri_for_action("/deviceiface/delete_js", [ ":iface" ]) %]';
+      id = $(this).attr('data-manoc-what');
+      url = url_base.replace(":iface", id);
+      $.post({
+        url : url,
+        data: {
+          ['csrf_token']: '[% c.get_token %]'
+        },
+        success: refresh_tab
+      });
+      return false;
+    });
+    $('#tabletoolbar a').click(function() {
+        showDialogForm($(this).attr('href'), $(this).text(), refresh_tab);
+        return false;
+    });
+});
+</script>

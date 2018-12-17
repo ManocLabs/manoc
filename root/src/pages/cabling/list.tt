@@ -1,0 +1,80 @@
+[% META
+   use_table=1
+-%]
+[% page.title = 'Cabling Matrix' %]
+
+<div id="tabletoolbar" class="btn-toolbar" role="toolbar">
+  <a href="[% c.uri_for_action('cabling/list_csv') %]" class="btn btn-sm btn-default">[% bootstrap_icon("download") %] CSV</a>
+  <div class="btn-group" role="group">
+  <div id="statusfilter_wrapper" class="filtermenu">
+  <select name="statusfilter" id="statusfilter" class="selectpicker" data-style="btn-default btn-sm">
+    <option value="all">Show all</option>
+    <option value="device">Devices</option>
+    <option value="host">Hosts</option>
+  </select>
+  </div>
+  </div>
+</div>
+
+<table class="table" id='cabling_table'>
+    <thead>
+	    <tr>
+            <th data-visible="false">Type</th>
+            <th>From</th>
+            <th>Interface</th>
+            <th>To</th>
+	        <th>Interface</th>
+            <th data-orderable="false"></th>
+	    </tr>
+    </thead>
+    <tbody>
+	    [% FOREACH cabling IN object_list %]
+	    <tr class="[% row_class %]">
+            <td>[% cabling.interface2 ? 'device' : 'host' %]</td>
+            <td>[% PP.manoc_print( cabling.device1 ) %]</td>
+            <td>[% PP.manoc_print( cabling.interface1 ) %]</td>
+            [% IF cabling.interface2 -%]
+            <td>[% PP.manoc_print( cabling.device2 ) %]</td>
+            <td>[% PP.manoc_print( cabling.interface2 ) %]</td>
+	        [% ELSE %]
+            <td>[% IF cabling.serverhw.server -%]
+                [% PP.manoc_print( cabling.serverhw.server ) %]
+                [% ELSE -%]
+                [% PP.manoc_print( cabling.serverhw ) %]
+                [% END -%]
+            </td>
+            <td>[% cabling.serverhw_nic.name %]</td>
+	        [% END -%]
+            <td>
+                <a href="#" data-manoc-action="cabling-delete" data-manoc-what="[%cabling.id%]">
+                    [% bootstrap_icon('trash') %]<span class="sr-only">Delete</span>
+                </a>
+            </dt>
+	    </tr>
+	    [% END -%]
+    </tbody>
+</table>
+[% capture = BLOCK -%]
+var table;
+
+function refresh_filter(e) {
+      value = $("#statusfilter").val();
+      s = '';
+      if (value != 'all') {
+          s = '^' + value + '$';
+      }
+      table.columns(0).search(s, true, false).draw();
+}
+
+$(document).ready(function() {
+  table = $("#cabling_table").DataTable({
+    "dom": '<"row"<"col-sm-6"<"toolbar">><"col-sm-6"f>>rtip',
+  });
+
+  $("#tabletoolbar").appendTo($("div.toolbar").first());
+
+  $("#statusfilter").on('changed.bs.select', refresh_filter);
+  refresh_filter();
+});
+[% END -%]
+[% js_scripts.push(capture) -%]

@@ -1,5 +1,5 @@
 package App::Manoc::DB::Result::Device;
-#ABSTRACT: A model object for logical devices
+#ABSTRACT: A model object for logical has_mans
 
 use strict;
 use warnings;
@@ -84,13 +84,13 @@ __PACKAGE__->add_unique_constraint( [qw/mng_address/] );
 __PACKAGE__->belongs_to(
     hwasset => 'App::Manoc::DB::Result::HWAsset',
     'hwasset_id',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 __PACKAGE__->belongs_to(
     rack => 'App::Manoc::DB::Result::Rack',
     'rack_id',
-    { join_type => 'left' }
+    { join_type => 'LEFT' }
 );
 
 =method rack
@@ -118,16 +118,7 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->has_many(
-    ifstatus => 'App::Manoc::DB::Result::IfStatus',
-    'device_id'
-);
-
-__PACKAGE__->has_many(
     uplinks => 'App::Manoc::DB::Result::Uplink',
-    'device_id'
-);
-__PACKAGE__->has_many(
-    ifnotes => 'App::Manoc::DB::Result::IfNotes',
     'device_id'
 );
 __PACKAGE__->has_many(
@@ -182,6 +173,32 @@ __PACKAGE__->belongs_to(
     'mng_url_format_id',
     { join_type => 'LEFT' }
 );
+
+__PACKAGE__->has_many(
+    cablings => 'App::Manoc::DB::Result::CablingMatrix',
+    { 'foreign.device1_id' => 'self.id' },
+    {
+        cascade_copy   => 0,
+        cascade_delete => 1,
+        cascade_update => 0,
+    }
+);
+
+__PACKAGE__->has_many(
+    interfaces => 'App::Manoc::DB::Result::DeviceIface',
+    'device_id',
+    {
+        cascade_copy   => 1,
+        cascade_delete => 1,
+        cascade_update => 0,
+    }
+);
+
+=method label
+
+=cut
+
+sub label { shift->name }
 
 =method mng_address
 
@@ -283,7 +300,7 @@ needed.
 =cut
 
 sub decommission {
-    my $self = shift;
+    my $self      = shift;
     my $timestamp = shift // time();
 
     $self->decommissioned and return;

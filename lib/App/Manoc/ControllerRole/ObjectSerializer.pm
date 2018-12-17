@@ -111,6 +111,9 @@ sub serialize_objects {
         $c->stash->{serialize_add_object_href} :
         $self->serialize_add_object_href;
 
+    # store the actual list of columns
+    $c->stash( serialized_columns => $serialize_columns );
+
     foreach my $row (@$rows) {
         my $ret = {};
 

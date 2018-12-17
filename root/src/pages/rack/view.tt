@@ -47,7 +47,7 @@ page.no_content_row = 1
   </div>
 
   <div class="panel-body">
-  [% IF object.devices.count -%]
+  [% IF object.devices -%]
   <table class="table table-condensed" id="device_list">
     <thead>
       <tr>
@@ -77,7 +77,7 @@ page.no_content_row = 1
   </div>
 
   <div class="panel-body">
-  [% IF object.servers.count -%]
+  [% IF object.servers -%]
   <table class="table table-condensed" id="server_list">
     <thead>
       <tr>

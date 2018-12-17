@@ -3,6 +3,7 @@
 	    <tr>
 	        <th>Local Interface</th>
             <th>Neigh Address</th>
+            <th>Remote Interface</th>
 	        <th>Neigh Name</th>
 	        <th>Neigh Description</th>
             <th>Last seen</th>
@@ -12,14 +13,16 @@
 	    [% FOREACH link IN neighs %]
 	    <tr [% UNLESS link.expired %]class="success"[% END %]>
 	        <td>
-	            <a href="[% c.uri_for_action('interface/view', [object.id, link.local_iface]) %]">
+	            <a href="[% c.uri_for_action('device/iface', [object.id, link.local_iface]) %]">
 	                [% link.local_iface %]</a>
 	        </td>
 	        [% IF  link.to_device_info  %]
             <td>[% link.to_device_info.mng_address %]</td>
+            <td>[% link.remote_iface %]</td>
 	        <td>[% PP.manoc_print(link.to_device_info) %]</td>
 	        [% ELSE %]
             <td>[% PP.manoc_print(link.to_device) -%]</td>
+            <td>[% link.remote_iface %]</td>
             <td>[% link.remote_id %]</td>
 	        [% END %]
 	        <td>[% link.remote_type %]</td>

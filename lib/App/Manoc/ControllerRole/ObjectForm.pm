@@ -52,6 +52,12 @@ has 'edit_object_perm' => (
     default => 'edit',
 );
 
+has 'delete_object_perm' => (
+    is      => 'rw',
+    isa     => 'Maybe[Str]',
+    default => 'delete',
+);
+
 =action object_form_create
 
 =cut
@@ -148,6 +154,10 @@ sub object_form : Private {
     }
     if ( $self->can("get_form_process_params") ) {
         %process_params = $self->get_form_process_params( $c, %process_params );
+    }
+
+    if ( $c->stash->{form_require_post} ) {
+        $process_params{posted} = $c->req->method eq 'POST';
     }
 
     # the "process" call has all the saving logic,

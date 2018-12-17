@@ -25,6 +25,14 @@ my %common_fields = (
     'location' => 'w',
 );
 
+# create a nic type
+my $nic_type = $schema->resultset("NICType")->find_or_create(
+    {
+        name     => 'Eth 100',
+    }
+);
+ok( $nic_type, "Create a test NIC type");
+
 # visit list
 $mech->get_ok('/serverhw');
 $mech->title_is('Manoc - Server Hardware');
@@ -141,9 +149,11 @@ $mech->submit_form_ok(
             'serial'     => 'moo004',
             'inventory'  => 'N01',
 
-            'nics.0.macaddr' => '00:00:00:11:22:33',
-            'nics.0.name'    => 'eth0',
-            'nics.1.macaddr' => '00:00:00:11:22:34',
+            'nics.0.macaddr'  => '00:00:00:11:22:33',
+            'nics.0.name'     => 'eth0',
+            'nics.0.nic_type' =>  $nic_type->id,
+            'nics.1.macaddr'  => '00:00:00:11:22:34',
+            'nics.1.nic_type' =>  $nic_type->id,
         }
     },
     "Create a server with a NIC serverhw"
@@ -165,6 +175,7 @@ $mech->submit_form_ok(
 
             'nics.0.macaddr' => '00:00:00:11:22:33',
             'nics.0.name'    => 'eth0',
+            'nics.0.nic_type' =>  $nic_type->id,
         }
     },
     "Create a server with a NIC (duplicated maccaddr)"
@@ -181,9 +192,11 @@ $mech->submit_form_ok(
 
             'nics.0.macaddr' => 'aa:bb:cc:dd:ee:ff',
             'nics.0.name'    => 'eth0',
+            'nics.0.nic_type' =>  $nic_type->id,
 
             'nics.1.macaddr' => 'aa:bb:cc:dd:ee:ff',
             'nics.1.name'    => 'eth0',
+            'nics.1.nic_type' =>  $nic_type->id,
         }
     },
     "Create a server with a NIC (duplicated maccaddr)"

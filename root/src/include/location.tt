@@ -11,7 +11,7 @@ $('#[% form.name %] input').on('change', function() {
 
  });
 function form_location_refresh() {
-  l=$('input[name="[% form.name %].location"]:checked').val();
+  l=$('#[% form.name %] input[name="location"]:checked').val();
 
   $("#[% form.name %] #building").prop('disabled', l != 'o').selectpicker('refresh');
   $("#[% form.name %] #room").prop('disabled', l != 'o');

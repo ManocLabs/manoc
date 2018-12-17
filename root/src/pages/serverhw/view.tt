@@ -45,18 +45,23 @@
   <dd>[% object.model | html %]</dd>
   <dt>Serial</dt>
   <dd>[% object.serial | html %]</dd>
-[% IF object.is_in_warehouse %]
-  <dt>Warehouse</dt>
-  <dd>Yes</dd>
-[% ELSE -%]
-  <dt>Building<dt><dd>[% PP.manoc_print(object.building) %]</dd>
-  <dt>Floor</dt><dd>[% object.floor | html %]</dd>
-  <dt>Room</dt> <dd>[% object.room | html %]</dd>
+  <dt>Location<dt>
+  <dd>
+      [% IF object.is_in_warehouse %]
+        Warehouse [% PP.manoc_print(object.warehouse) %]
+      [% ELSE -%]
+      [% PP.manoc_print(object.building) %]
+      [% IF object.floor != '' %]/ Floor [% object.floor | html %][% END -%]
+      [% IF object.room != '' %]/ Room</dt> <dd>[% object.room | html %][% END -%]
+      [% END %]
+  </dd>
   [% IF object.rack %]
-   <dt>Rack</dt><dd>[% PP.manoc_print(object.rack) %]</dd>
-   <dt>Level<dt><dd>[% object.rack_level %]</dd>
+   <dt>Rack</dt>
+   <dd>
+       [% PP.manoc_print(object.rack) %]
+       [%IF object.rack_level %]- [% object.rack_level | html %][% END %]
+   </dd>
   [% END %]
-[% END %]
   [% IF object.decommissioned -%]
   <dt>Decommissioned</dt>
   <dd>[% date.format(object.decommisioned_ts) | html %]</dd>
@@ -65,15 +70,17 @@
   <dt>RAM</dt>
   <dd>[% object.ram_memory | html %]</dd>
   <dt>CPU</dt>
-  <dd>[% object.n_procs | html %] x [% object.cpu_model | html %] at [% object.proc_freq | html %]Mhz
+  <dd>
+      [% IF object.n_procs %][% object.n_procs | html %] x [% END %]
+      [% object.cpu_model | html %] at [% object.proc_freq | html %]Mhz
   <dt>Cores</dt>
   <dd>[% object.cors | html %] ([% object.n_cores_proc | html %] x CPU)</dd>
-  <dt>Primary storage</dt>
-  <dd>[% object.storage1_size | html %]</dd>
-  <dt>Secondary storage</dt>
-  <dd>[% object.storage2_size | html %]</dd>
+  <dt>Storage</dt>
+  <dd>[% object.storage1_size | html %]
+      [% IF object.storage2_size %]+ [% object.storage2_size | html %][% END %]
+  </dd>
   <dt>NICs</dt>
-  <dd>[% FOREACH n IN object.nics %][% n.name %] [% PP.manoc_print(n.macaddr) -%]<br>[% END -%]</dd>
+  <dd>[% FOREACH n IN object.nics %][% PP.manoc_print(n) %] [% PP.manoc_print(n.macaddr) -%]<br>[% END -%]</dd>
   <dt>Notes</dt>
   <dd>[% object.notes | html %]</dd>
 </dl>

@@ -1,6 +1,0 @@
-[%
-   page.title='Interface Notes ' _ object.device.name _ '/' _ object.interface
-%]
-
-[% form.render %]
-[% ajax_form(form.name) %]

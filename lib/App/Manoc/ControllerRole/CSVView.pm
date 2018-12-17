@@ -28,7 +28,7 @@ Call serialize_objects. Redefine this method for custom serialization.
 =cut
 
 sub prepare_csv_objects {
-    my ( $self, $c, $rows ) = shift;
+    my ( $self, $c, $rows ) = @_;
 
     my $csv_columns = $self->csv_columns;
     @$csv_columns and $c->stash( serialize_columns => $csv_columns );
@@ -50,16 +50,17 @@ sub list_csv : Chained('object_list') : PathPart('csv') : Args(0) {
     $filename = $c->namespace();
     $filename =~ s|/|_|;
 
+    my $data = $self->prepare_csv_objects( $c, $c->stash->{object_list} );
+
     my @headers;
-    foreach my $col_name ( @{ $self->csv_columns } ) {
+    foreach my $col_name ( @{ $c->stash->{serialized_columns} } ) {
         my $name = $self->csv_column_alias->{$col_name} || $col_name;
         push @headers, $name;
     }
 
-    my @data = map { $self->prepare_csv_object( $c, $_ ) } @{ $c->stash->{object_list} };
     $c->stash(
         columns      => \@headers,
-        data         => \@data,
+        data         => $data,
         filename     => $filename,
         suffix       => '.csv',
         current_view => 'CSV',

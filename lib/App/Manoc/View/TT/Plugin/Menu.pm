@@ -72,9 +72,13 @@ my @DEFAULT_MENU_ITEMS = (
                 ]
             },
             {
-                name => 'WLAN',
-                path => '#',
+                name   => "Cabling Matrix",
+                action => 'cabling/list'
             },
+            #{
+            #    name => 'WLAN',
+            #    path => '#',
+            #},
             {
                 name   => 'DHCP Servers',
                 action => '/dhcpserver/list',
@@ -176,6 +180,11 @@ my @DEFAULT_MENU_ITEMS = (
                 name       => 'Management Urls',
                 action     => '/mngurlformat/list',
                 permission => 'mngurlformat.view',
+            },
+            {
+                name       => 'NIC types',
+                action     => '/nictype/list',
+                permission => 'nictype.view',
             },
             {
                 name       => 'Credentials',
