@@ -135,7 +135,7 @@ Ports status and mac-address associations network devices via SNMP
 
 =item
 
-Ethernet/IP address pairings via a sniffer agenta
+Ethernet/IP address pairings via a sniffer agent
 
 =item
 

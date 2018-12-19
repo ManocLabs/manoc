@@ -29,7 +29,9 @@ sub init_manoctest {
     -f $config_file or
         BAIL_OUT "Can't find config file $config_file";
 
-    $ENV{LANG}            = 'C';
+    $ENV{LANG}   = 'en_US.UTF-8';
+    $ENV{LC_ALL} = 'en_US.UTF-8';
+
     $ENV{CATALYST_CONFIG} = $config_file;
 
     $ENV{MANOC_SKIP_CSRF}    = 1;
