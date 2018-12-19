@@ -4,7 +4,7 @@ App::Manoc - Network monitoring application
 
 # VERSION
 
-version 2.99.3
+version 2.99.4
 
 # SYNOPSIS
 
@@ -17,7 +17,7 @@ Manoc is a web-based network monitoring/reporting platform designed for moderate
 Manoc collects and displays:
 
 - Ports status and mac-address associations network devices via SNMP
-- Ethernet/IP address pairings via a sniffer agenta
+- Ethernet/IP address pairings via a sniffer agent
 - DHCP leases/reservations using a lightweight agent for ISC DHCPD
 based servers
 - users and computer logon in a Windows AD environment, using an
