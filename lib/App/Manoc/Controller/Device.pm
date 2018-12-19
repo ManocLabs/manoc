@@ -460,7 +460,7 @@ sub ifacecreate : Chained('object') : PathPart('ifacecreate') : Args(0) {
     my ( $self, $c ) = @_;
 
     # device is already in stash
-    $c->forward('/deviceiface/create');
+    $c->visit('/deviceiface/create');
 }
 
 =action ifacepopulate
@@ -473,7 +473,7 @@ sub ifacepopulate : Chained('object') : PathPart('ifacepopulate') : Args(0) {
     my ( $self, $c ) = @_;
 
     # device is already in stash
-    $c->forward('/deviceiface/populate');
+    $c->visit('/deviceiface/populate');
 }
 
 =method get_object
