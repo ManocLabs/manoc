@@ -1,6 +1,8 @@
 Revision history for App-Manoc
 
 {{$NEXT}}
+
+2.99.4    2018-12-19 17:18:21+01:00 Europe/Rome (TRIAL RELEASE)
   - set LC_ALL for controller tests
   - updated requirements
 
