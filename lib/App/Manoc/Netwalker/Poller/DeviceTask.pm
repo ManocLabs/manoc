@@ -349,17 +349,17 @@ sub update {
         return;
     }
 
+    my $do_full_update = 1;
+    if ( $nwinfo->enable_partial_updates ) {
+        my $full_update_interval = $self->config->full_update_interval;
+        my $elapsed_full_update  = $self->timestamp - $nwinfo->last_full_update;
+        $do_full_update = ( $elapsed_full_update >= $full_update_interval );
+    }
+
     $self->update_device_info;
 
     # if full_update_interval is elapsed update interface table
-    my $full_update_interval = $self->config->full_update_interval;
-    my $elapsed_full_update  = $self->timestamp - $nwinfo->last_full_update;
-    if ( $elapsed_full_update >= $full_update_interval ) {
-        $self->update_if_table;
-
-        # update nwinfo
-        $nwinfo->last_full_update( $self->timestamp );
-    }
+    $do_full_update and $self->update_if_table;
 
     # always update CPD info
     $self->update_cdp_neighbors;
@@ -374,6 +374,8 @@ sub update {
 
     $self->reschedule_on_success;
     $nwinfo->last_visited( $self->timestamp );
+    $do_full_update and $nwinfo->last_full_update( $self->timestamp );
+
     $nwinfo->offline(0);
     $nwinfo->update();
 
@@ -501,12 +503,29 @@ sub update_if_table {
 
     my $ifstatus_table = $source->ifstatus_table;
 
+    # apply iface filer
+    if ($iface_filter) {
+        my @filtered;
+
+        foreach my $port ( keys %$ifstatus_table ) {
+            if ( lc($port) =~ /^(vlan|null|unrouted vlan)/o ) {
+                push @filtered, $port;
+            }
+            if ( exists $ifstatus_table->{$port}->{has_device} &&
+                !$ifstatus_table->{$port}->{has_device} )
+            {
+                push @filtered, $port;
+            }
+        }
+        delete @$ifstatus_table{@filtered};
+    }
+
     # delete old infos
     foreach my $interface ( $entry->interfaces ) {
-        $interface->status()->delete;
+        $interface->status and
+            $interface->status()->delete;
 
-        if ( exists $ifstatus_table->{ $interface->name } ) {
-
+        if ( !exists $ifstatus_table->{ $interface->name } ) {
             if ( $interface->autocreated ) {
                 $interface->delete;
             }
@@ -519,8 +538,6 @@ sub update_if_table {
 
     # update
     foreach my $port ( keys %$ifstatus_table ) {
-        $iface_filter && lc($port) =~ /^(vlan|null|unrouted vlan)/o and next;
-
         my $ifstatus = $ifstatus_table->{$port};
         my $interface = $entry->find_or_new_related( interfaces => { name => $port } );
         $interface->nw_confirmed(1);
@@ -532,8 +549,17 @@ sub update_if_table {
             $interface->update();
         }
 
-        # $ifstatus is supposed to have the same fields as DeviceIfStatus
-        $interface->create_related( status => $ifstatus );
+        my @ifstatus_fields = qw(
+            description
+            up  up_admin
+            duplex duplex_admin
+            speed  vlan  stp_state
+            cps_enable  cps_status  cps_count
+        );
+
+        # $ifstatus is supposed to have the same field names of DeviceIfStatus
+        my %ifstatus_entry = map { $_ => $ifstatus->{$_} } @ifstatus_fields;
+        $interface->create_related( status => \%ifstatus_entry );
     }
 }
 

@@ -99,6 +99,12 @@ __PACKAGE__->add_columns(
         default_value => '0',
     },
 
+    enable_partial_updates => {
+        data_type     => 'int',
+        size          => 1,
+        default_value => '0',
+    },
+
     mat_native_vlan_id => {
         data_type     => 'int',
         default_value => '1',

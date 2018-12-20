@@ -35,6 +35,20 @@ has vtp_database => (
 );
 sub _build_vtp_database { }
 
+# each interface is represented by an hash
+# ifstatus_table{}$interface_name} = {
+#     description =>
+#     up => ..
+#     up_admin => ..
+#     duplex => ..
+#     duplex_admin => ..
+#     speed => ..
+#     vlan => ..
+#     stp_state => ..
+#     cps_enable => ..
+#     cps_status => ..
+#     cps_count => ..
+# }
 has 'ifstatus_table' => (
     is      => 'ro',
     isa     => 'Maybe[HashRef]',

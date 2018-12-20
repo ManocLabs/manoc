@@ -67,6 +67,12 @@ has_field 'get_vtp' => (
     label          => 'Download VTP database',
 );
 
+has_field 'enable_partial_updates' => (
+    type           => 'Checkbox',
+    checkbox_value => 1,
+    label          => 'Allow partial updates (for slow devices)',
+);
+
 has_field 'credentials' => (
     type  => 'Select',
     label => 'Credentials',
