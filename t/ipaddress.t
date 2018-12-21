@@ -82,6 +82,9 @@ BEGIN { use_ok 'App::Manoc::IPAddress::IPv4Network' }
     ok( $net, 'Create IPv4 Network with /32 prefix' );
 
     cmp_ok( "$net", 'eq', '1.2.3.4/32', 'stringify' );
+
+    cmp_ok( $net->first_host, 'eq', '1.2.3.4', 'first host' );
+    cmp_ok( $net->last_host,  'eq', '1.2.3.4', 'last host' );
 }
 
 done_testing();
