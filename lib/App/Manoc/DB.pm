@@ -92,8 +92,11 @@ our $DEFAULT_CONFIG = {
         # dbi_attributes
         quote_names => 1,
 
+        sqlite_unicode => 1,
+
         # extra attributes
         AutoCommit => 1,
+
     },
 };
 
