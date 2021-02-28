@@ -12,6 +12,7 @@ Makefile.old
 *.bak
 *.tdy
 *.retry
+/local
 /manoc.db
 /manoc.conf
 /manoc_log.conf
