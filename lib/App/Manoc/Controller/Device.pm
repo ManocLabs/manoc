@@ -30,12 +30,6 @@ use App::Manoc::Form::Cabling;
 use App::Manoc::Form::Uplink;
 use App::Manoc::Form::Device::Decommission;
 
-use App::Manoc::Netwalker::Config;
-use App::Manoc::Netwalker::ControlClient;
-
-# moved  App::Manoc::Netwalker::DeviceUpdater to conditional block in refresh
-# where we need it
-
 __PACKAGE__->config(
     # define PathPart
     action => {
@@ -215,22 +209,27 @@ sub cablings : Chained('object') : PathPart('cablings') : Args(0) {
 
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
-    my $device_id = $c->stash->{object}->id;
 
-    my $config = App::Manoc::Netwalker::Config->new( $c->config->{Netwalker} || {} );
-    my $client = App::Manoc::Netwalker::ControlClient->new( config => $config );
+    my $device = $c->stash->{object};
+    $c->require_permission( $device, 'edit' );
 
-    my $status = $client->enqueue_device($device_id);
+    my $response = {
+        success => 0,
+        device  => $device->id
+    };
 
-    if ( !$status ) {
-        $c->flash( error_msg => "An error occurred while scheduling device refresh" );
+    if ( $c->req->method eq 'POST' &&
+        !$device->decommissioned &&
+        defined( $device->netwalker_info ) )
+    {
+        my $nwinfo = $device->netwalker_info;
+        $nwinfo->scheduled_attempt( time + 5 );
+        $nwinfo->update;
+        $response->{success} = 1;
     }
-    else {
-        $c->flash( message => "Device refresh scheduled" );
-    }
 
-    $c->response->redirect( $c->uri_for_action( '/device/view', [$device_id] ) );
-    $c->detach();
+    $c->stash( json_data => $response );
+    $c->forward('View::JSON');
 }
 
 =action uplinks
@@ -429,8 +428,10 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     my $device = $c->stash->{object};
     $c->require_permission( $device, 'edit' );
 
-    my $response = {};
-    $response->{success} = 0;
+    my $response = {
+        success => 0,
+        device  => $device->id
+    };
 
     if ( !$device->decommissioned &&
         defined( $device->netwalker_info ) &&
@@ -460,7 +461,7 @@ sub ifacecreate : Chained('object') : PathPart('ifacecreate') : Args(0) {
     my ( $self, $c ) = @_;
 
     # device is already in stash
-    $c->forward('/deviceiface/create');
+    $c->visit('/deviceiface/create');
 }
 
 =action ifacepopulate
@@ -473,7 +474,7 @@ sub ifacepopulate : Chained('object') : PathPart('ifacepopulate') : Args(0) {
     my ( $self, $c ) = @_;
 
     # device is already in stash
-    $c->forward('/deviceiface/populate');
+    $c->visit('/deviceiface/populate');
 }
 
 =method get_object

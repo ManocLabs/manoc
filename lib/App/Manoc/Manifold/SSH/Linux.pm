@@ -8,7 +8,8 @@ use Moose;
 with 'App::Manoc::ManifoldRole::SSH',
     'App::Manoc::ManifoldRole::Base',
     'App::Manoc::ManifoldRole::Host',
-    'App::Manoc::ManifoldRole::Hypervisor';
+    'App::Manoc::ManifoldRole::Hypervisor',
+    'App::Manoc::ManifoldRole::NetDevice';
 
 use Try::Tiny;
 use App::Manoc::Utils::Units qw(parse_storage_size);
@@ -230,24 +231,23 @@ sub _build_arp_table {
     my $self = shift;
 
     my %arp_table;
-    my @data;
+
     try {
-        @data = $self->cmd('/sbin/arp -n');
+        my @data = $self->root_cmd('/sbin/arp -n');
 
-    }
-    catch {
-        $self->log->error( 'Error fetching arp table: ', $self->get_error );
-        return;
-    };
-
-    # parse arp table
-    # 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
-    foreach my $line (@data) {
-        if ( $line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
-            my ( $ip, $mac ) = ( $1, $2 );
-            $arp_table{$ip} = $mac;
+        # parse arp table
+        # 192.168.1.1 ether 00:b6:aa:f5:bb:6e C eth1
+        foreach my $line (@data) {
+            if ( $line =~ /([0-9\.]+)\s+ether\s+([a-f0-9:]+)/ ) {
+                my ( $ip, $mac ) = ( $1, $2 );
+                $arp_table{$ip} = $mac;
+            }
         }
     }
+    catch {
+        $self->log->error( 'Error fetching arp table via arp command: ', $self->get_error );
+    };
+
     return \%arp_table;
 }
 
@@ -396,6 +396,68 @@ sub root_cmd {
     return $self->cmd( $opts, @cmd );
 
 }
+
+sub _build_ifstatus_table {
+    my $self = shift;
+    my %ifstatus;
+
+    $self->log->debug("Read info from  /proc/net/dev");
+
+    my @data;
+    try {
+        @data = $self->root_cmd('ls /sys/class/net/');
+    }
+    catch {
+        $self->log->error( 'Error fetching net dev: ', $self->get_error );
+    };
+
+    foreach my $line (@data) {
+        chomp($line);
+        foreach my $name ( split /\s+/, $line ) {
+            my %interface = (
+                description  => '',
+                up           => '',
+                up_admin     => '',
+                duplex       => '',
+                duplex_admin => '',
+                speed        => '',
+                vlan         => 1,
+                stp_state    => '',
+
+                cps_enable => 0,
+                cps_status => 0,
+                cps_count  => 0,
+            );
+            $ifstatus{$name} = \%interface;
+        }
+    }
+
+    foreach my $port ( keys %ifstatus ) {
+        # check physical /sys/class/net/*/device
+        try {
+            my $r = $self->system("ls '/sys/class/net/$port/device'");
+            $ifstatus{$port}{has_device} = $r ? 1 : 0;
+        };
+
+        # parse /sys/class/net/*/operstate
+        try {
+            my $r = $self->cmd("/bin/cat '/sys/class/net/$port/operstate'");
+            chomp($r);
+            $ifstatus{$port}{up} = $r;
+        };
+
+        # parse /sys/class/net/*/speed
+        try {
+            my $r = $self->cmd("/bin/cat '/sys/class/net/$port/speed'");
+            chomp($r);
+            $ifstatus{$port}{speed} = $r;
+        };
+    }
+
+    return \%ifstatus;
+}
+
+sub _build_mat { return {} }
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

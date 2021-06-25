@@ -126,7 +126,8 @@ has _first_host_i => (
 );
 
 sub _build_first_host_i {
-    $_[0]->_address_i + 1;
+    $_[0]->prefix < 31 ? $_[0]->_address_i + 1 :
+        $_[0]->_address_i;
 }
 
 =attr first_host
@@ -154,7 +155,8 @@ has _last_host_i => (
 );
 
 sub _build_last_host_i {
-    $_[0]->_broadcast_i - 1;
+    $_[0]->prefix < 31 ? $_[0]->_broadcast_i - 1 :
+        $_[0]->_broadcast_i;
 }
 
 =attr last_host

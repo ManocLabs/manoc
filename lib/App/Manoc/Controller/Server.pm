@@ -166,22 +166,27 @@ sub nwinfo : Chained('object') : PathPart('nwinfo') : Args(0) {
 
 sub refresh : Chained('object') : PathPart('refresh') : Args(0) {
     my ( $self, $c ) = @_;
-    my $id = $c->stash->{object}->id;
 
-    my $config = App::Manoc::Netwalker::Config->new( $c->config->{Netwalker} || {} );
-    my $client = App::Manoc::Netwalker::ControlClient->new( config => $config );
+    my $server = $c->stash->{object};
+    $c->require_permission( $server, 'edit' );
 
-    my $status = $client->enqueue_server($id);
+    my $response = {
+        success => 0,
+        server  => $server->id
+    };
 
-    if ( !$status ) {
-        $c->flash( error_msg => "An error occurred while scheduling server refresh" );
+    if ( $c->req->method eq 'POST' &&
+        !$server->decommissioned &&
+        defined( $server->netwalker_info ) )
+    {
+        my $nwinfo = $server->netwalker_info;
+        $nwinfo->scheduled_attempt( time + 5 );
+        $nwinfo->update;
+        $response->{success} = 1;
     }
-    else {
-        $c->flash( message => "Device refresh scheduled" );
-    }
 
-    $c->response->redirect( $c->uri_for_action( '/server/view', [$id] ) );
-    $c->detach();
+    $c->stash( json_data => $response );
+    $c->forward('View::JSON');
 }
 
 =action update_from_nwinfo
@@ -194,12 +199,14 @@ sub update_from_nwinfo : Chained('object') : PathPart('from_nwinfo') : Args(0) {
     my $server = $c->stash->{object};
     $c->require_permission( $server, 'edit' );
 
-    my $response = {};
-    $response->{success} = 0;
+    my $response = {
+        success => 0,
+        server  => $server->id
+    };
 
-    if ( !$server->decommissioned &&
-        defined( $server->netwalker_info ) &&
-        $c->req->method eq 'POST' )
+    if ( $c->req->method eq 'POST' &&
+        !$server->decommissioned &&
+        defined( $server->netwalker_info ) )
     {
         my $nwinfo = $server->netwalker_info;
         my $what   = lc( $c->req->params->{what} );

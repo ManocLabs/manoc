@@ -35,8 +35,6 @@ page.title   = 'Device ' _ object.name
       </li>
     </ul>
   </div><!-- end btn group -->
-  <a class="btn btn-default" href="[% c.uri_for_action('/device/refresh', [object.id]) %]">
-    [% bootstrap_icon('refresh') %] Refresh Info</a>
 [% ELSE -%]
 [%# decommissioned object -%]
   <a class="btn btn-primary [% 'disabled' UNLESS c.check_permission(object, 'edit') %]"
@@ -133,9 +131,14 @@ page.title   = 'Device ' _ object.name
 	<dt>VTP domain</dt>
 	<dd>[% nwinfo.vtp_domain | html %]</dd>
 
-	<dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html %]</dd>
-
-	<dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) %]</dd>
+    <dt>Up from</dt><dd>[% date.format(nwinfo.boottime) | html IF nwinfo.boottime %]</dd>
+    <dt>Last visited</dt><dd>[% date.format(nwinfo.last_visited) IF nwinfo.last_visited %]</dd>
+    <dt>Next visit</dt>
+    <dd>
+        [% date.format(nwinfo.scheduled_attempt) %]
+        <a href="#" data-manoc-action="refresh-nwinfo">
+          [% bootstrap_icon('refresh') %]<span class="sr-only">Refresh info</span></a>
+    </dd>
 	<dt>Fetch configuration<dt>
 	<dd>[% nwinfo.get_config ? 'Yes' : 'No' %]</dd>
 	<dt>Fetch ARP table</dt>
@@ -201,6 +204,18 @@ $('a[data-manoc-action="from-nwinfo"]').on( 'click', function (e) {
     url: '[% c.uri_for_action("/device/update_from_nwinfo", [object.id]) %]',
     data: {
       'what': $(this).attr('data-manoc-what'),
+      ['csrf_token']: '[% c.get_token %]'
+    },
+    success: function() {
+        $('#content-wrapper').load(" #content");
+    }
+  });
+});
+
+$('a[data-manoc-action="refresh-nwinfo"]').on( 'click', function (e) {
+  $.post({
+    url: "[% c.uri_for_action('/device/refresh', [object.id]) %]",
+    data: {
       ['csrf_token']: '[% c.get_token %]'
     },
     success: function() {
