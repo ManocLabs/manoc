@@ -1,7 +1,7 @@
-name: learn-github-actions
+name: Push time tests
 on: [push]
 jobs:
-  check-bats-version:
+  run-prove:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -10,3 +10,10 @@ jobs:
           perl-version: '5.34'
       - run: cpanm -n --installdeps .
       - run: prove -lv t
+  perlcritic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gmambro/action-perlcritic@master
+        with:
+          perlcritic_flags: --quiet --profile .perlcriticrc lib/ script/
