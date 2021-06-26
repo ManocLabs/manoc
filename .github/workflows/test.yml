@@ -1,19 +1,33 @@
 name: Push time tests
-on: [push]
+on:
+  - push
+  - pull_request
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref  }}
+  cancel-in-progress: true
+  
 jobs:
   run-prove:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    
+    strategy:
+      matrix:
+        perl:
+          - '5.26' # for Centos
+          - '5.30' # Ubuntu 20.04
+          - '5.34'
     steps:
       - uses: actions/checkout@v2
       - uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: '5.34'
+          perl-version: ${{ matrix.perl }}
       - run: cpanm -n --installdeps .
       - run: prove -lv t
+
   perlcritic:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: gmambro/action-perlcritic@master
+      - uses: Difegue/action-perlcritic@master
         with:
-          perlcritic_flags: --quiet --profile .perlcriticrc lib/ script/
+          args: --quiet --profile .perlcriticrc lib/ script/
