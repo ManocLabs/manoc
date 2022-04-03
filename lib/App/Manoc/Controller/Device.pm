@@ -511,9 +511,9 @@ sub delete_object {
     my $name   = $device->name;
 
     my $has_related_info = $device->interfaces->count() ||
-        $device->uplinks->count()      ||
-        $device->mat_assocs()->count() ||
-        $device->dot11assocs->count()  ||
+        $device->uplinks->count()                       ||
+        $device->mat_assocs()->count()                  ||
+        $device->dot11assocs->count()                   ||
         $device->neighs->count();
 
     if ($has_related_info) {

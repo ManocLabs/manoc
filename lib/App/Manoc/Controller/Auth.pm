@@ -32,7 +32,7 @@ sub login : Local : CaptureArgs(0) {
         $login_redirect ? $c->req->base . $login_redirect :
         $c->uri_for('/search');
 
-    my $form = App::Manoc::Form::Login->new( ctx => $c );
+    my $form    = App::Manoc::Form::Login->new( ctx => $c );
     my $success = $form->process(
         posted => ( $c->req->method eq 'POST' ),
         params => $c->req->params

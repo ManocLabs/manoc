@@ -85,7 +85,7 @@ sub insert {
     my $guard = $self->result_source->schema->txn_scope_guard;
 
     if ( !defined( $self->name ) ) {
-        my $rs = $self->result_source->resultset;
+        my $rs    = $self->result_source->resultset;
         my $count = $rs->search( { serverhw_id => $self->serverhw_id } )->count();
         $self->name("nic$count");
     }

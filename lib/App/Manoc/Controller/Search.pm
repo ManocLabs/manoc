@@ -22,7 +22,7 @@ sub index : Path : Args(0) {
     my $button   = $c->request->param('submit');
     my $advanced = $c->request->param('advanced') || 0;
     my $limit    = $advanced ? $c->request->param('limit') : undef;
-    my $type     = $advanced ? $c->request->param('type') : undef;
+    my $type     = $advanced ? $c->request->param('type')  : undef;
 
     my @search_types = (
         [ 'ipaddr',    'IP' ],

@@ -22,7 +22,7 @@ ok( $schema, "Create schema" );
     );
 
     ok( $arp_rs->register_tuple( %tuple1, timestamp => 1 ), "ARP register tuple" );
-    ok( $arp_rs->search( \%tuple1 )->count == 1, "ARP tuple added" );
+    ok( $arp_rs->search( \%tuple1 )->count == 1,            "ARP tuple added" );
 
     $arp_rs->register_tuple( %tuple1, timestamp => 100, );
 
@@ -51,7 +51,7 @@ ok( $schema, "Create schema" );
     );
 
     ok( $mat_rs->register_tuple( %tuple1, timestamp => 1 ), "MAT register tuple" );
-    ok( $mat_rs->search( \%tuple1 )->count == 1, "MAT tuple added" );
+    ok( $mat_rs->search( \%tuple1 )->count == 1,            "MAT tuple added" );
 
 }
 

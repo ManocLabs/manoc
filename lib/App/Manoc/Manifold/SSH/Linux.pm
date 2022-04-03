@@ -149,7 +149,7 @@ EOS
         ;
 
     my @out = $self->cmd( { stdin_data => $os_script }, "sh" );
-    my $os = $out[0];
+    my $os  = $out[0];
     $os =~ s/\r?\n//o;
     my $ver = $out[1];
     $ver =~ s/\r?\n//o;
@@ -371,7 +371,7 @@ sub root_cmd {
     my $self = shift;
 
     my $opts = ref( $_[0] ) eq 'ARRAY' ? shift : {};
-    my @cmd = @_;
+    my @cmd  = @_;
 
     if ( $self->username ne 'root' ) {
         if ( $self->use_sudo ) {

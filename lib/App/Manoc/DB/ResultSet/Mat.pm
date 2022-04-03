@@ -29,7 +29,7 @@ sub search_multihost {
         { 'archived' => 0 },
         {
             select => [
-                'me.device_id', 'me.interface',
+                'me.device_id',                         'me.interface',
                 { count => { distinct => 'macaddr' } }, 'description',
             ],
 

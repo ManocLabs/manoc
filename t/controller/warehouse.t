@@ -62,7 +62,7 @@ $mech->get('/warehouse');
 $mech->text_contains( 'W01', "New warehouse in the list" );
 
 my $warehouse = $schema->resultset("Warehouse")->find( { name => 'W01' } );
-my $hwasset = $schema->resultset("HWAsset")->create(
+my $hwasset   = $schema->resultset("HWAsset")->create(
     {
         type      => App::Manoc::DB::Result::HWAsset->TYPE_DEVICE,
         vendor    => 'IQ',

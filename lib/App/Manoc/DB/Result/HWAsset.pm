@@ -313,7 +313,7 @@ Mark object as decommissioned.
 =cut
 
 sub decommission {
-    my $self = shift;
+    my $self      = shift;
     my $timestamp = shift || time();
 
     $self->location(LOCATION_DECOMMISSIONED);
@@ -421,8 +421,7 @@ sub display_location {
     my $location = $self->_location;
 
     if ( $location eq LOCATION_WAREHOUSE ) {
-        return
-            defined( $self->warehouse ) ? "Warehouse - " . $self->warehouse->name :
+        return defined( $self->warehouse ) ? "Warehouse - " . $self->warehouse->name :
             "Warehouse";
     }
 

@@ -120,7 +120,7 @@ sub datatable_source : Chained('base') : PathPart('datatable_source') : Args(0) 
     my $sort_column_i = $c->request->param('order[0][column]');
     if ( defined($sort_column_i) ) {
         my $column = $col_names->[$sort_column_i];
-        my $dir = $c->request->param("order[0][dir]") eq 'desc' ? '-desc' : '-asc';
+        my $dir    = $c->request->param("order[0][dir]") eq 'desc' ? '-desc' : '-asc';
 
         $search_attrs->{order_by} = { $dir => $column };
         $c->log->debug("order by $column $dir");

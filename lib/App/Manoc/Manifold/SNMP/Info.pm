@@ -97,7 +97,7 @@ sub _build_community {
 }
 
 sub _build_version {
-    my $self = shift;
+    my $self    = shift;
     my $version = $self->credentials->{snmp_version} || 2;
     $version eq '2c' and $version = 2;
 

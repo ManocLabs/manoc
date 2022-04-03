@@ -24,7 +24,7 @@ our $ADMIN_PASS = $App::Manoc::DB::DEFAULT_ADMIN_PASSWORD;
 
 sub init_manoctest {
 
-    my $lib = dirname( $INC{"ManocTest.pm"} );
+    my $lib         = dirname( $INC{"ManocTest.pm"} );
     my $config_file = File::Spec->catfile( $lib, "manoc_test.conf" );
     -f $config_file or
         BAIL_OUT "Can't find config file $config_file";

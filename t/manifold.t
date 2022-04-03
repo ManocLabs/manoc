@@ -59,7 +59,7 @@ SKIP: {
 
     # Please use a Linux host w/ NetSNMP
 
-    my $host = $ENV{MANOC_TEST_SNMP_HOST};
+    my $host      = $ENV{MANOC_TEST_SNMP_HOST};
     my $community = $ENV{MANOC_TEST_SNMP_COMMUNITY} || 'public';
 
     my $m = App::Manoc::Manifold->new_manifold(

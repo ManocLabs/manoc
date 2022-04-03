@@ -67,7 +67,7 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
     my $device = $self->find_device($c);
     $c->stash( form_parameters => { device_id => $device->id } );
-    $c->stash( title => 'New interface' );
+    $c->stash( title           => 'New interface' );
 };
 
 =action populate
@@ -85,9 +85,9 @@ sub populate : Chained('base') : PathPart('populate') : Args(0) {
     my $form = App::Manoc::Form::DeviceIface::Populate->new( { device => $device, ctx => $c } );
 
     $c->stash(
-        form   => $form,
-        action => $c->uri_for( $c->action, $c->req->captures ),
-        title  => 'Create interface range',
+        form                      => $form,
+        action                    => $c->uri_for( $c->action, $c->req->captures ),
+        title                     => 'Create interface range',
         form_require_post         => 1,    # posted => ($c->req->method eq 'POST'),
         object_form_ajax_add_html => 1,    # enable manoc ajax forms
     );
@@ -116,7 +116,7 @@ sub list_uncabled_js : Chained('base') : PathPart('uncabled') : Args(0) {
     my $q         = $c->req->query_parameters->{'q'};
 
     my $filter;
-    $q and $filter->{name} = { -like => "$q%" };
+    $q         and $filter->{name}      = { -like => "$q%" };
     $device_id and $filter->{device_id} = $device_id;
 
     my @ifaces =

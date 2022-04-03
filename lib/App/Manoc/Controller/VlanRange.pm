@@ -39,7 +39,7 @@ before 'create' => sub {
     my ( $self, $c ) = @_;
 
     my $segment_id = $c->req->query_parameters->{'lansegment'};
-    my $segment = $c->model('ManocDB::LanSegment')->find( { id => $segment_id } );
+    my $segment    = $c->model('ManocDB::LanSegment')->find( { id => $segment_id } );
     $c->stash( form_defaults => { lan_segment => $segment } );
 };
 
@@ -67,8 +67,6 @@ sub view : Chained('object') : PathPart('') : Args(0) {
     my $object = $c->stash->{object};
     $c->response->redirect( $c->uri_for_action( 'vlanrange/edit', [ $object->id ] ) );
 }
-
-=cut
 
 =method delete_object
 

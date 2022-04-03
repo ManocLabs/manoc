@@ -70,7 +70,7 @@ override validate_model => sub {
     my $item = $self->item;
 
     # check for overlapping ranges (excluding self!)
-    my $rs = $self->source->resultset;
+    my $rs      = $self->source->resultset;
     my $overlap = $rs->get_overlap_ranges( $lan_segment_id, $start, $end );
     $overlap = $overlap->search( id => { '<>' => $self->item->id } )
         if $item->in_storage;

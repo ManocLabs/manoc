@@ -127,7 +127,7 @@ sub _get_vlan_list {
 
     return @{ $self->_vlan_list } if $self->_vlan_list;
 
-    my $rs = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
+    my $rs   = $self->schema->resultset('Vlan')->search( {}, { order_by => 'id' } );
     my @list = map +{ value => $_->id, label => $_->name . " (" . $_->id . ")" }, $rs->all();
 
     $self->_vlan_list( \@list );

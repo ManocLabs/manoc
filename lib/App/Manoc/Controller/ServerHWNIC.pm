@@ -65,7 +65,7 @@ sub list_uncabled_js : Chained('base') : PathPart('uncabled') : Args(0) {
     my $q           = $c->req->query_parameters->{'q'};
 
     my $filter;
-    $q and $filter->{name} = { -like => "$q%" };
+    $q           and $filter->{name}             = { -like => "$q%" };
     $server_id   and $filter->{'server.id'}      = $server_id;
     $serverhw_id and $filter->{'me.serverhw_id'} = $serverhw_id;
 

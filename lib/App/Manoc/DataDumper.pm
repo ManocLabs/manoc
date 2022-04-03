@@ -470,7 +470,7 @@ sub save {
 
     my $datadump = App::Manoc::DataDumper::Data->init( $self->filename, $self->version,
         $self->config->{DataDumper} );
-    my $path_to_tar = $self->config->{DataDumper}->{path_to_tar} || undef;
+    my $path_to_tar  = $self->config->{DataDumper}->{path_to_tar} || undef;
     my $source_names = $self->source_names;
 
     foreach my $source_name (@$source_names) {

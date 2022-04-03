@@ -33,8 +33,7 @@ sub get_overlap_ranges {
         lan_segment_id => $lan_segment_id,
     };
 
-    return
-        wantarray ? $self->search($conditions)->all :
+    return wantarray ? $self->search($conditions)->all :
         $self->search_rs($conditions);
 }
 

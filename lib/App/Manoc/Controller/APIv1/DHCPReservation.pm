@@ -63,9 +63,9 @@ sub reservation_post : Chained('base') PathPart('') POST {
             $server->reservations->update( on_server => 0 );
 
             foreach my $r (@$records) {
-                my $macaddr = $r->{macaddr}                                    or next;
-                my $ipaddr  = App::Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
-                my $status  = $r->{server};
+                my $macaddr  = $r->{macaddr}                                    or next;
+                my $ipaddr   = App::Manoc::IPAddress::IPv4->new( $r->{ipaddr} ) or next;
+                my $status   = $r->{server};
                 my $hostname = $r->{hostname};
                 my $name     = $r->{name};
 

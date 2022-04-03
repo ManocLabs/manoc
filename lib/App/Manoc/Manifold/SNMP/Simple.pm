@@ -77,7 +77,7 @@ sub _build_community {
 }
 
 sub _build_version {
-    my $self = shift;
+    my $self    = shift;
     my $version = $self->credentials->{snmp_version} || 2;
 
     my %version_map = (
@@ -168,7 +168,7 @@ subroutine.
 sub has_snmp_scalar {
     my ( $name, %options ) = @_;
 
-    my $oid = $options{oid} or croak "oid attribute is required";
+    my $oid    = $options{oid} or croak "oid attribute is required";
     my $munger = $options{munger};
 
     my $attr_name    = "snmp_$name";
@@ -185,7 +185,7 @@ sub has_snmp_scalar {
         *{$builder_name} = sub {
             my $self = shift;
             $self->_mib_read_scalar( $oid, $munger );
-            }
+        }
     }
 }
 
@@ -223,7 +223,7 @@ sub has_snmp_table {
             *{$builder_name} = sub {
                 my $self = shift;
                 $self->_mib_read_tablerow( $col_oid, $munger );
-                }
+            }
         }
     }
 }
@@ -591,8 +591,8 @@ sub _build_package_name_parser {
 
             # redhat name, version release platform
             $pkg =~ /^(.+)-([^-]+)-([^-]+)\.(.*)$/ and
-                return [ $1,   $2 ];
-            return     [ $pkg, undef ];
+                return [ $1, $2 ];
+            return [ $pkg, undef ];
         };
     }
 

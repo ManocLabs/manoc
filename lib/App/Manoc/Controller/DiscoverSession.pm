@@ -54,7 +54,7 @@ To be used via AJAX. Start, stop or delete a session.
 sub command : Chained('base') : PathPart('command') : POST {
     my ( $self, $c ) = @_;
 
-    my $id = $c->request->body_parameters->{session};
+    my $id      = $c->request->body_parameters->{session};
     my $session = $self->get_object( $c, $id );
     if ( !$session ) {
         $c->detach('/error/http_404');

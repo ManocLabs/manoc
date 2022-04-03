@@ -160,7 +160,7 @@ sub _build_csv_to_db_map {
 }
 
 sub _build_mapped_columns {
-    my $self = shift;
+    my $self           = shift;
     my %mapped_columns = map { $_ => 1 } values %{ $self->csv_to_db_map };
     return \%mapped_columns;
 }
@@ -169,7 +169,7 @@ sub update_model {
     my $self = shift;
 
     my $csv = Text::CSV->new( { binary => 1 } );
-    my $fh = $self->value->{file}->fh;
+    my $fh  = $self->value->{file}->fh;
 
     # get column names from headers
     my $csv_column_names = $csv->getline($fh);

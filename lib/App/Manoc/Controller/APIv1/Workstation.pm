@@ -51,7 +51,7 @@ sub workstation_post : Chained('base') PathPart('discovery') POST {
 
     my $req_data = $c->stash->{api_request_data};
 
-    my $name = $req_data->{server};
+    my $name        = $req_data->{server};
     my $workstation = $c->stash->{resultset}->find( { name => 'name' } );
     if ( !$workstation ) {
         push @{ $c->stash->{api_field_errors} }, "Unknown workstation $name";

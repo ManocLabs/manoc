@@ -226,7 +226,7 @@ sub upgrade_Device {
                 os os_ver boottime vtp_domain
                 vendor model serial
                 mng_url_format
-                )
+            )
         };
     }
 
@@ -443,7 +443,7 @@ sub upgrade_HWAsset {
 
         my $r = {};
         $r->{id}         = $asset_id;
-        $r->{model}      = $_->{model} || 'Unknown';
+        $r->{model}      = $_->{model}  || 'Unknown';
         $r->{vendor}     = $_->{vendor} || 'Unknown';
         $r->{serial}     = $_->{serial};
         $r->{rack_id}    = $_->{rack};
