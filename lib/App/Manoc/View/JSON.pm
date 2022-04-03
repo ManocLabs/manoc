@@ -38,11 +38,7 @@ sub encode_json {
         return;
     }
 
-    my $encoder = JSON::MaybeXS->new(
-        utf8            => 1,
-        allow_blessed   => 1,
-        convert_blessed => 1,
-    );
+    my $encoder = JSON->new()->utf8()->allow_blessed()->convert_blessed();
     return $encoder->encode($data);
 }
 
