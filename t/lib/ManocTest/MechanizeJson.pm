@@ -1,7 +1,7 @@
 package ManocTest::MechanizeJson;
 use Moose::Role;
 
-use JSON::MaybeXS;
+use JSON;
 
 my $TB = Test::Builder->new();
 
@@ -75,7 +75,7 @@ sub post_json_ok {
     }    # parms left
 
     if ( not defined $desc ) {
-        $url = $url->url if ref($url) eq 'WWW::Mechanize::Link';
+        $url  = $url->url if ref($url) eq 'WWW::Mechanize::Link';
         $desc = "POST json $url";
     }
 
