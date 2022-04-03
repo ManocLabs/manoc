@@ -27,15 +27,15 @@ sub manoc_search {
 
     if ( $type eq 'inventory' || $type eq 'device' ) {
         $filter = { name => { -like => $pattern } };
-        $match = sub { shift->name };
+        $match  = sub { shift->name };
     }
     elsif ( $type eq 'address' ) {
         $filter = { 'mng_address' => { -like => $pattern } };
-        $match = sub { shift->mng_address->address };
+        $match  = sub { shift->mng_address->address };
     }
     elsif ( $type eq 'note' ) {
         $filter = { notes => { -like => $pattern } };
-        $match = sub { shift->name };
+        $match  = sub { shift->name };
     }
     else {
         return;

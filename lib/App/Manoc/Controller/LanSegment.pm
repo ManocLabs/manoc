@@ -70,8 +70,6 @@ sub delete_object {
     return $segment->delete;
 }
 
-=cut
-
 __PACKAGE__->meta->make_immutable;
 
 1;

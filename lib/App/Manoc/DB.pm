@@ -34,7 +34,7 @@ __PACKAGE__->load_components(
         Helper::Schema::Verifier::ColumnInfo
         Helper::Schema::Verifier::RelationshipColumnName
         Helper::Schema::Verifier::Parent
-        )
+    )
 );
 
 __PACKAGE__->load_namespaces( default_resultset_class => '+App::Manoc::DB::ResultSet', );
@@ -259,7 +259,7 @@ sub init_roles {
     my $rs = $self->resultset('Role');
 
     my $default_roles = \%App::Manoc::CatalystRole::Permission::DEFAULT_ROLES;
-    my $roles = Catalyst::Utils::merge_hashes( $default_roles, $conf_roles );
+    my $roles         = Catalyst::Utils::merge_hashes( $default_roles, $conf_roles );
 
     foreach my $role ( keys %$roles ) {
         $rs->update_or_create( { role => $role } );

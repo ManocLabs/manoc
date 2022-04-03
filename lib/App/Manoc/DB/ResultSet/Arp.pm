@@ -112,8 +112,8 @@ sub first_last_seen {
     my $rs = $self->search(
         {},
         {
-            select   => [ 'ipaddr', { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
-            as       => [ 'ip_address', 'lastseen', 'firstseen' ],
+            select   => [ 'ipaddr',     { MAX => 'lastseen' }, { MIN => 'firstseen' }, ],
+            as       => [ 'ip_address', 'lastseen',            'firstseen' ],
             group_by => ['ipaddr'],
         }
     );

@@ -88,7 +88,7 @@ has_field 'cabling_interface_val' => (
 sub default_cabling_device_val {
     my ( $self, $field, $item ) = @_;
 
-    $item or return;
+    $item          or return;
     $item->cabling or return;
     return $item->cabling->interface1->device->id;
 }
@@ -96,7 +96,7 @@ sub default_cabling_device_val {
 sub default_cabling_interface_val {
     my ( $self, $field, $item ) = @_;
 
-    $item or return;
+    $item          or return;
     $item->cabling or return;
     return $item->cabling->interface1->id;
 }

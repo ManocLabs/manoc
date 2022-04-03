@@ -22,7 +22,7 @@ has 'search_string' => (
 );
 
 enum 'QueryMatch' => [qw(begin end exact partial)];
-has 'match'       => (
+has 'match' => (
     is     => 'ro',
     isa    => 'QueryMatch',
     writer => '_match',
@@ -228,7 +228,7 @@ sub _guess_query {
 }
 
 sub _build_sql_pattern {
-    my $self = shift;
+    my $self    = shift;
     my $pattern = join( ' ', @{ $self->words } );
     return $pattern if ( !$pattern );
 

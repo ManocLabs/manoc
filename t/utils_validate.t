@@ -13,7 +13,7 @@ BEGIN { use_ok 'App::Manoc::Utils::Validate' }
     $have = App::Manoc::Utils::Validate::validate( 'asd', $rule );
     is_deeply( $have, $want, "Validate scalar value" ) or diag explain $have;
 
-    $rule = { type => 'scalar' };
+    $rule = { type    => 'scalar' };
     $want = { 'error' => 'Expected scalar', 'valid' => 0 };
     $have = App::Manoc::Utils::Validate::validate( [], $rule );
     is_deeply( $have, $want, "Validate bad scalar value" ) or diag explain $have;
@@ -23,7 +23,7 @@ BEGIN { use_ok 'App::Manoc::Utils::Validate' }
     $have = App::Manoc::Utils::Validate::validate( [], $rule );
     is_deeply( $have, $want, "Validate array value" ) or diag explain $have;
 
-    $rule = { type => 'array' };
+    $rule = { type    => 'array' };
     $want = { 'error' => 'Expected array', 'valid' => 0 };
     $have = App::Manoc::Utils::Validate::validate( {}, $rule );
     is_deeply( $have, $want, "Validate bad array value" ) or diag explain $have;
@@ -33,7 +33,7 @@ BEGIN { use_ok 'App::Manoc::Utils::Validate' }
     $have = App::Manoc::Utils::Validate::validate( {}, $rule );
     is_deeply( $have, $want, "Validate hash value" ) or diag explain $have;
 
-    $rule = { type => 'hash' };
+    $rule = { type    => 'hash' };
     $want = { 'error' => 'Expected hash', 'valid' => 0 };
     $have = App::Manoc::Utils::Validate::validate( [], $rule );
     is_deeply( $have, $want, "Validate bad hash value" ) or diag explain $have;

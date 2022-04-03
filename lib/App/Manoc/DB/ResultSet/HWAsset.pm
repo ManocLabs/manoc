@@ -36,7 +36,7 @@ sub unused_devices {
     my $me = $self->current_source_alias;
     my $rs = $self->search(
         {
-            "$me.type" => App::Manoc::DB::Result::HWAsset::TYPE_DEVICE,
+            "$me.type"     => App::Manoc::DB::Result::HWAsset::TYPE_DEVICE,
             "$me.location" =>
                 { '!=' => App::Manoc::DB::Result::HWAsset::LOCATION_DECOMMISSIONED },
             "$me.id" => {

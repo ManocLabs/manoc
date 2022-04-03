@@ -67,7 +67,7 @@ sub mk_compclass {
     my $controller_class = "$helper->{app}::Controller::$model_name";
 
     my $manoc_base_path = canonpath( catdir( $FindBin::Bin, ".." ) );
-    my $manoc_lib_path = catdir( "lib", split( /::/, $helper->{app} ) );
+    my $manoc_lib_path  = catdir( "lib", split( /::/, $helper->{app} ) );
 
     Class::Load::load_class($schema_class);
     my $schema = $schema_class->connect;
@@ -85,7 +85,7 @@ sub mk_compclass {
         my $nullable = $info->{is_nullable};
         my $autoinc  = $info->{is_auto_increment};
 
-        my $allowed = !$autoinc && !( $default && $default =~ /(nextval|sequence|timestamp)/ );
+        my $allowed  = !$autoinc && !( $default && $default =~ /(nextval|sequence|timestamp)/ );
         my $required = ( !$default || !$nullable ) && !$autoinc;
 
         $allowed  and push @{ $params->{create_allows} },   $col;
@@ -103,7 +103,7 @@ sub mk_compclass {
         label        => 1,
     );
     my $form_content = $form_generator->generate_form;
-    my $form_dir = catdir( $manoc_lib_path, "Form" );
+    my $form_dir     = catdir( $manoc_lib_path, "Form" );
     $helper->mk_dir($form_dir);
     my $form_file = catfile( $form_dir, $model_name . ".pm" );
     $helper->mk_file( $form_file, $form_content );

@@ -44,7 +44,7 @@ sub register_tuple {
         croak "No $_ in values" unless $params{$_};
     }
     my $timestamp = $params{timestamp} || time;
-    my %tuple = map { $_ => $params{$_} } @$tuple_columns;
+    my %tuple     = map { $_ => $params{$_} } @$tuple_columns;
 
     my @entries = $self->search(
         {

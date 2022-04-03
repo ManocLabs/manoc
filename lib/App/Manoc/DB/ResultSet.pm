@@ -22,7 +22,7 @@ __PACKAGE__->load_components(
         Helper::ResultSet::SearchOr
         Helper::ResultSet::SetOperations
         Helper::ResultSet::Shortcut
-        }
+    }
 );
 
 1;

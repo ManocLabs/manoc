@@ -513,7 +513,7 @@ Return children ordered by ascending network address
 
 sub children_ordered {
     my $self = shift;
-    my $rs = $self->children->search( {}, { order_by => { -asc => 'address' } } );
+    my $rs   = $self->children->search( {}, { order_by => { -asc => 'address' } } );
 
     return wantarray ? $rs->all : $rs;
 }

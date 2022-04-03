@@ -154,7 +154,7 @@ sub _build_device_set {
 
     # columns are not inflated
     my @addresses = $self->schema->resultset('Device')->get_column('mng_address')->all;
-    my %addr_set = map { App::Manoc::IPAddress::IPv4->new($_)->unpadded => 1 } @addresses;
+    my %addr_set  = map { App::Manoc::IPAddress::IPv4->new($_)->unpadded => 1 } @addresses;
     return \%addr_set;
 }
 
@@ -538,7 +538,7 @@ sub update_if_table {
 
     # update
     foreach my $port ( keys %$ifstatus_table ) {
-        my $ifstatus = $ifstatus_table->{$port};
+        my $ifstatus  = $ifstatus_table->{$port};
         my $interface = $entry->find_or_new_related( interfaces => { name => $port } );
         $interface->nw_confirmed(1);
         if ( !$interface->in_storage ) {

@@ -101,7 +101,7 @@ sub api_form : Private {
     else {
         $c->stash(
             api_field_errors => {
-                errors => $form->form_errors || "",
+                errors       => $form->form_errors || "",
                 field_errors => [ $form->errors_by_name, ],
             }
         );

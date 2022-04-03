@@ -65,7 +65,7 @@ sub prepare_form_json_response : Private {
     my $json_data = {};
     $json_data->{form_ok} = $process_status ? 1 : 0;
     if ( !$process_status ) {
-        $json_data->{errors} = $form->form_errors || "";
+        $json_data->{errors}       = $form->form_errors || "";
         $json_data->{field_errors} = [ $form->errors_by_name, ];
     }
     $c->stash( current_view => 'JSON' );

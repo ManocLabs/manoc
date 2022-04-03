@@ -41,8 +41,8 @@ $hw->delete;
 ok( $hw = $rs->new_result( { %fields, inventory => 'Manoc0001' } ),
     "New result with inventory" );
 ok( $hw->insert(), "Insert" );
-is( $hw->inventory, 'Manoc0001', "Preserve povided inventory" );
-is( $hw->label, 'Manoc0001 (Moon - ShinyBlade)', "label" );
+is( $hw->inventory, 'Manoc0001',                     "Preserve povided inventory" );
+is( $hw->label,     'Manoc0001 (Moon - ShinyBlade)', "label" );
 
 $hw->discard_changes();
 

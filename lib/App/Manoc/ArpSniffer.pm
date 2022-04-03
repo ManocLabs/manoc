@@ -192,9 +192,9 @@ sub handle_arp_packets {
     # use vlan filter
     return if $self->vlan_filter->{$vlan};
 
-    my $arp = NetPacket::ARP->decode( $data, $eth );
+    my $arp      = NetPacket::ARP->decode( $data, $eth );
     my $mac_addr = join( ":", unpack( "(A2)*", $arp->{sha} ) );
-    my $ip_addr = join( ".", unpack( "C4", pack( "H*", $arp->{spa} ) ) );
+    my $ip_addr  = join( ".", unpack( "C4",    pack( "H*", $arp->{spa} ) ) );
 
     my $timestamp = time();
 

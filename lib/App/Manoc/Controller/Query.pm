@@ -71,7 +71,7 @@ sub statistics : Chained('base') : PathPart('statistics') : Args(0) {
             {
             vlan    => $vlan,
             macaddr => $vlan_stats{$vlan}->{macaddr} || 'na',
-            ipaddr  => $vlan_stats{$vlan}->{ipaddr} || 'na',
+            ipaddr  => $vlan_stats{$vlan}->{ipaddr}  || 'na',
             };
     }
 
@@ -126,7 +126,7 @@ sub multihost : Chained('base') : PathPart('multihost') : Args(0) {
         { 'archived' => 0 },
         {
             select => [
-                'me.device', 'me.interface',
+                'me.device',                            'me.interface',
                 { count => { distinct => 'macaddr' } }, 'ifstatus.description',
             ],
 

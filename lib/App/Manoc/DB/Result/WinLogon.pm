@@ -11,7 +11,7 @@ __PACKAGE__->load_components(
     qw(
         +App::Manoc::DB::Helper::Row::TupleArchive
         +App::Manoc::DB::InflateColumn::IPv4
-        )
+    )
 );
 
 __PACKAGE__->table('win_logon');

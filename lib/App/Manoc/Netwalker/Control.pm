@@ -126,7 +126,7 @@ sub _build_session {
                     on_server_error
                     on_client_input
                     on_client_error
-                    )
+                )
             ],
         ],
     );
@@ -207,7 +207,7 @@ sub on_client_input {
 
     my $client = $self->get_client($wheel_id);
 
-    my @tokens = split( /\s+/, $input );
+    my @tokens  = split( /\s+/, $input );
     my $command = lc( shift @tokens );
 
     my $handler = "command_$command";

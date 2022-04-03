@@ -56,8 +56,6 @@ sub admin_password : Chained('object') : PathPart('password') : Args(0) {
     }
 }
 
-=cut
-
 =action change_password
 
 =cut

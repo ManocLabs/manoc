@@ -163,5 +163,3 @@ Data is stored using a SQL database like Postgres or MySQL using DBIx::Class .
 L<Catalyst> L<SNMP::Info> L<Moose>
 
 =cut
-
-=cut
